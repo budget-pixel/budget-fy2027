@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tourist Development Fund CIP Schedules — Walton County FY 2027 Budget</title>
+<title>Strategic Initiatives — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -23,7 +23,7 @@
 <a href="../pages/budget-in-brief.html">Budget-in-Brief</a>
 <a href="../pages/overview-of-walton-county.html">Overview of Walton County</a>
 <a href="../pages/organizational-structure.html">Organizational Structure</a>
-<a href="../pages/strategic-initiatives.html">Strategic Initiatives</a>
+<a href="../pages/strategic-initiatives.html" class="active">Strategic Initiatives</a>
 </div>
 </div>
 <div class="nav-section">
@@ -116,7 +116,7 @@
 <a href="../pages/cip-capital-projects.html">Capital Projects Fund Schedule</a>
 <a href="../pages/cip-grants.html">Grant Funded Schedule</a>
 <a href="../pages/cip-sheriff.html">Sheriff Fund Schedule</a>
-<a href="../pages/cip-tourist-development.html" class="active">Tourist Development Fund Schedule</a>
+<a href="../pages/cip-tourist-development.html">Tourist Development Fund Schedule</a>
 <a href="../pages/cip-transportation.html">Transportation Fund Schedule</a>
 </div>
 </div>
@@ -129,389 +129,526 @@
 
   </aside>
   <main id="content">
+
+<div class="page-eyebrow">Introduction and Overview</div>
+<h1 class="page-title">Strategic Initiatives</h1>
+
 <style>
-    *{
-      box-sizing:border-box;
+  .wc-mission-vision-wrap{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:28px;
+    width:100%;
+    margin:24px auto;
+    box-sizing:border-box;
+  }
+
+  .wc-mission-card{
+    position:relative;
+    overflow:hidden;
+    background:#ffffff;
+    border-radius:28px;
+    padding:18px;
+    box-sizing:border-box;
+
+    box-shadow:
+      0 18px 40px rgba(36,52,77,0.12),
+      0 6px 18px rgba(36,52,77,0.08);
+
+    transition:
+      transform .28s ease,
+      box-shadow .28s ease;
+  }
+
+  .wc-mission-card:hover{
+    transform:translateY(-6px);
+
+    box-shadow:
+      0 24px 52px rgba(36,52,77,0.16),
+      0 10px 24px rgba(36,52,77,0.10);
+  }
+
+  .wc-mission-card img{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:18px;
+  }
+
+  @media(max-width:900px){
+    .wc-mission-vision-wrap{
+      grid-template-columns:1fr;
     }
+  }
+</style><div class="wc-mission-vision-wrap">
 
-    body{
-      margin:0;
-      background:#ffffff;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      overflow-x:hidden;
-    }
+  <div class="wc-mission-card">
+    <img alt="Mission Statement" src="https://stories.opengov.com/countyofwaltonfl/uploads/55ad1c1e7011-Mission.gif">
+  </div>
 
-    .wc-transport-page{
-      width:100%;
-      background:#ffffff;
-    }
+  <div class="wc-mission-card">
+    <img alt="Vision Statement" src="https://stories.opengov.com/countyofwaltonfl/uploads/60b7e99b8b6a-Vision.gif">
+  </div>
 
-    .wc-cip-sticky-nav-shell{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto 18px auto;
-      padding:10px 0 12px 0;
-      background:transparent;
-      box-sizing:border-box;
-    }
-
-    .wc-cip-sticky-nav-shell::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:0;
-      width:100vw;
-      height:4px;
-      transform:translateX(-50%);
-      background:#006231;
-      pointer-events:none;
-    }
-
-    .wc-cip-proxy-nav{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:0;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:0 12px;
-      background:transparent;
-      box-sizing:border-box;
-    }
-
-    .wc-cip-proxy-button,
-    .wc-cip-proxy-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:42px;
-      margin:8px 2px;
-      padding:0 18px;
-      border:0;
-      border-radius:999px;
-      background:transparent;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      text-decoration:none;
-      cursor:pointer;
-      transition:background .22s ease, color .22s ease;
-    }
-
-    .wc-cip-proxy-button:hover,
-    .wc-cip-proxy-link:hover,
-    .wc-cip-proxy-link.is-active{
-      background:#00623114;
-      color:#006231;
-    }
-
-    .wc-cip-proxy-link.wc-cip-proxy-search{
-      margin-left:8px;
-      background:#006231;
-      color:#ffffff;
-    }
-
-    .wc-cip-proxy-link.wc-cip-proxy-search:hover{
-      background:#004f28;
-      color:#ffffff;
-    }
-
-    .wc-transport-hero{
-      position:relative;
-      width:100%;
-      min-height:440px;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:72px 28px;
-      background:
-        linear-gradient(90deg,rgba(6,32,45,0.84) 0%,rgba(4,48,38,0.62) 48%,rgba(10,42,59,0.36) 100%),
-        url("https://stories.opengov.com/countyofwaltonfl/uploads/4f9ae2ab7bae-Picture1222.jpg&q") center center / cover no-repeat;
-    }
-
-    .wc-transport-title-box{
-      width:100%;
-      max-width:1100px;
-      text-align:center;
-      color:#ffffff;
-    }
-
-    .wc-transport-title-box span{
-      display:block;
-      margin-bottom:16px;
-      color:#f1dc94;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      text-shadow:0 2px 10px rgba(0,0,0,0.34);
-    }
-
-    .wc-transport-title-box h1{
-      margin:0;
-      font-size:clamp(42px, 5vw, 74px);
-      line-height:1.05;
-      font-weight:800;
-      color:#ffffff;
-      text-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        0 4px 10px rgba(0,0,0,.25);
-    }
-
-    .wc-transport-title-box h1::after{
-      content:"";
-      display:block;
-      width:118px;
-      height:5px;
-      margin:24px auto 0 auto;
-      border-radius:999px;
-      background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
-      box-shadow:0 0 18px rgba(209,190,120,0.36);
-    }
-
-    .wc-transport-content{
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:42px 28px 64px 28px;
-    }
-
-    .wc-year-table-block{
-      margin-top:34px;
-    }
-
-    .wc-year-table-heading{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:20px;
-      margin-bottom:14px;
-      padding-bottom:12px;
-      border-bottom:4px solid #006231;
-    }
-
-    .wc-year-table-heading h2{
-      margin:0;
-      color:#172033;
-      font-size:30px;
-      line-height:1.15;
-      font-weight:800;
-    }
-
-    .wc-year-table-heading strong{
-      color:#006231;
-      font-size:22px;
-      white-space:nowrap;
-    }
-
-    .wc-table-wrap{
-      width:100%;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      border:1px solid rgba(209,190,120,0.45);
-      border-radius:24px;
-      background:#ffffff;
-      box-shadow:
-        0 14px 34px rgba(0,98,49,0.08),
-        0 4px 12px rgba(36,52,77,0.06);
-    }
-
-    .wc-transport-table{
-      width:100%;
-      min-width:940px;
-      border-collapse:separate;
-      border-spacing:0;
-      background:#ffffff;
-      font-size:14px;
-    }
-
-    .wc-transport-table th{
-      padding:12px 14px;
-      border:0;
-      border-bottom:4px solid #d1be78;
-      background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
-      color:#ffffff;
-      font-size:14px;
-      font-weight:700;
-      text-align:center;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table td{
-      padding:12px 14px;
-      border:0;
-      border-bottom:1px solid rgba(36,52,77,0.10);
-      color:#344054;
-      font-size:14px;
-      line-height:1.45;
-      text-align:center;
-      vertical-align:middle;
-      background:#ffffff;
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td{
-      background:rgba(0,98,49,0.04);
-    }
-
-    .wc-transport-table tbody tr:hover td{
-      background:rgba(209,190,120,0.18);
-    }
-
-    .wc-transport-table td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      background:#ffffff;
-      background-clip:padding-box;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      color:#172033;
-      font-weight:700;
-    }
-
-    .wc-transport-table thead th:first-child{
-      position:sticky;
-      left:0;
-      z-index:12;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td:first-child{
-      background:#f5f9f7;
-    }
-
-    .wc-transport-table tbody tr:hover td:first-child{
-      background:#f8f2dc;
-    }
-
-    .wc-transport-table .amount{
-      text-align:right;
-      font-weight:800;
-      color:#172033;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table tfoot td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-      color:#172033;
-      font-weight:700;
-      border-bottom:0;
-      padding:13px 14px;
-    }
-
-    .wc-transport-table tfoot tr:hover td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-transport-table tfoot td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-empty-message{
-      padding:38px 20px;
-      text-align:center;
-      color:#667085;
-      font-weight:700;
-    }
-
-    @media(max-width:700px){
-      .wc-transport-hero{
-        min-height:360px;
-        padding:54px 18px;
-      }
-
-      .wc-transport-content{
-        padding:34px 14px 48px 14px;
-      }
-
-      .wc-cip-proxy-nav{
-        justify-content:flex-start;
-        flex-wrap:nowrap;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:none;
-        padding:0 8px;
-      }
-
-      .wc-cip-proxy-nav::-webkit-scrollbar{
-        display:none;
-      }
-
-      .wc-cip-proxy-button,
-      .wc-cip-proxy-link{
-        flex:0 0 auto;
-        min-height:40px;
-        padding:0 13px;
-        font-size:12px;
-        white-space:nowrap;
-      }
-
-      .wc-year-table-heading{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:8px;
-      }
-
-      .wc-year-table-heading h2{
-        font-size:25px;
-      }
-
-    }
-
-</style>
-<main class="wc-transport-page">
-  <div class="wc-cip-sticky-nav-shell">
-  <nav class="wc-cip-proxy-nav" aria-label="Capital Improvement Plan navigation">
-    <a class="wc-cip-proxy-link" href="capital-improvement-plan.html">Overview</a>
-<a class="wc-cip-proxy-link" href="cip-transportation.html">Transportation</a>
-<a class="wc-cip-proxy-link" href="cip-capital-projects.html">Capital Fund</a>
-<a class="wc-cip-proxy-link" href="cip-sheriff.html">Sheriff</a>
-<a class="wc-cip-proxy-link is-active" href="cip-tourist-development.html">Tourist Development</a>
-<a class="wc-cip-proxy-link" href="cip-grants.html">Grants</a>
-<a class="wc-cip-proxy-link wc-cip-proxy-search" href="search.html">Project Search</a>
-
-  </nav>
 </div>
-  <section class="wc-transport-hero" style="background:linear-gradient(135deg,#06202d 0%,#043026 55%,#0a2a3b 100%);">
-    <div class="wc-transport-title-box">
-      <span>Walton County, Florida</span>
-      <h1>Tourist Development Fund CIP Schedules</h1>
-    </div>
-  </section>
-  <section class="wc-transport-content">
-    <div id="touristTables"></div>
-  </section>
-</main>
-<script src="../assets/walton-cip-projects.js"></script>
-<script src="../assets/walton-cip-fund-schedule.js"></script>
-<script>
-  renderFundSchedule({funding:"tourist development fund", mountId:"touristTables", label:"Tourist Development Fund"});
+
+<style>
+/* Walton County soft green chart card wrapper */
+.media-block[data-media-type="chart"],
+.media-block[data-media-type="chartTile"],
+.media-block[data-media-type="visualization"],
+.media-block[data-media-type="tile"],
+.media-block:has(.highcharts-container){
+  position:relative !important;
+  background:linear-gradient(180deg,#ffffff 0%,#eef7f1 100%) !important;
+  border:1px solid rgba(0,98,49,0.28) !important;
+  border-radius:24px !important;
+  padding:24px !important;
+  box-sizing:border-box !important;
+  box-shadow:
+    0 14px 34px rgba(0,98,49,0.08),
+    0 4px 12px rgba(36,52,77,0.06) !important;
+  overflow:visible !important;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+
+.media-block[data-media-type="chart"]:hover,
+.media-block[data-media-type="chartTile"]:hover,
+.media-block[data-media-type="visualization"]:hover,
+.media-block[data-media-type="tile"]:hover,
+.media-block:has(.highcharts-container):hover{
+  transform:translateY(-4px);
+  border-color:rgba(0,98,49,0.42) !important;
+  box-shadow:
+    0 20px 44px rgba(0,98,49,0.14),
+    0 8px 18px rgba(36,52,77,0.08) !important;
+}
+
+.media-block[data-media-type="chart"] *,
+.media-block[data-media-type="chartTile"] *,
+.media-block[data-media-type="visualization"] *,
+.media-block[data-media-type="tile"] *,
+.media-block:has(.highcharts-container) *{
+  box-sizing:border-box !important;
+}
+
+.media-block[data-media-type="chart"] .chartContainer__hvXPi,
+.media-block[data-media-type="chartTile"] .chartContainer__hvXPi,
+.media-block[data-media-type="visualization"] .chartContainer__hvXPi,
+.media-block[data-media-type="tile"] .chartContainer__hvXPi,
+.media-block:has(.highcharts-container) .chartContainer__hvXPi,
+.media-block[data-media-type="chart"] [class*="chartContainer"],
+.media-block[data-media-type="chartTile"] [class*="chartContainer"],
+.media-block[data-media-type="visualization"] [class*="chartContainer"],
+.media-block[data-media-type="tile"] [class*="chartContainer"],
+.media-block:has(.highcharts-container) [class*="chartContainer"]{
+  background:transparent !important;
+  border-radius:16px !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+
+.media-block[data-media-type="chart"] .reportingChartContainer__o97\+-,
+.media-block[data-media-type="chartTile"] .reportingChartContainer__o97\+-,
+.media-block[data-media-type="visualization"] .reportingChartContainer__o97\+-,
+.media-block[data-media-type="tile"] .reportingChartContainer__o97\+-,
+.media-block:has(.highcharts-container) .reportingChartContainer__o97\+-,
+.media-block[data-media-type="chart"] [class*="reportingChartContainer"],
+.media-block[data-media-type="chartTile"] [class*="reportingChartContainer"],
+.media-block[data-media-type="visualization"] [class*="reportingChartContainer"],
+.media-block[data-media-type="tile"] [class*="reportingChartContainer"],
+.media-block:has(.highcharts-container) [class*="reportingChartContainer"]{
+  background:transparent !important;
+  border-radius:16px !important;
+  overflow:visible !important;
+}
+
+.media-block[data-media-type="chart"] .highcharts-container,
+.media-block[data-media-type="chartTile"] .highcharts-container,
+.media-block[data-media-type="visualization"] .highcharts-container,
+.media-block[data-media-type="tile"] .highcharts-container,
+.media-block:has(.highcharts-container) .highcharts-container,
+.media-block[data-media-type="chart"] svg.highcharts-root,
+.media-block[data-media-type="chartTile"] svg.highcharts-root,
+.media-block[data-media-type="visualization"] svg.highcharts-root,
+.media-block[data-media-type="tile"] svg.highcharts-root,
+.media-block:has(.highcharts-container) svg.highcharts-root{
+  border-radius:16px !important;
+  overflow:hidden !important;
+}
+
+.media-block[data-media-type="chart"] .footer__fRygO,
+.media-block[data-media-type="chartTile"] .footer__fRygO,
+.media-block[data-media-type="visualization"] .footer__fRygO,
+.media-block[data-media-type="tile"] .footer__fRygO,
+.media-block:has(.highcharts-container) .footer__fRygO,
+.media-block[data-media-type="chart"] [class*="footer"],
+.media-block[data-media-type="chartTile"] [class*="footer"],
+.media-block[data-media-type="visualization"] [class*="footer"],
+.media-block[data-media-type="tile"] [class*="footer"],
+.media-block:has(.highcharts-container) [class*="footer"]{
+  color:#43516a !important;
+  background:transparent !important;
+  padding:10px 4px 0 !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+}
+
+.media-block[data-media-type="chart"] .footer__fRygO span,
+.media-block[data-media-type="chartTile"] .footer__fRygO span,
+.media-block[data-media-type="visualization"] .footer__fRygO span,
+.media-block[data-media-type="tile"] .footer__fRygO span,
+.media-block:has(.highcharts-container) .footer__fRygO span,
+.media-block[data-media-type="chart"] [class*="footer"] span,
+.media-block[data-media-type="chartTile"] [class*="footer"] span,
+.media-block[data-media-type="visualization"] [class*="footer"] span,
+.media-block[data-media-type="tile"] [class*="footer"] span,
+.media-block:has(.highcharts-container) [class*="footer"] span{
+  color:#43516a !important;
+}
+
+@media(max-width:700px){
+  .media-block[data-media-type="chart"],
+  .media-block[data-media-type="chartTile"],
+  .media-block[data-media-type="visualization"],
+  .media-block[data-media-type="tile"],
+  .media-block:has(.highcharts-container){
+    border-radius:20px !important;
+    padding:16px !important;
+  }
+}
+
+/* Walton County branded Highcharts pie styling */
+.highcharts-root{
+  font-family:Arial, Helvetica, sans-serif !important;
+}
+
+.highcharts-background{
+  fill:#ffffff !important;
+  stroke:none !important;
+  stroke-width:0 !important;
+  rx:16 !important;
+  ry:16 !important;
+}
+
+.highcharts-title{
+  fill:#172033 !important;
+  color:#172033 !important;
+  font-size:18px !important;
+  font-weight:900 !important;
+  letter-spacing:.01em !important;
+}
+
+.highcharts-subtitle{
+  fill:#43516a !important;
+  color:#43516a !important;
+  font-size:13px !important;
+  line-height:1.4 !important;
+}
+
+.highcharts-series.highcharts-pie-series .highcharts-point{
+  stroke:#ffffff !important;
+  stroke-width:2px !important;
+  filter:drop-shadow(0 4px 8px rgba(36,52,77,.12));
+  transition:opacity .2s ease;
+}
+
+.highcharts-series.highcharts-pie-series .highcharts-point:hover,
+.highcharts-series.highcharts-pie-series .highcharts-point.highcharts-point-hover{
+  opacity:.92 !important;
+}
+
+.highcharts-data-label text,
+.highcharts-data-label tspan{
+  fill:#24344d !important;
+  color:#24344d !important;
+  font-size:10px !important;
+  font-weight:600 !important;
+}
+
+.highcharts-data-label tspan[style*="font-weight: bold"],
+.highcharts-data-label tspan[style*="font-weight:bold"]{
+  fill:#006231 !important;
+  color:#006231 !important;
+  font-weight:900 !important;
+}
+
+.highcharts-text-outline{
+  stroke:#ffffff !important;
+  stroke-width:4px !important;
+}
+
+.highcharts-data-label-connector{
+  stroke-width:1.5px !important;
+  opacity:.85 !important;
+}
+
+.highcharts-legend{
+  display:none !important;
+}
+
+.highcharts-legend text{
+  fill:#24344d !important;
+  color:#24344d !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+}
+
+.highcharts-legend-item rect.highcharts-point{
+  rx:999 !important;
+  ry:999 !important;
+}
+
+.highcharts-exporting-group,
+.highcharts-credits{
+  display:none !important;
+}
+
+.highcharts-root text[style*="font-size: 18px"]{
+  fill:#006231 !important;
+  color:#006231 !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+}
+
+.highcharts-root text[style*="font-size: 12px"]{
+  fill:#d1be78 !important;
+  color:#d1be78 !important;
+  font-weight:800 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+}
+
+@media(max-width:768px){
+  .highcharts-title{
+    font-size:15px !important;
+  }
+
+  .highcharts-subtitle{
+    font-size:11px !important;
+  }
+
+  .highcharts-data-label text,
+  .highcharts-data-label tspan{
+    font-size:9px !important;
+  }
+
+  .highcharts-legend text{
+    font-size:10px !important;
+  }
+}
+</style><script>
+(function(){
+  const wcPieColors = [
+    '#006231',
+    '#d1be78',
+    '#097fbb',
+    '#0b7741',
+    '#8a7640',
+    '#24344d'
+  ];
+
+  function shouldStyleChart(svg){
+    const title = svg.querySelector('.highcharts-title');
+    const titleText = title ? title.textContent.trim().toLowerCase() : '';
+
+    return !titleText || titleText.indexOf('initiatives') !== -1;
+  }
+
+  function forceFill(element,color){
+    element.setAttribute('fill',color);
+    element.style.fill = color;
+  }
+
+  function forceStroke(element,color,width){
+    element.setAttribute('stroke',color);
+    element.style.stroke = color;
+
+    if(width){
+      element.setAttribute('stroke-width',width);
+      element.style.strokeWidth = width + 'px';
+    }
+  }
+
+  function improvePieLayout(svg){
+    const pieGroup = svg.querySelector('.highcharts-series.highcharts-pie-series');
+    const labelGroup = svg.querySelector('.highcharts-data-labels.highcharts-pie-series');
+
+    if(!pieGroup || !labelGroup){
+      return;
+    }
+
+    let box;
+
+    try{
+      box = pieGroup.getBBox();
+    }
+    catch(error){
+      return;
+    }
+
+    const centerX = box.x + (box.width / 2);
+    const centerY = box.y + (box.height / 2);
+    const scale = 1.14;
+
+    const svgWidth = svg.viewBox && svg.viewBox.baseVal
+      ? svg.viewBox.baseVal.width
+      : svg.getBoundingClientRect().width;
+
+    const desiredCenterX = (svgWidth * 0.5);
+    const shiftX = desiredCenterX - centerX;
+
+    if(!pieGroup.dataset.wcBaseTransform){
+      pieGroup.dataset.wcBaseTransform = pieGroup.getAttribute('transform') || '';
+    }
+
+    pieGroup.setAttribute(
+      'transform',
+      pieGroup.dataset.wcBaseTransform +
+      ' translate(' + shiftX + ' 0)' +
+      ' translate(' + centerX + ' ' + centerY + ')' +
+      ' scale(' + scale + ')' +
+      ' translate(' + (-centerX) + ' ' + (-centerY) + ')'
+    );
+
+    labelGroup.querySelectorAll('.highcharts-label').forEach(function(label){
+      const currentTransform = label.getAttribute('transform') || '';
+      const match = currentTransform.match(/translate\(([-0-9.]+),?\s*([-0-9.]+)\)/);
+
+      if(!match){
+        return;
+      }
+
+      if(!label.dataset.wcOriginalX){
+        label.dataset.wcOriginalX = match[1];
+        label.dataset.wcOriginalY = match[2];
+      }
+
+      const originalX = parseFloat(label.dataset.wcOriginalX);
+      const originalY = parseFloat(label.dataset.wcOriginalY);
+      const tightenedX = centerX + ((originalX - centerX) * .88) + shiftX;
+      const tightenedY = centerY + ((originalY - centerY) * .88);
+
+      label.setAttribute('transform','translate(' + tightenedX + ',' + tightenedY + ')');
+    });
+  }
+
+  function styleWaltonPieCharts(){
+    document.querySelectorAll('svg.highcharts-root').forEach(function(svg){
+      if(!shouldStyleChart(svg)){
+        return;
+      }
+
+      const background = svg.querySelector('.highcharts-background');
+      if(background){
+        forceFill(background,'#ffffff');
+        forceStroke(background,'none','0');
+        background.setAttribute('rx','16');
+        background.setAttribute('ry','16');
+      }
+
+      svg.querySelectorAll('.highcharts-series.highcharts-pie-series .highcharts-point').forEach(function(point,index){
+        const color = wcPieColors[index % wcPieColors.length];
+        forceFill(point,color);
+        forceStroke(point,'#ffffff','2');
+      });
+
+      svg.querySelectorAll('.highcharts-data-label-connector').forEach(function(connector,index){
+        const color = wcPieColors[index % wcPieColors.length];
+        forceStroke(connector,color,'1.5');
+        connector.setAttribute('opacity','.85');
+      });
+
+      svg.querySelectorAll('.highcharts-data-label text').forEach(function(label){
+        label.setAttribute('fill','#24344d');
+        label.style.fill = '#24344d';
+        label.style.color = '#24344d';
+        label.style.fontWeight = '600';
+      });
+
+      svg.querySelectorAll('.highcharts-data-label .highcharts-text-outline').forEach(function(outline){
+        forceStroke(outline,'#ffffff','4');
+      });
+
+      svg.querySelectorAll('text').forEach(function(textNode){
+        if(textNode.textContent && textNode.textContent.trim().toUpperCase() === 'GOAL'){
+          textNode.textContent = 'TOTAL INITIATIVE FUNDING';
+          textNode.style.fontSize = '11px';
+          textNode.style.letterSpacing = '.08em';
+          textNode.style.fontWeight = '900';
+          textNode.style.fill = '#d1be78';
+          textNode.style.color = '#d1be78';
+        }
+      });
+
+      if(svg.dataset.wcLayoutAdjusted !== 'true'){
+        improvePieLayout(svg);
+        svg.dataset.wcLayoutAdjusted = 'true';
+      }
+    });
+  }
+
+  function bindChartHoverFixes(){
+    document.querySelectorAll('svg.highcharts-root').forEach(function(svg){
+      if(svg.dataset.wcHoverBound === 'true'){
+        return;
+      }
+
+      svg.addEventListener('mouseenter',function(){
+        window.clearTimeout(svg.wcHoverTimer);
+        svg.wcHoverTimer = window.setTimeout(styleWaltonPieCharts,80);
+      });
+
+      svg.addEventListener('mouseleave',function(){
+        window.clearTimeout(svg.wcHoverTimer);
+        svg.wcHoverTimer = window.setTimeout(styleWaltonPieCharts,80);
+      });
+
+      svg.dataset.wcHoverBound = 'true';
+    });
+  }
+
+  function run(){
+    styleWaltonPieCharts();
+    bindChartHoverFixes();
+  }
+
+  function observeCharts(){
+    let observerTimer;
+
+    const observer = new MutationObserver(function(mutations){
+      const shouldRun = mutations.some(function(mutation){
+        return mutation.addedNodes && mutation.addedNodes.length;
+      });
+
+      if(!shouldRun){
+        return;
+      }
+
+      window.clearTimeout(observerTimer);
+      observerTimer = window.setTimeout(run,150);
+    });
+
+    observer.observe(document.body,{
+      childList:true,
+      subtree:true
+    });
+  }
+
+  run();
+  observeCharts();
+  setTimeout(run,600);
+  setTimeout(run,1800);
+})();
 </script>
+
 <nav class="page-nav" aria-label="Page navigation">
-  <a class="prev" href="cip-sheriff.html">Sheriff Fund Schedule</a>
-  <a class="next" href="cip-transportation.html">Transportation Fund Schedule</a>
+  <a class="prev" href="organizational-structure.html">Organizational Structure</a>
+  <a class="next" href="budget-process-and-calendar.html">Budget Process &amp; Calendar</a>
 </nav>
   </main>
 </div>

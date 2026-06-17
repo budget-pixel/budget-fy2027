@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tourist Development Fund CIP Schedules — Walton County FY 2027 Budget</title>
+<title>Financial Forecast — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -107,7 +107,7 @@
   <button class="nav-section-toggle">Capital, Debt, and Financial Forecast<span class="arrow">▶</span></button>
   <div class="nav-section-links"><a href="../pages/capital-improvement-plan.html">Capital Improvement Plan</a>
 <a href="../pages/debt-overview.html">Debt Overview</a>
-<a href="../pages/financial-forecast.html">Financial Forecast</a>
+<a href="../pages/financial-forecast.html" class="active">Financial Forecast</a>
 </div>
 </div>
 <div class="nav-section">
@@ -116,7 +116,7 @@
 <a href="../pages/cip-capital-projects.html">Capital Projects Fund Schedule</a>
 <a href="../pages/cip-grants.html">Grant Funded Schedule</a>
 <a href="../pages/cip-sheriff.html">Sheriff Fund Schedule</a>
-<a href="../pages/cip-tourist-development.html" class="active">Tourist Development Fund Schedule</a>
+<a href="../pages/cip-tourist-development.html">Tourist Development Fund Schedule</a>
 <a href="../pages/cip-transportation.html">Transportation Fund Schedule</a>
 </div>
 </div>
@@ -129,389 +129,158 @@
 
   </aside>
   <main id="content">
-<style>
-    *{
-      box-sizing:border-box;
-    }
 
-    body{
-      margin:0;
-      background:#ffffff;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      overflow-x:hidden;
-    }
+<div class="page-eyebrow">Capital, Debt, and Financial Forecast</div>
+<h1 class="page-title">Financial Forecast</h1>
 
-    .wc-transport-page{
-      width:100%;
-      background:#ffffff;
-    }
-
-    .wc-cip-sticky-nav-shell{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto 18px auto;
-      padding:10px 0 12px 0;
-      background:transparent;
-      box-sizing:border-box;
-    }
-
-    .wc-cip-sticky-nav-shell::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:0;
-      width:100vw;
-      height:4px;
-      transform:translateX(-50%);
-      background:#006231;
-      pointer-events:none;
-    }
-
-    .wc-cip-proxy-nav{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:0;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:0 12px;
-      background:transparent;
-      box-sizing:border-box;
-    }
-
-    .wc-cip-proxy-button,
-    .wc-cip-proxy-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:42px;
-      margin:8px 2px;
-      padding:0 18px;
-      border:0;
-      border-radius:999px;
-      background:transparent;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      text-decoration:none;
-      cursor:pointer;
-      transition:background .22s ease, color .22s ease;
-    }
-
-    .wc-cip-proxy-button:hover,
-    .wc-cip-proxy-link:hover,
-    .wc-cip-proxy-link.is-active{
-      background:#00623114;
-      color:#006231;
-    }
-
-    .wc-cip-proxy-link.wc-cip-proxy-search{
-      margin-left:8px;
-      background:#006231;
-      color:#ffffff;
-    }
-
-    .wc-cip-proxy-link.wc-cip-proxy-search:hover{
-      background:#004f28;
-      color:#ffffff;
-    }
-
-    .wc-transport-hero{
-      position:relative;
-      width:100%;
-      min-height:440px;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:72px 28px;
-      background:
-        linear-gradient(90deg,rgba(6,32,45,0.84) 0%,rgba(4,48,38,0.62) 48%,rgba(10,42,59,0.36) 100%),
-        url("https://stories.opengov.com/countyofwaltonfl/uploads/4f9ae2ab7bae-Picture1222.jpg&q") center center / cover no-repeat;
-    }
-
-    .wc-transport-title-box{
-      width:100%;
-      max-width:1100px;
-      text-align:center;
-      color:#ffffff;
-    }
-
-    .wc-transport-title-box span{
-      display:block;
-      margin-bottom:16px;
-      color:#f1dc94;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      text-shadow:0 2px 10px rgba(0,0,0,0.34);
-    }
-
-    .wc-transport-title-box h1{
-      margin:0;
-      font-size:clamp(42px, 5vw, 74px);
-      line-height:1.05;
-      font-weight:800;
-      color:#ffffff;
-      text-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        0 4px 10px rgba(0,0,0,.25);
-    }
-
-    .wc-transport-title-box h1::after{
-      content:"";
-      display:block;
-      width:118px;
-      height:5px;
-      margin:24px auto 0 auto;
-      border-radius:999px;
-      background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
-      box-shadow:0 0 18px rgba(209,190,120,0.36);
-    }
-
-    .wc-transport-content{
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:42px 28px 64px 28px;
-    }
-
-    .wc-year-table-block{
-      margin-top:34px;
-    }
-
-    .wc-year-table-heading{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:20px;
-      margin-bottom:14px;
-      padding-bottom:12px;
-      border-bottom:4px solid #006231;
-    }
-
-    .wc-year-table-heading h2{
-      margin:0;
-      color:#172033;
-      font-size:30px;
-      line-height:1.15;
-      font-weight:800;
-    }
-
-    .wc-year-table-heading strong{
-      color:#006231;
-      font-size:22px;
-      white-space:nowrap;
-    }
-
-    .wc-table-wrap{
-      width:100%;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      border:1px solid rgba(209,190,120,0.45);
-      border-radius:24px;
-      background:#ffffff;
-      box-shadow:
-        0 14px 34px rgba(0,98,49,0.08),
-        0 4px 12px rgba(36,52,77,0.06);
-    }
-
-    .wc-transport-table{
-      width:100%;
-      min-width:940px;
-      border-collapse:separate;
-      border-spacing:0;
-      background:#ffffff;
-      font-size:14px;
-    }
-
-    .wc-transport-table th{
-      padding:12px 14px;
-      border:0;
-      border-bottom:4px solid #d1be78;
-      background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
-      color:#ffffff;
-      font-size:14px;
-      font-weight:700;
-      text-align:center;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table td{
-      padding:12px 14px;
-      border:0;
-      border-bottom:1px solid rgba(36,52,77,0.10);
-      color:#344054;
-      font-size:14px;
-      line-height:1.45;
-      text-align:center;
-      vertical-align:middle;
-      background:#ffffff;
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td{
-      background:rgba(0,98,49,0.04);
-    }
-
-    .wc-transport-table tbody tr:hover td{
-      background:rgba(209,190,120,0.18);
-    }
-
-    .wc-transport-table td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      background:#ffffff;
-      background-clip:padding-box;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      color:#172033;
-      font-weight:700;
-    }
-
-    .wc-transport-table thead th:first-child{
-      position:sticky;
-      left:0;
-      z-index:12;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td:first-child{
-      background:#f5f9f7;
-    }
-
-    .wc-transport-table tbody tr:hover td:first-child{
-      background:#f8f2dc;
-    }
-
-    .wc-transport-table .amount{
-      text-align:right;
-      font-weight:800;
-      color:#172033;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table tfoot td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-      color:#172033;
-      font-weight:700;
-      border-bottom:0;
-      padding:13px 14px;
-    }
-
-    .wc-transport-table tfoot tr:hover td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-transport-table tfoot td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-empty-message{
-      padding:38px 20px;
-      text-align:center;
-      color:#667085;
-      font-weight:700;
-    }
-
-    @media(max-width:700px){
-      .wc-transport-hero{
-        min-height:360px;
-        padding:54px 18px;
-      }
-
-      .wc-transport-content{
-        padding:34px 14px 48px 14px;
-      }
-
-      .wc-cip-proxy-nav{
-        justify-content:flex-start;
-        flex-wrap:nowrap;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:none;
-        padding:0 8px;
-      }
-
-      .wc-cip-proxy-nav::-webkit-scrollbar{
-        display:none;
-      }
-
-      .wc-cip-proxy-button,
-      .wc-cip-proxy-link{
-        flex:0 0 auto;
-        min-height:40px;
-        padding:0 13px;
-        font-size:12px;
-        white-space:nowrap;
-      }
-
-      .wc-year-table-heading{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:8px;
-      }
-
-      .wc-year-table-heading h2{
-        font-size:25px;
-      }
-
-    }
-
-</style>
-<main class="wc-transport-page">
-  <div class="wc-cip-sticky-nav-shell">
-  <nav class="wc-cip-proxy-nav" aria-label="Capital Improvement Plan navigation">
-    <a class="wc-cip-proxy-link" href="capital-improvement-plan.html">Overview</a>
-<a class="wc-cip-proxy-link" href="cip-transportation.html">Transportation</a>
-<a class="wc-cip-proxy-link" href="cip-capital-projects.html">Capital Fund</a>
-<a class="wc-cip-proxy-link" href="cip-sheriff.html">Sheriff</a>
-<a class="wc-cip-proxy-link is-active" href="cip-tourist-development.html">Tourist Development</a>
-<a class="wc-cip-proxy-link" href="cip-grants.html">Grants</a>
-<a class="wc-cip-proxy-link wc-cip-proxy-search" href="search.html">Project Search</a>
-
-  </nav>
-</div>
-  <section class="wc-transport-hero" style="background:linear-gradient(135deg,#06202d 0%,#043026 55%,#0a2a3b 100%);">
-    <div class="wc-transport-title-box">
-      <span>Walton County, Florida</span>
-      <h1>Tourist Development Fund CIP Schedules</h1>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Table</p>
+  <div data-report-table-container-id="6989dbbd986e584c322f6216-0">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbd986e584c322f6216-0">
+        <thead><tr><th></th><th>2024 - 25 Actual</th><th>2026 - 27 Budget</th><th>2027 - 28 Budget</th><th>2028 - 29 Budget</th></tr></thead>
+        <tbody><tr><td>Revenues</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>General Government Taxes</td><td>$148,142,218</td><td>$153,187,006</td><td>$156,248,874</td><td>$159,371,952</td></tr>
+<tr><td>Intergovernmental Revenues</td><td>$29,629,264</td><td>$17,329,160</td><td>$17,564,375</td><td>$18,775,530</td></tr>
+<tr><td>Other Sources</td><td>$8,559,717</td><td>$6,763,405</td><td>$6,884,037</td><td>$8,581,650</td></tr>
+<tr><td>Miscellaneous Revenue</td><td>$9,126,287</td><td>$6,952,923</td><td>$7,015,676</td><td>$7,081,395</td></tr>
+<tr><td>Charges for Services</td><td>$5,466,300</td><td>$6,320,335</td><td>$6,403,838</td><td>$6,490,648</td></tr>
+<tr><td>Permits, Fees, and Special Assessments</td><td>$3,177,439</td><td>$1,913,738</td><td>$2,000,049</td><td>$2,094,631</td></tr>
+<tr><td>Judgments, Fines and Forfeits</td><td>$287,596</td><td>$312,500</td><td>$312,500</td><td>$312,500</td></tr>
+<tr><td>REVENUES TOTAL</td><td>$204,388,822</td><td>$192,779,067</td><td>$196,429,349</td><td>$202,708,306</td></tr>
+<tr><td>Expenses</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Other Uses</td><td>$110,593,207</td><td>$117,809,989</td><td>$118,758,791</td><td>$122,312,905</td></tr>
+<tr><td>Personnel Services</td><td>$36,232,775</td><td>$42,055,160</td><td>$43,316,888</td><td>$44,616,474</td></tr>
+<tr><td>Operating Expendituresi</td><td>$31,073,416</td><td>$31,781,824</td><td>$32,735,399</td><td>$33,717,603</td></tr>
+<tr><td>Grants and Aid</td><td>$4,420,864</td><td>$3,902,400</td><td>$4,019,477</td><td>$4,140,068</td></tr>
+<tr><td>Capital Outlay</td><td>$4,253,433</td><td>$2,259,476</td><td>$2,327,266</td><td>$2,397,096</td></tr>
+<tr><td>EXPENSES TOTAL</td><td>$186,573,695</td><td>$197,808,849</td><td>$201,157,821</td><td>$207,184,146</td></tr>
+<tr><td>REVENUES LESS EXPENSES</td><td>$17,815,127</td><td>-$5,029,782</td><td>-$4,728,472</td><td>-$4,475,840</td></tr>
+</tbody>
+      </table>
     </div>
-  </section>
-  <section class="wc-transport-content">
-    <div id="touristTables"></div>
-  </section>
-</main>
-<script src="../assets/walton-cip-projects.js"></script>
-<script src="../assets/walton-cip-fund-schedule.js"></script>
-<script>
-  renderFundSchedule({funding:"tourist development fund", mountId:"touristTables", label:"Tourist Development Fund"});
-</script>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Table</p>
+  <div data-report-table-container-id="6989dbbd986e584c322f6216-1">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbd986e584c322f6216-1">
+        <thead><tr><th></th><th>2024 - 25 Actual</th><th>2026 - 27 Budget</th><th>2027 - 28 Budget</th><th>2028 - 29 Budget</th></tr></thead>
+        <tbody><tr><td>Revenues</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Other Sources</td><td>$17,072,837</td><td>$18,332,189</td><td>$23,044,933</td><td>$15,158,845</td></tr>
+<tr><td>General Government Taxes</td><td>$4,825,581</td><td>$4,314,342</td><td>$4,443,773</td><td>$4,577,087</td></tr>
+<tr><td>Intergovernmental Revenues</td><td>$5,396,320</td><td>$3,144,785</td><td>$3,184,126</td><td>$3,224,042</td></tr>
+<tr><td>Miscellaneous Revenue</td><td>$2,706,216</td><td>$849,468</td><td>$872,442</td><td>$896,565</td></tr>
+<tr><td>Charges for Services</td><td>$69,730</td><td>$62,400</td><td>$64,896</td><td>$67,492</td></tr>
+<tr><td>Permits, Fees, and Special Assessments</td><td>$20</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>REVENUES TOTAL</td><td>$30,070,705</td><td>$26,703,184</td><td>$31,610,170</td><td>$23,924,031</td></tr>
+<tr><td>Expenses</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Personnel Services</td><td>$11,578,458</td><td>$12,429,107</td><td>$12,677,693</td><td>$12,931,255</td></tr>
+<tr><td>Capital Outlay</td><td>$7,586,397</td><td>$8,699,828</td><td>$13,219,905</td><td>$5,137,304</td></tr>
+<tr><td>Operating Expendituresi</td><td>$7,065,910</td><td>$8,657,179</td><td>$8,830,331</td><td>$9,006,954</td></tr>
+<tr><td>EXPENSES TOTAL</td><td>$26,230,765</td><td>$29,786,114</td><td>$34,727,929</td><td>$27,075,513</td></tr>
+<tr><td>REVENUES LESS EXPENSES</td><td>$3,839,940</td><td>-$3,082,930</td><td>-$3,117,759</td><td>-$3,151,482</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Table</p>
+  <div data-report-table-container-id="6989dbbd986e584c322f6216-2">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbd986e584c322f6216-2">
+        <thead><tr><th></th><th>2024 - 25 Actual</th><th>2026 - 27 Budget</th><th>2027 - 28 Budget</th><th>2028 - 29 Budget</th></tr></thead>
+        <tbody><tr><td>Revenues</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Other Sources</td><td>$130,500,082</td><td>$104,673,818</td><td>$106,939,035</td><td>$109,249,555</td></tr>
+<tr><td>Charges for Services</td><td>$4,304,566</td><td>$7,216,972</td><td>$7,216,972</td><td>$7,216,972</td></tr>
+<tr><td>Miscellaneous Revenue</td><td>$3,069,025</td><td>$1,019,700</td><td>$1,040,094</td><td>$1,060,897</td></tr>
+<tr><td>Intergovernmental Revenues</td><td>$1,487,978</td><td>$1,370,000</td><td>$1,370,000</td><td>$1,370,000</td></tr>
+<tr><td>Judgments, Fines and Forfeits</td><td>$60,659</td><td>$58,710</td><td>$59,885</td><td>$61,083</td></tr>
+<tr><td>REVENUES TOTAL</td><td>$139,422,311</td><td>$114,339,200</td><td>$116,625,986</td><td>$118,958,507</td></tr>
+<tr><td>Expenses</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Personnel Services</td><td>$71,706,111</td><td>$73,857,296</td><td>$75,334,443</td><td>$76,841,133</td></tr>
+<tr><td>Capital Outlay</td><td>$33,662,820</td><td>$16,201,422</td><td>$16,525,451</td><td>$16,855,961</td></tr>
+<tr><td>Operating Expendituresi</td><td>$17,700,353</td><td>$21,026,623</td><td>$21,447,156</td><td>$21,876,100</td></tr>
+<tr><td>EXPENSES TOTAL</td><td>$123,069,284</td><td>$111,085,341</td><td>$113,307,050</td><td>$115,573,194</td></tr>
+<tr><td>REVENUES LESS EXPENSES</td><td>$16,353,027</td><td>$3,253,859</td><td>$3,318,936</td><td>$3,385,313</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Table</p>
+  <div data-report-table-container-id="6989dbbd986e584c322f6216-3">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbd986e584c322f6216-3">
+        <thead><tr><th></th><th>2024 - 25 Actual</th><th>2026 - 27 Budget</th><th>2027 - 28 Budget</th><th>2028 - 29 Budget</th></tr></thead>
+        <tbody><tr><td>Revenues</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>General Government Taxes</td><td>$60,328,570</td><td>$57,494,650</td><td>$58,515,738</td><td>$58,903,130</td></tr>
+<tr><td>Miscellaneous Revenue</td><td>$4,842,008</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>Charges for Services</td><td>$201,106</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>Intergovernmental Revenues</td><td>$31,735</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>REVENUES TOTAL</td><td>$65,403,419</td><td>$57,494,650</td><td>$58,515,738</td><td>$58,903,130</td></tr>
+<tr><td>Expenses</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Operating Expendituresi</td><td>$28,332,405</td><td>$37,517,638</td><td>$38,268,024</td><td>$39,033,449</td></tr>
+<tr><td>Personnel Services</td><td>$6,967,700</td><td>$10,377,139</td><td>$10,584,694</td><td>$10,796,403</td></tr>
+<tr><td>Capital Outlay</td><td>$11,691,070</td><td>$2,352,730</td><td>$2,270,905</td><td>$1,533,324</td></tr>
+<tr><td>Other Uses</td><td>$0</td><td>$5,791,984</td><td>$5,907,824</td><td>$6,025,981</td></tr>
+<tr><td>EXPENSES TOTAL</td><td>$46,991,176</td><td>$56,039,491</td><td>$57,031,447</td><td>$57,389,157</td></tr>
+<tr><td>REVENUES LESS EXPENSES</td><td>$18,412,243</td><td>$1,455,159</td><td>$1,484,291</td><td>$1,513,973</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Table</p>
+  <div data-report-table-container-id="6989dbbd986e584c322f6216-4">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbd986e584c322f6216-4">
+        <thead><tr><th></th><th>2024 - 25 Actual</th><th>2026 - 27 Budget</th><th>2027 - 28 Budget</th><th>2028 - 29 Budget</th></tr></thead>
+        <tbody><tr><td>Revenues</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>General Government Taxes</td><td>$41,566,141</td><td>$38,151,750</td><td>$38,914,785</td><td>$39,693,081</td></tr>
+<tr><td>Other Sources</td><td>$0</td><td>$0</td><td>$4,322,983</td><td>$0</td></tr>
+<tr><td>Miscellaneous Revenue</td><td>$1,383,166</td><td>$435,750</td><td>$444,465</td><td>$453,355</td></tr>
+<tr><td>Charges for Services</td><td>$719,336</td><td>$420,000</td><td>$428,400</td><td>$436,968</td></tr>
+<tr><td>Intergovernmental Revenues</td><td>$93,750</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>Permits, Fees, and Special Assessments</td><td>$77,367</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>REVENUES TOTAL</td><td>$43,839,760</td><td>$39,007,500</td><td>$44,110,633</td><td>$40,583,404</td></tr>
+<tr><td>Expenses</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Other Uses</td><td>$17,489,222</td><td>$19,146,844</td><td>$23,852,757</td><td>$19,300,628</td></tr>
+<tr><td>Operating Expendituresi</td><td>$15,485,856</td><td>$16,692,888</td><td>$17,026,751</td><td>$17,868,966</td></tr>
+<tr><td>Personnel Services</td><td>$2,064,635</td><td>$2,082,755</td><td>$2,124,412</td><td>$2,230,636</td></tr>
+<tr><td>Capital Outlay</td><td>$1,732,094</td><td>$926,675</td><td>$945,209</td><td>$995,575</td></tr>
+<tr><td>EXPENSES TOTAL</td><td>$36,771,806</td><td>$38,849,162</td><td>$43,949,129</td><td>$40,395,805</td></tr>
+<tr><td>REVENUES LESS EXPENSES</td><td>$7,067,954</td><td>$158,338</td><td>$161,504</td><td>$187,599</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Table</p>
+  <div data-report-table-container-id="6989dbbd986e584c322f6216-5">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbd986e584c322f6216-5">
+        <thead><tr><th></th><th>2024 - 25 Actual</th><th>2026 - 27 Budget</th><th>2027 - 28 Budget</th><th>2028 - 29 Budget</th></tr></thead>
+        <tbody><tr><td>Revenues</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Other Sources</td><td>$12,216,385</td><td>$11,442,685</td><td>$9,656,014</td><td>$11,629,936</td></tr>
+<tr><td>Miscellaneous Revenue</td><td>$939,537</td><td>$477,640</td><td>$487,193</td><td>$496,937</td></tr>
+<tr><td>Intergovernmental Revenues</td><td>$1,221,320</td><td>$0</td><td>$0</td><td>$0</td></tr>
+<tr><td>REVENUES TOTAL</td><td>$14,377,242</td><td>$11,920,325</td><td>$10,143,207</td><td>$12,126,873</td></tr>
+<tr><td>Expenses</td><td>$12,040,906</td><td>$11,934,655</td><td>$10,157,824</td><td>$12,141,783</td></tr>
+<tr><td>REVENUES LESS EXPENSES</td><td>$2,336,336</td><td>-$14,330</td><td>-$14,617</td><td>-$14,910</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
 <nav class="page-nav" aria-label="Page navigation">
-  <a class="prev" href="cip-sheriff.html">Sheriff Fund Schedule</a>
-  <a class="next" href="cip-transportation.html">Transportation Fund Schedule</a>
+  <a class="prev" href="debt-overview.html">Debt Overview</a>
+  <a class="next" href="glossary-acronyms-and-frequently-asked-questions.html">Glossary, Acronyms, and Frequently Asked Questions</a>
 </nav>
   </main>
 </div>

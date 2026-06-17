@@ -1733,7 +1733,7 @@ function renderProjects(){
         <div class="wc-cip-sticky-nav-shell">
           <nav class="wc-cip-proxy-nav" aria-label="Capital Improvement Plan navigation">
             ${isStandaloneSearchPage
-              ? `<a class="wc-cip-proxy-link" href="6989dbbd4a9d93e5ac05a153.html">Overview</a>`
+              ? `<a class="wc-cip-proxy-link" href="capital-improvement-plan.html">Overview</a>`
               : `<button type="button" class="wc-cip-proxy-button is-active">Overview</button>`}
             <a class="wc-cip-proxy-link" href="cip-transportation.html">Transportation</a>
             <a class="wc-cip-proxy-link" href="cip-capital-projects.html">Capital Fund</a>

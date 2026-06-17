@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tourist Development Fund CIP Schedules — Walton County FY 2027 Budget</title>
+<title>Tourism Beach Operations — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -98,7 +98,7 @@
 <a href="../pages/soil-conservation.html">Soil Conservation</a>
 <a href="../pages/solid-waste.html">Solid Waste</a>
 <a href="../pages/tourism-administration.html">Tourism Administration</a>
-<a href="../pages/tourism-beach-operations.html">Tourism Beach Operations</a>
+<a href="../pages/tourism-beach-operations.html" class="active">Tourism Beach Operations</a>
 <a href="../pages/tourism-lifeguard-services-and-beach-safety.html">Tourism Lifeguard Services and Beach Safety</a>
 <a href="../pages/veteran-services.html">Veteran Services</a>
 </div>
@@ -116,7 +116,7 @@
 <a href="../pages/cip-capital-projects.html">Capital Projects Fund Schedule</a>
 <a href="../pages/cip-grants.html">Grant Funded Schedule</a>
 <a href="../pages/cip-sheriff.html">Sheriff Fund Schedule</a>
-<a href="../pages/cip-tourist-development.html" class="active">Tourist Development Fund Schedule</a>
+<a href="../pages/cip-tourist-development.html">Tourist Development Fund Schedule</a>
 <a href="../pages/cip-transportation.html">Transportation Fund Schedule</a>
 </div>
 </div>
@@ -129,389 +129,165 @@
 
   </aside>
   <main id="content">
-<style>
-    *{
-      box-sizing:border-box;
-    }
 
-    body{
-      margin:0;
-      background:#ffffff;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      overflow-x:hidden;
-    }
+<div class="page-eyebrow">Department Information</div>
+<h1 class="page-title">Tourism Beach Operations</h1>
 
-    .wc-transport-page{
-      width:100%;
-      background:#ffffff;
-    }
-
-    .wc-cip-sticky-nav-shell{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto 18px auto;
-      padding:10px 0 12px 0;
-      background:transparent;
-      box-sizing:border-box;
-    }
-
-    .wc-cip-sticky-nav-shell::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:0;
-      width:100vw;
-      height:4px;
-      transform:translateX(-50%);
-      background:#006231;
-      pointer-events:none;
-    }
-
-    .wc-cip-proxy-nav{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:0;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:0 12px;
-      background:transparent;
-      box-sizing:border-box;
-    }
-
-    .wc-cip-proxy-button,
-    .wc-cip-proxy-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:42px;
-      margin:8px 2px;
-      padding:0 18px;
-      border:0;
-      border-radius:999px;
-      background:transparent;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      text-decoration:none;
-      cursor:pointer;
-      transition:background .22s ease, color .22s ease;
-    }
-
-    .wc-cip-proxy-button:hover,
-    .wc-cip-proxy-link:hover,
-    .wc-cip-proxy-link.is-active{
-      background:#00623114;
-      color:#006231;
-    }
-
-    .wc-cip-proxy-link.wc-cip-proxy-search{
-      margin-left:8px;
-      background:#006231;
-      color:#ffffff;
-    }
-
-    .wc-cip-proxy-link.wc-cip-proxy-search:hover{
-      background:#004f28;
-      color:#ffffff;
-    }
-
-    .wc-transport-hero{
-      position:relative;
-      width:100%;
-      min-height:440px;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:72px 28px;
-      background:
-        linear-gradient(90deg,rgba(6,32,45,0.84) 0%,rgba(4,48,38,0.62) 48%,rgba(10,42,59,0.36) 100%),
-        url("https://stories.opengov.com/countyofwaltonfl/uploads/4f9ae2ab7bae-Picture1222.jpg&q") center center / cover no-repeat;
-    }
-
-    .wc-transport-title-box{
-      width:100%;
-      max-width:1100px;
-      text-align:center;
-      color:#ffffff;
-    }
-
-    .wc-transport-title-box span{
-      display:block;
-      margin-bottom:16px;
-      color:#f1dc94;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      text-shadow:0 2px 10px rgba(0,0,0,0.34);
-    }
-
-    .wc-transport-title-box h1{
-      margin:0;
-      font-size:clamp(42px, 5vw, 74px);
-      line-height:1.05;
-      font-weight:800;
-      color:#ffffff;
-      text-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        0 4px 10px rgba(0,0,0,.25);
-    }
-
-    .wc-transport-title-box h1::after{
-      content:"";
-      display:block;
-      width:118px;
-      height:5px;
-      margin:24px auto 0 auto;
-      border-radius:999px;
-      background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
-      box-shadow:0 0 18px rgba(209,190,120,0.36);
-    }
-
-    .wc-transport-content{
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:42px 28px 64px 28px;
-    }
-
-    .wc-year-table-block{
-      margin-top:34px;
-    }
-
-    .wc-year-table-heading{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:20px;
-      margin-bottom:14px;
-      padding-bottom:12px;
-      border-bottom:4px solid #006231;
-    }
-
-    .wc-year-table-heading h2{
-      margin:0;
-      color:#172033;
-      font-size:30px;
-      line-height:1.15;
-      font-weight:800;
-    }
-
-    .wc-year-table-heading strong{
-      color:#006231;
-      font-size:22px;
-      white-space:nowrap;
-    }
-
-    .wc-table-wrap{
-      width:100%;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      border:1px solid rgba(209,190,120,0.45);
-      border-radius:24px;
-      background:#ffffff;
-      box-shadow:
-        0 14px 34px rgba(0,98,49,0.08),
-        0 4px 12px rgba(36,52,77,0.06);
-    }
-
-    .wc-transport-table{
-      width:100%;
-      min-width:940px;
-      border-collapse:separate;
-      border-spacing:0;
-      background:#ffffff;
-      font-size:14px;
-    }
-
-    .wc-transport-table th{
-      padding:12px 14px;
-      border:0;
-      border-bottom:4px solid #d1be78;
-      background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
-      color:#ffffff;
-      font-size:14px;
-      font-weight:700;
-      text-align:center;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table td{
-      padding:12px 14px;
-      border:0;
-      border-bottom:1px solid rgba(36,52,77,0.10);
-      color:#344054;
-      font-size:14px;
-      line-height:1.45;
-      text-align:center;
-      vertical-align:middle;
-      background:#ffffff;
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td{
-      background:rgba(0,98,49,0.04);
-    }
-
-    .wc-transport-table tbody tr:hover td{
-      background:rgba(209,190,120,0.18);
-    }
-
-    .wc-transport-table td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      background:#ffffff;
-      background-clip:padding-box;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      color:#172033;
-      font-weight:700;
-    }
-
-    .wc-transport-table thead th:first-child{
-      position:sticky;
-      left:0;
-      z-index:12;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td:first-child{
-      background:#f5f9f7;
-    }
-
-    .wc-transport-table tbody tr:hover td:first-child{
-      background:#f8f2dc;
-    }
-
-    .wc-transport-table .amount{
-      text-align:right;
-      font-weight:800;
-      color:#172033;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table tfoot td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-      color:#172033;
-      font-weight:700;
-      border-bottom:0;
-      padding:13px 14px;
-    }
-
-    .wc-transport-table tfoot tr:hover td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-transport-table tfoot td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-empty-message{
-      padding:38px 20px;
-      text-align:center;
-      color:#667085;
-      font-weight:700;
-    }
-
-    @media(max-width:700px){
-      .wc-transport-hero{
-        min-height:360px;
-        padding:54px 18px;
-      }
-
-      .wc-transport-content{
-        padding:34px 14px 48px 14px;
-      }
-
-      .wc-cip-proxy-nav{
-        justify-content:flex-start;
-        flex-wrap:nowrap;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:none;
-        padding:0 8px;
-      }
-
-      .wc-cip-proxy-nav::-webkit-scrollbar{
-        display:none;
-      }
-
-      .wc-cip-proxy-button,
-      .wc-cip-proxy-link{
-        flex:0 0 auto;
-        min-height:40px;
-        padding:0 13px;
-        font-size:12px;
-        white-space:nowrap;
-      }
-
-      .wc-year-table-heading{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:8px;
-      }
-
-      .wc-year-table-heading h2{
-        font-size:25px;
-      }
-
-    }
-
-</style>
-<main class="wc-transport-page">
-  <div class="wc-cip-sticky-nav-shell">
-  <nav class="wc-cip-proxy-nav" aria-label="Capital Improvement Plan navigation">
-    <a class="wc-cip-proxy-link" href="capital-improvement-plan.html">Overview</a>
-<a class="wc-cip-proxy-link" href="cip-transportation.html">Transportation</a>
-<a class="wc-cip-proxy-link" href="cip-capital-projects.html">Capital Fund</a>
-<a class="wc-cip-proxy-link" href="cip-sheriff.html">Sheriff</a>
-<a class="wc-cip-proxy-link is-active" href="cip-tourist-development.html">Tourist Development</a>
-<a class="wc-cip-proxy-link" href="cip-grants.html">Grants</a>
-<a class="wc-cip-proxy-link wc-cip-proxy-search" href="search.html">Project Search</a>
-
-  </nav>
-</div>
-  <section class="wc-transport-hero" style="background:linear-gradient(135deg,#06202d 0%,#043026 55%,#0a2a3b 100%);">
-    <div class="wc-transport-title-box">
-      <span>Walton County, Florida</span>
-      <h1>Tourist Development Fund CIP Schedules</h1>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Expenditure Budget</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-1">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-1">
+        <thead><tr><th>Row labels</th><th>FY 2020 Actuals</th><th>FY 2021 Actuals</th><th>FY 2022 Actuals</th><th>FY 2023 Actuals</th><th>FY 2024 Actuals</th><th>FY 2025 Actuals</th><th>FY 2026 Budget</th><th>Empty Values</th></tr></thead>
+        <tbody><tr><td>Personnel Budgeti</td><td>–</td><td>–</td><td>–</td><td>–</td><td>$62,107</td><td>$3,891,655</td><td>$4,561,840</td><td>–</td></tr>
+<tr><td>Operating Expendituresi</td><td>$1,166,400</td><td>$1,557,789</td><td>$1,714,552</td><td>$1,946,009</td><td>$2,029,681</td><td>$2,523,878</td><td>$5,109,977</td><td>–</td></tr>
+<tr><td>Capital Budgeti</td><td>$1,028,696</td><td>$525,089</td><td>$938,533</td><td>$1,560,133</td><td>$3,545,884</td><td>$5,662,403</td><td>$799,881</td><td>–</td></tr>
+<tr><td>Total</td><td>$2,195,096</td><td>$2,082,878</td><td>$2,653,086</td><td>$3,506,142</td><td>$5,637,672</td><td>$12,077,936</td><td>$10,471,698</td><td>–</td></tr>
+</tbody>
+      </table>
     </div>
-  </section>
-  <section class="wc-transport-content">
-    <div id="touristTables"></div>
-  </section>
-</main>
-<script src="../assets/walton-cip-projects.js"></script>
-<script src="../assets/walton-cip-fund-schedule.js"></script>
-<script>
-  renderFundSchedule({funding:"tourist development fund", mountId:"touristTables", label:"Tourist Development Fund"});
-</script>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Expenditure Detail</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-2">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-2">
+        <thead><tr><th>Itemization Description</th><th>Amount</th></tr></thead>
+        <tbody><tr><td>F250 Super Cab 4x4.-Rpl # 8635</td><td>$101,000</td></tr>
+<tr><td>F250 Super Cab 4X4 Service New Landscape Techs</td><td>$101,000</td></tr>
+<tr><td>F250 Super Cab 4X4 Service Electrician Helper</td><td>$101,000</td></tr>
+<tr><td>F250 Super Cab 4x4. New Specialist Positions</td><td>$78,000</td></tr>
+<tr><td>F250 Super Cab 4x4. New Specialist Positions</td><td>$78,000</td></tr>
+<tr><td>F150 Super Cab 4x4 -Rpl # 9043 Tech</td><td>$74,500</td></tr>
+<tr><td>Bronco Sport/Ranger Administration</td><td>$35,000</td></tr>
+<tr><td>Ford Transit Van Additional Staff</td><td>$70,000</td></tr>
+<tr><td>14k Tilt Trailer -Rpl #8880</td><td>$12,000</td></tr>
+<tr><td>16' utility trailer -Rpl #3963</td><td>$5,000</td></tr>
+<tr><td>20' Trailer -Rpl #4369</td><td>$9,000</td></tr>
+<tr><td>Turo Dingo Lift Landscape</td><td>$70,000</td></tr>
+<tr><td>Portable Change Message Board -Rpl #8637</td><td>$25,000</td></tr>
+<tr><td>Portable Change Message Board -Rpl #8323</td><td>$25,000</td></tr>
+<tr><td>Telehandler Lift</td><td>$150,000</td></tr>
+<tr><td>Snapon Zeus Shop Diagnostic Tool</td><td>$18,000</td></tr>
+<tr><td>Truck Wash System</td><td>$200,000</td></tr>
+<tr><td>18k Hunter 4-post Lift -Rpl #</td><td>$50,000</td></tr>
+<tr><td>Trash Compactor</td><td>$100,000</td></tr>
+<tr><td></td><td>$1,302,500</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Staffing / FTE</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-3">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-3">
+        <thead><tr><th>Position Name</th><th>2023-2024</th><th>2024-2025</th><th>2025-2026</th><th>2026-2027</th></tr></thead>
+        <tbody><tr><td>Allocated FTE Count</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Beach Operations Projects Coordinator</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Assistant Landscape Crew Leader</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Beach Maintenance Specialist Crew Leader</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+<tr><td>Beach Maintenance Manager</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Assistant Beach Maintenance Specialist Crew Leader</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+<tr><td>Executive Assistant</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Administrative Assistant</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Beach Maintenance Technician</td><td>6</td><td>8</td><td>8</td><td>8</td></tr>
+<tr><td>Beach Maint Technician Crew Leader</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Deputy Director of Beach Operations</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Beach Maintenance Landscape Technician</td><td>6</td><td>6</td><td>6</td><td>8</td></tr>
+<tr><td>Shop Foreman</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Electrician Helper</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>Assistant Shop Foreman</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Assistant Beach Maintenance Technician Crew Leader</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Electrician</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Beach Maintenance Specialist</td><td>29</td><td>29</td><td>29</td><td>33</td></tr>
+<tr><td>Landscape Maintenance Coordinator</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Director of Beach Operations</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>ALLOCATED FTE COUNT</td><td>56</td><td>60</td><td>60</td><td>67</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Expenditure Budget</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-4">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-4">
+        <thead><tr><th>Row labels</th><th>FY 2020 Actuals</th><th>FY 2021 Actuals</th><th>FY 2022 Actuals</th><th>FY 2023 Actuals</th><th>FY 2024 Actuals</th><th>FY 2025 Actuals</th><th>FY 2026 Budget</th><th>Empty Values</th></tr></thead>
+        <tbody><tr><td>Personnel Budgeti</td><td>–</td><td>–</td><td>–</td><td>–</td><td>$20,556</td><td>$1,062,615</td><td>$2,694,376</td><td>–</td></tr>
+<tr><td>Operating Expendituresi</td><td>$523,827</td><td>$2,424,427</td><td>$4,149,723</td><td>$5,063,174</td><td>$7,091,671</td><td>$4,784,913</td><td>$605,750</td><td>–</td></tr>
+<tr><td>Capital Budgeti</td><td>–</td><td>$742,272</td><td>$6,059,235</td><td>$4,797,195</td><td>$3,486,823</td><td>$5,256,860</td><td>$216,000</td><td>–</td></tr>
+<tr><td>Total</td><td>$523,827</td><td>$3,166,700</td><td>$10,208,958</td><td>$9,860,369</td><td>$10,599,050</td><td>$11,104,388</td><td>$3,516,126</td><td>–</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Expenditure Detail</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-5">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-5">
+        <thead><tr><th>Itemization Description</th><th>Amount</th></tr></thead>
+        <tbody><tr><td>2027 Ford Ranger XLT 2WD Crew Cab. For requested Assistant Crew Leaders</td><td>$42,000</td></tr>
+<tr><td>2027 Starcraft ADA Shuttle. Replacing 10284.</td><td>$155,000</td></tr>
+<tr><td>2027 Starcraft ADA Shuttle. Replacing 10287.</td><td>$155,000</td></tr>
+<tr><td>2027 Starcraft ADA Shuttle. Replacing 10289.</td><td>$155,000</td></tr>
+<tr><td></td><td>$507,000</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Staffing / FTE</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-6">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-6">
+        <thead><tr><th>Position Name</th><th>2023-2024</th><th>2024-2025</th><th>2025-2026</th><th>2026-2027</th></tr></thead>
+        <tbody><tr><td>Allocated FTE Count</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Beach Tram Driver</td><td>60</td><td>44</td><td>44</td><td>48</td></tr>
+<tr><td>Transportation Specialist</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+<tr><td>Administrative Assistant</td><td>2</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Transportation Assistant Crew Leader</td><td>4</td><td>2</td><td>2</td><td>4</td></tr>
+<tr><td>Transportation Crew Leader</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+<tr><td>Transportation Assistant Manager</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Transportation Mechanic</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Transportation Manager</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>Transportation Assistant Mechanic</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>ALLOCATED FTE COUNT</td><td>74</td><td>54</td><td>54</td><td>60</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <p class="wc-table-label">Expenditure Budget</p>
+  <div data-report-table-container-id="6989dbbed36e2967b08392bf-7">
+    <div data-table-scroll-container="true">
+      <table data-report-table-id="6989dbbed36e2967b08392bf-7">
+        <thead><tr><th>Row labels</th><th>FY 2020 Actuals</th><th>FY 2021 Actuals</th><th>FY 2022 Actuals</th><th>FY 2023 Actuals</th><th>FY 2024 Actuals</th><th>FY 2025 Actuals</th><th>FY 2026 Budget</th><th>Empty Values</th></tr></thead>
+        <tbody><tr><td>Operating Expendituresi</td><td>$2,926,510</td><td>$1,288,470</td><td>$1,368,648</td><td>$1,481,632</td><td>$3,666,769</td><td>$43,019</td><td>–</td><td>–</td></tr>
+<tr><td>Capital Budgeti</td><td>$1,603,941</td><td>$5,911,581</td><td>$3,271,667</td><td>$58,789</td><td>$563,008</td><td>$709,093</td><td>$10,000,000</td><td>–</td></tr>
+<tr><td>Other Uses</td><td>–</td><td>–</td><td>$123,903</td><td>$330</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
+<tr><td>Total</td><td>$4,530,450</td><td>$7,200,052</td><td>$4,764,218</td><td>$1,540,751</td><td>$4,229,778</td><td>$752,111</td><td>$10,000,000</td><td>–</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="wc-table-wrap">
+  <div id="wc-performance-measures" data-department="Tourism Beach Operations"></div>
+</div>
+<script src="../assets/walton-performance-data.js"></script>
+<script src="../assets/walton-performance-measures.js"></script>
+
 <nav class="page-nav" aria-label="Page navigation">
-  <a class="prev" href="cip-sheriff.html">Sheriff Fund Schedule</a>
-  <a class="next" href="cip-transportation.html">Transportation Fund Schedule</a>
+  <a class="prev" href="tourism-administration.html">Tourism Administration</a>
+  <a class="next" href="tourism-lifeguard-services-and-beach-safety.html">Tourism Lifeguard Services and Beach Safety</a>
 </nav>
   </main>
 </div>
@@ -600,6 +376,7 @@ window.wcBudgetPages = [
 ];
 </script>
 <script src="../assets/walton-budget-nav.js"></script>
+<script src="../assets/walton-budget-pdf.js"></script>
 <script src="../assets/nav.js"></script>
 </body>
 </html>
