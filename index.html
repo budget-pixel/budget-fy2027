@@ -3,78 +3,634 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FY 2027 Adopted Budget — Walton County</title>
+<title>Home — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="assets/style.css">
-<link rel="stylesheet" href="assets/header.css">
-<link rel="stylesheet" href="assets/sidebar.css">
-<link rel="stylesheet" href="assets/flipbook.css">
 </head>
 <body>
 
-<header id="wc-header">
-  <a class="wc-header-logo" href="pages/home.html" aria-label="Go to Home">
-    <img src="https://stories.opengov.com/countyofwaltonfl/uploads/c432578eae78-Walton_County_Logo_no_background.png" alt="Walton County logo">
-  </a>
-  <div class="wc-header-title">FY 2027 Adopted Budget</div>
-  <div class="wc-header-icons">
-    <button id="wc-search-icon-btn" class="wc-header-icon-btn" type="button" aria-label="Search budget pages">&#128269;</button>
-    <button id="wc-menu-icon-btn" class="wc-header-icon-btn" type="button" aria-label="Open navigation menu">&#9776;</button>
-  </div>
-</header>
+<!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
+<nav id="nav-menu" class="nav-menu">
+  <div class="logo-container"></div>
+</nav>
 
-<div id="wc-sidebar-overlay"></div>
-<aside id="wc-sidebar" aria-label="Budget navigation">
-  <div class="wc-sidebar-header">
-    <span>Browse Budget</span>
-    <button id="wc-sidebar-close" type="button" aria-label="Close navigation">&times;</button>
-  </div>
-  <div class="wc-sidebar-search">
-    <input id="wc-sidebar-search-input" type="search" placeholder="Search pages&hellip;" aria-label="Search budget pages">
-  </div>
-  <div id="wc-sidebar-sections"></div>
-</aside>
-
-<div id="book-wrap" hidden>
-  <div id="book"></div>
-  <div id="page-counter"></div>
-  <button class="wc-flip-btn prev" type="button" aria-label="Previous page">&lsaquo;</button>
-  <button class="wc-flip-btn next" type="button" aria-label="Next page">&rsaquo;</button>
+<div id="layout">
+  <aside id="sidebar" aria-label="Budget navigation">
+<div class="nav-section">
+  <button class="nav-section-toggle">Introduction and Overview<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/home.html" class="active">Home</a>
+<a href="pages/gfoa-distinguished-budget-presentation-award.html">GFOA Distinguished Budget Presentation Award</a>
+<a href="pages/transmittal-letter.html">Transmittal Letter</a>
+<a href="pages/budget-in-brief.html">Budget-in-Brief</a>
+<a href="pages/overview-of-walton-county.html">Overview of Walton County</a>
+<a href="pages/organizational-structure.html">Organizational Structure</a>
+<a href="pages/strategic-initiatives.html">Strategic Initiatives</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Financial Structure, Policies, and Process<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/budget-process-and-calendar.html">Budget Process &amp; Calendar</a>
+<a href="pages/fund-descriptions-and-structure.html">Fund Descriptions and Structure</a>
+<a href="pages/department-to-fund-relationship.html">Department to Fund Relationship</a>
+<a href="pages/financial-policies.html">Financial Policies</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Financial Summaries<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/consolidated-financial-schedules.html">Consolidated Financial Schedules</a>
+<a href="pages/fund-financial-schedules.html">Fund Financial Schedules</a>
+<a href="pages/summary-of-revenues.html">Summary of Revenues</a>
+<a href="pages/summary-of-expenses.html">Summary of Expenses</a>
+<a href="pages/summary-of-interfund-transfers.html">Summary of Interfund Transfers</a>
+<a href="pages/summary-of-personnel.html">Summary of Personnel</a>
+<a href="pages/summary-of-machinery-vehicles-and-equipment.html">Summary of Machinery, Vehicles &amp; Equipment</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Constitutional Officers<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/board-of-county-commissioners.html">Board of County Commissioners</a>
+<a href="pages/clerk-of-courts-and-county-comptroller.html">Clerk of Courts &amp; County Comptroller</a>
+<a href="pages/property-appraiser.html">Property Appraiser</a>
+<a href="pages/sheriffs-office.html">Sheriff's Office</a>
+<a href="pages/supervisor-of-elections.html">Supervisor of Elections</a>
+<a href="pages/tax-collector.html">Tax Collector</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Autonomous Entities<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/circuit-court.html">Circuit Court</a>
+<a href="pages/county-court.html">County Court</a>
+<a href="pages/court-technology-and-innovations.html">Court Technology &amp; Innovations</a>
+<a href="pages/guardian-ad-litem.html">Guardian Ad Litem</a>
+<a href="pages/medical-examiner.html">Medical Examiner</a>
+<a href="pages/non-profit-funding-program.html">Non-Profit Funding Program</a>
+<a href="pages/public-defender.html">Public Defender</a>
+<a href="pages/south-walton-fire-and-state-control.html">South Walton Fire &amp; State Control</a>
+<a href="pages/state-attorney.html">State Attorney</a>
+<a href="pages/statutory-and-other-agency-funding.html">Statutory &amp; Other Agency Funding</a>
+<a href="pages/walton-county-health-department.html">Walton County Health Department</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Department Information<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/building-construction-and-maintenance.html">Building Construction and Maintenance</a>
+<a href="pages/building-department.html">Building Department</a>
+<a href="pages/code-compliance.html">Code Compliance</a>
+<a href="pages/county-administration.html">County Administration</a>
+<a href="pages/eagle-springs-golf-and-recreation-center.html">Eagle Springs Golf and Recreation Center</a>
+<a href="pages/eagle-springs-grill.html">Eagle Springs Grill</a>
+<a href="pages/emergency-management.html">Emergency Management</a>
+<a href="pages/engineering-department.html">Engineering Department</a>
+<a href="pages/environmental-resources.html">Environmental Resources</a>
+<a href="pages/extension-office.html">Extension Office</a>
+<a href="pages/geographic-info-systems.html">Geographic Info Systems</a>
+<a href="pages/housing-and-urban-development.html">Housing &amp; Urban Development</a>
+<a href="pages/human-resources.html">Human Resources</a>
+<a href="pages/libraries.html">Libraries</a>
+<a href="pages/mosquito-control.html">Mosquito Control</a>
+<a href="pages/mossy-head-wastewater-treatment-facility.html">Mossy Head Wastewater Treatment Facility</a>
+<a href="pages/office-of-management-and-budget.html">Office of Management and Budget</a>
+<a href="pages/office-of-the-county-attorney.html">Office of the County Attorney</a>
+<a href="pages/planning.html">Planning</a>
+<a href="pages/probation.html">Probation</a>
+<a href="pages/public-works.html">Public Works</a>
+<a href="pages/purchasing.html">Purchasing</a>
+<a href="pages/recreation.html">Recreation</a>
+<a href="pages/soil-conservation.html">Soil Conservation</a>
+<a href="pages/solid-waste.html">Solid Waste</a>
+<a href="pages/tourism-administration.html">Tourism Administration</a>
+<a href="pages/tourism-beach-operations.html">Tourism Beach Operations</a>
+<a href="pages/tourism-lifeguard-services-and-beach-safety.html">Tourism Lifeguard Services and Beach Safety</a>
+<a href="pages/veteran-services.html">Veteran Services</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Capital, Debt, and Financial Forecast<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/capital-improvement-plan.html">Capital Improvement Plan</a>
+<a href="pages/debt-overview.html">Debt Overview</a>
+<a href="pages/financial-forecast.html">Financial Forecast</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Capital Improvement Projects<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/search.html">CIP Project Search</a>
+<a href="pages/cip-capital-projects.html">Capital Projects Fund Schedule</a>
+<a href="pages/cip-grants.html">Grant Funded Schedule</a>
+<a href="pages/cip-sheriff.html">Sheriff Fund Schedule</a>
+<a href="pages/cip-tourist-development.html">Tourist Development Fund Schedule</a>
+<a href="pages/cip-transportation.html">Transportation Fund Schedule</a>
+</div>
+</div>
+<div class="nav-section">
+  <button class="nav-section-toggle">Glossary, Statistical, and Supplemental Information<span class="arrow">▶</span></button>
+  <div class="nav-section-links"><a href="pages/glossary-acronyms-and-frequently-asked-questions.html">Glossary, Acronyms, and Frequently Asked Questions</a>
+<a href="pages/statistical-and-supplemental-information.html">Statistical &amp; Supplemental Information</a>
+</div>
 </div>
 
-<div id="mobile-wrap" hidden>
-  <div id="mobile-content"></div>
-  <div id="mobile-bar">
-    <button id="mobile-prev" type="button">&lsaquo; Prev</button>
-    <span id="mobile-page-counter"></span>
-    <button id="mobile-next" type="button">Next &rsaquo;</button>
+  </aside>
+  <main id="content">
+
+<style>
+  html,
+  body{
+    margin:0;
+    padding:0;
+  }
+
+  .wc-video-hero{
+    position:relative;
+    width:100%;
+    height:clamp(420px, 56vh, 620px);
+    overflow:hidden;
+    background:#24344d;
+    font-family:Arial, Helvetica, sans-serif;
+    border-radius:32px;
+    isolation:isolate;
+    box-shadow:
+      0 10px 24px rgba(36,52,77,0.14),
+      0 3px 8px rgba(36,52,77,0.08),
+      0 1px 0 rgba(255,255,255,0.05) inset;
+  }
+  .wc-video-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border:1px solid rgba(209,190,120,0.32);
+    border-radius:32px;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.08),
+      inset 0 -18px 28px rgba(0,0,0,0.06);
+    z-index:4;
+    pointer-events:none;
+  }
+
+  .wc-video-frame{
+    position:absolute;
+    top:50%;
+    left:50%;
+
+    width:100vw;
+    height:56.25vw;
+
+    min-width:177.78vh;
+    min-height:100%;
+
+    transform:translate(-50%, -50%);
+
+    border:0;
+    pointer-events:none;
+
+    z-index:1;
+  }
+
+  .wc-video-overlay{
+    position:absolute;
+    inset:0;
+
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(255,255,255,0) 54%,
+        rgba(20,30,45,0.12) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(20,30,45,0.04) 0%,
+        rgba(20,30,45,0.08) 58%,
+        rgba(20,30,45,0.12) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(0,98,49,0.10) 0%,
+        rgba(0,98,49,0) 28%,
+        rgba(0,98,49,0) 72%,
+        rgba(209,190,120,0.08) 100%
+      );
+
+    z-index:2;
+    pointer-events:none;
+  }
+
+  .wc-video-content{
+    position:relative;
+    z-index:3;
+
+    width:100%;
+    max-width:1280px;
+    height:100%;
+
+    margin:0 auto;
+    padding:0 42px;
+
+    box-sizing:border-box;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+    color:#ffffff;
+  }
+
+  .wc-video-title-box{
+    display:inline-block;
+    max-width:1080px;
+
+    padding:32px 52px 34px 52px;
+
+    border-radius:28px;
+
+    background:linear-gradient(
+      180deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.13) 100%
+    );
+    border:1px solid rgba(255,255,255,0.30);
+
+    backdrop-filter:blur(16px) saturate(130%);
+    -webkit-backdrop-filter:blur(16px) saturate(130%);
+
+    box-shadow:
+      0 8px 18px rgba(0,0,0,0.16),
+      inset 0 1px 0 rgba(255,255,255,0.26),
+      0 0 18px rgba(209,190,120,0.10);
+    animation:wcHeroFadeIn 1.4s ease forwards;
+  }
+
+  @keyframes wcHeroFadeIn{
+
+    from{
+      opacity:0;
+      transform:translateY(22px);
+    }
+
+    to{
+      opacity:1;
+      transform:translateY(0);
+    }
+  }
+
+  .wc-video-content span{
+    display:inline-block;
+    margin-bottom:18px;
+
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+
+    color:#f1dc94;
+    text-shadow:0 2px 10px rgba(0,0,0,0.34);
+  }
+
+  .wc-video-content h1{
+    max-width:1000px;
+    margin:0;
+
+    font-size:clamp(44px, 5vw, 78px);
+    line-height:1.05;
+    font-weight:800;
+
+    color:#ffffff;
+
+    text-shadow:
+      0 10px 30px rgba(0,0,0,.35),
+      0 4px 10px rgba(0,0,0,.25);
+  }
+
+  .wc-video-content h1::after{
+    content:"";
+    display:block;
+
+    width:118px;
+    height:5px;
+
+    margin:24px auto 0 auto;
+
+    border-radius:999px;
+    background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
+    box-shadow:0 0 18px rgba(209,190,120,0.36);
+  }
+
+  .wc-video-content p{
+    max-width:880px;
+    margin:28px auto 0 auto;
+
+    font-size:20px;
+    line-height:1.75;
+
+    color:rgba(255,255,255,.92);
+  }
+
+
+  @media(max-width:768px){
+
+    .wc-video-hero{
+      height:420px;
+    }
+
+    .wc-video-content{
+      padding:0 24px;
+    }
+
+    .wc-video-title-box{
+      padding:24px 26px 26px 26px;
+      border-radius:20px;
+    }
+
+    .wc-video-content p{
+      font-size:16px;
+      line-height:1.65;
+    }
+  }
+</style><div class="wc-video-hero">
+
+  <iframe class="wc-video-frame" src="https://www.youtube.com/embed/9KzURzB0E-U?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=9KzURzB0E-U&amp;controls=0&amp;modestbranding=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" title="Final Budget 2025–2026" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen="">
+  </iframe>
+
+  <div class="wc-video-overlay"></div>
+
+  <div class="wc-video-content">
+
+    <div class="wc-video-title-box">
+
+      <span>Walton County, Florida</span>
+
+      <h1>Proposed Fiscal Year 2027 Budget</h1>
+
+
+    </div>
+
   </div>
+
 </div>
 
-<script src="assets/pages-data.js"></script>
-<script src="assets/content-loader.js"></script>
-<script src="assets/sidebar.js"></script>
-<script src="assets/flipbook.js"></script>
-<script src="assets/mobile-scroll.js"></script>
-<script src="assets/mode-switch.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  WCSidebar.init();
-  WCModeSwitch.init();
+<h2 class="wc-budget-strip-title">Budget at a Glance</h2><style>
 
-  document.querySelector('.wc-flip-btn.prev').addEventListener('click', function () { WCFlipbook.prev(); });
-  document.querySelector('.wc-flip-btn.next').addEventListener('click', function () { WCFlipbook.next(); });
+  .wc-budget-strip-title{
+    margin:54px 0 16px 0;
+    color:#172033;
+    font-size:42px;
+    line-height:1.15;
+    font-weight:700;
+    font-family:Arial, Helvetica, sans-serif;
+    text-align:center;
+  }
 
-  document.addEventListener('keydown', function (e) {
-    var tag = (e.target.tagName || '').toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+  .wc-budget-strip-title::after{
+    content:"";
+    display:block;
+    width:90px;
+    height:4px;
+    background:#d1be78;
+    border-radius:4px;
+    margin:16px auto 0 auto;
+  }
 
-    var bookWrap = document.getElementById('book-wrap');
-    if (bookWrap.hidden) return;
+  .wc-budget-strip{
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0,1fr));
+    gap:16px;
+    margin:34px 0 42px 0;
+    padding:22px;
+    background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
+    border-radius:26px;
+    box-shadow:0 18px 42px rgba(0,0,0,.12);
+    font-family:Arial, Helvetica, sans-serif;
+  }
 
-    if (e.key === 'ArrowRight') WCFlipbook.next();
-    if (e.key === 'ArrowLeft') WCFlipbook.prev();
-  });
-});
+  .wc-budget-item{
+    padding:14px 10px;
+    text-align:center;
+  }
+
+  .wc-budget-label{
+    display:block;
+    margin-bottom:10px;
+    color:rgba(255,255,255,.76);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    line-height:1.35;
+    min-height:42px;
+  }
+
+  .wc-budget-item strong{
+    display:block;
+    color:#ffffff;
+    font-size:30px;
+    line-height:1.1;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .wc-budget-count{
+    display:block;
+  }
+
+  @media(max-width:900px){
+    .wc-budget-strip{
+      grid-template-columns:repeat(2,1fr);
+    }
+  }
+
+  @media(max-width:600px){
+    .wc-budget-strip{
+      grid-template-columns:1fr;
+      padding:20px;
+    }
+
+    .wc-budget-strip-title{
+      margin-top:38px;
+      font-size:34px;
+    }
+
+    .wc-budget-item strong{
+      font-size:26px;
+    }
+  }
+
+</style><div class="wc-budget-strip">
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Property Taxes</span>
+    <strong class="wc-budget-count" data-target="163.4" data-prefix="$" data-suffix="M" data-decimals="1">$163.4M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Tourist Development Tax</span>
+    <strong class="wc-budget-count" data-target="58.8" data-prefix="$" data-suffix="M" data-decimals="1">$58.8M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Local Discretionary Sales Surtax</span>
+    <strong class="wc-budget-count" data-target="40.0" data-prefix="$" data-suffix="M" data-decimals="1">$40.0M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Local Government 1/2 Cent Sales Tax</span>
+    <strong class="wc-budget-count" data-target="17.9" data-prefix="$" data-suffix="M" data-decimals="1">$17.9M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">All Other Revenues</span>
+    <strong class="wc-budget-count" data-target="57.9" data-prefix="$" data-suffix="M" data-decimals="1">$57.9M</strong>
+  </div>
+
+</div><script>
+  (function(){
+    const section = document.querySelector('.wc-budget-strip');
+    const counters = document.querySelectorAll('.wc-budget-count');
+
+    if(!section || !counters.length){
+      return;
+    }
+
+    function formatValue(value, decimals){
+      return Number(value).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function animateCounters(){
+      counters.forEach(function(counter){
+        const target = Number(counter.dataset.target || 0);
+        const prefix = counter.dataset.prefix || '';
+        const suffix = counter.dataset.suffix || '';
+        const decimals = Number(counter.dataset.decimals || 0);
+        const duration = 1100;
+        const startTime = performance.now();
+
+        function update(now){
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const currentValue = target * eased;
+
+          counter.textContent = prefix + formatValue(currentValue, decimals) + suffix;
+
+          if(progress < 1){
+            requestAnimationFrame(update);
+          }else{
+            counter.textContent = prefix + formatValue(target, decimals) + suffix;
+          }
+        }
+
+        counter.textContent = prefix + formatValue(0, decimals) + suffix;
+        requestAnimationFrame(update);
+      });
+    }
+
+    if('IntersectionObserver' in window){
+      const observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            animateCounters();
+            observer.disconnect();
+          }
+        });
+      }, { threshold:.35 });
+
+      observer.observe(section);
+    }else{
+      animateCounters();
+    }
+  })();
 </script>
+
+<nav class="page-nav" aria-label="Page navigation">
+  
+  <a class="next" href="pages/gfoa-distinguished-budget-presentation-award.html">GFOA Distinguished Budget Presentation Award</a>
+</nav>
+  </main>
+</div>
+
+<!-- walton-budget-nav.js will inject footer[role="contentinfo"] here -->
+
+<script>
+/* set wcBudgetPages before nav script runs so search is fully populated */
+window.wcBudgetAssetBaseUrl = "https://budget-pixel.github.io/walton-budget-nav.js/";
+window.wcBudgetPages = [
+  {title:"Home",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/home.html"},
+  {title:"GFOA Distinguished Budget Presentation Award",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/gfoa-distinguished-budget-presentation-award.html"},
+  {title:"Transmittal Letter",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/transmittal-letter.html"},
+  {title:"Budget-in-Brief",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/budget-in-brief.html"},
+  {title:"Overview of Walton County",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/overview-of-walton-county.html"},
+  {title:"Organizational Structure",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/organizational-structure.html"},
+  {title:"Strategic Initiatives",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/strategic-initiatives.html"},
+  {title:"Budget Process & Calendar",section:"Financial Structure, Policies, and Process",href:"https://budget-pixel.github.io/budget-fy2027/../pages/budget-process-and-calendar.html"},
+  {title:"Fund Descriptions and Structure",section:"Financial Structure, Policies, and Process",href:"https://budget-pixel.github.io/budget-fy2027/../pages/fund-descriptions-and-structure.html"},
+  {title:"Department to Fund Relationship",section:"Financial Structure, Policies, and Process",href:"https://budget-pixel.github.io/budget-fy2027/../pages/department-to-fund-relationship.html"},
+  {title:"Financial Policies",section:"Financial Structure, Policies, and Process",href:"https://budget-pixel.github.io/budget-fy2027/../pages/financial-policies.html"},
+  {title:"Consolidated Financial Schedules",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/consolidated-financial-schedules.html"},
+  {title:"Fund Financial Schedules",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/fund-financial-schedules.html"},
+  {title:"Summary of Revenues",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-revenues.html"},
+  {title:"Summary of Expenses",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-expenses.html"},
+  {title:"Summary of Interfund Transfers",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-interfund-transfers.html"},
+  {title:"Summary of Personnel",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-personnel.html"},
+  {title:"Summary of Machinery, Vehicles & Equipment",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-machinery-vehicles-and-equipment.html"},
+  {title:"Board of County Commissioners",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/board-of-county-commissioners.html"},
+  {title:"Clerk of Courts & County Comptroller",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/clerk-of-courts-and-county-comptroller.html"},
+  {title:"Property Appraiser",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/property-appraiser.html"},
+  {title:"Sheriff's Office",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/sheriffs-office.html"},
+  {title:"Supervisor of Elections",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/supervisor-of-elections.html"},
+  {title:"Tax Collector",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/tax-collector.html"},
+  {title:"Circuit Court",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/circuit-court.html"},
+  {title:"County Court",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/county-court.html"},
+  {title:"Court Technology & Innovations",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/court-technology-and-innovations.html"},
+  {title:"Guardian Ad Litem",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/guardian-ad-litem.html"},
+  {title:"Medical Examiner",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/medical-examiner.html"},
+  {title:"Non-Profit Funding Program",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/non-profit-funding-program.html"},
+  {title:"Public Defender",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/public-defender.html"},
+  {title:"South Walton Fire & State Control",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/south-walton-fire-and-state-control.html"},
+  {title:"State Attorney",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/state-attorney.html"},
+  {title:"Statutory & Other Agency Funding",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statutory-and-other-agency-funding.html"},
+  {title:"Walton County Health Department",section:"Autonomous Entities",href:"https://budget-pixel.github.io/budget-fy2027/../pages/walton-county-health-department.html"},
+  {title:"Building Construction and Maintenance",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/building-construction-and-maintenance.html"},
+  {title:"Building Department",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/building-department.html"},
+  {title:"Code Compliance",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/code-compliance.html"},
+  {title:"County Administration",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/county-administration.html"},
+  {title:"Eagle Springs Golf and Recreation Center",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/eagle-springs-golf-and-recreation-center.html"},
+  {title:"Eagle Springs Grill",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/eagle-springs-grill.html"},
+  {title:"Emergency Management",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/emergency-management.html"},
+  {title:"Engineering Department",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/engineering-department.html"},
+  {title:"Environmental Resources",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/environmental-resources.html"},
+  {title:"Extension Office",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/extension-office.html"},
+  {title:"Geographic Info Systems",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/geographic-info-systems.html"},
+  {title:"Housing & Urban Development",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/housing-and-urban-development.html"},
+  {title:"Human Resources",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/human-resources.html"},
+  {title:"Libraries",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/libraries.html"},
+  {title:"Mosquito Control",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/mosquito-control.html"},
+  {title:"Mossy Head Wastewater Treatment Facility",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/mossy-head-wastewater-treatment-facility.html"},
+  {title:"Office of Management and Budget",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/office-of-management-and-budget.html"},
+  {title:"Office of the County Attorney",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/office-of-the-county-attorney.html"},
+  {title:"Planning",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/planning.html"},
+  {title:"Probation",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/probation.html"},
+  {title:"Public Works",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/public-works.html"},
+  {title:"Purchasing",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/purchasing.html"},
+  {title:"Recreation",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/recreation.html"},
+  {title:"Soil Conservation",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/soil-conservation.html"},
+  {title:"Solid Waste",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/solid-waste.html"},
+  {title:"Tourism Administration",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/tourism-administration.html"},
+  {title:"Tourism Beach Operations",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/tourism-beach-operations.html"},
+  {title:"Tourism Lifeguard Services and Beach Safety",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/tourism-lifeguard-services-and-beach-safety.html"},
+  {title:"Veteran Services",section:"Department Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/veteran-services.html"},
+  {title:"Capital Improvement Plan",section:"Capital, Debt, and Financial Forecast",href:"https://budget-pixel.github.io/budget-fy2027/../pages/capital-improvement-plan.html"},
+  {title:"CIP Project Search",section:"Capital Improvement Projects",href:"https://budget-pixel.github.io/budget-fy2027/../pages/search.html"},
+  {title:"Capital Projects Fund Schedule",section:"Capital Improvement Projects",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-capital-projects.html"},
+  {title:"Grant Funded Schedule",section:"Capital Improvement Projects",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-grants.html"},
+  {title:"Sheriff Fund Schedule",section:"Capital Improvement Projects",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-sheriff.html"},
+  {title:"Tourist Development Fund Schedule",section:"Capital Improvement Projects",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-tourist-development.html"},
+  {title:"Transportation Fund Schedule",section:"Capital Improvement Projects",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-transportation.html"},
+  {title:"Debt Overview",section:"Capital, Debt, and Financial Forecast",href:"https://budget-pixel.github.io/budget-fy2027/../pages/debt-overview.html"},
+  {title:"Financial Forecast",section:"Capital, Debt, and Financial Forecast",href:"https://budget-pixel.github.io/budget-fy2027/../pages/financial-forecast.html"},
+  {title:"Glossary, Acronyms, and Frequently Asked Questions",section:"Glossary, Statistical, and Supplemental Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/glossary-acronyms-and-frequently-asked-questions.html"},
+  {title:"Statistical & Supplemental Information",section:"Glossary, Statistical, and Supplemental Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
+];
+</script>
+<script src="assets/walton-budget-nav.js"></script>
+<script src="assets/nav.js"></script>
 </body>
 </html>
