@@ -1,0 +1,1608 @@
+(function(){
+  var wcBudgetNavStarted = false;
+  var wcLastKnownUrl = location.href;
+  var wcRepairTimer = null;
+  var wcBudgetAssetBaseUrl = "https://budget-pixel.github.io/walton-budget-nav.js/";
+  var wcCipAssetBaseUrl = "https://budget-pixel.github.io/walton-cip-project-search/";
+  var wcCipProjectSearchUrl = wcCipAssetBaseUrl + "?view=all&v=6";
+  var wcCapitalImprovementPlanPageId = "6989dbbd4a9d93e5ac05a153";
+  window.wcCipAssetBaseUrl = wcCipAssetBaseUrl;
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);
+    t.async=1;
+    t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];
+    y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "x1l60xfnei");
+
+  /* Google Analytics 4 */
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+
+  var gaScript = document.createElement("script");
+  gaScript.async = true;
+  gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-Z7W0K4BTDP";
+  document.head.appendChild(gaScript);
+
+  gtag("js", new Date());
+  gtag("config", "G-Z7W0K4BTDP");
+  var mobileStylesheetId = "wc-budget-mobile-styles";
+  var splitLogoScriptId = "wc-split-logo-script";
+  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "walton-split-logo.js?v=1";
+  function loadWaltonMobileStylesheet(){
+    var mobileStylesheet = document.getElementById(mobileStylesheetId);
+    if(!mobileStylesheet){
+      mobileStylesheet = document.createElement("link");
+      mobileStylesheet.id = mobileStylesheetId;
+      mobileStylesheet.rel = "stylesheet";
+    }
+    mobileStylesheet.href = wcBudgetAssetBaseUrl + "walton-budget-mobile.css?v=8";
+    document.head.appendChild(mobileStylesheet);
+  }
+  function loadWcScriptOnce(scriptId, src, onload){
+    var existingScript = document.getElementById(scriptId);
+    if(existingScript){
+      if(typeof onload === "function"){
+        if(existingScript.getAttribute("data-loaded") === "true"){
+          onload();
+        }else{
+          existingScript.addEventListener("load", onload, { once:true });
+        }
+      }
+      return;
+    }
+    var script = document.createElement("script");
+    script.id = scriptId;
+    script.src = src;
+    script.async = true;
+    script.addEventListener("load", function(){
+      script.setAttribute("data-loaded", "true");
+      if(typeof onload === "function"){
+        onload();
+      }
+    });
+    script.addEventListener("error", function(){
+      script.setAttribute("data-load-failed", "true");
+      if(window.console && typeof window.console.error === "function"){
+        window.console.error("Failed to load Walton County budget script:", src);
+      }
+    });
+    document.head.appendChild(script);
+  }
+  function loadWaltonSplitLogo(onReady){
+    if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.getHtml === "function"){
+      if(typeof onReady === "function"){
+        onReady();
+      }
+      return;
+    }
+    loadWcScriptOnce(splitLogoScriptId, splitLogoScriptUrl, function(){
+      if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.injectStyles === "function"){
+        window.WaltonSplitLogo.injectStyles();
+      }
+      if(typeof onReady === "function"){
+        onReady();
+      }
+    });
+  }
+  function loadWaltonBudgetSearchModules(onReady){
+    loadWcScriptOnce(
+      "wc-budget-search-data-script",
+      wcBudgetAssetBaseUrl + "walton-budget-search-data.js?v=1",
+      function(){
+        loadWcScriptOnce(
+          "wc-budget-search-script",
+          wcBudgetAssetBaseUrl + "walton-budget-search.js?v=1",
+          function(){
+            var fallbackSlot = document.querySelector(".wc-nav-search-slot-fallback");
+            if(fallbackSlot && fallbackSlot.parentNode){
+              fallbackSlot.parentNode.removeChild(fallbackSlot);
+            }
+            if(typeof onReady === "function"){
+              onReady();
+            }
+          }
+        );
+      }
+    );
+  }
+  function setFyColumnsVisible(table, indices, visible){
+    table.classList.toggle('wc-prior-years-hidden', !visible);
+    table.classList.toggle('wc-prior-years-visible', visible);
+    var rows = table.querySelectorAll('tr');
+    rows.forEach(function(row){
+      var columnIndex = 0;
+      Array.prototype.forEach.call(row.children, function(cell){
+        var span = parseInt(cell.getAttribute('colspan') || '1', 10);
+        var start = columnIndex;
+        var end = columnIndex + (span > 0 ? span : 1);
+        var shouldHide = indices.some(function(targetIndex){
+          return targetIndex >= start && targetIndex < end;
+        });
+        if(shouldHide){
+          cell.classList.toggle('wc-fy-column-hidden', !visible);
+        }
+        columnIndex = end;
+      });
+    });
+    markNarrowReportTable(table);
+  }
+  function markNarrowReportTable(table){
+    var firstHeaderRow = table.querySelector('thead tr');
+    if(!firstHeaderRow){
+      return;
+    }
+    var visibleColumnCount = Array.prototype.reduce.call(firstHeaderRow.children, function(count, cell){
+      if(cell.classList && cell.classList.contains('wc-fy-column-hidden')){
+        return count;
+      }
+      var span = parseInt(cell.getAttribute('colspan') || '1', 10);
+      return count + (span > 0 ? span : 1);
+    }, 0);
+    table.classList.toggle('wc-mobile-fit-visible-columns', visibleColumnCount <= 2);
+  }
+  var wcBudgetLineTooltips = [
+    {
+      key:'personnel',
+      label:'Personnel Budget',
+      patterns:[/personnel\s+budget/i, /^personnel$/i],
+      message:'Covers employee compensation and benefits, including salaries, overtime, weekend and holiday pay, seasonal workers, FICA, Florida Retirement System (FRS) contributions, health insurance, workers’ compensation, life insurance, and paid leave buybacks.'
+    },
+    {
+      key:'operating',
+      label:'Operating Expenditures',
+      patterns:[/operating\s+expenditures/i, /operating\s+expenses/i],
+      message:'Covers the day-to-day costs of providing County services, including utilities, fuel, maintenance, professional services, software, office supplies, communications, training, and other routine operating expenses.'
+    },
+    {
+      key:'capital',
+      label:'Capital Budget',
+      patterns:[/capital\s+budget/i, /^capital$/i],
+      message:'Covers major investments in long-term County assets, including vehicles, machinery and equipment, technology systems, buildings, facility improvements, roads, drainage, parks, and other infrastructure projects.'
+    }
+  ];
+  function getBudgetLineCellText(cell){
+    var clone = cell.cloneNode(true);
+    Array.prototype.forEach.call(clone.querySelectorAll('.wc-budget-line-tooltip-anchor'), function(anchor){
+      if(anchor.parentNode){
+        anchor.parentNode.removeChild(anchor);
+      }
+    });
+    return clone.textContent.trim().replace(/\s+/g, ' ');
+  }
+  function getBudgetLineTooltipConfig(text){
+    return wcBudgetLineTooltips.find(function(config){
+      return config.patterns.some(function(pattern){
+        return pattern.test(text);
+      });
+    }) || null;
+  }
+  function ensureBudgetLineTooltipBubble(){
+    var bubble = document.querySelector('.wc-budget-line-tooltip-bubble');
+    if(!bubble){
+      bubble = document.createElement('div');
+      bubble.className = 'wc-budget-line-tooltip-bubble';
+      bubble.setAttribute('role', 'tooltip');
+      document.body.appendChild(bubble);
+    }
+    return bubble;
+  }
+  function positionBudgetLineTooltip(anchor, bubble){
+    var rect = anchor.getBoundingClientRect();
+    var width = Math.min(300, Math.max(220, window.innerWidth - 32));
+    var left = rect.left + (rect.width / 2) - (width / 2);
+    left = Math.max(16, Math.min(left, window.innerWidth - width - 16));
+    var top = rect.bottom + 8;
+    if(top + bubble.offsetHeight > window.innerHeight - 16){
+      top = Math.max(16, rect.top - bubble.offsetHeight - 8);
+    }
+    bubble.style.setProperty('width', width + 'px', 'important');
+    bubble.style.setProperty('left', left + 'px', 'important');
+    bubble.style.setProperty('top', top + 'px', 'important');
+  }
+  function showBudgetLineTooltip(anchor){
+    var bubble = ensureBudgetLineTooltipBubble();
+    bubble.textContent = anchor.getAttribute('data-wc-tooltip') || '';
+    bubble.classList.add('is-visible');
+    positionBudgetLineTooltip(anchor, bubble);
+  }
+  function hideBudgetLineTooltip(){
+    var bubble = document.querySelector('.wc-budget-line-tooltip-bubble');
+    if(bubble){
+      bubble.classList.remove('is-visible');
+    }
+  }
+  function bindBudgetLineTooltipAnchor(anchor){
+    if(anchor.getAttribute('data-wc-tooltip-bound') === 'true'){
+      return;
+    }
+    anchor.addEventListener('mouseenter', function(){
+      showBudgetLineTooltip(anchor);
+    });
+    anchor.addEventListener('focus', function(){
+      showBudgetLineTooltip(anchor);
+    });
+    anchor.addEventListener('mouseleave', hideBudgetLineTooltip);
+    anchor.addEventListener('blur', hideBudgetLineTooltip);
+    anchor.setAttribute('data-wc-tooltip-bound', 'true');
+  }
+  function addBudgetLineTooltips(table){
+    Array.prototype.forEach.call(table.querySelectorAll('tbody tr'), function(row){
+      var cells = Array.prototype.slice.call(row.querySelectorAll('th, td'));
+      var targetCell = null;
+      var targetConfig = null;
+      cells.some(function(cell){
+        var text = getBudgetLineCellText(cell);
+        var config = getBudgetLineTooltipConfig(text);
+        if(config){
+          targetCell = cell;
+          targetConfig = config;
+          return true;
+        }
+        return false;
+      });
+      if(!targetCell || !targetConfig){
+        return;
+      }
+      targetCell.classList.add('wc-budget-line-tooltip-cell');
+      var existingAnchor = targetCell.querySelector('.wc-budget-line-tooltip-anchor');
+      if(existingAnchor){
+        existingAnchor.setAttribute('aria-label', targetConfig.label + ' information');
+        existingAnchor.setAttribute('data-wc-tooltip', targetConfig.message);
+        bindBudgetLineTooltipAnchor(existingAnchor);
+        return;
+      }
+      var anchor = document.createElement('button');
+      anchor.type = 'button';
+      anchor.className = 'wc-budget-line-tooltip-anchor';
+      anchor.setAttribute('aria-label', targetConfig.label + ' information');
+      anchor.setAttribute('data-wc-tooltip', targetConfig.message);
+      anchor.textContent = 'i';
+      targetCell.appendChild(anchor);
+      bindBudgetLineTooltipAnchor(anchor);
+    });
+  }
+  function findFyColumnToggleTitle(table, container){
+    var scope = container || table;
+    var cursor = scope.previousElementSibling;
+    while(cursor){
+      var titleText = cursor.querySelector('[data-test="summary-table-title"]');
+      if(titleText){
+        return titleText.closest('div') || titleText.parentNode;
+      }
+      cursor = cursor.previousElementSibling;
+    }
+    var parent = scope.parentNode;
+    if(parent){
+      var nearbyTitle = null;
+      Array.prototype.forEach.call(parent.querySelectorAll('[data-test="summary-table-title"]'), function(titleText){
+        if(titleText.compareDocumentPosition(scope) & Node.DOCUMENT_POSITION_FOLLOWING){
+          nearbyTitle = titleText;
+        }
+      });
+      if(nearbyTitle){
+        return nearbyTitle.closest('div') || nearbyTitle.parentNode;
+      }
+    }
+    return null;
+  }
+  function isPerformanceTable(table, container, titleWrap){
+    var text = '';
+    if(titleWrap){
+      text += titleWrap.textContent || '';
+    }
+    if(container && container !== titleWrap){
+      text += ' ' + (container.textContent || '');
+    }
+    text += ' ' + (table.textContent || '');
+    text = text.trim().replace(/\s+/g, ' ');
+    if(/\bperformance\b|\bperformance\s+measures\b|\bperformance\s+measure\b|\bmeasure(s)?\b|\bmetric(s)?\b|\boutcome(s)?\b/i.test(text)){
+      return true;
+    }
+    return false;
+  }
+  function removeFyColumnToggle(table, container, titleWrap){
+    if(table.getAttribute('data-wc-fy-toggle') !== 'true'){
+      return;
+    }
+    var wrapper;
+    if(titleWrap){
+      wrapper = titleWrap.querySelector('.wc-fy-column-toggle-wrap');
+      if(wrapper && wrapper.parentNode){
+        wrapper.parentNode.removeChild(wrapper);
+      }
+    }
+    container = container || table.parentNode;
+    if(container && container.previousElementSibling && container.previousElementSibling.classList.contains('wc-fy-column-toggle-wrap')){
+      container.parentNode.removeChild(container.previousElementSibling);
+    }
+    table.removeAttribute('data-wc-fy-toggle');
+  }
+  function isPriorYearToggleHeader(text){
+    var normalized = text.trim().replace(/\s+/g, ' ');
+    var rangeMatch = normalized.match(/\b(20\d{2})\s*[-–]\s*(20\d{2})\b/);
+    if(rangeMatch){
+      return parseInt(rangeMatch[2], 10) < 2027;
+    }
+    var fyMatch = normalized.match(/\bFY\s*(20\d{2})\b/i);
+    if(fyMatch){
+      return parseInt(fyMatch[1], 10) < 2027;
+    }
+    var yearMatch = normalized.match(/\b(20\d{2})\b/);
+    if(yearMatch){
+      return parseInt(yearMatch[1], 10) < 2027;
+    }
+    return false;
+  }
+  function createFyColumnToggle(table){
+    if(table.getAttribute('data-wc-fy-toggle') === 'true'){
+      return;
+    }
+    var headerCells = Array.prototype.slice.call(table.querySelectorAll('thead th'));
+    var targetIndices = headerCells.reduce(function(found, th, index){
+      var text = th.textContent.trim().replace(/\s+/g, ' ');
+      if(isPriorYearToggleHeader(text)){
+        found.push(index);
+      }
+      return found;
+    }, []);
+    if(!targetIndices.length){
+      return;
+    }
+    var wrapper = document.createElement('div');
+    wrapper.className = 'wc-fy-column-toggle-wrap';
+    var label = document.createElement('label');
+    label.className = 'wc-fy-column-toggle-label';
+    var checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'wc-fy-column-toggle-checkbox';
+    checkbox.setAttribute('aria-checked', 'false');
+    checkbox.setAttribute('aria-label', 'View Prior Years');
+    var labelText = document.createElement('span');
+    labelText.className = 'wc-fy-column-toggle-text';
+    labelText.textContent = 'View Prior Years';
+    label.appendChild(checkbox);
+    label.appendChild(labelText);
+    checkbox.addEventListener('change', function(){
+      var visible = checkbox.checked;
+      setFyColumnsVisible(table, targetIndices, visible);
+      checkbox.setAttribute('aria-checked', visible.toString());
+    });
+    wrapper.appendChild(label);
+    var container = table.closest('[data-report-table-container-id]') || table.parentNode;
+    var titleWrap = findFyColumnToggleTitle(table, container);
+    if(isPerformanceTable(table, container, titleWrap)){
+      removeFyColumnToggle(table, container, titleWrap);
+      return;
+    }
+    if(titleWrap){
+      titleWrap.classList.add('wc-has-fy-column-toggle-title');
+      wrapper.classList.add('wc-fy-column-toggle-in-title');
+      titleWrap.appendChild(wrapper);
+    } else if(container && container.parentNode){
+      container.parentNode.insertBefore(wrapper, container);
+    } else {
+      table.parentNode.insertBefore(wrapper, table);
+    }
+    setFyColumnsVisible(table, targetIndices, false);
+    table.setAttribute('data-wc-fy-toggle', 'true');
+  }
+  function styleTotalRow(row){
+    Array.prototype.forEach.call(row.querySelectorAll('th, td'), function(cell){
+      cell.style.setProperty('background', 'linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%)', 'important');
+      cell.style.setProperty('color', '#172033', 'important');
+      cell.style.setProperty('font-weight', '700', 'important');
+      cell.style.setProperty('border-bottom', '0', 'important');
+    });
+  }
+  function markTotalRows(table){
+    Array.prototype.forEach.call(table.querySelectorAll('tbody tr'), function(row){
+      var totalCell = row.querySelector('th, td');
+      if(totalCell && totalCell.textContent.trim().toLowerCase() === 'total'){
+        row.classList.add('wc-budget-total-row');
+        styleTotalRow(row);
+        return;
+      }
+      Array.prototype.forEach.call(row.querySelectorAll('th, td'), function(cell){
+        if(cell.textContent.trim().toLowerCase() === 'total'){
+          row.classList.add('wc-budget-total-row');
+          styleTotalRow(row);
+        }
+      });
+    });
+  }
+  function enhanceBudgetTables(){
+    Array.prototype.forEach.call(document.querySelectorAll('[data-report-table-id]'), function(table){
+      addBudgetLineTooltips(table);
+      var container = table.closest('[data-report-table-container-id]') || table.parentNode;
+      var titleWrap = findFyColumnToggleTitle(table, container);
+      if(isPerformanceTable(table, container, titleWrap)){
+        removeFyColumnToggle(table, container, titleWrap);
+      } else {
+        createFyColumnToggle(table);
+      }
+      markNarrowReportTable(table);
+      if(table.getAttribute('data-wc-enhanced') === 'true'){
+        return;
+      }
+      markTotalRows(table);
+      table.setAttribute('data-wc-enhanced', 'true');
+    });
+  }
+  function watchForBudgetTables(){
+    if(window.wcBudgetTableObserver){
+      return;
+    }
+    try{
+      window.wcBudgetTableObserver = new MutationObserver(function(){
+        enhanceBudgetTables();
+      });
+      window.wcBudgetTableObserver.observe(document.body, { childList:true, subtree:true });
+    }catch(error){
+      if(window.console && typeof window.console.error === 'function'){
+        window.console.error('Budget table observer failed:', error);
+      }
+    }
+  }
+  function loadWaltonPerformanceMobile(){
+    loadWcScriptOnce(
+      "wc-performance-mobile-script",
+      wcBudgetAssetBaseUrl + "walton-performance-mobile.js?v=2"
+    );
+  }
+  var css = `
+  *,
+  *::before,
+  *::after{
+    box-sizing:border-box !important;
+  }
+  html,
+  body{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:hidden !important;
+    -webkit-text-size-adjust:100% !important;
+    text-size-adjust:100% !important;
+  }
+  body{
+    position:relative !important;
+  }
+  .story-page,
+  .content,
+  .main-content,
+  main,
+  article,
+  [data-testid="story-page"],
+  .page-content,
+  .story-content{
+    max-width:100% !important;
+    overflow-x:hidden !important;
+  }
+  img,
+  svg,
+  canvas,
+  iframe,
+  video{
+    max-width:100% !important;
+  }
+  /* WALTON COUNTY MENU RESTYLE */
+  body,
+  .story-page,
+  .content,
+  .main-content{
+    margin-top:0 !important;
+    padding-top:0 !important;
+  }
+  nav#nav-menu.nav-menu{
+    position:sticky !important;
+    top:0 !important;
+    z-index:9999 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:24px !important;
+    min-height:74px !important;
+    margin-top:0 !important;
+    padding:10px 28px !important;
+    box-sizing:border-box !important;
+    background:#ffffff !important;
+    border-top:0 !important;
+    border-bottom:4px solid #006231 !important;
+    box-shadow:0 1px 4px rgba(36,52,77,0.04) !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+  }
+  nav#nav-menu.nav-menu::before{
+    display:none !important;
+  }
+  nav#nav-menu .logo-container{
+    position:relative !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    flex:0 0 auto !important;
+    width:auto !important;
+    min-width:0 !important;
+    height:64px !important;
+    min-height:64px !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+    font-family:"Avenir Next", Avenir, Helvetica, Arial, sans-serif !important;
+  }
+  nav#nav-menu .logo-container::before,
+  nav#nav-menu .logo-container::after{
+    content:none !important;
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+  }
+  nav#nav-menu .logo-container img,
+  nav#nav-menu img.js-logo-navigation,
+  nav#nav-menu .logo-container .wc-logo-text-link{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+  }
+  nav#nav-menu .logo-container,
+  .wc-standalone-brand,
+  .wc-budget-footer-brand{
+    position:relative !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    flex:0 0 auto !important;
+    width:auto !important;
+    min-width:max-content !important;
+    max-width:none !important;
+    height:64px !important;
+    min-height:64px !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+    font-family:"Avenir Next", Avenir, Helvetica, Arial, sans-serif !important;
+    text-decoration:none !important;
+  }
+  nav#nav-menu .wc-nav-search-slot{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    flex:0 0 460px !important;
+    width:460px !important;
+    min-width:460px !important;
+    max-width:460px !important;
+    margin-left:auto !important;
+    margin-right:0 !important;
+    position:relative !important;
+    z-index:2 !important;
+  }
+  nav#nav-menu .wc-search-wrap{
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    box-sizing:border-box !important;
+  }
+  nav#nav-menu .wc-search-box{
+    position:relative !important;
+    width:100% !important;
+    max-width:460px !important;
+    margin:0 auto !important;
+    display:flex !important;
+    align-items:center !important;
+    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+    border-radius:999px !important;
+    padding:9px 14px !important;
+    box-sizing:border-box !important;
+    box-shadow:0 8px 18px rgba(0,98,49,0.14) !important;
+    transition:box-shadow .22s ease, background-color .22s ease !important;
+  }
+  nav#nav-menu .wc-search-box:hover,
+  nav#nav-menu .wc-search-box:focus-within{
+    transform:none !important;
+    box-shadow:0 8px 18px rgba(0,98,49,0.14) !important;
+  }
+  nav#nav-menu .wc-search-icon{
+    width:18px !important;
+    height:18px !important;
+    flex-shrink:0 !important;
+    margin-right:10px !important;
+    color:#ffffff !important;
+    stroke:#ffffff !important;
+    fill:none !important;
+  }
+  nav#nav-menu #wcTocSearch{
+    width:100% !important;
+    border:0 !important;
+    outline:0 !important;
+    background:transparent !important;
+    color:#ffffff !important;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    font-weight:600 !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+  }
+  nav#nav-menu #wcTocSearch::placeholder{
+    color:rgba(255,255,255,.72) !important;
+    opacity:1 !important;
+  }
+  nav#nav-menu .wc-nav-search-results{
+    position:absolute !important;
+    top:calc(100% + 10px) !important;
+    right:0 !important;
+    width:100% !important;
+    max-width:520px !important;
+    max-height:420px !important;
+    overflow:auto !important;
+    background:#ffffff !important;
+    border:1px solid rgba(209,190,120,0.38) !important;
+    border-radius:18px !important;
+    box-shadow:0 16px 34px rgba(36,52,77,0.14) !important;
+    padding:8px !important;
+    box-sizing:border-box !important;
+    display:none;
+    z-index:10000 !important;
+  }
+  nav#nav-menu .wc-nav-search-results.is-active{
+    display:block !important;
+  }
+  nav#nav-menu .wc-nav-search-result{
+    display:block !important;
+    padding:12px 14px !important;
+    border-radius:12px !important;
+    text-decoration:none !important;
+    border-bottom:1px solid rgba(36,52,77,0.08) !important;
+  }
+  nav#nav-menu .wc-nav-search-result:hover{
+    background:rgba(0,98,49,0.06) !important;
+  }
+  nav#nav-menu .wc-nav-search-result strong{
+    display:block !important;
+    margin:0 0 4px 0 !important;
+    color:#006231 !important;
+    font-size:14px !important;
+    font-weight:800 !important;
+  }
+  nav#nav-menu .wc-nav-search-result span{
+    display:block !important;
+    color:rgba(36,52,77,0.66) !important;
+    font-size:12px !important;
+    font-weight:600 !important;
+  }
+  nav#nav-menu .wc-nav-search-empty{
+    padding:14px !important;
+    color:rgba(36,52,77,0.68) !important;
+    font-size:13px !important;
+    font-weight:600 !important;
+  }
+  nav#nav-menu .nav-menu-list{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    gap:10px !important;
+    margin:0 !important;
+    padding:0 !important;
+    list-style:none !important;
+    flex:1 1 auto !important;
+  }
+  nav#nav-menu .nav-menu-item,
+  nav#nav-menu .dropdown-item{
+    position:relative !important;
+    border-radius:999px !important;
+    background:transparent !important;
+    border:1px solid transparent !important;
+  }
+  nav#nav-menu .nav-menu-item-title,
+  nav#nav-menu .dropdown-item-title{
+    margin:0 !important;
+    padding:11px 18px !important;
+    color:#24344d !important;
+    font-size:13px !important;
+    line-height:1 !important;
+    font-weight:700 !important;
+    letter-spacing:.08em !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+  }
+  nav#nav-menu .nav-menu-item:hover,
+  nav#nav-menu .dropdown-item:hover{
+    background:rgba(0,98,49,0.06) !important;
+  }
+  nav#nav-menu .dropdown{
+    margin-top:12px !important;
+    border:1px solid rgba(209,190,120,0.38) !important;
+    border-radius:18px !important;
+    background:#ffffff !important;
+    box-shadow:0 16px 34px rgba(36,52,77,0.14) !important;
+    overflow:hidden !important;
+  }
+  nav#nav-menu .dropdown-list{
+    margin:0 !important;
+    padding:8px !important;
+    list-style:none !important;
+  }
+  nav#nav-menu .hamburger-menu,
+  nav#nav-menu .table-of-contents,
+  nav#nav-menu .table-of-contents-button,
+  nav#nav-menu .js-inline-nav-menu-item,
+  nav#nav-menu .js-more-nav-menu-dropdown-button,
+  nav#nav-menu li[data-id="more-nav-menu-dropdown"],
+  nav#nav-menu li[aria-controls="more-nav-menu-dropdown-dropdown"],
+  nav#nav-menu li[data-id="6989dbbdb4696f0b333f2246"]{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    width:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+  nav#nav-menu .nav-menu-item-title,
+  nav#nav-menu .dropdown-item-title{
+    pointer-events:auto !important;
+  }
+  nav#nav-menu .js-more-nav-menu-dropdown-button .nav-menu-item-title,
+  nav#nav-menu li[data-id="more-nav-menu-dropdown"] .nav-menu-item-title,
+  nav#nav-menu li[aria-controls="more-nav-menu-dropdown-dropdown"] .nav-menu-item-title{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+  }
+  [data-report-table-container-id]{
+    border:1px solid rgba(209,190,120,0.45) !important;
+    border-radius:24px !important;
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    box-sizing:border-box !important;
+    background:#ffffff !important;
+    box-shadow:
+      0 14px 34px rgba(0,98,49,0.08),
+      0 4px 12px rgba(36,52,77,0.06) !important;
+  }
+  [data-table-scroll-container="true"]{
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    max-width:100% !important;
+  }
+  [data-report-table-id]{
+    width:max-content !important;
+    min-width:100% !important;
+    border-collapse:separate !important;
+    border-spacing:0 !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    font-size:14px !important;
+  }
+  [data-report-table-id] th,
+  [data-report-table-id] td{
+    padding:12px 14px !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(36,52,77,0.10) !important;
+    vertical-align:middle !important;
+  }
+  [data-report-table-id] thead th{
+    background:linear-gradient(135deg,#006231 0%,#0b7d45 100%) !important;
+    color:#ffffff !important;
+    font-weight:700 !important;
+    text-align:center !important;
+    border-bottom:4px solid #d1be78 !important;
+  }
+  [data-report-table-id] tbody th{
+    color:#172033 !important;
+    font-weight:700 !important;
+    text-align:left !important;
+    background:#ffffff !important;
+  }
+  [data-report-table-id] tbody td{
+    color:#344054 !important;
+    text-align:center !important;
+    background:#ffffff !important;
+  }
+  [data-report-table-id] tbody tr:nth-child(even) th,
+  [data-report-table-id] tbody tr:nth-child(even) td{
+    background:rgba(0,98,49,0.04) !important;
+  }
+  [data-report-table-id] tbody tr:hover th,
+  [data-report-table-id] tbody tr:hover td{
+    background:rgba(209,190,120,0.18) !important;
+  }
+  [data-report-table-id] tbody tr.rowGroupTotal__cm3qr th,
+  [data-report-table-id] tbody tr.rowGroupTotal__cm3qr td{
+    background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%) !important;
+    color:#172033 !important;
+    font-weight:700 !important;
+    border-bottom:0 !important;
+  }
+  [data-report-table-id] .wc-budget-total-row th,
+  [data-report-table-id] .wc-budget-total-row td{
+    background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%) !important;
+    color:#172033 !important;
+    font-weight:700 !important;
+    border-bottom:0 !important;
+  }
+  [data-report-table-id] .wc-budget-total-row:hover th,
+  [data-report-table-id] .wc-budget-total-row:hover td{
+    background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%) !important;
+  }
+  [data-report-table-id] th.wc-fy-column-hidden,
+  [data-report-table-id] td.wc-fy-column-hidden{
+    display:none !important;
+    width:0 !important;
+    min-width:0 !important;
+    max-width:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    margin:0 !important;
+    height:0 !important;
+    line-height:0 !important;
+    font-size:0 !important;
+    box-sizing:border-box !important;
+  }
+  .wc-fy-column-toggle-wrap{
+    display:flex !important;
+    justify-content:flex-end !important;
+    align-items:center !important;
+    width:auto !important;
+    min-height:18px !important;
+    padding:2px 7px !important;
+    margin:0 0 3px 0 !important;
+    box-sizing:border-box !important;
+    background:#ffffff !important;
+    border:1px solid rgba(209,190,120,0.55) !important;
+    border-radius:999px !important;
+    color:#24344d !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    font-size:10px !important;
+    font-weight:600 !important;
+  }
+  .wc-has-fy-column-toggle-title{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    width:100% !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  .wc-has-fy-column-toggle-title [data-test="summary-table-title"]{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+  }
+  .wc-fy-column-toggle-in-title{
+    flex:0 0 auto !important;
+    margin-left:auto !important;
+    width:auto !important;
+  }
+  .wc-fy-column-toggle-label{
+    display:inline-flex !important;
+    align-items:center !important;
+    gap:4px !important;
+    cursor:pointer !important;
+    color:#24344d !important;
+    font-size:10px !important;
+    font-weight:600 !important;
+    font-style:italic !important;
+    text-transform:none !important;
+    letter-spacing:.03em !important;
+  }
+  .wc-fy-column-toggle-checkbox{
+    width:11px !important;
+    height:11px !important;
+    margin:0 !important;
+    accent-color:#006231 !important;
+    cursor:pointer !important;
+  }
+  .wc-fy-column-toggle-text{
+    font-size:10px !important;
+    line-height:1 !important;
+    font-style:italic !important;
+    text-transform:none !important;
+    letter-spacing:.03em !important;
+  }
+  .wc-budget-line-tooltip-cell{
+    white-space:normal !important;
+  }
+  .wc-budget-line-tooltip-anchor{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:16px !important;
+    height:16px !important;
+    min-width:16px !important;
+    margin:0 0 0 6px !important;
+    padding:0 !important;
+    border:1px solid #d1be78 !important;
+    border-radius:999px !important;
+    background:#ffffff !important;
+    color:#006231 !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    font-size:10px !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    font-style:normal !important;
+    vertical-align:middle !important;
+    cursor:help !important;
+    box-shadow:0 1px 4px rgba(23,32,51,0.12) !important;
+  }
+  .wc-budget-line-tooltip-anchor:hover,
+  .wc-budget-line-tooltip-anchor:focus{
+    background:#d1be78 !important;
+    color:#172033 !important;
+    outline:2px solid rgba(0,98,49,0.22) !important;
+    outline-offset:2px !important;
+  }
+  .wc-budget-line-tooltip-bubble{
+    position:fixed !important;
+    z-index:10050 !important;
+    display:block !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+    max-width:calc(100vw - 32px) !important;
+    padding:10px 12px !important;
+    border:1px solid #d1be78 !important;
+    border-radius:8px !important;
+    background:#172033 !important;
+    color:#ffffff !important;
+    box-shadow:0 12px 28px rgba(23,32,51,0.24) !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    font-size:12px !important;
+    line-height:1.4 !important;
+    font-weight:600 !important;
+    text-align:left !important;
+    transform:translateY(-2px) !important;
+    transition:opacity .15s ease, transform .15s ease, visibility .15s ease !important;
+  }
+  .wc-budget-line-tooltip-bubble.is-visible{
+    visibility:visible !important;
+    opacity:1 !important;
+    transform:translateY(0) !important;
+  }
+  [data-report-table-id] th:first-child,
+  [data-report-table-id] td:first-child{
+    position:sticky !important;
+    left:0 !important;
+    z-index:10 !important;
+    min-width:150px !important;
+    max-width:190px !important;
+    text-align:left !important;
+    background:#ffffff !important;
+    background-clip:padding-box !important;
+    box-shadow:10px 0 14px rgba(36,52,77,0.14) !important;
+  }
+  [data-report-table-id] thead th:first-child{
+    z-index:12 !important;
+    background:linear-gradient(135deg,#006231 0%,#0b7d45 100%) !important;
+    color:#ffffff !important;
+  }
+  [data-report-table-id] tbody tr:nth-child(even) th:first-child,
+  [data-report-table-id] tbody tr:nth-child(even) td:first-child{
+    background:#f5f9f7 !important;
+  }
+  [data-report-table-id] tbody tr:hover th:first-child,
+  [data-report-table-id] tbody tr:hover td:first-child{
+    background:#f8f2dc !important;
+  }
+  [data-report-table-id] tbody tr.rowGroupTotal__cm3qr th:first-child,
+  [data-report-table-id] tbody tr.rowGroupTotal__cm3qr td:first-child,
+  [data-report-table-id] .wc-budget-total-row th:first-child,
+  [data-report-table-id] .wc-budget-total-row td:first-child,
+  [data-report-table-id] .wc-budget-total-row:hover th:first-child,
+  [data-report-table-id] .wc-budget-total-row:hover td:first-child{
+    background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%) !important;
+  }
+  [data-report-table-id] caption{
+    display:none !important;
+  }
+  .social-wrapper{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    height:0 !important;
+    width:0 !important;
+    overflow:hidden !important;
+  }
+  .powered-by{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    height:0 !important;
+    width:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+  footer[role="contentinfo"]{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-height:150px !important;
+    height:auto !important;
+    margin:48px 0 0 0 !important;
+    padding:0 0 4px 0 !important;
+    background:#ffffff !important;
+    border-top:4px solid #006231 !important;
+    box-shadow:none !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    z-index:1 !important;
+  }
+  footer[role="contentinfo"] *{
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+  footer[role="contentinfo"] .footer-container{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-height:82px !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:28px 36px 1px 36px !important;
+    background:#ffffff !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  footer[role="contentinfo"] .logo-container{
+    display:none !important;
+  }
+  .wc-budget-footer-inner{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:28px !important;
+    width:100% !important;
+    min-height:auto !important;
+    padding-bottom:1px !important;
+    margin-bottom:0 !important;
+    height:auto !important;
+    background:#ffffff !important;
+    box-sizing:border-box !important;
+    min-width:0 !important;
+  }
+  .wc-budget-footer-brand{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:0 !important;
+    width:auto !important;
+    min-width:max-content !important;
+    max-width:none !important;
+    height:64px !important;
+    flex:0 0 auto !important;
+    overflow:visible !important;
+    text-decoration:none !important;
+  }
+  .wc-split-brand-link{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    width:max-content !important;
+    max-width:100% !important;
+    height:64px !important;
+    color:inherit !important;
+    text-decoration:none !important;
+    cursor:pointer !important;
+  }
+  .wc-split-brand-link .wc-split-brand{
+    pointer-events:none !important;
+  }
+  .wc-budget-footer-links{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    flex-wrap:wrap !important;
+    gap:8px !important;
+  }
+  .wc-budget-footer-links a{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:38px !important;
+    padding:10px 16px !important;
+    border-radius:999px !important;
+    color:#ffffff !important;
+    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+    border:0 !important;
+    text-decoration:none !important;
+    font-size:12px !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    letter-spacing:.07em !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+    box-shadow:0 8px 18px rgba(0,98,49,0.14) !important;
+    transition:transform .2s ease, box-shadow .2s ease !important;
+  }
+  .wc-budget-footer-links a:hover{
+    transform:translateY(-1px) !important;
+    box-shadow:0 12px 24px rgba(0,98,49,0.20) !important;
+    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+  }
+  .wc-budget-footer-bottom{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-height:52px !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:14px 36px 48px 36px !important;
+    border-top:1px solid rgba(36,52,77,0.10) !important;
+    background:#ffffff !important;
+    box-sizing:border-box !important;
+    color:rgba(36,52,77,0.70) !important;
+    font-size:12px !important;
+    line-height:1.5 !important;
+    font-weight:600 !important;
+    text-align:center !important;
+    overflow:visible !important;
+  }
+  
+  /* STANDALONE WALTON HEADER */
+  .wc-standalone-budget-nav{
+    position:sticky !important;
+    top:0 !important;
+    z-index:9999 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:24px !important;
+    min-height:74px !important;
+    padding:10px 28px !important;
+    box-sizing:border-box !important;
+    background:#ffffff !important;
+    border-bottom:4px solid #006231 !important;
+    box-shadow:0 1px 4px rgba(36,52,77,0.04) !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+  }
+  .wc-standalone-brand{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:0 !important;
+    width:auto !important;
+    min-width:max-content !important;
+    max-width:none !important;
+    height:64px !important;
+    flex:0 0 auto !important;
+    overflow:visible !important;
+    text-decoration:none !important;
+  }
+  .wc-standalone-links{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    gap:10px !important;
+    margin-left:auto !important;
+  }
+  .wc-standalone-links a{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:38px !important;
+    padding:10px 16px !important;
+    border-radius:999px !important;
+    color:#24344d !important;
+    background:transparent !important;
+    border:1px solid transparent !important;
+    text-decoration:none !important;
+    font-size:13px !important;
+    line-height:1 !important;
+    font-weight:700 !important;
+    letter-spacing:.08em !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+  }
+  .wc-standalone-links a:hover{
+    background:rgba(0,98,49,0.06) !important;
+  }
+  
+  `;
+  var style = document.getElementById("wc-budget-nav-styles");
+  if(!style){
+    style = document.createElement("style");
+    style.id = "wc-budget-nav-styles";
+    document.head.appendChild(style);
+  }
+  style.textContent = css;
+  loadWaltonMobileStylesheet();
+  function getWaltonSplitBrandHtml(linkHref, linkLabel){
+    if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.getHtml === "function"){
+      var splitLogoHtml = window.WaltonSplitLogo.getHtml("", "");
+      if(!linkHref){
+        return splitLogoHtml;
+      }
+      var splitLogoLabel = linkLabel || "Walton County";
+      return '<a class="wc-split-brand-link" href="' + linkHref + '" aria-label="' + splitLogoLabel + '">' + splitLogoHtml + '</a>';
+    }
+    var brandHtml = `
+      <div class="wc-split-brand" aria-label="Walton County Board of County Commissioners">
+        <div class="wc-split-brand-left">
+          <div class="wc-split-brand-top">Walton</div>
+          <div class="wc-split-brand-bottom">Board of County</div>
+        </div>
+        <span class="wc-split-brand-seal wc-seal-mark" aria-hidden="true"></span>
+        <div class="wc-split-brand-right">
+          <div class="wc-split-brand-top">County</div>
+          <div class="wc-split-brand-bottom">Commissioners</div>
+        </div>
+      </div>
+    `;
+    if(!linkHref){
+      return brandHtml;
+    }
+    return '<a class="wc-split-brand-link" href="' + linkHref + '" aria-label="' + (linkLabel || "Walton County") + '">' + brandHtml + '</a>';
+  }
+
+  function ensureWaltonSplitLogoStyles(){
+    if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.injectStyles === "function"){
+      window.WaltonSplitLogo.injectStyles();
+    }
+  }
+  function initWcNavSearch(){
+    var nav = document.querySelector("nav#nav-menu.nav-menu");
+    if(!nav){
+      return;
+    }
+    if(typeof window.initWaltonBudgetSearch === "function"){
+      window.initWaltonBudgetSearch({
+        nav:nav,
+        getWaltonSplitBrandHtml:getWaltonSplitBrandHtml
+      });
+      return;
+    }
+    var logoContainer = nav.querySelector(".logo-container");
+    if(logoContainer && !logoContainer.querySelector(".wc-split-brand")){
+      logoContainer.innerHTML = getWaltonSplitBrandHtml(
+        "https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246",
+        "Go to Table of Contents"
+      );
+    }
+    if(nav.querySelector(".wc-nav-search-slot")){
+      return;
+    }
+    var slot = document.createElement("div");
+    slot.className = "wc-nav-search-slot wc-nav-search-slot-fallback";
+    slot.innerHTML = `
+      <div class="wc-search-wrap">
+        <div class="wc-search-box">
+          <svg class="wc-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+          </svg>
+          <input
+            type="search"
+            id="wcTocSearch"
+            placeholder="Search is loading..."
+            aria-label="Search table of contents"
+            autocomplete="off"
+            disabled
+          >
+        </div>
+      </div>
+      <div class="wc-nav-search-results" role="listbox" aria-label="Search results"></div>
+    `;
+    nav.appendChild(slot);
+  }
+  function hideOpenGovMoreButton(){
+    var nav = document.querySelector("nav#nav-menu.nav-menu");
+    if(!nav){
+      return;
+    }
+    var moreButtons = nav.querySelectorAll(
+      '.js-more-nav-menu-dropdown-button, li[data-id="more-nav-menu-dropdown"], li[aria-controls="more-nav-menu-dropdown-dropdown"], li.nav-menu-item.clickable.js-dropdown-button.js-more-nav-menu-dropdown-button'
+    );
+    moreButtons.forEach(function(button){
+      button.style.setProperty("display", "none", "important");
+      button.style.setProperty("visibility", "hidden", "important");
+      button.style.setProperty("opacity", "0", "important");
+      button.style.setProperty("width", "0", "important");
+      button.style.setProperty("height", "0", "important");
+      button.style.setProperty("overflow", "hidden", "important");
+      button.style.setProperty("pointer-events", "none", "important");
+      button.setAttribute("aria-hidden", "true");
+      button.setAttribute("tabindex", "-1");
+    });
+    nav.querySelectorAll(".nav-menu-item-title").forEach(function(title){
+      if(title.textContent && title.textContent.trim().toLowerCase() === "more"){
+        var parent = title.closest("li");
+        if(parent){
+          parent.style.setProperty("display", "none", "important");
+          parent.style.setProperty("visibility", "hidden", "important");
+          parent.style.setProperty("opacity", "0", "important");
+          parent.style.setProperty("width", "0", "important");
+          parent.style.setProperty("height", "0", "important");
+          parent.style.setProperty("overflow", "hidden", "important");
+          parent.style.setProperty("pointer-events", "none", "important");
+          parent.setAttribute("aria-hidden", "true");
+          parent.setAttribute("tabindex", "-1");
+        }
+      }
+    });
+  }
+  function getNormalizedWcNavText(element){
+    return (element && element.textContent ? element.textContent : "").trim().replace(/\s+/g, " ").toLowerCase();
+  }
+  function isCapitalImprovementPlanElement(element){
+    if(!element){
+      return false;
+    }
+    var href = element.getAttribute && element.getAttribute("href");
+    return (element.getAttribute && element.getAttribute("data-id") === wcCapitalImprovementPlanPageId) ||
+      (href && href.indexOf(wcCapitalImprovementPlanPageId) !== -1) ||
+      getNormalizedWcNavText(element) === "capital improvement plan";
+  }
+  function getCapitalImprovementPlanNavigationTarget(element){
+    if(!element || !element.closest){
+      return null;
+    }
+    var target = element.closest('a, button, li, [role="button"], .nav-menu-item, .dropdown-item');
+    if(isCapitalImprovementPlanElement(target)){
+      return target;
+    }
+    var title = element.closest(".nav-menu-item-title, .dropdown-item-title");
+    if(title && isCapitalImprovementPlanElement(title)){
+      return title.closest('a, button, li, [role="button"], .nav-menu-item, .dropdown-item') || title;
+    }
+    return null;
+  }
+  function updateCapitalImprovementPlanLinks(){
+    document.querySelectorAll("a").forEach(function(link){
+      if(isCapitalImprovementPlanElement(link)){
+        link.href = wcCipProjectSearchUrl;
+        link.removeAttribute("target");
+        link.removeAttribute("rel");
+      }
+    });
+    document.querySelectorAll('[data-id="' + wcCapitalImprovementPlanPageId + '"]').forEach(function(element){
+      element.setAttribute("data-wc-cip-target-url", wcCipProjectSearchUrl);
+      if(!element.hasAttribute("tabindex")){
+        element.setAttribute("tabindex", "0");
+      }
+      if(!element.hasAttribute("role")){
+        element.setAttribute("role", "link");
+      }
+    });
+  }
+  function handleCapitalImprovementPlanNavigation(event){
+    var target = getCapitalImprovementPlanNavigationTarget(event.target);
+    if(!target){
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    if(event.type === "click" && (event.metaKey || event.ctrlKey || event.shiftKey)){
+      window.open(wcCipProjectSearchUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    window.location.href = wcCipProjectSearchUrl;
+  }
+  function bindCapitalImprovementPlanNavigation(){
+    if(document.documentElement.getAttribute("data-wc-cip-navigation-bound") === "true"){
+      return;
+    }
+    document.documentElement.setAttribute("data-wc-cip-navigation-bound", "true");
+    document.addEventListener("click", handleCapitalImprovementPlanNavigation, true);
+    document.addEventListener("keydown", function(event){
+      if(event.key !== "Enter" && event.key !== " "){
+        return;
+      }
+      handleCapitalImprovementPlanNavigation(event);
+    }, true);
+  }
+  function renderStandaloneBudgetNav(){
+    if(!document.body){
+      return;
+    }
+    if(document.querySelector(".wc-standalone-budget-nav")){
+      return;
+    }
+    var header = document.createElement("header");
+    header.className = "wc-standalone-budget-nav";
+    header.innerHTML = `
+      <div class="wc-standalone-brand" aria-label="Walton County">
+        ${getWaltonSplitBrandHtml("", "")}
+      </div>
+    `;
+    document.body.insertBefore(header, document.body.firstChild);
+  }
+  function renderWaltonBudgetFooter(){
+    if(!document.body){
+      return;
+    }
+    var footer = document.querySelector('footer[role="contentinfo"]');
+    if(!footer){
+      footer = document.createElement('footer');
+      footer.setAttribute('role', 'contentinfo');
+      var appContainer = document.getElementById('app');
+      if(appContainer && appContainer.parentNode){
+        appContainer.parentNode.insertBefore(footer, appContainer.nextSibling);
+      }else{
+        document.body.appendChild(footer);
+      }
+    }
+    var appContainer = document.getElementById('app');
+    if(appContainer && appContainer.parentNode && footer.previousElementSibling !== appContainer){
+      appContainer.parentNode.insertBefore(footer, appContainer.nextSibling);
+    }
+    var footerContainer = footer.querySelector('.footer-container');
+    if(!footerContainer){
+      footerContainer = document.createElement('div');
+      footerContainer.className = 'footer-container';
+      footerContainer.id = 'footer';
+      footer.insertBefore(footerContainer, footer.firstChild);
+    }
+    var hasOpenGovNav = !!document.querySelector('nav#nav-menu.nav-menu');
+    var desiredFooterHtml = `
+      <div class="wc-budget-footer-inner">
+        <div class="wc-budget-footer-brand" aria-label="Walton County">
+          ${getWaltonSplitBrandHtml("", "")}
+        </div>
+        ${hasOpenGovNav ? `
+        <nav class="wc-budget-footer-links" aria-label="Budget footer links">
+          <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246">Budget Book</a>
+          <a href="${wcCipProjectSearchUrl}">Capital Improvement Plan</a>
+          <a href="${wcCipProjectSearchUrl}" target="_blank" rel="noopener noreferrer">Project Search</a>
+          <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd48feef483c784fe0">Glossary & FAQ</a>
+        </nav>
+        ` : ``}
+      </div>
+    `;
+    if(footerContainer.getAttribute("data-wc-rendered") !== "true" || footerContainer.innerHTML.trim() !== desiredFooterHtml.trim()){
+      footerContainer.innerHTML = desiredFooterHtml;
+      footerContainer.setAttribute("data-wc-rendered", "true");
+    }
+    if(!footer.querySelector('.wc-budget-footer-bottom')){
+      var footerBottom = document.createElement('div');
+      footerBottom.className = 'wc-budget-footer-bottom';
+      footerBottom.textContent = 'Prepared by the Walton County Office of Management and Budget.';
+      footer.appendChild(footerBottom);
+    }
+  }
+  function startWcBudgetNav(){
+    ensureWaltonSplitLogoStyles();
+    if(wcBudgetNavStarted){
+      initWcNavSearch();
+      hideOpenGovMoreButton();
+      renderWaltonBudgetFooter();
+      updateCapitalImprovementPlanLinks();
+      bindCapitalImprovementPlanNavigation();
+      lockHorizontalPageScroll();
+      return;
+    }
+    wcBudgetNavStarted = true;
+    bindCapitalImprovementPlanNavigation();
+    if(document.querySelector("nav#nav-menu.nav-menu")){
+      loadWaltonBudgetSearchModules(function(){
+        initWcNavSearch();
+      });
+      loadWaltonPerformanceMobile();
+      setTimeout(initWcNavSearch, 800);
+      setTimeout(initWcNavSearch, 2000);
+      hideOpenGovMoreButton();
+      renderWaltonBudgetFooter();
+      updateCapitalImprovementPlanLinks();
+      setTimeout(hideOpenGovMoreButton, 500);
+      setTimeout(hideOpenGovMoreButton, 1500);
+      setTimeout(renderWaltonBudgetFooter, 500);
+      setTimeout(renderWaltonBudgetFooter, 1500);
+      setTimeout(updateCapitalImprovementPlanLinks, 500);
+      setTimeout(updateCapitalImprovementPlanLinks, 1500);
+      return;
+    }
+    renderStandaloneBudgetNav();
+    loadWaltonPerformanceMobile();
+    if(document.getElementById('app')){
+      renderWaltonBudgetFooter();
+      updateCapitalImprovementPlanLinks();
+    }else{
+      document.addEventListener('DOMContentLoaded', function(){
+        renderWaltonBudgetFooter();
+        updateCapitalImprovementPlanLinks();
+      }, { once:true });
+    }
+  }
+  function safelyStartWcBudgetNav(){
+    if(!document.body){
+      document.addEventListener('DOMContentLoaded', startWcBudgetNav, { once:true });
+      document.addEventListener('DOMContentLoaded', function(){
+        enhanceBudgetTables();
+        watchForBudgetTables();
+      }, { once:true });
+      return;
+    }
+    startWcBudgetNav();
+    enhanceBudgetTables();
+    watchForBudgetTables();
+  }
+  loadWaltonSplitLogo(safelyStartWcBudgetNav);
+  function lockHorizontalPageScroll(){
+    document.documentElement.style.setProperty('overflow-x','hidden','important');
+    document.documentElement.style.setProperty('max-width','100%','important');
+    document.body.style.setProperty('overflow-x','hidden','important');
+    document.body.style.setProperty('max-width','100%','important');
+    document.querySelectorAll('.story-page, .content, .main-content, main, article, [data-testid="story-page"], .page-content, .story-content').forEach(function(el){
+      el.style.setProperty('max-width','100%','important');
+      el.style.setProperty('overflow-x','hidden','important');
+    });
+  }
+  function repairWcBudgetNavAfterOpenGovNavigation(){
+    try{
+      ensureWaltonSplitLogoStyles();
+      hideOpenGovMoreButton();
+      renderWaltonBudgetFooter();
+      updateCapitalImprovementPlanLinks();
+      bindCapitalImprovementPlanNavigation();
+      lockHorizontalPageScroll();
+      if(document.querySelector("nav#nav-menu.nav-menu")){
+        if(typeof window.initWaltonBudgetSearch === "function"){
+          window.initWaltonBudgetSearch({
+            nav:document.querySelector("nav#nav-menu.nav-menu"),
+            getWaltonSplitBrandHtml:getWaltonSplitBrandHtml
+          });
+        }else{
+          initWcNavSearch();
+        }
+      }
+    }catch(error){
+      if(window.console && typeof window.console.error === "function"){
+        window.console.error("Walton County budget nav repair failed:", error);
+      }
+    }
+  }
+  function queueWcBudgetNavRepair(){
+    if(wcRepairTimer){
+      clearTimeout(wcRepairTimer);
+    }
+    wcRepairTimer = setTimeout(function(){
+      wcRepairTimer = null;
+      repairWcBudgetNavAfterOpenGovNavigation();
+    }, 700);
+  }
+  function watchForOpenGovNavigation(){
+    var originalPushState = history.pushState;
+    var originalReplaceState = history.replaceState;
+    history.pushState = function(){
+      originalPushState.apply(history, arguments);
+      if(location.href !== wcLastKnownUrl){
+        wcLastKnownUrl = location.href;
+        queueWcBudgetNavRepair();
+      }
+    };
+    history.replaceState = function(){
+      originalReplaceState.apply(history, arguments);
+      if(location.href !== wcLastKnownUrl){
+        wcLastKnownUrl = location.href;
+        queueWcBudgetNavRepair();
+      }
+    };
+    window.addEventListener("popstate", function(){
+      if(location.href !== wcLastKnownUrl){
+        wcLastKnownUrl = location.href;
+        queueWcBudgetNavRepair();
+      }
+    });
+  }
+  lockHorizontalPageScroll();
+  setTimeout(lockHorizontalPageScroll, 500);
+  setTimeout(lockHorizontalPageScroll, 1500);
+  setTimeout(lockHorizontalPageScroll, 3000);
+  // Navigation watcher intentionally disabled for OpenGov stability testing.
+  // watchForOpenGovNavigation();
+})();
