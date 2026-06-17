@@ -2,7 +2,9 @@
   var wcBudgetNavStarted = false;
   var wcLastKnownUrl = location.href;
   var wcRepairTimer = null;
-  var wcBudgetAssetBaseUrl = "https://budget-pixel.github.io/walton-budget-nav.js/";
+  var wcBudgetAssetBaseUrl = (document.currentScript && document.currentScript.src)
+    ? document.currentScript.src.replace(/[^/]+$/, "")
+    : "../assets/";
   var wcCipAssetBaseUrl = "https://budget-pixel.github.io/walton-cip-project-search/";
   var wcCipProjectSearchUrl = wcCipAssetBaseUrl + "?view=all&v=6";
   var wcCapitalImprovementPlanPageId = "6989dbbd4a9d93e5ac05a153";
@@ -1271,8 +1273,8 @@
     var logoContainer = nav.querySelector(".logo-container");
     if(logoContainer && !logoContainer.querySelector(".wc-split-brand")){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
-        "https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246",
-        "Go to Table of Contents"
+        "6989dbbdb4696f0b333f2246.html",
+        "Go to Home"
       );
     }
     if(nav.querySelector(".wc-nav-search-slot")){
@@ -1456,7 +1458,7 @@
         </div>
         ${hasOpenGovNav ? `
         <nav class="wc-budget-footer-links" aria-label="Budget footer links">
-          <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246">Budget Book</a>
+          <a href="6989dbbdb4696f0b333f2246.html">Home</a>
           <a href="${wcCipProjectSearchUrl}">Capital Improvement Plan</a>
           <a href="${wcCipProjectSearchUrl}" target="_blank" rel="noopener noreferrer">Project Search</a>
           <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd48feef483c784fe0">Glossary & FAQ</a>

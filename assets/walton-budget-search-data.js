@@ -5,7 +5,7 @@
 window.wcProjectSearchBaseUrl = "https://budget-pixel.github.io/walton-cip-project-search/?view=all&v=6&q=";
 
 window.wcBudgetPages = [
-  { title:"Table of Contents", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246" },
+  { title:"Home", section:"Introduction and Overview", href:"6989dbbdb4696f0b333f2246.html" },
   { title:"GFOA Distinguished Budget Presentation Award", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd25815ed4e2fe49b4" },
   { title:"Transmittal Letter", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdc3a5aa570050fba9" },
   { title:"Budget-in-Brief", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=69e8ae83a93da8d66dc5e248" },
@@ -78,7 +78,7 @@ window.wcBudgetPages = [
 
 (function(){
   const keywordMap = {
-    "Table of Contents": [
+    "Home": [
       "contents", "index", "navigation", "budget book", "budget sections", "chapters", "pages", "find a page", "where is"
     ],
 

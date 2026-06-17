@@ -15,8 +15,8 @@
       typeof getWaltonSplitBrandHtml === "function"
     ){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
-        "https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246",
-        "Go to Table of Contents"
+        "6989dbbdb4696f0b333f2246.html",
+        "Go to Home"
       );
     }
 

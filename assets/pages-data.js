@@ -11,7 +11,7 @@ window.WC_SECTION_ORDER = [
 ];
 
 window.wcPageList = [
-  {id:"6989dbbdb4696f0b333f2246",title:"Table of Contents",section:"Introduction and Overview"},
+  {id:"6989dbbdb4696f0b333f2246",title:"Home",section:"Introduction and Overview"},
   {id:"6989dbbd25815ed4e2fe49b4",title:"GFOA Distinguished Budget Presentation Award",section:"Introduction and Overview"},
   {id:"6989dbbdc3a5aa570050fba9",title:"Transmittal Letter",section:"Introduction and Overview"},
   {id:"69e8ae83a93da8d66dc5e248",title:"Budget-in-Brief",section:"Introduction and Overview"},
