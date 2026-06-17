@@ -167,6 +167,17 @@ body {
 .page-nav a.prev::before { content: "←  "; }
 .page-nav a.next::after  { content: "  →"; }
 
+/* ── chart notice ── */
+.chart-notice {
+  background: var(--light); border: 1px solid var(--border);
+  border-left: 4px solid var(--gold); border-radius: 0 8px 8px 0;
+  padding: 14px 18px; font-size: .85rem;
+}
+.chart-notice p { margin-bottom: 8px; color: var(--muted); }
+.chart-notice a { color: var(--green); font-weight: 700; }
+.chart-notice ul { margin: 0; padding-left: 18px; color: var(--text); }
+.chart-notice li { margin-bottom: 3px; font-size: .82rem; }
+
 /* ── no-content notice ── */
 .no-content {
   background: var(--light); border: 1px dashed var(--border);
