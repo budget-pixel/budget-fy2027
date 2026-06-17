@@ -133,9 +133,738 @@
 
 <div class="page-eyebrow">Financial Structure, Policies, and Process</div>
 <h1 class="page-title">Fund Descriptions and Structure</h1>
-<div class="page-text">
-<p>Financial Structure Fund Descriptions and Structure Walton County uses fund accounting to organize, manage, and report public resources based on their intended purpose. This structure supports transparency, accountability, and responsible financial stewardship. Governmental Funds Used to account for core public services, including general operations, transportation, public safety, tourism, and capital projects. Proprietary Funds Used for activities that operate similarly to business-type functions or internal service activities. Fiduciary Funds Used to account for resources held by the County on behalf of other individuals, agencies, governments, or funds. Governmental Funds Major Funds Major governmental funds represent the County’s primary operating, infrastructure, public safety, tourism, solid waste, and capital improvement activities. General Fund The General Fund is the County’s primary operating fund and accounts for all financial resources not required to be reported in another fund. Major funding sources include ad valorem taxes. Transportation Fund Accounts for motor fuel taxes, local option gas taxes, state revenue sharing, and grants supporting roadway construction, maintenance, drainage, and infrastructure operations. Sheriff Fund Accounts for fines, forfeitures, grants, and transfers supporting Sheriff operations in accordance with Florida Statutes. Tourist Development Fund Supports tourism promotion, beach renourishment, visitor-serving infrastructure, and public safety initiatives funded primarily by tourist development taxes. Solid Waste Fund Accounts for landfill operations funded through County surtaxes, state grants, landfill fees, and scrap sales revenues. Capital Projects Fund Used to account for financial resources designated for the acquisition, construction, and improvement of major capital facilities and infrastructure. Governmental Funds Non-Major Funds Non-major governmental funds account for legally restricted, dedicated, or specialized revenue sources used for specific programs, services, assessments, grants, and regulatory purposes. MSBU Fund Building Fund SHIP Fund Mosquito Control Fund Mosquito Control State Aid Fund E911 Fund Housing &amp; Urban Development Fund Preservation Fund Recreation Plat Fee Fund Sidewalk Fund Fund Sankey Diagram The sankey diagram presented below offers a detailed visualization of Walton County’s fund allocation, categorizing the funds into three distinct groups: governmental funds, proprietary funds, and fiduciary funds. Within the governmental funds category, the chart further segments these into ‘major’ and ‘non-major’ funds. Each specific major and non-major fund is listed, allowing for a clear understanding of the different areas where resources are allocated. Importantly, the width of the links in the chart is proportional to the flow of allocated resources to each fund, visually representing the relative financial weight or emphasis placed on each area. This feature provides a quick and intuitive understanding of how resources are distributed within the County, emphasizing the scale of investment in various funds.</p>
-</div>
+
+<section class="wc-fund-intro">
+
+  <div class="wc-fund-header">
+    <span>Financial Structure</span>
+
+    <h2>Fund Descriptions and Structure</h2>
+
+    <p>
+      Walton County uses fund accounting to organize, manage, and report public
+      resources based on their intended purpose. This structure supports
+      transparency, accountability, and responsible financial stewardship.
+    </p>
+  </div>
+
+  <div class="wc-fund-glance-grid">
+
+    <div class="wc-fund-glance-card">
+
+
+      <h3>Governmental Funds</h3>
+
+      <p>
+        Used to account for core public services, including general operations,
+        transportation, public safety, tourism, and capital projects.
+      </p>
+
+    </div>
+
+    <div class="wc-fund-glance-card">
+
+
+      <h3>Proprietary Funds</h3>
+
+      <p>
+        Used for activities that operate similarly to business-type functions
+        or internal service activities.
+      </p>
+
+    </div>
+
+    <div class="wc-fund-glance-card">
+
+
+      <h3>Fiduciary Funds</h3>
+
+      <p>
+        Used to account for resources held by the County on behalf of other
+        individuals, agencies, governments, or funds.
+      </p>
+
+    </div>
+
+  </div>
+
+</section><style>
+
+  .wc-fund-intro{
+
+    width:100%;
+    max-width:1280px;
+
+    margin:60px auto;
+
+    padding:0 24px;
+
+    box-sizing:border-box;
+
+    font-family:Arial, Helvetica, sans-serif;
+  }
+
+  .wc-fund-header{
+
+    text-align:center;
+
+    max-width:900px;
+
+    margin:0 auto 42px auto;
+  }
+
+  .wc-fund-header span{
+
+    display:inline-block;
+
+    margin-bottom:12px;
+
+    color:#006231;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:.12em;
+
+    text-transform:uppercase;
+  }
+
+  .wc-fund-header h2{
+
+    margin:0 0 16px 0;
+
+    color:#172033;
+
+    font-size:42px;
+
+    line-height:1.15;
+  }
+
+  .wc-fund-header h2::after{
+
+    content:"";
+
+    display:block;
+
+    width:90px;
+
+    height:4px;
+
+    background:#d1be78;
+
+    border-radius:4px;
+
+    margin:16px auto 0 auto;
+  }
+
+  .wc-fund-header p{
+
+    margin:0;
+
+    color:#344054;
+
+    font-size:17px;
+
+    line-height:1.8;
+
+    text-align:center;
+  }
+
+  .wc-fund-glance-grid{
+
+    display:flex;
+
+    flex-wrap:nowrap;
+
+    gap:24px;
+
+    width:100%;
+
+    margin:0 auto;
+
+    align-items:stretch;
+
+    justify-content:flex-start;
+  }
+
+  .wc-fund-glance-card{
+
+    flex:1 1 0;
+
+    min-width:0;
+
+    width:100%;
+
+    margin:0;
+
+    background:#ffffff;
+
+    border-radius:24px;
+
+    padding:30px 24px;
+
+    box-sizing:border-box;
+
+    box-shadow:
+      0 12px 30px rgba(36,52,77,0.10),
+      0 4px 12px rgba(36,52,77,0.06);
+
+    border-top:6px solid #d1be78;
+
+    transition:
+      transform .25s ease,
+      box-shadow .25s ease;
+  }
+
+  .wc-fund-glance-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+      0 18px 40px rgba(36,52,77,0.14),
+      0 6px 16px rgba(36,52,77,0.08);
+  }
+
+
+  .wc-fund-glance-card h3{
+
+    margin:0 0 14px 0;
+
+    color:#172033;
+
+    font-size:22px;
+
+    line-height:1.3;
+  }
+
+  .wc-fund-glance-card p{
+
+    margin:0;
+
+    color:#344054;
+
+    font-size:15.5px;
+
+    line-height:1.75;
+  }
+
+  @media(max-width:900px){
+
+    .wc-fund-glance-grid{
+
+      flex-wrap:wrap;
+    }
+
+    .wc-fund-glance-card{
+
+      flex:0 0 calc(50% - 12px);
+    }
+  }
+
+  @media(max-width:700px){
+
+    .wc-fund-glance-card{
+
+      flex:0 0 100%;
+    }
+
+    .wc-fund-header h2{
+
+      font-size:34px;
+    }
+  }
+
+</style>
+
+<section class="wc-major-funds-section">
+
+  <div class="wc-major-header">
+
+    <span>Governmental Funds</span>
+
+    <h2>Major Funds</h2>
+
+    <p>
+      Major governmental funds represent the County&rsquo;s primary operating,
+      infrastructure, public safety, tourism, solid waste, and capital
+      improvement activities.
+    </p>
+
+  </div>
+
+  <!-- ROW 1 -->
+
+  <div class="wc-major-row">
+
+    <div class="wc-major-card">
+      <h3>General Fund</h3>
+      <p>
+        The General Fund is the County&rsquo;s primary operating fund and accounts
+        for all financial resources not required to be reported in another
+        fund. Major funding sources include ad valorem taxes.
+      </p>
+    </div>
+
+    <div class="wc-major-card">
+      <h3>Transportation Fund</h3>
+      <p>
+        Accounts for motor fuel taxes, local option gas taxes, state revenue
+        sharing, and grants supporting roadway construction, maintenance,
+        drainage, and infrastructure operations.
+      </p>
+    </div>
+
+    <div class="wc-major-card">
+      <h3>Sheriff Fund</h3>
+      <p>
+        Accounts for fines, forfeitures, grants, and transfers supporting
+        Sheriff operations in accordance with Florida Statutes.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ROW 2 -->
+
+  <div class="wc-major-row">
+
+    <div class="wc-major-card">
+      <h3>Tourist Development Fund</h3>
+      <p>
+        Supports tourism promotion, beach renourishment, visitor-serving
+        infrastructure, and public safety initiatives funded primarily by
+        tourist development taxes.
+      </p>
+    </div>
+
+    <div class="wc-major-card">
+      <h3>Solid Waste Fund</h3>
+      <p>
+        Accounts for landfill operations funded through County surtaxes,
+        state grants, landfill fees, and scrap sales revenues.
+      </p>
+    </div>
+
+    <div class="wc-major-card">
+      <h3>Capital Projects Fund</h3>
+      <p>
+        Used to account for financial resources designated for the
+        acquisition, construction, and improvement of major capital
+        facilities and infrastructure.
+      </p>
+    </div>
+
+  </div>
+
+</section><style>
+
+  .wc-major-funds-section{
+    width:100%;
+    margin:70px 0;
+    padding:0;
+    font-family:Arial, Helvetica, sans-serif;
+    box-sizing:border-box;
+  }
+
+  .wc-major-header{
+    text-align:center;
+    max-width:860px;
+    margin:0 auto 42px auto;
+    padding:0 24px;
+    box-sizing:border-box;
+  }
+
+  .wc-major-header span{
+    display:inline-block;
+    margin-bottom:12px;
+    color:#006231;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+
+  .wc-major-header h2{
+    margin:0 0 16px 0;
+    color:#172033;
+    font-size:42px;
+    line-height:1.1;
+  }
+
+  .wc-major-header h2::after{
+    content:"";
+    display:block;
+    width:90px;
+    height:4px;
+    background:#d1be78;
+    border-radius:4px;
+    margin:16px auto 0 auto;
+  }
+
+  .wc-major-header p{
+    margin:0;
+    color:#344054;
+    font-size:17px;
+    line-height:1.8;
+    text-align:center;
+  }
+
+  .wc-major-row{
+    display:flex;
+    gap:24px;
+    width:100%;
+    margin:0 0 24px 0;
+    padding:0;
+    box-sizing:border-box;
+    align-items:flex-start;
+  }
+
+  .wc-major-card{
+    flex:1 1 0;
+    min-width:0;
+    margin:0;
+    background:#ffffff;
+    border-radius:24px;
+    padding:30px;
+    box-sizing:border-box;
+
+    box-shadow:
+      0 14px 34px rgba(36,52,77,0.10),
+      0 4px 12px rgba(36,52,77,0.06);
+
+    border-top:6px solid #d1be78;
+
+    transition:
+      transform .25s ease,
+      box-shadow .25s ease;
+  }
+
+  .wc-major-card:hover{
+    transform:translateY(-4px);
+
+    box-shadow:
+      0 18px 40px rgba(36,52,77,0.14),
+      0 6px 16px rgba(36,52,77,0.08);
+  }
+
+  .wc-major-card h3{
+    margin:0 0 16px 0;
+    color:#172033;
+    font-size:24px;
+    line-height:1.25;
+  }
+
+  .wc-major-card p{
+    margin:0;
+    color:#344054;
+    font-size:15.5px;
+    line-height:1.75;
+    text-align:justify;
+  }
+
+  @media(max-width:900px){
+
+    .wc-major-row{
+      flex-wrap:wrap;
+    }
+
+    .wc-major-card{
+      flex:0 0 calc(50% - 12px);
+    }
+  }
+
+  @media(max-width:700px){
+
+    .wc-major-header h2{
+      font-size:34px;
+    }
+
+    .wc-major-card{
+      flex:0 0 100%;
+      padding:24px;
+    }
+  }
+
+</style>
+
+<section class="wc-nonmajor-section">
+
+  <div class="wc-nonmajor-panel">
+
+    <div class="wc-nonmajor-header">
+
+      <span>Governmental Funds</span>
+
+      <h2>Non-Major Funds</h2>
+
+      <p>
+        Non-major governmental funds account for legally restricted,
+        dedicated, or specialized revenue sources used for specific
+        programs, services, assessments, grants, and regulatory purposes.
+      </p>
+
+    </div>
+
+    <div class="wc-nonmajor-grid">
+
+      <div class="wc-nonmajor-row">
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for special assessments charged to property owners to provide infrastructure improvements.">MSBU Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for fees and assessments levied on building activities to help ensure compliance with Florida Statutes and County ordinances.">Building Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for state grant funds provided through the State Housing Initiatives Partnership Program.">SHIP Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for activities of the dependent special district established to help control mosquitoes and insects within Walton County.">Mosquito Control Fund</div>
+      </div>
+
+      <div class="wc-nonmajor-row">
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for state grants used to support mosquito and insect control activities.">Mosquito Control State Aid Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for phone charges assessed for the purpose of providing emergency assistance services.">E911 Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for federal grants received from the Department of Housing and Urban Development.">Housing &amp; Urban Development Fund</div>
+      </div>
+
+      <div class="wc-nonmajor-row">
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for fees paid in lieu of reserved land. Expenditures are limited to restoration of native vegetation on public lands.">Preservation Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for assessments charged to property developers to provide recreational facilities within Walton County.">Recreation Plat Fee Fund</div>
+        <div class="wc-nonmajor-item" data-tooltip="Accounts for assessments charged to developers in lieu of constructing sidewalks as required by the Walton County Land Development Code.">Sidewalk Fund</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section><style>
+
+  .wc-nonmajor-section{
+    width:100%;
+    margin:60px 0 0 0;
+    padding:0;
+    font-family:Arial, Helvetica, sans-serif;
+    box-sizing:border-box;
+  }
+
+  .wc-nonmajor-panel{
+
+    position:relative;
+
+    overflow:visible;
+
+    background:
+      linear-gradient(
+        135deg,
+        #006231 0%,
+        #0b7d45 100%
+      );
+
+    border-radius:30px;
+
+    padding:42px;
+
+    box-sizing:border-box;
+
+    box-shadow:
+      0 18px 42px rgba(0,98,49,0.22);
+  }
+
+  .wc-nonmajor-header{
+    text-align:center;
+    max-width:860px;
+    margin:0 auto 36px auto;
+  }
+
+  .wc-nonmajor-header span{
+    display:inline-block;
+    margin-bottom:12px;
+    color:#d1be78;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+
+  .wc-nonmajor-header h2{
+    margin:0 0 16px 0;
+    color:#ffffff;
+    font-size:42px;
+    line-height:1.1;
+  }
+
+  .wc-nonmajor-header h2::after{
+    content:"";
+    display:block;
+    width:90px;
+    height:4px;
+    background:#d1be78;
+    border-radius:4px;
+    margin:16px auto 0 auto;
+  }
+
+  .wc-nonmajor-header p{
+    margin:0;
+    color:rgba(255,255,255,0.88);
+    font-size:17px;
+    line-height:1.8;
+    text-align:center;
+  }
+
+  .wc-nonmajor-grid{
+    display:block !important;
+    width:100%;
+    box-sizing:border-box;
+    overflow:visible;
+  }
+
+  .wc-nonmajor-row{
+    display:flex !important;
+    gap:18px;
+    width:100%;
+    margin:0 0 18px 0;
+    padding:0;
+    box-sizing:border-box;
+    align-items:stretch;
+    justify-content:flex-start;
+  }
+
+  .wc-nonmajor-row:last-child{
+    margin-bottom:0;
+  }
+
+  .wc-nonmajor-item{
+
+    position:relative;
+
+    display:flex !important;
+
+    flex:1 1 0;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:auto;
+
+    min-width:0;
+
+    margin:0 !important;
+
+    cursor:help;
+
+    background:rgba(255,255,255,0.10);
+
+    border:1px solid rgba(255,255,255,0.14);
+
+    border-radius:18px;
+
+    padding:18px 16px;
+
+    text-align:center;
+
+    color:#ffffff;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    line-height:1.5;
+
+    box-sizing:border-box;
+
+    transition:
+      transform .25s ease,
+      background .25s ease;
+  }
+
+  .wc-nonmajor-item::after{
+    content:attr(data-tooltip);
+    position:absolute;
+    left:50%;
+    bottom:calc(100% + 14px);
+    transform:translateX(-50%) translateY(8px);
+    width:min(320px, 82vw);
+    padding:14px 16px;
+    background:#ffffff;
+    color:#172033;
+    border-radius:14px;
+    box-shadow:
+      0 14px 34px rgba(23,32,51,0.22),
+      0 4px 12px rgba(23,32,51,0.10);
+    font-size:13.5px;
+    font-weight:600;
+    line-height:1.55;
+    text-align:left;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    z-index:20;
+    transition:
+      opacity .2s ease,
+      transform .2s ease,
+      visibility .2s ease;
+  }
+
+  .wc-nonmajor-item::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:calc(100% + 6px);
+    transform:translateX(-50%) translateY(8px);
+    border-width:8px 8px 0 8px;
+    border-style:solid;
+    border-color:#ffffff transparent transparent transparent;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    z-index:21;
+    transition:
+      opacity .2s ease,
+      transform .2s ease,
+      visibility .2s ease;
+  }
+
+  .wc-nonmajor-item:hover::after,
+  .wc-nonmajor-item:hover::before,
+  .wc-nonmajor-item:focus::after,
+  .wc-nonmajor-item:focus::before{
+    opacity:1;
+    visibility:visible;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  .wc-nonmajor-item:hover{
+    transform:translateY(-3px);
+    background:rgba(255,255,255,0.16);
+  }
+
+  @media(max-width:950px){
+
+    .wc-nonmajor-row{
+      flex-wrap:wrap;
+    }
+
+    .wc-nonmajor-item{
+      flex:0 0 calc(50% - 9px);
+    }
+  }
+
+  @media(max-width:700px){
+
+    .wc-nonmajor-panel{
+      padding:28px 24px;
+    }
+
+    .wc-nonmajor-header h2{
+      font-size:34px;
+    }
+
+    .wc-nonmajor-item{
+      flex:0 0 100%;
+    }
+
+    .wc-nonmajor-item::after{
+      width:calc(100vw - 64px);
+      left:50%;
+    }
+  }
+
+</style>
 
 <nav class="page-nav" aria-label="Page navigation">
   <a class="prev" href="6989dbbdeb3f9f1b409e86d5.html">Budget Process &amp; Calendar</a>

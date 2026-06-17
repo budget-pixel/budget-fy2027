@@ -1,0 +1,88 @@
+#wc-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  background: var(--green);
+  border-bottom: 3px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 300;
+  box-sizing: border-box;
+}
+
+.wc-header-logo {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.wc-header-logo img {
+  height: calc(var(--nav-h) - 28px);
+  display: block;
+}
+
+.wc-header-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.wc-header-icons {
+  display: flex;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+.wc-header-icon-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.wc-header-icon-btn:hover,
+.wc-header-icon-btn:focus-visible {
+  background: rgba(255, 255, 255, .14);
+}
+
+@media (max-width: 768px) {
+  .wc-header-title {
+    font-size: .85rem;
+    max-width: 46vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wc-header-logo img {
+    height: calc(var(--nav-h) - 36px);
+  }
+
+  #wc-header {
+    padding: 0 12px;
+  }
+
+  .wc-header-icons {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wc-header-title {
+    font-size: .75rem;
+    max-width: 38vw;
+  }
+}

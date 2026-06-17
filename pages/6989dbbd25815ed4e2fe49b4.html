@@ -133,9 +133,176 @@
 
 <div class="page-eyebrow">Introduction and Overview</div>
 <h1 class="page-title">GFOA Distinguished Budget Presentation Award</h1>
-<div class="page-text">
-<p>Distinguished Budget Presentation Award The Government Finance Officers Association of the United States and Canada (GFOA) presented a Distinguished Budget Presentation Award to Walton County, Florida for its Annual Budget for the fiscal year beginning October 1, 2025. In order to receive this award, a government unit must publish a budget document that meets program criteria as a policy document, as a financial plan, as an operations guide, and as a communications device. This award is valid for a period of one year only. We believe our current budget continues to conform to program requirements, and we are submitting it to GFOA to determine its eligibility for another award. GFOA Budget Award Winners</p>
+
+<script src="https://budget-pixel.github.io/walton-budget-nav.js/walton-header-slide.js"></script>
+
+<div style="
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding:40px 20px;
+  background:#ffffff;
+  box-sizing:border-box;
+">
+
+  <div style="
+    background:#ffffff;
+    border-radius:28px;
+    padding:24px;
+    box-shadow:
+      0 10px 30px rgba(36,52,77,0.12),
+      0 4px 12px rgba(36,52,77,0.08);
+    max-width:700px;
+    width:100%;
+    box-sizing:border-box;
+  ">
+
+    <img alt="Walton County Graphic" src="https://stories.opengov.com/countyofwaltonfl/uploads/01505b16c250-Untitled.png?v=2026-05-13T12:24:08.130Z" style="
+        width:100%;
+        height:auto;
+        display:block;
+        border-radius:20px;
+        border:4px solid #d1be78;
+      ">
+
+  </div>
+
 </div>
+
+<div style="
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding:40px 20px;
+  background:#ffffff;
+  box-sizing:border-box;
+">
+
+  <div style="
+    background:#ffffff;
+    border-radius:28px;
+    padding:28px;
+    box-shadow:
+      0 10px 30px rgba(36,52,77,0.12),
+      0 4px 12px rgba(36,52,77,0.08);
+    max-width:1150px;
+    width:100%;
+    box-sizing:border-box;
+  ">
+
+    <img alt="Walton County Graphic" src="https://stories.opengov.com/countyofwaltonfl/uploads/254c1ac3f06a-15654.png?v=2026-05-13T12:27:42.104Z" style="
+        width:100%;
+        height:auto;
+        display:block;
+        border-radius:20px;
+      ">
+
+  </div>
+
+</div>
+
+<style>
+  .wc-award-confetti-bottom{
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:420px;
+    pointer-events:none;
+    z-index:99999;
+    overflow:visible;
+  }
+
+  .wc-award-confetti-bottom span{
+    position:absolute;
+    bottom:-30px;
+    display:block;
+    width:9px;
+    height:18px;
+    border-radius:2px;
+    opacity:0;
+    animation:wcConfettiBlast 2s ease-out forwards;
+  }
+
+  .wc-award-confetti-bottom span:nth-child(3n){
+    background:#006231;
+  }
+
+  .wc-award-confetti-bottom span:nth-child(3n+1){
+    background:#d1be78;
+  }
+
+  .wc-award-confetti-bottom span:nth-child(3n+2){
+    background:#ffffff;
+    border:1px solid #d1be78;
+  }
+
+  .wc-award-confetti-bottom span:nth-child(5n){
+    width:7px;
+    height:7px;
+    border-radius:999px;
+  }
+
+  @keyframes wcConfettiBlast{
+    0%{
+      opacity:0;
+      transform:translateX(0) translateY(0) rotate(0deg) scale(.7);
+    }
+
+    10%{
+      opacity:1;
+    }
+
+    100%{
+      opacity:0;
+      transform:
+        translateX(var(--x))
+        translateY(var(--y))
+        rotate(var(--r))
+        scale(1.1);
+    }
+  }
+</style><div id="wcAwardConfettiBottom" class="wc-award-confetti-bottom"></div><script>
+(function(){
+
+  var container = document.getElementById("wcAwardConfettiBottom");
+
+  for(var i = 0; i < 120; i++){
+
+    var piece = document.createElement("span");
+
+    piece.style.left = Math.random() * 100 + "%";
+
+    piece.style.setProperty(
+      "--x",
+      ((Math.random() * 320) - 160) + "px"
+    );
+
+    piece.style.setProperty(
+      "--y",
+      (-(Math.random() * 520 + 120)) + "px"
+    );
+
+    piece.style.setProperty(
+      "--r",
+      ((Math.random() * 720) - 360) + "deg"
+    );
+
+    piece.style.animationDelay =
+      (Math.random() * 0.25) + "s";
+
+    piece.style.animationDuration =
+      (1.6 + Math.random() * 0.8) + "s";
+
+    container.appendChild(piece);
+  }
+
+  setTimeout(function(){
+    container.remove();
+  }, 2600);
+
+})();
+</script>
 
 <nav class="page-nav" aria-label="Page navigation">
   <a class="prev" href="6989dbbdb4696f0b333f2246.html">Table of Contents</a>

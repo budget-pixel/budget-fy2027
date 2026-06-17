@@ -208,15 +208,18 @@ function applyPriorYearsState(){
 }
 
 function initPriorYearsToggle(){
-  document.addEventListener('change', (e)=>{
-    const target = e.target;
-    if(!target || !target.classList) return;
-    if(target.classList.contains('wc-fy-column-toggle-checkbox')){
-      wcShowPriorYears = !!target.checked;
-      try{ localStorage.setItem(WC_PRIOR_YEARS_KEY, wcShowPriorYears ? '1' : '0'); }catch(e){}
-      applyPriorYearsState();
-    }
-  });
+  if(!window.__wcPerfChangeBound){
+    window.__wcPerfChangeBound = true;
+    document.addEventListener('change', (e)=>{
+      const target = e.target;
+      if(!target || !target.classList) return;
+      if(target.classList.contains('wc-fy-column-toggle-checkbox')){
+        wcShowPriorYears = !!target.checked;
+        try{ localStorage.setItem(WC_PRIOR_YEARS_KEY, wcShowPriorYears ? '1' : '0'); }catch(e){}
+        applyPriorYearsState();
+      }
+    });
+  }
 
   // ensure initial state applied
   applyPriorYearsState();
