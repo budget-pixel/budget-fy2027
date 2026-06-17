@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tourist Development Fund CIP Schedules — Walton County FY 2027 Budget</title>
+<title>Home — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
   <aside id="sidebar" aria-label="Budget navigation">
 <div class="nav-section">
   <button class="nav-section-toggle">Introduction and Overview<span class="arrow">▶</span></button>
-  <div class="nav-section-links"><a href="../pages/home.html">Home</a>
+  <div class="nav-section-links"><a href="../pages/home.html" class="active">Home</a>
 <a href="../pages/gfoa-distinguished-budget-presentation-award.html">GFOA Distinguished Budget Presentation Award</a>
 <a href="../pages/transmittal-letter.html">Transmittal Letter</a>
 <a href="../pages/budget-in-brief.html">Budget-in-Brief</a>
@@ -116,7 +116,7 @@
 <a href="../pages/cip-capital-projects.html">Capital Projects Fund Schedule</a>
 <a href="../pages/cip-grants.html">Grant Funded Schedule</a>
 <a href="../pages/cip-sheriff.html">Sheriff Fund Schedule</a>
-<a href="../pages/cip-tourist-development.html" class="active">Tourist Development Fund Schedule</a>
+<a href="../pages/cip-tourist-development.html">Tourist Development Fund Schedule</a>
 <a href="../pages/cip-transportation.html">Transportation Fund Schedule</a>
 </div>
 </div>
@@ -129,389 +129,420 @@
 
   </aside>
   <main id="content">
+
 <style>
-    *{
-      box-sizing:border-box;
+  html,
+  body{
+    margin:0;
+    padding:0;
+  }
+
+  .wc-video-hero{
+    position:relative;
+    width:100%;
+    height:clamp(420px, 56vh, 620px);
+    overflow:hidden;
+    background:#24344d;
+    font-family:Arial, Helvetica, sans-serif;
+    border-radius:32px;
+    isolation:isolate;
+    box-shadow:
+      0 10px 24px rgba(36,52,77,0.14),
+      0 3px 8px rgba(36,52,77,0.08),
+      0 1px 0 rgba(255,255,255,0.05) inset;
+  }
+  .wc-video-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border:1px solid rgba(209,190,120,0.32);
+    border-radius:32px;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.08),
+      inset 0 -18px 28px rgba(0,0,0,0.06);
+    z-index:4;
+    pointer-events:none;
+  }
+
+  .wc-video-frame{
+    position:absolute;
+    top:50%;
+    left:50%;
+
+    width:100vw;
+    height:56.25vw;
+
+    min-width:177.78vh;
+    min-height:100%;
+
+    transform:translate(-50%, -50%);
+
+    border:0;
+    pointer-events:none;
+
+    z-index:1;
+  }
+
+  .wc-video-overlay{
+    position:absolute;
+    inset:0;
+
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(255,255,255,0) 54%,
+        rgba(20,30,45,0.12) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(20,30,45,0.04) 0%,
+        rgba(20,30,45,0.08) 58%,
+        rgba(20,30,45,0.12) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(0,98,49,0.10) 0%,
+        rgba(0,98,49,0) 28%,
+        rgba(0,98,49,0) 72%,
+        rgba(209,190,120,0.08) 100%
+      );
+
+    z-index:2;
+    pointer-events:none;
+  }
+
+  .wc-video-content{
+    position:relative;
+    z-index:3;
+
+    width:100%;
+    max-width:1280px;
+    height:100%;
+
+    margin:0 auto;
+    padding:0 42px;
+
+    box-sizing:border-box;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+    color:#ffffff;
+  }
+
+  .wc-video-title-box{
+    display:inline-block;
+    max-width:1080px;
+
+    padding:32px 52px 34px 52px;
+
+    border-radius:28px;
+
+    background:linear-gradient(
+      180deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.13) 100%
+    );
+    border:1px solid rgba(255,255,255,0.30);
+
+    backdrop-filter:blur(16px) saturate(130%);
+    -webkit-backdrop-filter:blur(16px) saturate(130%);
+
+    box-shadow:
+      0 8px 18px rgba(0,0,0,0.16),
+      inset 0 1px 0 rgba(255,255,255,0.26),
+      0 0 18px rgba(209,190,120,0.10);
+    animation:wcHeroFadeIn 1.4s ease forwards;
+  }
+
+  @keyframes wcHeroFadeIn{
+
+    from{
+      opacity:0;
+      transform:translateY(22px);
     }
 
-    body{
-      margin:0;
-      background:#ffffff;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      overflow-x:hidden;
+    to{
+      opacity:1;
+      transform:translateY(0);
+    }
+  }
+
+  .wc-video-content span{
+    display:inline-block;
+    margin-bottom:18px;
+
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+
+    color:#f1dc94;
+    text-shadow:0 2px 10px rgba(0,0,0,0.34);
+  }
+
+  .wc-video-content h1{
+    max-width:1000px;
+    margin:0;
+
+    font-size:clamp(44px, 5vw, 78px);
+    line-height:1.05;
+    font-weight:800;
+
+    color:#ffffff;
+
+    text-shadow:
+      0 10px 30px rgba(0,0,0,.35),
+      0 4px 10px rgba(0,0,0,.25);
+  }
+
+  .wc-video-content h1::after{
+    content:"";
+    display:block;
+
+    width:118px;
+    height:5px;
+
+    margin:24px auto 0 auto;
+
+    border-radius:999px;
+    background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
+    box-shadow:0 0 18px rgba(209,190,120,0.36);
+  }
+
+  .wc-video-content p{
+    max-width:880px;
+    margin:28px auto 0 auto;
+
+    font-size:20px;
+    line-height:1.75;
+
+    color:rgba(255,255,255,.92);
+  }
+
+
+  @media(max-width:768px){
+
+    .wc-video-hero{
+      height:420px;
     }
 
-    .wc-transport-page{
-      width:100%;
-      background:#ffffff;
+    .wc-video-content{
+      padding:0 24px;
     }
 
-    .wc-cip-sticky-nav-shell{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto 18px auto;
-      padding:10px 0 12px 0;
-      background:transparent;
-      box-sizing:border-box;
+    .wc-video-title-box{
+      padding:24px 26px 26px 26px;
+      border-radius:20px;
     }
 
-    .wc-cip-sticky-nav-shell::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:0;
-      width:100vw;
-      height:4px;
-      transform:translateX(-50%);
-      background:#006231;
-      pointer-events:none;
+    .wc-video-content p{
+      font-size:16px;
+      line-height:1.65;
     }
+  }
+</style><div class="wc-video-hero">
 
-    .wc-cip-proxy-nav{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:0;
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:0 12px;
-      background:transparent;
-      box-sizing:border-box;
-    }
+  <iframe class="wc-video-frame" src="https://www.youtube.com/embed/9KzURzB0E-U?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=9KzURzB0E-U&amp;controls=0&amp;modestbranding=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" title="Final Budget 2025–2026" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen="">
+  </iframe>
 
-    .wc-cip-proxy-button,
-    .wc-cip-proxy-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:42px;
-      margin:8px 2px;
-      padding:0 18px;
-      border:0;
-      border-radius:999px;
-      background:transparent;
-      color:#172033;
-      font-family:Arial, Helvetica, sans-serif;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      text-decoration:none;
-      cursor:pointer;
-      transition:background .22s ease, color .22s ease;
-    }
+  <div class="wc-video-overlay"></div>
 
-    .wc-cip-proxy-button:hover,
-    .wc-cip-proxy-link:hover,
-    .wc-cip-proxy-link.is-active{
-      background:#00623114;
-      color:#006231;
-    }
+  <div class="wc-video-content">
 
-    .wc-cip-proxy-link.wc-cip-proxy-search{
-      margin-left:8px;
-      background:#006231;
-      color:#ffffff;
-    }
+    <div class="wc-video-title-box">
 
-    .wc-cip-proxy-link.wc-cip-proxy-search:hover{
-      background:#004f28;
-      color:#ffffff;
-    }
-
-    .wc-transport-hero{
-      position:relative;
-      width:100%;
-      min-height:440px;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:72px 28px;
-      background:
-        linear-gradient(90deg,rgba(6,32,45,0.84) 0%,rgba(4,48,38,0.62) 48%,rgba(10,42,59,0.36) 100%),
-        url("https://stories.opengov.com/countyofwaltonfl/uploads/4f9ae2ab7bae-Picture1222.jpg&q") center center / cover no-repeat;
-    }
-
-    .wc-transport-title-box{
-      width:100%;
-      max-width:1100px;
-      text-align:center;
-      color:#ffffff;
-    }
-
-    .wc-transport-title-box span{
-      display:block;
-      margin-bottom:16px;
-      color:#f1dc94;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      text-shadow:0 2px 10px rgba(0,0,0,0.34);
-    }
-
-    .wc-transport-title-box h1{
-      margin:0;
-      font-size:clamp(42px, 5vw, 74px);
-      line-height:1.05;
-      font-weight:800;
-      color:#ffffff;
-      text-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        0 4px 10px rgba(0,0,0,.25);
-    }
-
-    .wc-transport-title-box h1::after{
-      content:"";
-      display:block;
-      width:118px;
-      height:5px;
-      margin:24px auto 0 auto;
-      border-radius:999px;
-      background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
-      box-shadow:0 0 18px rgba(209,190,120,0.36);
-    }
-
-    .wc-transport-content{
-      width:100%;
-      max-width:1600px;
-      margin:0 auto;
-      padding:42px 28px 64px 28px;
-    }
-
-    .wc-year-table-block{
-      margin-top:34px;
-    }
-
-    .wc-year-table-heading{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:20px;
-      margin-bottom:14px;
-      padding-bottom:12px;
-      border-bottom:4px solid #006231;
-    }
-
-    .wc-year-table-heading h2{
-      margin:0;
-      color:#172033;
-      font-size:30px;
-      line-height:1.15;
-      font-weight:800;
-    }
-
-    .wc-year-table-heading strong{
-      color:#006231;
-      font-size:22px;
-      white-space:nowrap;
-    }
-
-    .wc-table-wrap{
-      width:100%;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      border:1px solid rgba(209,190,120,0.45);
-      border-radius:24px;
-      background:#ffffff;
-      box-shadow:
-        0 14px 34px rgba(0,98,49,0.08),
-        0 4px 12px rgba(36,52,77,0.06);
-    }
-
-    .wc-transport-table{
-      width:100%;
-      min-width:940px;
-      border-collapse:separate;
-      border-spacing:0;
-      background:#ffffff;
-      font-size:14px;
-    }
-
-    .wc-transport-table th{
-      padding:12px 14px;
-      border:0;
-      border-bottom:4px solid #d1be78;
-      background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
-      color:#ffffff;
-      font-size:14px;
-      font-weight:700;
-      text-align:center;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table td{
-      padding:12px 14px;
-      border:0;
-      border-bottom:1px solid rgba(36,52,77,0.10);
-      color:#344054;
-      font-size:14px;
-      line-height:1.45;
-      text-align:center;
-      vertical-align:middle;
-      background:#ffffff;
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td{
-      background:rgba(0,98,49,0.04);
-    }
-
-    .wc-transport-table tbody tr:hover td{
-      background:rgba(209,190,120,0.18);
-    }
-
-    .wc-transport-table td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      background:#ffffff;
-      background-clip:padding-box;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      color:#172033;
-      font-weight:700;
-    }
-
-    .wc-transport-table thead th:first-child{
-      position:sticky;
-      left:0;
-      z-index:12;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-    }
-
-    .wc-transport-table tbody tr:nth-child(even) td:first-child{
-      background:#f5f9f7;
-    }
-
-    .wc-transport-table tbody tr:hover td:first-child{
-      background:#f8f2dc;
-    }
-
-    .wc-transport-table .amount{
-      text-align:right;
-      font-weight:800;
-      color:#172033;
-      white-space:nowrap;
-    }
-
-    .wc-transport-table tfoot td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-      color:#172033;
-      font-weight:700;
-      border-bottom:0;
-      padding:13px 14px;
-    }
-
-    .wc-transport-table tfoot tr:hover td{
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-transport-table tfoot td:first-child{
-      position:sticky;
-      left:0;
-      z-index:10;
-      min-width:220px;
-      max-width:280px;
-      text-align:left;
-      box-shadow:10px 0 14px rgba(36,52,77,0.14);
-      background:linear-gradient(135deg,#d1be78 0%,#c2ac5f 100%);
-    }
-
-    .wc-empty-message{
-      padding:38px 20px;
-      text-align:center;
-      color:#667085;
-      font-weight:700;
-    }
-
-    @media(max-width:700px){
-      .wc-transport-hero{
-        min-height:360px;
-        padding:54px 18px;
-      }
-
-      .wc-transport-content{
-        padding:34px 14px 48px 14px;
-      }
-
-      .wc-cip-proxy-nav{
-        justify-content:flex-start;
-        flex-wrap:nowrap;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:none;
-        padding:0 8px;
-      }
-
-      .wc-cip-proxy-nav::-webkit-scrollbar{
-        display:none;
-      }
-
-      .wc-cip-proxy-button,
-      .wc-cip-proxy-link{
-        flex:0 0 auto;
-        min-height:40px;
-        padding:0 13px;
-        font-size:12px;
-        white-space:nowrap;
-      }
-
-      .wc-year-table-heading{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:8px;
-      }
-
-      .wc-year-table-heading h2{
-        font-size:25px;
-      }
-
-    }
-
-</style>
-<main class="wc-transport-page">
-  <div class="wc-cip-sticky-nav-shell">
-  <nav class="wc-cip-proxy-nav" aria-label="Capital Improvement Plan navigation">
-    <a class="wc-cip-proxy-link" href="capital-improvement-plan.html">Overview</a>
-<a class="wc-cip-proxy-link" href="cip-transportation.html">Transportation</a>
-<a class="wc-cip-proxy-link" href="cip-capital-projects.html">Capital Fund</a>
-<a class="wc-cip-proxy-link" href="cip-sheriff.html">Sheriff</a>
-<a class="wc-cip-proxy-link is-active" href="cip-tourist-development.html">Tourist Development</a>
-<a class="wc-cip-proxy-link" href="cip-grants.html">Grants</a>
-<a class="wc-cip-proxy-link wc-cip-proxy-search" href="search.html">Project Search</a>
-
-  </nav>
-</div>
-  <section class="wc-transport-hero" style="background:linear-gradient(135deg,#06202d 0%,#043026 55%,#0a2a3b 100%);">
-    <div class="wc-transport-title-box">
       <span>Walton County, Florida</span>
-      <h1>Tourist Development Fund CIP Schedules</h1>
+
+      <h1>Proposed Fiscal Year 2027 Budget</h1>
+
+
     </div>
-  </section>
-  <section class="wc-transport-content">
-    <div id="touristTables"></div>
-  </section>
-</main>
-<script src="../assets/walton-cip-projects.js"></script>
-<script src="../assets/walton-cip-fund-schedule.js"></script>
-<script>
-  renderFundSchedule({funding:"tourist development fund", mountId:"touristTables", label:"Tourist Development Fund"});
+
+  </div>
+
+</div>
+
+<h2 class="wc-budget-strip-title">Budget at a Glance</h2><style>
+
+  .wc-budget-strip-title{
+    margin:54px 0 16px 0;
+    color:#172033;
+    font-size:42px;
+    line-height:1.15;
+    font-weight:700;
+    font-family:Arial, Helvetica, sans-serif;
+    text-align:center;
+  }
+
+  .wc-budget-strip-title::after{
+    content:"";
+    display:block;
+    width:90px;
+    height:4px;
+    background:#d1be78;
+    border-radius:4px;
+    margin:16px auto 0 auto;
+  }
+
+  .wc-budget-strip{
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0,1fr));
+    gap:16px;
+    margin:34px 0 42px 0;
+    padding:22px;
+    background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
+    border-radius:26px;
+    box-shadow:0 18px 42px rgba(0,0,0,.12);
+    font-family:Arial, Helvetica, sans-serif;
+  }
+
+  .wc-budget-item{
+    padding:14px 10px;
+    text-align:center;
+  }
+
+  .wc-budget-label{
+    display:block;
+    margin-bottom:10px;
+    color:rgba(255,255,255,.76);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    line-height:1.35;
+    min-height:42px;
+  }
+
+  .wc-budget-item strong{
+    display:block;
+    color:#ffffff;
+    font-size:30px;
+    line-height:1.1;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .wc-budget-count{
+    display:block;
+  }
+
+  @media(max-width:900px){
+    .wc-budget-strip{
+      grid-template-columns:repeat(2,1fr);
+    }
+  }
+
+  @media(max-width:600px){
+    .wc-budget-strip{
+      grid-template-columns:1fr;
+      padding:20px;
+    }
+
+    .wc-budget-strip-title{
+      margin-top:38px;
+      font-size:34px;
+    }
+
+    .wc-budget-item strong{
+      font-size:26px;
+    }
+  }
+
+</style><div class="wc-budget-strip">
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Property Taxes</span>
+    <strong class="wc-budget-count" data-target="163.4" data-prefix="$" data-suffix="M" data-decimals="1">$163.4M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Tourist Development Tax</span>
+    <strong class="wc-budget-count" data-target="58.8" data-prefix="$" data-suffix="M" data-decimals="1">$58.8M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Local Discretionary Sales Surtax</span>
+    <strong class="wc-budget-count" data-target="40.0" data-prefix="$" data-suffix="M" data-decimals="1">$40.0M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">Local Government 1/2 Cent Sales Tax</span>
+    <strong class="wc-budget-count" data-target="17.9" data-prefix="$" data-suffix="M" data-decimals="1">$17.9M</strong>
+  </div>
+
+  <div class="wc-budget-item">
+    <span class="wc-budget-label">All Other Revenues</span>
+    <strong class="wc-budget-count" data-target="57.9" data-prefix="$" data-suffix="M" data-decimals="1">$57.9M</strong>
+  </div>
+
+</div><script>
+  (function(){
+    const section = document.querySelector('.wc-budget-strip');
+    const counters = document.querySelectorAll('.wc-budget-count');
+
+    if(!section || !counters.length){
+      return;
+    }
+
+    function formatValue(value, decimals){
+      return Number(value).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function animateCounters(){
+      counters.forEach(function(counter){
+        const target = Number(counter.dataset.target || 0);
+        const prefix = counter.dataset.prefix || '';
+        const suffix = counter.dataset.suffix || '';
+        const decimals = Number(counter.dataset.decimals || 0);
+        const duration = 1100;
+        const startTime = performance.now();
+
+        function update(now){
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const currentValue = target * eased;
+
+          counter.textContent = prefix + formatValue(currentValue, decimals) + suffix;
+
+          if(progress < 1){
+            requestAnimationFrame(update);
+          }else{
+            counter.textContent = prefix + formatValue(target, decimals) + suffix;
+          }
+        }
+
+        counter.textContent = prefix + formatValue(0, decimals) + suffix;
+        requestAnimationFrame(update);
+      });
+    }
+
+    if('IntersectionObserver' in window){
+      const observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            animateCounters();
+            observer.disconnect();
+          }
+        });
+      }, { threshold:.35 });
+
+      observer.observe(section);
+    }else{
+      animateCounters();
+    }
+  })();
 </script>
+
 <nav class="page-nav" aria-label="Page navigation">
-  <a class="prev" href="cip-sheriff.html">Sheriff Fund Schedule</a>
-  <a class="next" href="cip-transportation.html">Transportation Fund Schedule</a>
+  
+  <a class="next" href="gfoa-distinguished-budget-presentation-award.html">GFOA Distinguished Budget Presentation Award</a>
 </nav>
   </main>
 </div>

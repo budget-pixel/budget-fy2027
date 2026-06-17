@@ -15,7 +15,7 @@
       typeof getWaltonSplitBrandHtml === "function"
     ){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
-        "6989dbbdb4696f0b333f2246.html",
+        "home.html",
         "Go to Home"
       );
     }
