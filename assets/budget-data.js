@@ -36,7 +36,7 @@
     ],
     "public defender": ["court technology public defender"],
     "statutory and other agency funding": ["statutory and other agency fund"],
-    "south walton fire and state control": ["south walton fire district", "state fire control"],
+    "south walton fire and state control": ["south walton fire", "state fire"],
     "code compliance": ["code compliance beach", "code compliance street"],
     "libraries": ["county libraries"],
     "planning": ["planning short term rental"]
@@ -112,12 +112,40 @@
       .replace(/'/g, "&#039;");
   }
 
-  // Escapes narrative text for safe HTML rendering, then converts
-  // markdown-style **bold** spans into <strong> tags (used for Statement of
-  // Function, Mission, Budget Highlights, and any other narrative content
-  // pulled from Google Sheets).
+  // Only http(s)/mailto links are allowed through; anything else
+  // (javascript:, data:, vbscript:, a bare "//evil.com", etc.) is rejected
+  // so a sheet editor can't turn narrative text into an XSS vector.
+  function sanitizeNarrativeUrl(url) {
+    const trimmed = String(url || "").trim();
+    return /^(https?:|mailto:)/i.test(trimmed) ? trimmed : "";
+  }
+
+  // Renders narrative text pulled from Google Sheets: escapes it for safe
+  // HTML output, then converts markdown-style **bold** spans into <strong>
+  // and [Link Text](https://example.com) spans into target="_blank" links.
+  // Used for Statement of Function, Mission, Budget Highlights, and any
+  // other narrative content loaded from the sheets.
   function formatNarrativeText(value) {
-    return escapeHtml(value).replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>");
+    const text = String(value === undefined || value === null ? "" : value);
+    const pattern = /\*\*(.+?)\*\*|\[([^[\]]+)\]\(([^()\s]+)\)/gs;
+    let result = "";
+    let lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      result += escapeHtml(text.slice(lastIndex, match.index));
+      if (match[1] !== undefined) {
+        result += "<strong>" + escapeHtml(match[1]) + "</strong>";
+      } else {
+        const linkText = escapeHtml(match[2]);
+        const safeUrl = sanitizeNarrativeUrl(match[3]);
+        result += safeUrl
+          ? '<a href="' + escapeHtml(safeUrl) + '" target="_blank" rel="noopener noreferrer">' + linkText + "</a>"
+          : linkText;
+      }
+      lastIndex = pattern.lastIndex;
+    }
+    result += escapeHtml(text.slice(lastIndex));
+    return result;
   }
 
   // Splits a raw narrative cell's text into paragraphs. Google Sheets cells
