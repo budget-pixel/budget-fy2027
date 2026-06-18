@@ -195,6 +195,10 @@
       }
 
       projects.forEach(function(project){
+        if(project && project.is_legacy_in_house_engineering_row){
+          return;
+        }
+
         var projectTitle = getProjectValue(project, [
           "title",
           "projectTitle",

@@ -19,11 +19,20 @@ function getYearAmount(project, year){
     .reduce((sum, item) => sum + Number(item.amount_value || 0), 0);
 }
 
-function isInHouseEngineeringProject(project){
+function getInHouseEngineeringAmount(project){
+  if(Number(project.in_house_engineering_value || 0) > 0){
+    return Number(project.in_house_engineering_value || 0);
+  }
+
+  return (project.in_house_engineering_rows || [])
+    .reduce((sum, row) => sum + Number(row.amount_value || 0), 0);
+}
+
+function isLegacyInHouseEngineeringRow(project){
   const title = String(project.title || "").toLowerCase();
   const accountCode = String(project.budget_account_code || "").trim();
 
-  return Boolean(project.has_in_house_engineering) ||
+  return Boolean(project.is_legacy_in_house_engineering_row) ||
     title.includes("in-house engineering") ||
     accountCode === "534000";
 }
@@ -80,8 +89,8 @@ function renderFundSchedule(config){
     const projects = (Array.isArray(projectList) ? projectList : window.wcCipProjects || [])
       .filter(project => String(project.funding || "").toLowerCase() === config.funding);
 
-    const scheduleProjects = projects.filter(project => !isInHouseEngineeringProject(project));
-    const inHouseProjects = projects.filter(isInHouseEngineeringProject);
+    const scheduleProjects = projects.filter(project => !isLegacyInHouseEngineeringRow(project));
+    const inHouseProjects = scheduleProjects.filter(project => getInHouseEngineeringAmount(project) > 0);
 
     function getYearProjects(projectSource, year){
       return projectSource
@@ -93,9 +102,19 @@ function renderFundSchedule(config){
         .sort((a, b) => b.year_amount_value - a.year_amount_value || a.title.localeCompare(b.title));
     }
 
+    function getYearInHouseProjects(projectSource, year){
+      return projectSource
+        .map(project => ({
+          ...project,
+          year_amount_value: year === "FY2027" ? getInHouseEngineeringAmount(project) : 0
+        }))
+        .filter(project => project.year_amount_value > 0)
+        .sort((a, b) => b.year_amount_value - a.year_amount_value || a.title.localeCompare(b.title));
+    }
+
     const tables = years.map(year => {
       const yearProjects = getYearProjects(scheduleProjects, year);
-      const yearInHouseProjects = getYearProjects(inHouseProjects, year);
+      const yearInHouseProjects = getYearInHouseProjects(inHouseProjects, year);
 
       return [
         renderYearScheduleTable(year, config.label + " Schedule", yearProjects, config.label),

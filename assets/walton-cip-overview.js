@@ -42,6 +42,10 @@ function getFilteredProjects(){
   const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
 
   return projects.filter(project => {
+    if(project.is_legacy_in_house_engineering_row){
+      return false;
+    }
+
     const department = String(project.dept || project.department || "").toLowerCase();
     const target = String(project.target || "").toLowerCase();
     const targetYears = Array.isArray(project.target_years) ? project.target_years.join(" ").toLowerCase() : "";

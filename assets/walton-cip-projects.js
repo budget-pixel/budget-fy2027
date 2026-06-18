@@ -154,9 +154,12 @@
         fundingSource || get(row, "Pertinent Information")
       );
       const accountName = get(row, "Budget Account Name(s)");
-      const isInHouseEngineering =
+      const accountCode = get(row, "Budget Account Code(s)");
+      const inHouseEngineeringValue = parseMoney(get(row, "In-House Engineering"));
+      const isLegacyInHouseEngineeringRow =
         title.toLowerCase().includes("in-house engineering") ||
-        get(row, "Budget Account Code(s)") === "534000";
+        accountCode === "534000";
+      const hasInHouseEngineering = inHouseEngineeringValue > 0;
 
       return {
         title,
@@ -188,12 +191,20 @@
         status_text: phase,
         status_class: getStatusClass(phase),
         budget_org_code: get(row, "Budget Org Code(s)"),
-        budget_account_code: get(row, "Budget Account Code(s)"),
+        budget_account_code: accountCode,
         budget_account_name: accountName,
-        has_in_house_engineering: isInHouseEngineering,
-        in_house_engineering_value: isInHouseEngineering ? totalValue : 0,
-        in_house_engineering_value_formatted: isInHouseEngineering ? formatMoney(totalValue) : "",
-        in_house_engineering_rows: isInHouseEngineering ? yearlyFunding : [],
+        is_legacy_in_house_engineering_row: isLegacyInHouseEngineeringRow,
+        has_in_house_engineering: hasInHouseEngineering,
+        in_house_engineering_value: inHouseEngineeringValue,
+        in_house_engineering_value_formatted: hasInHouseEngineering ? formatMoney(inHouseEngineeringValue) : "",
+        in_house_engineering_rows: hasInHouseEngineering
+          ? [{
+              description: title,
+              year: "FY2027",
+              amount_value: inHouseEngineeringValue,
+              amount: formatMoney(inHouseEngineeringValue)
+            }]
+          : [],
         raw: row
       };
     });
