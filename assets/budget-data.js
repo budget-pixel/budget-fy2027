@@ -637,6 +637,7 @@
     const isExpense = kind !== "revenue";
     const codeField = isExpense ? "Object_Code" : "Revenue_Code";
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
+    const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
     const descField = descriptionField || "Note";
 
     // Combine rows that share the same name (e.g. the same revenue source
@@ -648,7 +649,7 @@
       const name = r[nameField] || "";
       const existing = grouped.get(name);
       if (!existing) {
-        const merged = { codes: [r[codeField] || ""].filter(Boolean), desc: r[descField] || "" };
+        const merged = { codes: [r[codeField] || ""].filter(Boolean), desc: r[descField] || "", category: r[categoryField] || "" };
         sumFields.forEach((f) => { merged[f] = r[f] || 0; });
         grouped.set(name, merged);
         return;
@@ -657,7 +658,7 @@
       sumFields.forEach((f) => { existing[f] += r[f] || 0; });
     });
     const mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
-      const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.desc };
+      const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.desc, [categoryField]: merged.category };
       sumFields.forEach((f) => { row[f] = merged[f]; });
       return row;
     });
@@ -669,7 +670,8 @@
         const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
         return (
           "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
-          "<td>" + escapeHtml(r[codeField] || "") + "</td>" +
+          "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
+          (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
           "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
           "<td>" + escapeHtml(r[descField] || "") + "</td>" +
           BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
@@ -680,14 +682,13 @@
       });
 
     const detailTable = renderTable({
-      columns: [
-        { label: isExpense ? "Object Code" : "Revenue Code" },
-        { label: isExpense ? "Object Name" : "Revenue Name" },
-        { label: "Itemized Description" }
-      ].concat(
-        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
-        [{ label: "FY 2027 Proposed", num: true }]
-      ),
+      columns: [{ label: "Category" }]
+        .concat(isExpense ? [{ label: "Object Code" }] : [])
+        .concat([{ label: isExpense ? "Object Name" : "Revenue Name" }, { label: "Itemized Description" }])
+        .concat(
+          BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
+          [{ label: "FY 2027 Proposed", num: true }]
+        ),
       bodyRows: bodyRows
     });
 
