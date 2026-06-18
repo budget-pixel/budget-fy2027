@@ -109,6 +109,35 @@
     return "wc-status-planning";
   }
 
+  function normalizeDepartment(row, title, fund, projectManager) {
+    const rawDept = get(row, "Dept");
+    const source = [
+      rawDept,
+      title,
+      fund,
+      projectManager,
+      get(row, "Location Name"),
+      get(row, "Budget Account Name(s)")
+    ].join(" ").toLowerCase();
+
+    if (/\bsheriff\b/.test(source)) return "Sheriff";
+    if (/\btdt\b|\btdc\b|tourist|tourism|beach|dune|30a|miramar|visitor|gulfview|blue mountain/.test(source)) return "Beach Operations";
+    if (/\bpw\b|\beng\b|public works|engineering|road|bridge|sidewalk|path|stormwater|drainage|intersection|connector|pave|overlay|resurfacing|transportation/.test(source)) return "Public Works/Engineering";
+    if (/admin|library|building construction|maintenance|facility|county buildings|renovation|rehab/.test(source)) return "Administration";
+    if (/\bfm\b/.test(source)) return "Building Construction & Maintenance";
+    return rawDept || "Capital Projects";
+  }
+
+  function departmentFilterValue(department) {
+    const text = cleanText(department).toLowerCase();
+    if (text.includes("public works") || text.includes("engineering")) return "public works";
+    if (text.includes("beach") || text.includes("tourism")) return "beach operations";
+    if (text.includes("sheriff")) return "sheriff";
+    if (text.includes("administration") || text === "admin") return "administration";
+    if (text.includes("building construction") || text.includes("maintenance")) return "building construction";
+    return text;
+  }
+
   function getPrimaryYear(fundingByYear) {
     if (!fundingByYear.length) return "";
     return fundingByYear[fundingByYear.length - 1].year;
@@ -140,6 +169,8 @@
       const totalValue = parseMoney(get(row, "Total FY2027-FY2031"));
       const fund = get(row, "Budget Fund(s)");
       const phase = get(row, "Project Phase") || "Identification";
+      const projectManager = get(row, "Project Manager");
+      const department = normalizeDepartment(row, title, fund, projectManager);
       let baseSlug = slugify(title);
       if (slugCounts[baseSlug]) {
         baseSlug = slugify([title, code || fund || index + 1].filter(Boolean).join(" "));
@@ -165,10 +196,11 @@
         title,
         slug,
         proposal_name: title,
-        dept: get(row, "Dept"),
-        department: get(row, "Dept"),
+        dept: department,
+        department,
+        department_filter: departmentFilterValue(department),
         project_code: code,
-        project_manager: get(row, "Project Manager"),
+        project_manager: projectManager,
         estimated_completion_date: get(row, "Estimated Completion Date"),
         start_date: get(row, "Start Date"),
         priority: get(row, "Project Priority") || "None",

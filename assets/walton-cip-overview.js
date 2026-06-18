@@ -29,6 +29,10 @@ const filters = {
   search: incomingSearch
 };
 
+function normalizeFilterValue(value){
+  return String(value || "").trim().toLowerCase();
+}
+
 function escapeHtml(value){
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -38,23 +42,66 @@ function escapeHtml(value){
     .replace(/'/g, "&#039;");
 }
 
-function getFilteredProjects(){
+function getSearchableProjects(){
   const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
 
-  return projects.filter(project => {
-    if(project.is_legacy_in_house_engineering_row){
-      return false;
+  return projects.filter(project => !project.is_legacy_in_house_engineering_row);
+}
+
+function getFilterOptions(projects, key, preferredOrder){
+  const seen = {};
+  const options = [];
+
+  projects.forEach(project => {
+    const label = String(project[key] || "").trim();
+
+    if(!label){
+      return;
     }
 
-    const department = String(project.dept || project.department || "").toLowerCase();
+    const value = normalizeFilterValue(label);
+
+    if(seen[value]){
+      return;
+    }
+
+    seen[value] = true;
+    options.push({ label, value });
+  });
+
+  const order = preferredOrder.reduce((acc, item, index) => {
+    acc[normalizeFilterValue(item)] = index;
+    return acc;
+  }, {});
+
+  return options.sort((a, b) => {
+    const aOrder = order[a.value] ?? 999;
+    const bOrder = order[b.value] ?? 999;
+
+    return aOrder - bOrder || a.label.localeCompare(b.label);
+  });
+}
+
+function renderFilterButton(type, value, label){
+  return `<button class="wc-project-filter ${filters[type] === value ? "active" : ""}" data-filter-type="${escapeHtml(type)}" data-filter="${escapeHtml(value)}">${escapeHtml(label)}</button>`;
+}
+
+function getFilteredProjects(){
+  const projects = getSearchableProjects();
+
+  return projects.filter(project => {
+
+    const department = normalizeFilterValue(project.department_filter || project.dept || project.department);
+    const departmentLabel = normalizeFilterValue(project.dept || project.department);
     const target = String(project.target || "").toLowerCase();
     const targetYears = Array.isArray(project.target_years) ? project.target_years.join(" ").toLowerCase() : "";
-    const funding = String(project.funding || "").toLowerCase();
+    const funding = normalizeFilterValue(project.funding);
 
     const content = [
       project.title,
       project.description,
       project.dept,
+      project.department_filter,
       project.category,
       project.category_label,
       project.budget,
@@ -70,7 +117,8 @@ function getFilteredProjects(){
 
     const matchesDepartment =
       filters.department === "all" ||
-      department.includes(filters.department);
+      department.includes(filters.department) ||
+      departmentLabel.includes(filters.department);
 
     const matchesYear =
       filters.year === "all" ||
@@ -237,8 +285,24 @@ function initBudgetCounters(){
 }
 
 function renderProjects(){
+  const allProjects = getSearchableProjects();
   const filtered = getFilteredProjects();
   const visibleProjects = filtered.slice(0, visibleLimit);
+  const departmentOptions = getFilterOptions(allProjects, "dept", [
+    "Public Works/Engineering",
+    "Beach Operations",
+    "Sheriff",
+    "Administration",
+    "Capital Projects"
+  ]);
+  const fundOptions = getFilterOptions(allProjects, "funding", [
+    "Capital Projects Fund",
+    "Transportation Fund",
+    "Tourist Development Fund",
+    "Grant Funded",
+    "Sheriff Fund",
+    "General Fund"
+  ]);
   const rows = [];
 
   for(let i = 0; i < visibleProjects.length; i += 3){
@@ -845,7 +909,7 @@ function renderProjects(){
         left:50%;
         margin-left:-50vw;
         margin-right:-50vw;
-        padding:54px 34px;
+        padding:34px 24px;
         background:#ffffff;
         font-family:Arial, Helvetica, sans-serif;
         box-sizing:border-box;
@@ -853,20 +917,20 @@ function renderProjects(){
 
       .wc-project-index-inner{
         width:100%;
-        max-width:1600px;
+        max-width:1180px;
         margin:0 auto;
       }
 
       .wc-project-index-header{
         text-align:center;
-        margin-bottom:34px;
+        margin-bottom:22px;
       }
 
       .wc-project-index-header span{
         display:block;
-        margin-bottom:10px;
+        margin-bottom:8px;
         color:#006231;
-        font-size:13px;
+        font-size:11px;
         font-weight:700;
         letter-spacing:.14em;
         text-transform:uppercase;
@@ -875,27 +939,27 @@ function renderProjects(){
       .wc-project-index-header h2{
         margin:0;
         color:#172033;
-        font-size:42px;
-        line-height:1.08;
+        font-size:30px;
+        line-height:1.12;
         font-weight:700;
       }
 
       .wc-project-index-header h2::after{
         content:"";
         display:block;
-        width:82px;
-        height:4px;
-        margin:14px auto 0 auto;
+        width:64px;
+        height:3px;
+        margin:10px auto 0 auto;
         border-radius:999px;
         background:linear-gradient(90deg,#006231 0%,#0b7d45 100%);
       }
 
       .wc-project-index-header p{
-        max-width:980px;
-        margin:18px auto 0 auto;
+        max-width:780px;
+        margin:12px auto 0 auto;
         color:#475467;
-        font-size:16px;
-        line-height:1.7;
+        font-size:14px;
+        line-height:1.55;
       }
 
       .wc-project-full-search-row{
@@ -931,17 +995,17 @@ function renderProjects(){
       .wc-project-toolbar{
         display:flex;
         flex-wrap:wrap;
-        gap:16px;
+        gap:12px;
         align-items:center;
         justify-content:space-between;
-        margin-bottom:24px;
-        padding:22px;
+        margin-bottom:16px;
+        padding:14px;
         background:#ffffff;
-        border-radius:24px;
+        border-radius:14px;
         border:1px solid rgba(209,190,120,0.34);
         box-shadow:
-          0 12px 28px rgba(0,98,49,0.08),
-          0 4px 10px rgba(36,52,77,0.05);
+          0 8px 20px rgba(0,98,49,0.07),
+          0 3px 8px rgba(36,52,77,0.05);
       }
 
       .wc-project-search-wrap{
@@ -952,13 +1016,13 @@ function renderProjects(){
 
       .wc-project-search{
         width:100% !important;
-        height:58px !important;
-        padding:0 18px 0 72px !important;
+        height:44px !important;
+        padding:0 14px 0 48px !important;
         text-indent:0 !important;
-        border-radius:16px;
+        border-radius:10px;
         border:1px solid rgba(0,98,49,0.16);
         background:#f8faf8;
-        font-size:15px;
+        font-size:13px;
         color:#172033;
         outline:none;
         box-sizing:border-box;
@@ -981,11 +1045,11 @@ function renderProjects(){
 
       .wc-project-search-icon{
         position:absolute !important;
-        left:24px !important;
+        left:17px !important;
         top:50% !important;
         transform:translateY(-50%) !important;
-        width:18px !important;
-        height:18px !important;
+        width:16px !important;
+        height:16px !important;
         opacity:.55 !important;
         pointer-events:none !important;
         z-index:2 !important;
@@ -994,21 +1058,21 @@ function renderProjects(){
       .wc-project-filter-group{
         display:flex;
         flex-wrap:wrap;
-        gap:12px;
+        gap:9px;
         width:100%;
       }
 
       .wc-project-filter-set{
         display:flex;
         flex-wrap:wrap;
-        gap:10px;
+        gap:7px;
         align-items:center;
         width:100%;
       }
 
       .wc-project-filter-label{
         color:#475467;
-        font-size:12px;
+        font-size:10px;
         font-weight:800;
         letter-spacing:.12em;
         text-transform:uppercase;
@@ -1016,13 +1080,13 @@ function renderProjects(){
       }
 
       .wc-project-filter{
-        height:46px;
-        padding:0 18px;
+        height:34px;
+        padding:0 11px;
         border-radius:999px;
         border:1px solid rgba(0,98,49,0.14);
         background:#ffffff;
         color:#172033;
-        font-size:14px;
+        font-size:12px;
         font-weight:600;
         cursor:pointer;
         transition:
@@ -1046,17 +1110,17 @@ function renderProjects(){
         display:flex;
         align-items:center;
         justify-content:space-between;
-        gap:18px;
-        margin:0 0 12px 0;
+        gap:12px;
+        margin:0 0 10px 0;
         color:#475467;
-        font-size:14px;
+        font-size:12px;
         font-weight:700;
       }
 
       .wc-project-grid{
         display:flex !important;
         flex-direction:column !important;
-        gap:24px !important;
+        gap:14px !important;
         width:100% !important;
         max-width:100% !important;
         margin:0 !important;
@@ -1069,7 +1133,7 @@ function renderProjects(){
         flex-direction:row !important;
         align-items:stretch !important;
         justify-content:flex-start !important;
-        gap:24px !important;
+        gap:14px !important;
         width:100% !important;
         max-width:100% !important;
         margin:0 !important;
@@ -1080,22 +1144,22 @@ function renderProjects(){
       .wc-project-card{
         cursor:pointer;
         flex:1 1 0 !important;
-        width:calc((100% - 48px) / 3) !important;
-        max-width:calc((100% - 48px) / 3) !important;
+        width:calc((100% - 28px) / 3) !important;
+        max-width:calc((100% - 28px) / 3) !important;
         min-width:0 !important;
         box-sizing:border-box !important;
         position:relative;
         display:flex;
         flex-direction:column;
         align-self:stretch !important;
-        gap:16px;
-        padding:28px;
+        gap:11px;
+        padding:16px;
         background:#ffffff;
-        border-radius:26px;
+        border-radius:14px;
         border:1px solid rgba(209,190,120,0.34);
         box-shadow:
-          0 14px 34px rgba(0,98,49,0.08),
-          0 4px 12px rgba(36,52,77,0.06);
+          0 8px 20px rgba(0,98,49,0.07),
+          0 3px 8px rgba(36,52,77,0.05);
         transition:
           transform .24s ease,
           box-shadow .24s ease,
@@ -1103,25 +1167,25 @@ function renderProjects(){
       }
 
       .wc-project-card:hover{
-        transform:translateY(-4px);
+        transform:translateY(-2px);
         border-color:rgba(0,98,49,0.28);
         box-shadow:
-          0 22px 44px rgba(0,98,49,0.12),
-          0 8px 18px rgba(36,52,77,0.08);
+          0 14px 28px rgba(0,98,49,0.10),
+          0 5px 12px rgba(36,52,77,0.07);
       }
 
       .wc-project-card-top{
         display:flex;
         align-items:flex-start;
         justify-content:space-between;
-        gap:12px;
+        gap:8px;
       }
 
       .wc-project-card h3{
         margin:0;
         color:#172033;
-        font-size:24px;
-        line-height:1.2;
+        font-size:17px;
+        line-height:1.24;
         font-weight:700;
       }
 
@@ -1129,11 +1193,11 @@ function renderProjects(){
         display:inline-flex;
         align-items:center;
         justify-content:center;
-        padding:8px 14px;
+        padding:5px 8px;
         border-radius:999px;
         background:rgba(0,98,49,0.08);
         color:#006231;
-        font-size:12px;
+        font-size:9px;
         font-weight:700;
         letter-spacing:.08em;
         text-transform:uppercase;
@@ -1142,13 +1206,13 @@ function renderProjects(){
 
       .wc-project-description{
         color:#475467;
-        font-size:15px;
-        line-height:1.72;
+        font-size:12px;
+        line-height:1.5;
         position:relative;
       }
 
       .wc-project-card.has-overflow .wc-project-description{
-        max-height:78px;
+        max-height:54px;
         overflow:hidden;
       }
 
@@ -1163,7 +1227,7 @@ function renderProjects(){
         left:0;
         right:0;
         bottom:0;
-        height:34px;
+        height:24px;
         background:linear-gradient(
           180deg,
           rgba(255,255,255,0) 0%,
@@ -1184,7 +1248,7 @@ function renderProjects(){
         background:transparent;
         color:#006231;
         font-family:Arial, Helvetica, sans-serif;
-        font-size:13px;
+        font-size:11px;
         font-weight:800;
         letter-spacing:.06em;
         text-transform:uppercase;
@@ -1198,15 +1262,15 @@ function renderProjects(){
       .wc-project-metrics{
         display:grid;
         grid-template-columns:repeat(2,minmax(0,1fr));
-        gap:14px;
+        gap:8px;
         margin-top:auto;
         align-items:stretch;
       }
 
       .wc-project-metric{
-        min-height:92px;
-        padding:14px 16px;
-        border-radius:16px;
+        min-height:64px;
+        padding:9px 10px;
+        border-radius:10px;
         background:#f8faf8;
         border:1px solid rgba(0,98,49,0.08);
         display:flex;
@@ -1217,9 +1281,9 @@ function renderProjects(){
 
       .wc-project-metric span{
         display:block;
-        margin-bottom:6px;
+        margin-bottom:4px;
         color:#667085;
-        font-size:11px;
+        font-size:9px;
         font-weight:700;
         letter-spacing:.10em;
         text-transform:uppercase;
@@ -1228,7 +1292,7 @@ function renderProjects(){
       .wc-project-metric strong{
         display:block;
         color:#172033;
-        font-size:18px;
+        font-size:13px;
         line-height:1.25;
         font-weight:700;
         word-break:break-word;
@@ -1244,9 +1308,9 @@ function renderProjects(){
         align-items:center;
         gap:8px;
         width:max-content;
-        padding:10px 16px;
+        padding:7px 10px;
         border-radius:999px;
-        font-size:13px;
+        font-size:10px;
         font-weight:700;
         letter-spacing:.06em;
         text-transform:uppercase;
@@ -1254,8 +1318,8 @@ function renderProjects(){
 
       .wc-project-status::before{
         content:"";
-        width:10px;
-        height:10px;
+        width:8px;
+        height:8px;
         border-radius:999px;
         background:currentColor;
       }
@@ -1263,7 +1327,7 @@ function renderProjects(){
       .wc-project-card-badges{
         display:flex;
         flex-wrap:wrap;
-        gap:10px;
+        gap:7px;
         margin-top:-2px;
       }
 
@@ -1272,12 +1336,12 @@ function renderProjects(){
         align-items:center;
         gap:7px;
         width:max-content;
-        padding:9px 13px;
+        padding:7px 9px;
         border-radius:999px;
         background:rgba(52,64,84,0.08);
         color:#344054;
         border:1px solid rgba(52,64,84,0.16);
-        font-size:12px;
+        font-size:10px;
         font-weight:800;
         letter-spacing:.04em;
         text-transform:uppercase;
@@ -1495,7 +1559,7 @@ function renderProjects(){
           left:auto !important;
           margin-left:0 !important;
           margin-right:0 !important;
-          padding:32px 14px !important;
+          padding:24px 12px !important;
           overflow-x:hidden !important;
         }
 
@@ -1505,7 +1569,7 @@ function renderProjects(){
         }
 
         .wc-project-index-header{
-          margin-bottom:24px;
+          margin-bottom:18px;
           padding:0 4px;
         }
 
@@ -1515,14 +1579,14 @@ function renderProjects(){
         }
 
         .wc-project-index-header h2{
-          font-size:30px;
+          font-size:26px;
           line-height:1.12;
         }
 
         .wc-project-index-header p{
-          font-size:15px;
-          line-height:1.6;
-          margin-top:14px;
+          font-size:13px;
+          line-height:1.5;
+          margin-top:10px;
         }
 
         .wc-project-full-search-row{
@@ -1537,9 +1601,9 @@ function renderProjects(){
         }
 
         .wc-project-toolbar{
-          padding:16px !important;
-          border-radius:20px;
-          gap:14px;
+          padding:12px !important;
+          border-radius:13px;
+          gap:10px;
         }
 
         .wc-project-search-wrap{
@@ -1549,25 +1613,25 @@ function renderProjects(){
         }
 
         .wc-project-search{
-          height:54px !important;
-          padding-left:62px !important;
-          font-size:14px !important;
-          border-radius:15px;
+          height:42px !important;
+          padding-left:46px !important;
+          font-size:13px !important;
+          border-radius:10px;
         }
 
         .wc-project-search-icon{
-          left:22px !important;
-          width:17px !important;
-          height:17px !important;
+          left:16px !important;
+          width:15px !important;
+          height:15px !important;
         }
 
         .wc-project-filter-group{
-          gap:14px;
+          gap:9px;
         }
 
         .wc-project-filter-set{
           width:100%;
-          gap:8px;
+          gap:7px;
         }
 
         .wc-project-filter-label{
@@ -1577,27 +1641,27 @@ function renderProjects(){
         }
 
         .wc-project-filter{
-          height:42px;
-          padding:0 14px;
-          font-size:13px;
+          height:34px;
+          padding:0 10px;
+          font-size:12px;
           flex:0 1 auto;
         }
 
         .wc-project-results-row{
           flex-direction:column;
           align-items:flex-start;
-          gap:6px;
-          margin-bottom:16px;
-          font-size:13px;
+          gap:5px;
+          margin-bottom:12px;
+          font-size:12px;
         }
 
         .wc-project-grid{
-          gap:18px !important;
+          gap:12px !important;
         }
 
         .wc-project-row{
           flex-direction:column !important;
-          gap:18px !important;
+          gap:12px !important;
           width:100% !important;
         }
 
@@ -1607,9 +1671,9 @@ function renderProjects(){
           max-width:100% !important;
           min-width:0 !important;
           align-self:auto !important;
-          padding:22px !important;
-          border-radius:22px;
-          gap:14px;
+          padding:15px !important;
+          border-radius:14px;
+          gap:10px;
         }
 
         .wc-project-card:hover{
@@ -1622,7 +1686,7 @@ function renderProjects(){
         }
 
         .wc-project-card h3{
-          font-size:21px;
+          font-size:17px;
           line-height:1.22;
         }
 
@@ -1634,12 +1698,12 @@ function renderProjects(){
         }
 
         .wc-project-description{
-          font-size:14px;
-          line-height:1.65;
+          font-size:12px;
+          line-height:1.5;
         }
 
         .wc-project-card.has-overflow .wc-project-description{
-          max-height:96px;
+          max-height:66px;
         }
 
         .wc-project-metrics{
@@ -1649,11 +1713,11 @@ function renderProjects(){
 
         .wc-project-metric{
           min-height:auto;
-          padding:13px 14px;
+          padding:9px 10px;
         }
 
         .wc-project-metric strong{
-          font-size:16px;
+          font-size:13px;
           line-height:1.3;
         }
 
@@ -1661,8 +1725,8 @@ function renderProjects(){
           width:100%;
           justify-content:center;
           text-align:center;
-          padding:11px 14px;
-          font-size:12px;
+          padding:8px 10px;
+          font-size:10px;
         }
 
         .wc-project-card-badge{
@@ -1708,29 +1772,29 @@ function renderProjects(){
         }
 
         .wc-project-index-section{
-          padding:28px 10px !important;
+          padding:22px 8px !important;
         }
 
         .wc-project-index-header h2{
-          font-size:27px;
+          font-size:24px;
         }
 
         .wc-project-toolbar{
-          padding:14px !important;
+          padding:10px !important;
         }
 
         .wc-project-filter{
           flex:1 1 calc(50% - 8px);
-          padding:0 10px;
-          font-size:12px;
+          padding:0 8px;
+          font-size:11px;
         }
 
         .wc-project-card{
-          padding:20px !important;
+          padding:14px !important;
         }
 
         .wc-project-card h3{
-          font-size:20px;
+          font-size:16px;
         }
       }
 
@@ -1924,12 +1988,8 @@ function renderProjects(){
 
             <div class="wc-project-filter-set" data-filter-type="department">
               <span class="wc-project-filter-label">Department</span>
-              <button class="wc-project-filter ${filters.department === "all" ? "active" : ""}" data-filter-type="department" data-filter="all">All</button>
-              <button class="wc-project-filter ${filters.department === "public works" ? "active" : ""}" data-filter-type="department" data-filter="public works">Public Works/Engineering</button>
-              <button class="wc-project-filter ${filters.department === "beach operations" ? "active" : ""}" data-filter-type="department" data-filter="beach operations">Beach Operations</button>
-              <button class="wc-project-filter ${filters.department === "sheriff" ? "active" : ""}" data-filter-type="department" data-filter="sheriff">Sheriff</button>
-              <button class="wc-project-filter ${filters.department === "administration" ? "active" : ""}" data-filter-type="department" data-filter="administration">Administration</button>
-              <button class="wc-project-filter ${filters.department === "building construction" ? "active" : ""}" data-filter-type="department" data-filter="building construction">Building Construction & Maintenance</button>
+              ${renderFilterButton("department", "all", "All")}
+              ${departmentOptions.map(option => renderFilterButton("department", option.value, option.label)).join("")}
             </div>
 
             <div class="wc-project-filter-set" data-filter-type="year">
@@ -1944,12 +2004,8 @@ function renderProjects(){
 
             <div class="wc-project-filter-set" data-filter-type="fund">
               <span class="wc-project-filter-label">Fund</span>
-              <button class="wc-project-filter ${filters.fund === "all" ? "active" : ""}" data-filter-type="fund" data-filter="all">All</button>
-              <button class="wc-project-filter ${filters.fund === "capital projects fund" ? "active" : ""}" data-filter-type="fund" data-filter="capital projects fund">Capital Projects</button>
-              <button class="wc-project-filter ${filters.fund === "transportation fund" ? "active" : ""}" data-filter-type="fund" data-filter="transportation fund">Transportation</button>
-              <button class="wc-project-filter ${filters.fund === "tourist development fund" ? "active" : ""}" data-filter-type="fund" data-filter="tourist development fund">Tourist Development</button>
-              <button class="wc-project-filter ${filters.fund === "grant" ? "active" : ""}" data-filter-type="fund" data-filter="grant">Grant Funded</button>
-              <button class="wc-project-filter ${filters.fund === "sheriff" ? "active" : ""}" data-filter-type="fund" data-filter="sheriff">Sheriff</button>
+              ${renderFilterButton("fund", "all", "All")}
+              ${fundOptions.map(option => renderFilterButton("fund", option.value, option.label)).join("")}
             </div>
 
           </div>
