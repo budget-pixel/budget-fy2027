@@ -700,7 +700,6 @@
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
       "</div>" +
-      renderNotesHtml("Expenditure Notes:", options.notes) +
       (options.showUpdated ? lastUpdatedNoteHtml() : "") +
       "</div>"
     );
@@ -834,14 +833,13 @@
         .concat(BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })))
         .concat([{ label: "FY 2027 Proposed", num: true }]),
       bodyRows: bodyRows,
-      notes: notes,
       toggleHtml: isExpense ? priorYearsToggleHtml(showPrior) : ""
     });
     if (!table) return "";
 
     return (
       '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
-      table + renderTableFooterRow(isExpense ? rows : null) +
+      table + renderTableFooterRow(isExpense ? rows : null) + renderNotesHtml("Expenditure Notes:", notes) +
       "</div>"
     );
   }
