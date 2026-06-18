@@ -49,7 +49,8 @@
   // amounts aren't counted twice.
   const EXPENSE_OBJECT_CODES_BROKEN_OUT = {
     "solid waste": ["534000"],
-    "building construction and maintenance": ["562000", "563000", "543000"]
+    "building construction and maintenance": ["562000", "563000", "543000"],
+    "board of county commissioners": ["531001", "531002", "531003", "531004"]
   };
 
   // Friendlier display captions for sub-group tables whose raw Dept_Name
@@ -560,6 +561,55 @@
     );
   }
 
+  let budgetLinesDetailCounter = 0;
+
+  // The expandable "View Budget Lines" detail under an Expenditure Summary
+  // table: every individual object-code line behind that table's rolled-up
+  // totals, including any itemized sub-account (Project_Name) and Note.
+  function renderBudgetLinesToggle(rows) {
+    if (!rows || !rows.length) return { button: "", detail: "" };
+    budgetLinesDetailCounter += 1;
+    const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
+
+    const bodyRows = rows
+      .slice()
+      .sort((a, b) => String(a.Object_Code || "").localeCompare(String(b.Object_Code || "")))
+      .map((r) =>
+        "<tr><td>" + escapeHtml(r.Object_Code || "") + "</td>" +
+        "<td>" + escapeHtml(r.Object_Name || "") + "</td>" +
+        "<td>" + escapeHtml(r.Note || "") + "</td>" +
+        '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
+      );
+
+    const detailTable = renderTable({
+      columns: [
+        { label: "Object Code" },
+        { label: "Object Name" },
+        { label: "Itemized Description" },
+        { label: "FY 2027 Proposed", num: true }
+      ],
+      bodyRows: bodyRows
+    });
+
+    return {
+      button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" aria-expanded="false">View Budget Lines</button>',
+      detail: '<div class="wc-budget-lines-detail" id="' + detailId + '" hidden>' + detailTable + "</div>"
+    };
+  }
+
+  // Single delegated listener handles every "View Budget Lines" button on
+  // the page, regardless of which function rendered the table it belongs to.
+  document.addEventListener("click", (event) => {
+    const toggle = event.target.closest(".wc-view-budget-lines-toggle");
+    if (!toggle) return;
+    const detail = document.getElementById(toggle.dataset.target);
+    if (!detail) return;
+    const isHidden = detail.hasAttribute("hidden");
+    detail.toggleAttribute("hidden", !isHidden);
+    toggle.setAttribute("aria-expanded", String(isHidden));
+    toggle.textContent = isHidden ? "Hide Budget Lines" : "View Budget Lines";
+  });
+
   function lastUpdatedNoteHtml() {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     return '<p class="wc-data-updated-note"><em>Last Updated: ' + escapeHtml(stamp) + "</em></p>";
@@ -688,12 +738,31 @@
 
     bodyRows.push('<tr class="wc-table-total-row"><td>Total</td><td class="wc-num">' + formatCurrency(grandTotal) + "</td></tr>");
 
-    return renderTable({
+    const table = renderTable({
       caption: caption,
       columns: [{ label: typeLabel }, { label: "FY 2027 Proposed", num: true }],
       bodyRows: bodyRows,
       notes: notes
     });
+    if (!table) return "";
+
+    return table + renderTableFooterRow(isExpense ? rows : null);
+  }
+
+  // A single row right under a table: the "Last Updated" stamp on the
+  // left and (for expense tables) the "View Budget Lines" toggle on the
+  // right, instead of two separate stacked lines.
+  function renderTableFooterRow(budgetLineRows) {
+    const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    const updated = '<em>Last Updated: ' + escapeHtml(stamp) + "</em>";
+    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows) : { button: "", detail: "" };
+    return (
+      '<div class="wc-table-footer-row">' +
+      '<p class="wc-data-updated-note">' + updated + "</p>" +
+      toggle.button +
+      "</div>" +
+      toggle.detail
+    );
   }
 
   // When a department's rows span more than one distinct Dept_Name (e.g.
@@ -1439,6 +1508,13 @@
     return '<section class="building-construction-supplemental-tables">' + pieces.join("") + "</section>";
   }
 
+  function renderBoardOfCountyCommissionersSupplementalTables() {
+    const rows = rowsForExactDepartment(cache.expenditures, "BCC Other Uses Contingency");
+    const piece = renderTypeSummaryTable(rows, "expense", "Reserves for Contingency", "BCC Other Uses Contingency");
+    if (!piece) return "";
+    return '<section class="bcc-supplemental-tables">' + piece + "</section>";
+  }
+
   // Tourism Administration's page combines five separately budgeted
   // divisions that each have their own rows in the sheets (and, across
   // sheets, sometimes a slightly different spelling of the same division).
@@ -1918,7 +1994,8 @@
       "department-machinery-table",
       "department-state-aid-tables",
       "department-solid-waste-tables",
-      "department-building-construction-tables"
+      "department-building-construction-tables",
+      "department-bcc-tables"
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
@@ -1935,7 +2012,7 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl] = containers;
 
         // Some pages combine several separately budgeted divisions; for
         // those, narrative/expenditures/revenue/staffing/machinery (and,
@@ -1962,6 +2039,7 @@
           mountOrHide(stateAidEl, "");
           mountOrHide(solidWasteEl, "");
           mountOrHide(buildingConstructionEl, "");
+          mountOrHide(bccEl, "");
           return;
         }
 
@@ -1979,6 +2057,7 @@
           mountOrHide(stateAidEl, "");
           mountOrHide(solidWasteEl, "");
           mountOrHide(buildingConstructionEl, "");
+          mountOrHide(bccEl, "");
           return;
         }
 
@@ -2025,6 +2104,14 @@
             : ""
         );
         bindTooltipAnchors(buildingConstructionEl);
+
+        mountOrHide(
+          bccEl,
+          normalizeDeptName(deptName) === "board of county commissioners"
+            ? renderBoardOfCountyCommissionersSupplementalTables()
+            : ""
+        );
+        bindTooltipAnchors(bccEl);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
