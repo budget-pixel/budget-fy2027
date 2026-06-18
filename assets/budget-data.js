@@ -837,6 +837,28 @@
       return;
     }
     container.hidden = false;
+
+    if (normalizeDeptName(deptName) === "libraries") {
+      const introParagraphs = paragraphs.slice(0, 2);
+      const remainingParagraphs = paragraphs.slice(2);
+      container.innerHTML =
+        '<section class="statement-of-function content-section libraries-statement-media">' +
+        "<h2>Statement of Function</h2>" +
+        '<div class="libraries-statement-intro">' +
+        introParagraphs.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+        "</div>" +
+        '<div class="libraries-statement-lower">' +
+        '<div class="libraries-statement-rest">' +
+        remainingParagraphs.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+        "</div>" +
+        '<div class="libraries-video-frame">' +
+        '<iframe src="https://www.youtube.com/embed/gJ7QNzqj8ks?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Libraries budget video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
+        "</div>" +
+        "</div>" +
+        "</section>";
+      return;
+    }
+
     container.innerHTML =
       '<section class="statement-of-function content-section">' +
       "<h2>Statement of Function</h2>" +
