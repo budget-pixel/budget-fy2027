@@ -1754,6 +1754,194 @@
     applyFilters();
   }
 
+  // Summary of Machinery, Vehicles & Equipment: a department picker instead
+  // of one long scrolling list of every item across every department.
+  function renderMachinerySummary(container) {
+    if (!container) return;
+    const rows = cache.machinery || [];
+    if (!rows.length) {
+      container.innerHTML = '<div class="wc-data-empty">No machinery, vehicles &amp; equipment data is available.</div>';
+      return;
+    }
+
+    const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
+
+    container.innerHTML =
+      '<div class="wc-filter-bar wc-machinery-picker">' +
+      '<label class="wc-filter-field"><span>Department</span>' +
+      '<select id="wcMachineryDeptSelect"><option value="">All</option>' +
+      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
+      "</select></label>" +
+      "</div>" +
+      '<div class="wc-financial-summary-table"></div>';
+
+    const select = container.querySelector("#wcMachineryDeptSelect");
+    const tableEl = container.querySelector(".wc-financial-summary-table");
+
+    function showDepartment(deptName) {
+      const items = deptName ? rows.filter((r) => r.Dept_Name === deptName) : rows;
+      const total = items.reduce((s, r) => s + (r.Amount || 0), 0);
+      const showDeptColumn = !deptName;
+
+      const bodyRows = items.map((r) =>
+        "<tr>" +
+        (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
+        "<td>" + escapeHtml(r.Item_Description || "") + '</td><td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
+      );
+      bodyRows.push(
+        '<tr class="wc-table-total-row"><td' + (showDeptColumn ? ' colspan="2"' : "") + ">Total</td><td class=\"wc-num\">" + formatCurrency(total) + "</td></tr>"
+      );
+
+      const columns = showDeptColumn
+        ? [{ label: "Department" }, { label: "Item Description" }, { label: "Amount", num: true }]
+        : [{ label: "Item Description" }, { label: "Amount", num: true }];
+
+      mountOrHide(
+        tableEl,
+        renderTable({
+          caption: deptName || "All Departments",
+          columns: columns,
+          bodyRows: bodyRows
+        })
+      );
+    }
+
+    select.addEventListener("change", () => showDepartment(select.value));
+    showDepartment("");
+  }
+
+  function initMachinerySummaryPage() {
+    const container = document.getElementById("machinery-summary");
+    if (!container) return;
+
+    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        renderMachinerySummary(container);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load machinery summary", err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
+  // Summary of Personnel: same department-picker pattern as the machinery
+  // summary. "All" shows each department's total FTE per year; selecting
+  // one department drills into its position-level staffing table.
+  function fundNameForRow(row) {
+    const code = fundCodeForRow(row);
+    const fund = (cache.funds || []).find((f) => f.Fund_Code === code);
+    return fund ? fund.Fund_Name : "Constitutional Offices";
+  }
+
+  function renderPersonnelSummary(container) {
+    if (!container) return;
+    const rows = cache.staffing || [];
+    if (!rows.length) {
+      container.innerHTML = '<div class="wc-data-empty">No personnel data is available.</div>';
+      return;
+    }
+
+    const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
+    const fundNames = uniqueSorted(rows.map((r) => fundNameForRow(r)));
+    const years = [2024, 2025, 2026, 2027];
+
+    container.innerHTML =
+      '<div class="wc-filter-bar wc-machinery-picker">' +
+      '<label class="wc-filter-field"><span>Department</span>' +
+      '<select id="wcPersonnelDeptSelect"><option value="">All</option>' +
+      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
+      "</select></label>" +
+      '<label class="wc-filter-field"><span>Fund</span>' +
+      '<select id="wcPersonnelFundSelect"><option value="">All</option>' +
+      fundNames.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
+      "</select></label>" +
+      "</div>" +
+      '<div class="wc-financial-summary-table"></div>';
+
+    const deptSelect = container.querySelector("#wcPersonnelDeptSelect");
+    const fundSelect = container.querySelector("#wcPersonnelFundSelect");
+    const tableEl = container.querySelector(".wc-financial-summary-table");
+
+    function applyFilters() {
+      const deptName = deptSelect.value;
+      const fundName = fundSelect.value;
+      const filtered = rows.filter((r) =>
+        (!deptName || r.Dept_Name === deptName) && (!fundName || fundNameForRow(r) === fundName)
+      );
+
+      if (!filtered.length) {
+        tableEl.hidden = false;
+        tableEl.innerHTML = '<div class="wc-data-empty">No positions match the current filters.</div>';
+        return;
+      }
+
+      if (deptName) {
+        mountOrHide(tableEl, renderStaffingTable(filtered));
+        bindPriorYearsToggle(tableEl);
+        return;
+      }
+
+      const deptsInView = uniqueSorted(filtered.map((r) => r.Dept_Name));
+      const totalsByDept = new Map();
+      deptsInView.forEach((d) => totalsByDept.set(d, { 2024: 0, 2025: 0, 2026: 0, 2027: 0 }));
+      filtered.forEach((r) => {
+        const t = totalsByDept.get(r.Dept_Name);
+        years.forEach((y) => { t[y] += r[y] || 0; });
+      });
+      const grand = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
+      totalsByDept.forEach((t) => years.forEach((y) => { grand[y] += t[y]; }));
+
+      const bodyRows = deptsInView.map((d) => {
+        const t = totalsByDept.get(d);
+        return "<tr><td>" + escapeHtml(d) + "</td>" + years.map((y) => '<td class="wc-num">' + formatNumber(t[y]) + "</td>").join("") + "</tr>";
+      });
+      bodyRows.push(
+        '<tr class="wc-table-total-row"><td>Total FTE</td>' +
+        years.map((y) => '<td class="wc-num">' + formatNumber(grand[y]) + "</td>").join("") +
+        "</tr>"
+      );
+
+      mountOrHide(
+        tableEl,
+        renderTable({
+          caption: fundName || "All Departments",
+          columns: [{ label: "Department" }].concat(years.map((y) => ({ label: "FY " + y, num: true }))),
+          bodyRows: bodyRows
+        })
+      );
+    }
+
+    deptSelect.addEventListener("change", applyFilters);
+    fundSelect.addEventListener("change", applyFilters);
+    applyFilters();
+  }
+
+  function initPersonnelSummaryPage() {
+    const container = document.getElementById("personnel-summary");
+    if (!container) return;
+
+    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        renderPersonnelSummary(container);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load personnel summary", err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
   function initFinancialSummaryPage() {
     const container = document.getElementById("financial-summary");
     if (!container) return;
@@ -1804,6 +1992,8 @@
     initDepartmentPage();
     initFinancialSummaryPage();
     initConsolidatedFundTablesPage();
+    initMachinerySummaryPage();
+    initPersonnelSummaryPage();
   });
 
   window.WCBudgetData = {
@@ -1824,6 +2014,8 @@
     renderFinancialSummary,
     renderFilterControls,
     renderConsolidatedRevenueBudgetTable,
-    renderConsolidatedExpenditureBudgetTable
+    renderConsolidatedExpenditureBudgetTable,
+    renderMachinerySummary,
+    renderPersonnelSummary
   };
 })();
