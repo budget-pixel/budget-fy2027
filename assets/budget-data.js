@@ -710,8 +710,9 @@
       .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""))
       .map((r) => {
         years.forEach((y) => { totals[y] += r[y] || 0; });
+        const rowClass = (r[2027] || 0) === 0 ? ' class="wc-staffing-zero-current"' : "";
         return (
-          "<tr><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
+          "<tr" + rowClass + "><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
           years.map((y) => {
             const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
             return '<td class="' + classes.join(" ") + '">' + formatNumber(r[y] || 0) + "</td>";

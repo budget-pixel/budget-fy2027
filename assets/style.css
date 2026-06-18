@@ -1099,6 +1099,9 @@ body.sidebar-pinned-right #content {
 .wc-staffing-card:not(.show-prior-years) .wc-staffing-table .wc-prior-year {
   display: none;
 }
+.wc-staffing-card:not(.show-prior-years) .wc-staffing-table tr.wc-staffing-zero-current {
+  display: none;
+}
 .wc-staffing-card .wc-fy-column-toggle-wrap {
   position: static !important;
   width: auto !important;
