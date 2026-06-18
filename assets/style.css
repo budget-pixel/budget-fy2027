@@ -486,6 +486,74 @@ body.sidebar-pinned-right #content {
   display: block;
 }
 
+.recreation-parks-section {
+  max-width: 1280px;
+  margin: 40px auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.recreation-parks-section h2 {
+  margin: 0 0 10px;
+  color: var(--navy);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.recreation-parks-rule {
+  width: 120px;
+  height: 5px;
+  background: var(--gold);
+  margin: 0 auto 28px;
+  border-radius: 3px;
+}
+
+.recreation-parks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+.recreation-parks-grid .wc-video-frame {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  border: 6px solid var(--gold);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 18px 42px rgba(36,52,77,0.16),
+    0 6px 16px rgba(36,52,77,0.08);
+}
+
+.recreation-parks-grid .wc-video-frame iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 104%;
+  height: 104%;
+  transform: translate(-50%, -50%);
+  border: 0;
+  display: block;
+}
+
+@media (max-width: 1000px) {
+  .recreation-parks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .recreation-parks-section h2 {
+    font-size: 26px;
+  }
+}
+
 .wc-plaque-card {
   margin: 20px 0;
   padding: 10px;
@@ -786,6 +854,78 @@ body.sidebar-pinned-right #content {
   background: #ffffff;
 }
 
+.public-works-iframe-link {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  margin: 28px auto;
+  text-decoration: none;
+}
+
+.public-works-iframe-preview {
+  position: relative;
+  border: 4px solid var(--gold);
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow:
+    0 18px 42px rgba(36,52,77,0.14),
+    0 6px 16px rgba(36,52,77,0.08);
+  cursor: pointer;
+}
+
+.public-works-iframe-preview::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green2) 100%);
+  z-index: 3;
+}
+
+.public-works-iframe-preview iframe {
+  display: block;
+  width: 100%;
+  height: 420px;
+  border: 0;
+  pointer-events: none;
+  filter: saturate(.92) contrast(.98) brightness(.98);
+}
+
+.public-works-iframe-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23,32,51,.18);
+  transition: background .25s ease, backdrop-filter .25s ease;
+  z-index: 2;
+}
+
+.public-works-iframe-button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 10px 26px rgba(23,32,51,.18);
+  transition: transform .25s ease, background .25s ease;
+}
+
+.public-works-iframe-preview:hover .public-works-iframe-overlay {
+  background: rgba(23,32,51,.08);
+  backdrop-filter: blur(2px);
+}
+
+.public-works-iframe-preview:hover .public-works-iframe-button {
+  transform: translateY(-2px);
+  background: #ffffff;
+}
+
 #department-expense-table { margin-top: 32px; }
 
 .wc-data-table-wrap { margin: 24px 0; }
@@ -917,6 +1057,23 @@ body.sidebar-pinned-right #content {
   }
 
   .environmental-iframe-button {
+    font-size: 12px;
+  }
+
+  .public-works-iframe-link {
+    margin: 20px auto;
+  }
+
+  .public-works-iframe-preview {
+    border-width: 4px;
+    border-radius: 18px;
+  }
+
+  .public-works-iframe-preview iframe {
+    height: 360px;
+  }
+
+  .public-works-iframe-button {
     font-size: 12px;
   }
 
