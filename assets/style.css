@@ -311,6 +311,13 @@ body.sidebar-pinned-right #content {
     height: 34px;
     flex: 0 0 34px;
   }
+
+  /* Reserve room for the hamburger above so the search box doesn't bleed
+     into it on pages that don't load walton-budget-pdf.js (which normally
+     sets its own, larger margin to also clear the PDF button). */
+  nav#nav-menu.nav-menu .wc-nav-search-slot {
+    margin-right: 38px !important;
+  }
 }
 
 /* ── responsive ── */

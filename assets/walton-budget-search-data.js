@@ -359,7 +359,6 @@ window.wcBudgetPages = window.wcBudgetPages || [
     "Home": "home.html",
     "GFOA Distinguished Budget Presentation Award": "gfoa-distinguished-budget-presentation-award.html",
     "Transmittal Letter": "transmittal-letter.html",
-    "Budget-in-Brief": "budget-in-brief.html",
     "Overview of Walton County": "overview-of-walton-county.html",
     "Organizational Structure": "organizational-structure.html",
     "Strategic Initiatives": "strategic-initiatives.html",
