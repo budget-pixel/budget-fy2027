@@ -560,6 +560,11 @@
     );
   }
 
+  function lastUpdatedNoteHtml() {
+    const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    return '<p class="wc-data-updated-note"><em>Last Updated: ' + escapeHtml(stamp) + "</em></p>";
+  }
+
   function renderTable(options) {
     const columns = options.columns || [];
     const bodyRows = options.bodyRows || [];
@@ -576,6 +581,7 @@
       "</table>" +
       "</div>" +
       renderNotesHtml("Expenditure Notes:", options.notes) +
+      (options.showUpdated ? lastUpdatedNoteHtml() : "") +
       "</div>"
     );
   }
@@ -883,6 +889,7 @@
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
       "</div>" +
+      lastUpdatedNoteHtml() +
       "</div>"
     );
   }
@@ -947,7 +954,8 @@
     return renderTable({
       caption: caption,
       columns: [{ label: fundLabel }, { label: "Description" }, { label: "Amount", num: true }],
-      bodyRows: bodyRows
+      bodyRows: bodyRows,
+      showUpdated: true
     });
   }
 
@@ -964,6 +972,331 @@
   function initInterfundTransfersPage() {
     initConsolidatedFundTableContainer("interfund-transfers-out-table", renderInterfundTransfersOutTable, "interfund transfers out");
     initConsolidatedFundTableContainer("interfund-transfers-in-table", renderInterfundTransfersInTable, "interfund transfers in");
+  }
+
+  // "Summary of Revenues" page: historical actuals (FY2020-FY2025) by
+  // revenue category, live from the revenues sheet.
+  const CONSOLIDATED_REVENUE_SUMMARY_ROWS = [
+    { type: "General Government Taxes", label: "General Government Taxes" },
+    { type: "Intergovernmental Revenues", label: "Intergovernmental Revenues" },
+    { type: "Miscellaneous Revenue", label: "Miscellaneous Revenue" },
+    { type: "Other Sources", label: "Other Sources" },
+    { type: "Charges for Services", label: "Charges for Services" },
+    { type: "Permits Fees and Special Assessments", label: "Permits, Fees, and Special Assessments" },
+    { type: "Judgments, Fines and Forfeits", label: "Judgments, Fines and Forfeits" }
+  ];
+
+  const CONSOLIDATED_REVENUE_SUMMARY_COLUMNS = [
+    { field: "FY2020_Actual", label: "FY 2020 Actuals" },
+    { field: "FY2021_Actual", label: "FY 2021 Actuals" },
+    { field: "FY2022_Actual", label: "FY 2022 Actuals" },
+    { field: "FY2023_Actual", label: "FY 2023 Actuals" },
+    { field: "FY2024_Actual", label: "FY 2024 Actuals" },
+    { field: "FY2025_Actual", label: "FY 2025 Actuals" },
+    { field: "FY2026_Budget", label: "FY 2026 Budget" },
+    { field: "FY2027_Proposed", label: "FY 2027 Budget" }
+  ];
+
+  function renderConsolidatedRevenueSummaryTable() {
+    const rows = cache.revenues || [];
+    if (!rows.length) return "";
+
+    const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
+    const bodyRows = CONSOLIDATED_REVENUE_SUMMARY_ROWS.map((spec) => {
+      // Revenue_Code 381000 (Interfund Group Transfer In) is reported on
+      // the Summary of Interfund Transfers page instead, so exclude it here.
+      const matching = rows.filter((r) =>
+        r.Revenue_Type === spec.type && String(r.Revenue_Code || "").trim() !== "381000"
+      );
+      return (
+        "<tr><td>" + escapeHtml(spec.label) + "</td>" +
+        CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
+          const sum = matching.reduce((s, r) => s + (r[col.field] || 0), 0);
+          totals[i] += sum;
+          return '<td class="wc-num">' + formatCurrency(sum) + "</td>";
+        }).join("") +
+        "</tr>"
+      );
+    });
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td>Total</td>' +
+      totals.map((t) => '<td class="wc-num">' + formatCurrency(t) + "</td>").join("") +
+      "</tr>"
+    );
+
+    return (
+      '<div class="wc-table-wrap">' +
+      '<p class="wc-table-label">Consolidated Revenue Summary</p>' +
+      '<div class="wc-data-table-scroll">' +
+      '<table class="wc-data-table">' +
+      "<thead><tr><th></th>" + CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((c) => '<th class="wc-num">' + escapeHtml(c.label) + "</th>").join("") + "</tr></thead>" +
+      "<tbody>" + bodyRows.join("") + "</tbody>" +
+      "</table>" +
+      "</div>" +
+      lastUpdatedNoteHtml() +
+      "</div>"
+    );
+  }
+
+  function initConsolidatedRevenueSummaryPage() {
+    initConsolidatedFundTableContainer("consolidated-revenue-summary-table", renderConsolidatedRevenueSummaryTable, "consolidated revenue summary");
+  }
+
+  // "Summary of Revenues" page: a narrative + bar-chart card for each major
+  // revenue source within each classification. Narrative text comes from
+  // the same departmentNarratives sheet, keyed by the topic name below
+  // instead of a department name.
+  function byRevenueCodes(codes) {
+    const set = new Set(codes);
+    return (r) => set.has(String(r.Revenue_Code || "").trim());
+  }
+  function byRevenueCodeAndDeptCode(code, deptCode) {
+    return (r) => String(r.Revenue_Code || "").trim() === code && String(r.Dept_Code || "").trim() === deptCode;
+  }
+  // A catch-all topic: every row of this Revenue_Type not already claimed
+  // by one of the other topics in the same section.
+  function remainderOfType(type, siblingMatchers) {
+    return (r) => r.Revenue_Type === type && !siblingMatchers.some((m) => m(r));
+  }
+
+  function buildIntergovernmentalRevenueTopics() {
+    const halfCent = { title: "Local Government Half-Cent Sales Tax", narrativeKey: "Local Government Half-Cent Sales Tax", matches: byRevenueCodes(["335180"]) };
+    const stateFuel = { title: "State Fuel Taxes", narrativeKey: "State Fuel Taxes", matches: byRevenueCodes(["335420", "335421", "335422", "335490"]) };
+    const stateRevenueShare = { title: "State Revenue Share Proceeds", narrativeKey: "State Revenue Share Proceeds", matches: byRevenueCodes(["335121"]) };
+    const section8 = { title: "Section 8 Housing Choice Voucher Program", narrativeKey: "Section 8 Housing Choice Voucher Program", matches: byRevenueCodes(["331500"]) };
+    const resourceOfficers = { title: "Sheriff Resource Officers", narrativeKey: "Sheriff Resource Officers", matches: byRevenueCodes(["337200"]) };
+    const siblings = [halfCent, stateFuel, stateRevenueShare, section8, resourceOfficers].map((t) => t.matches);
+    const remainder = { title: "Intergovernmental Revenue", narrativeKey: "Intergovernmental Revenue", matches: remainderOfType("Intergovernmental Revenues", siblings) };
+    return [halfCent, stateFuel, stateRevenueShare, section8, resourceOfficers, remainder];
+  }
+
+  function buildChargesForServicesTopics() {
+    const planningFees = { title: "Planning Fees", narrativeKey: "Planning Fees", matches: byRevenueCodes(["341201"]) };
+    const eagleSprings = {
+      title: "Eagle Springs Golf and Recreation Center Revenue",
+      narrativeKey: "Eagle Springs Golf and Recreation Center Revenue",
+      matches: byRevenueCodes(["347201", "347202", "347203", "347204", "347205", "347206", "347207", "347208", "347209", "347210", "347211"])
+    };
+    const ambulanceFees = { title: "Ambulance Fees", narrativeKey: "Ambulance Fees", matches: byRevenueCodes(["342600"]) };
+    const fireRescueMsbu = { title: "Fire Rescue MSBUs", narrativeKey: "Fire Rescue MSBUs", matches: byRevenueCodeAndDeptCode("343410", "107343") };
+    const siblings = [planningFees, eagleSprings, ambulanceFees, fireRescueMsbu].map((t) => t.matches);
+    const remainder = { title: "Charges for Services", narrativeKey: "Charges for Services", matches: remainderOfType("Charges for Services", siblings) };
+    return [planningFees, eagleSprings, ambulanceFees, fireRescueMsbu, remainder];
+  }
+
+  function buildPermitsFeesTopics() {
+    return [
+      { title: "Building Permits", narrativeKey: "Building Permits", matches: byRevenueCodes(["322000"]) },
+      { title: "Beach Activity & Event Permits", narrativeKey: "Beach Activity & Event Permits", matches: byRevenueCodes(["329002", "329003", "329004", "329005", "329009"]) }
+    ];
+  }
+
+  function buildJudgmentsFinesTopics() {
+    return [
+      { title: "Ordinance Fines", narrativeKey: "Ordinance Fines", matches: byRevenueCodes(["354000", "354001", "354002", "354003"]) }
+    ];
+  }
+
+  function buildMiscellaneousRevenueTopics() {
+    return [
+      { title: "Recreation Plat Fee", narrativeKey: "Recreation Plat Fee", matches: byRevenueCodes(["369902"]) },
+      { title: "Interest", narrativeKey: "Interest", matches: byRevenueCodes(["361100", "361102", "361103", "361105", "361106", "361107", "361108", "361111"]) }
+    ];
+  }
+
+  const REVENUE_CLASSIFICATION_SECTIONS = [
+    {
+      containerId: "general-government-tax-topics",
+      topics: [
+        { title: "Ad Valorem Taxes", narrativeKey: "Property Tax", matches: byRevenueCodes(["311000", "311001"]) },
+        { title: "Tourist Development Taxes", narrativeKey: "Tourist Development Tax", matches: byRevenueCodes(["312120", "312130", "312150", "312160", "312170"]) },
+        { title: "Local Discretionary Sales Surtax", narrativeKey: "Local Discretionary Sales Surtax", matches: byRevenueCodes(["312600"]) },
+        { title: "Local Option Fuel Tax", narrativeKey: "Local Option Fuel Tax", matches: byRevenueCodes(["312300", "312410"]) }
+      ]
+    },
+    { containerId: "intergovernmental-revenue-topics", topics: buildIntergovernmentalRevenueTopics() },
+    { containerId: "charges-for-services-topics", topics: buildChargesForServicesTopics() },
+    { containerId: "permits-fees-topics", topics: buildPermitsFeesTopics() },
+    { containerId: "judgments-fines-topics", topics: buildJudgmentsFinesTopics() },
+    { containerId: "miscellaneous-revenue-topics", topics: buildMiscellaneousRevenueTopics() }
+  ];
+
+  const REVENUE_TOPIC_CHART_YEARS = [
+    { field: "FY2022_Actual", label: "FY 2022 Actual" },
+    { field: "FY2023_Actual", label: "FY 2023 Actual" },
+    { field: "FY2024_Actual", label: "FY 2024 Actual" },
+    { field: "FY2025_Actual", label: "FY 2025 Actual" },
+    { field: "FY2026_Budget", label: "FY 2026 Budget" },
+    { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
+  ];
+
+  const REVENUE_TOPIC_CHART_COLORS = [
+    "#006231", "#097FBB", "#D1BE78", "#FFDE59", "#3A9FD6", "#2F8F5B",
+    "#A3955C", "#C7AA3F", "#065A86", "#00401F", "#BFAE6A", "#FFE98A",
+    "#4D4D4D", "#7A7A7A", "#00A651", "#000000", "#6FAF8F", "#5B7C99",
+    "#8A8F98", "#7A9E7E", "#355C7D", "#9BA3AF", "#4B6F52", "#6D8299"
+  ];
+
+  // Abbreviates large dollar amounts for axis ticks/legends, e.g. $150M, $1.2M, $500K.
+  function formatAbbreviatedCurrency(value) {
+    const n = Number(value) || 0;
+    const sign = n < 0 ? "-" : "";
+    const abs = Math.abs(n);
+    if (abs >= 1e9) return sign + "$" + trimDecimal(abs / 1e9) + "B";
+    if (abs >= 1e6) return sign + "$" + trimDecimal(abs / 1e6) + "M";
+    if (abs >= 1e3) return sign + "$" + trimDecimal(abs / 1e3) + "K";
+    return sign + "$" + abs;
+  }
+
+  function trimDecimal(n) {
+    return (Math.round(n * 10) / 10).toString();
+  }
+
+  function renderRevenueTopicCards(container, topics, idPrefix) {
+    if (!container) return;
+    const revenueRows = cache.revenues || [];
+    const narrativeRows = cache.departmentNarratives || [];
+
+    container.innerHTML = topics.map((topic, topicIndex) => {
+      const narrativeRow = narrativeRows.find((r) => normalizeDeptName(r.Dept_Name) === normalizeDeptName(topic.narrativeKey));
+      const paragraphs = narrativeRow ? splitIntoParagraphs(narrativeRow.Narrative) : [];
+      const narrativeHtml = paragraphs.length
+        ? paragraphs.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("")
+        : '<p class="wc-data-empty">Narrative coming soon.</p>';
+
+      const chartCardHtml =
+        '<div class="wc-revenue-topic-chart-card">' +
+        '<div class="wc-revenue-topic-chart-wrap"><canvas id="' + idPrefix + "-" + topicIndex + '"></canvas></div>' +
+        '<div class="wc-revenue-chart-legend" id="' + idPrefix + "-" + topicIndex + '-legend"></div>' +
+        lastUpdatedNoteHtml() +
+        "</div>";
+      const narrativeCardHtml =
+        '<div class="wc-revenue-topic-narrative-card">' +
+        '<h2 class="wc-revenue-topic-title">' + escapeHtml(topic.title) + "</h2>" +
+        narrativeHtml +
+        "</div>";
+      const isReversed = topicIndex % 2 === 1;
+
+      return (
+        '<div class="wc-revenue-topic-block">' +
+        '<div class="wc-revenue-topic-row' + (isReversed ? " wc-revenue-topic-row-reverse" : "") + '">' +
+        (isReversed ? narrativeCardHtml + chartCardHtml : chartCardHtml + narrativeCardHtml) +
+        "</div>" +
+        "</div>"
+      );
+    }).join("");
+
+    if (typeof Chart === "undefined") return;
+
+    topics.forEach((topic, topicIndex) => {
+      // Grouped by Revenue_Name (not Revenue_Code) so codes that share a
+      // name, like Tourist Development Tax's per-cent tiers, combine into
+      // a single bar segment instead of one sliver per code.
+      const byName = new Map();
+      revenueRows.filter(topic.matches).forEach((r) => {
+        const name = r.Revenue_Name || String(r.Revenue_Code || "").trim();
+        if (!byName.has(name)) byName.set(name, []);
+        byName.get(name).push(r);
+      });
+
+      const datasets = Array.from(byName.entries()).map(([name, rowsForName], i) => ({
+        label: name,
+        data: REVENUE_TOPIC_CHART_YEARS.map((y) => rowsForName.reduce((s, r) => s + (r[y.field] || 0), 0)),
+        backgroundColor: REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length],
+        borderRadius: 6,
+        borderSkipped: false
+      }));
+
+      const canvas = document.getElementById(idPrefix + "-" + topicIndex);
+      if (!canvas || !datasets.length) return;
+
+      const chart = new Chart(canvas, {
+        type: "bar",
+        data: { labels: REVENUE_TOPIC_CHART_YEARS.map((y) => y.label), datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              grid: { display: true },
+              ticks: { callback: (v) => formatAbbreviatedCurrency(v) }
+            }
+          },
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+              callbacks: {
+                label: (ctx) => ctx.dataset.label + ": " + formatAbbreviatedCurrency(ctx.parsed.y)
+              }
+            }
+          }
+        }
+      });
+
+      // Chart.js's built-in bottom legend gets cramped/overlaps once a
+      // topic has more than a few revenue codes (e.g. State Fuel Taxes),
+      // so render a full, always-visible custom legend list instead.
+      const legendEl = document.getElementById(idPrefix + "-" + topicIndex + "-legend");
+      if (legendEl) {
+        legendEl.innerHTML = datasets.map((d, i) =>
+          '<button type="button" class="wc-revenue-chart-legend-item" data-index="' + i + '">' +
+          '<span class="wc-revenue-chart-legend-swatch" style="background:' + d.backgroundColor + '"></span>' +
+          "<span>" + escapeHtml(d.label) + "</span>" +
+          "</button>"
+        ).join("");
+
+        legendEl.querySelectorAll(".wc-revenue-chart-legend-item").forEach((item) => {
+          const i = Number(item.dataset.index);
+          item.addEventListener("mouseenter", () => {
+            chart.setActiveElements(chart.data.datasets[i].data.map((_, di) => ({ datasetIndex: i, index: di })));
+            chart.update();
+          });
+          item.addEventListener("mouseleave", () => {
+            chart.setActiveElements([]);
+            chart.update();
+          });
+          item.addEventListener("click", () => {
+            const meta = chart.getDatasetMeta(i);
+            meta.hidden = meta.hidden === null ? !chart.data.datasets[i].hidden : !meta.hidden;
+            item.classList.toggle("is-hidden", !!meta.hidden);
+            chart.update();
+          });
+        });
+      }
+    });
+  }
+
+  function initRevenueTopicCardsPage() {
+    const sections = REVENUE_CLASSIFICATION_SECTIONS.filter((s) => document.getElementById(s.containerId));
+    if (!sections.length) return;
+
+    sections.forEach((s) => {
+      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+    });
+
+    loadBudgetData()
+      .then((data) => {
+        sections.forEach((s) => {
+          const container = document.getElementById(s.containerId);
+          if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+            container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+            return;
+          }
+          renderRevenueTopicCards(container, s.topics, "wc-chart-" + s.containerId);
+        });
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load revenue topic cards", err);
+        sections.forEach((s) => {
+          document.getElementById(s.containerId).innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+        });
+      });
   }
 
   // Flags any position whose FTE changed between the prior adopted year
@@ -2040,6 +2373,8 @@
     initMachinerySummaryPage();
     initPersonnelSummaryPage();
     initInterfundTransfersPage();
+    initConsolidatedRevenueSummaryPage();
+    initRevenueTopicCardsPage();
   });
 
   window.WCBudgetData = {
@@ -2064,6 +2399,8 @@
     renderMachinerySummary,
     renderPersonnelSummary,
     renderInterfundTransfersOutTable,
-    renderInterfundTransfersInTable
+    renderInterfundTransfersInTable,
+    renderConsolidatedRevenueSummaryTable,
+    renderRevenueTopicCards
   };
 })();

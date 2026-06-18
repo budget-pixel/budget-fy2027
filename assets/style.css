@@ -215,6 +215,106 @@ body.sidebar-pinned-right #content {
 
 /* ── table label (above walton-styled table) ── */
 .wc-table-wrap { margin: 28px 0; }
+.wc-data-updated-note { margin: 8px 0 0; font-size: .72rem; color: var(--muted); }
+
+#general-government-tax-topics,
+#intergovernmental-revenue-topics,
+#charges-for-services-topics,
+#permits-fees-topics,
+#judgments-fines-topics,
+#miscellaneous-revenue-topics { padding-top: 32px; }
+.wc-revenue-topic-block {
+  max-width: 1180px;
+  margin: 0 auto 40px;
+}
+.wc-revenue-topic-title {
+  margin: 0 0 18px;
+  color: var(--navy);
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+}
+.wc-revenue-topic-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 28px;
+  align-items: start;
+}
+.wc-revenue-topic-chart-card,
+.wc-revenue-topic-narrative-card {
+  padding: 24px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+.wc-revenue-topic-chart-card {
+  background: linear-gradient(135deg, #f4f8f5 0%, #eef7f1 100%);
+  border: 1px solid rgba(0,98,49,.14);
+  box-shadow: 0 6px 18px rgba(0,98,49,.06);
+}
+.wc-revenue-topic-narrative-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.wc-revenue-topic-chart-wrap {
+  position: relative;
+  height: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+.wc-revenue-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  max-height: 140px;
+  overflow-y: auto;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+.wc-revenue-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .75rem;
+  color: var(--text);
+  transition: background-color .15s ease;
+}
+.wc-revenue-chart-legend-item:hover {
+  background: rgba(0,98,49,.08);
+}
+.wc-revenue-chart-legend-item.is-hidden {
+  opacity: .45;
+  text-decoration: line-through;
+}
+.wc-revenue-chart-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: 0 0 10px;
+}
+.wc-revenue-topic-narrative-card p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .9rem; line-height: 1.7; text-align: justify; color: var(--text);
+  margin: 0 0 14px;
+}
+.wc-revenue-topic-narrative-card p:last-child { margin-bottom: 0; }
+
+@media (max-width: 900px) {
+  .wc-revenue-topic-row { grid-template-columns: 1fr; }
+  .wc-revenue-topic-chart-card, .wc-revenue-topic-narrative-card { padding: 20px; }
+  .wc-revenue-topic-chart-wrap { height: 260px; }
+}
 .wc-table-label {
   font-size: .68rem; font-weight: 800; text-transform: uppercase;
   letter-spacing: .08em; color: var(--muted); margin-bottom: 8px;
@@ -363,6 +463,10 @@ body.sidebar-pinned-right #content {
   font-size: .92rem; font-weight: 800; color: var(--navy);
   margin: 0 0 14px; text-transform: uppercase; letter-spacing: .05em;
   border-left: 4px solid var(--gold); padding-left: 10px;
+}
+.statement-of-function h3 {
+  margin: 0 0 10px; color: var(--navy);
+  font-size: 1.05rem; font-weight: 800;
 }
 .statement-of-function p {
   font-family: Arial, Helvetica, sans-serif;
