@@ -10,7 +10,9 @@
     staffing: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=676680519&single=true&output=csv",
     performanceMeasures: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=95242207&single=true&output=csv",
     machinery: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=203949583&single=true&output=csv",
-    departmentNarratives: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=445845528&single=true&output=csv"
+    departmentNarratives: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=445845528&single=true&output=csv",
+    funds: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=968844446&single=true&output=csv",
+    activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv"
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
@@ -95,6 +97,8 @@
     performanceMeasures: [],
     machinery: [],
     departmentNarratives: [],
+    funds: [],
+    activities: [],
     errors: {}
   };
   let loadPromise = null;
@@ -473,6 +477,32 @@
     };
   }
 
+  function normalizeFundRow(row) {
+    return {
+      Fund_Code: (row.Fund_Code || "").trim(),
+      Fund_Name: (row.Fund_Name || "").trim(),
+      Fund_Type: (row.Fund_Type || "").trim(),
+      Fund_Category: (row.Fund_Category || "").trim(),
+      Major_NonMajor: (row.Major_NonMajor || "").trim()
+    };
+  }
+
+  function normalizeActivityRow(row) {
+    return {
+      Dept_Code: (row.Dept_Code || "").trim(),
+      Dept_Name: (row.Dept_Name || "").trim(),
+      Activity: (row.Activity || "").trim()
+    };
+  }
+
+  // The expenditure/revenue sheets don't have a Fund column directly; the
+  // fund is encoded as the leading 3 digits of each row's Dept_Code, which
+  // line up with Fund_Code values in the funds sheet (e.g. "00104000" and
+  // "001381" both start with "001" for the General Fund).
+  function fundCodeForRow(row) {
+    return String((row && row.Dept_Code) || "").trim().slice(0, 3);
+  }
+
   function fetchCSV(url) {
     return fetch(url, { cache: "no-store" })
       .then((res) => {
@@ -491,7 +521,9 @@
       ["staffing", DATA_SOURCES.staffing, normalizeStaffingRow],
       ["performanceMeasures", DATA_SOURCES.performanceMeasures, normalizePerformanceRow],
       ["machinery", DATA_SOURCES.machinery, normalizeMachineryRow],
-      ["departmentNarratives", DATA_SOURCES.departmentNarratives, normalizeNarrativeRow]
+      ["departmentNarratives", DATA_SOURCES.departmentNarratives, normalizeNarrativeRow],
+      ["funds", DATA_SOURCES.funds, normalizeFundRow],
+      ["activities", DATA_SOURCES.activities, normalizeActivityRow]
     ];
 
     cache.datasetCount = specs.length;
@@ -677,6 +709,216 @@
         return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption, notes);
       })
       .join("");
+  }
+
+  // The "Consolidated Financial Schedules" revenue/expenditure-by-fund
+  // tables: rows are budget categories, columns are major funds (plus a
+  // Non-Major Funds rollup and a grand total), all derived live from the
+  // revenues/expenditures + funds sheets rather than hand-entered.
+  const CONSOLIDATED_REVENUE_FUND_COLUMNS = [
+    { code: "001", label: "General Fund" },
+    { code: "101", label: "Transportation Fund" },
+    { code: "107", label: "Fine & Forfeiture Fund" },
+    { code: "111", label: "Tourist Development Fund" },
+    { code: "112", label: "Solid Waste Fund" },
+    { code: "300", label: "Capital Projects Fund" }
+  ];
+
+  const CONSOLIDATED_EXPENDITURE_FUND_COLUMNS = [
+    { code: "001", label: "General Fund" },
+    { code: "101", label: "Transportation Fund" },
+    { code: "107", label: "Sheriff Fund" },
+    { code: "111", label: "Tourist Development Fund" },
+    { code: "112", label: "Solid Waste Fund" },
+    { code: "300", label: "Capital Projects Fund" }
+  ];
+
+  const CONSOLIDATED_REVENUE_TYPE_ROWS = [
+    { key: "Charges for Services", label: "Charges for Services" },
+    { key: "General Government Taxes", label: "General Government Taxes" },
+    { key: "Intergovernmental Revenues", label: "Intergovernmental Revenues" },
+    { key: "Judgments, Fines and Forfeits", label: "Judgments, Fines and Forfeits" },
+    { key: "Miscellaneous Revenue", label: "Miscellaneous Revenue" },
+    { key: "Other Sources", label: "Other Sources" },
+    { key: "Permits Fees and Special Assessments", label: "Permits, Fees, and Special Assessments" }
+  ];
+
+  // Expenditures are grouped by function/activity (General Government,
+  // Public Safety, etc. — from the activities sheet, keyed by Dept_Code)
+  // rather than by Object_Type, per the county's preferred presentation.
+  const CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS = [
+    "General Government",
+    "Public Safety",
+    "Physical Environment",
+    "Transportation",
+    "Economic Environment",
+    "Human Services",
+    "Culture and Recreation",
+    "Court Related Cost"
+  ];
+
+  // Activities that represent financing items (transfers, debt proceeds,
+  // fund balance) rather than a functional program area; these are pulled
+  // out of the 8 rows above and reported as "Other Financial Uses" instead.
+  const OTHER_FINANCING_ACTIVITIES = new Set(["interfund transfers", "other sources"]);
+
+  function activityForDeptCode(deptCode) {
+    const code = String(deptCode || "").trim();
+    const match = (cache.activities || []).find((a) => a.Dept_Code === code);
+    return match ? match.Activity : "";
+  }
+
+  // Builds a fund-by-category consolidated table. `categoryFor(row)` returns
+  // the row's category key (matched case-insensitively against `typeRows`).
+  // `isOtherFinancing(row)` flags rows that should be excluded from the
+  // regular category rows and instead reported on their own line below the
+  // categories' subtotal (e.g. interfund transfers).
+  function buildConsolidatedFundTable(config) {
+    const rows = config.rows || [];
+    if (!rows.length || !(cache.funds || []).length) return "";
+
+    const fundColumns = config.fundColumns;
+    const majorCodes = new Set(fundColumns.map((c) => c.code));
+    const amountFor = (r) => r.FY2027_Proposed || 0;
+
+    // Returns one cell per major fund column, then Non-Major, then Total —
+    // each either a formatted dollar amount or "–" if no matching rows
+    // exist for that fund at all (vs. "$0" when rows exist but sum to zero).
+    function cellsFor(predicate) {
+      const majorSums = {};
+      const majorHasRows = {};
+      fundColumns.forEach((c) => { majorSums[c.code] = 0; majorHasRows[c.code] = false; });
+      let nonMajorSum = 0;
+      let nonMajorHasRows = false;
+      let grandTotal = 0;
+
+      rows.forEach((r) => {
+        if (!predicate(r)) return;
+        const amt = amountFor(r);
+        const code = fundCodeForRow(r);
+        grandTotal += amt;
+        if (majorCodes.has(code)) {
+          majorSums[code] += amt;
+          majorHasRows[code] = true;
+        } else {
+          nonMajorSum += amt;
+          nonMajorHasRows = true;
+        }
+      });
+
+      const cells = fundColumns.map((c) => (majorHasRows[c.code] ? formatCurrency(majorSums[c.code]) : "–"));
+      cells.push(nonMajorHasRows ? formatCurrency(nonMajorSum) : "–");
+      cells.push(formatCurrency(grandTotal));
+      return cells;
+    }
+
+    function numericValuesFor(predicate) {
+      const majorSums = {};
+      fundColumns.forEach((c) => { majorSums[c.code] = 0; });
+      let nonMajorSum = 0;
+      let grandTotal = 0;
+      rows.forEach((r) => {
+        if (!predicate(r)) return;
+        const amt = amountFor(r);
+        const code = fundCodeForRow(r);
+        grandTotal += amt;
+        if (majorCodes.has(code)) majorSums[code] += amt;
+        else nonMajorSum += amt;
+      });
+      const values = fundColumns.map((c) => majorSums[c.code]);
+      values.push(nonMajorSum);
+      values.push(grandTotal);
+      return values;
+    }
+
+    const typeRowRecords = config.typeRows.map((spec) => {
+      const keyNorm = spec.key.toLowerCase();
+      const predicate = (r) => String(config.categoryFor(r) || "").toLowerCase() === keyNorm && !config.isOtherFinancing(r);
+      return { label: spec.label, cells: cellsFor(predicate), values: numericValuesFor(predicate) };
+    });
+
+    const columnCount = fundColumns.length + 2;
+    const categoryTotalValues = Array.from({ length: columnCount }, (_, i) =>
+      typeRowRecords.reduce((sum, tr) => sum + tr.values[i], 0)
+    );
+
+    const otherFinancingCells = cellsFor(config.isOtherFinancing);
+    const otherFinancingValues = numericValuesFor(config.isOtherFinancing);
+
+    const grandTotalValues = categoryTotalValues.map((v, i) => v + otherFinancingValues[i]);
+
+    const headerCells = ["ROW LABELS"]
+      .concat(fundColumns.map((c) => c.label.toUpperCase()))
+      .concat(["NON-MAJOR GOVERNMENTAL FUNDS", "TOTAL ALL FUNDS"]);
+
+    const bodyRows = [];
+    bodyRows.push('<tr class="wc-table-group-row"><td>' + escapeHtml(config.groupRowLabel) + "</td>" + headerCells.slice(1).map(() => "<td></td>").join("") + "</tr>");
+    typeRowRecords.forEach((tr) => {
+      bodyRows.push("<tr><td>" + escapeHtml(tr.label) + "</td>" + tr.cells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") + "</tr>");
+    });
+    bodyRows.push(
+      '<tr class="wc-table-subtotal-row"><td>' + escapeHtml(config.totalRowLabel) + "</td>" +
+      categoryTotalValues.map((v) => '<td class="wc-num">' + formatCurrency(v) + "</td>").join("") +
+      "</tr>"
+    );
+    bodyRows.push(
+      "<tr><td>" + escapeHtml(config.otherLineLabel) + "</td>" +
+      otherFinancingCells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") +
+      "</tr>"
+    );
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td>' + escapeHtml(config.grandTotalLabel) + "</td>" +
+      grandTotalValues.map((v) => '<td class="wc-num">' + formatCurrency(v) + "</td>").join("") +
+      "</tr>"
+    );
+
+    return (
+      '<div class="wc-table-wrap">' +
+      '<p class="wc-table-label">' + escapeHtml(config.caption) + "</p>" +
+      '<div class="wc-data-table-scroll">' +
+      '<table class="wc-data-table">' +
+      "<thead><tr>" + headerCells.map((h) => "<th>" + escapeHtml(h) + "</th>").join("") + "</tr></thead>" +
+      "<tbody>" + bodyRows.join("") + "</tbody>" +
+      "</table>" +
+      "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderConsolidatedRevenueBudgetTable() {
+    return buildConsolidatedFundTable({
+      rows: cache.revenues,
+      fundColumns: CONSOLIDATED_REVENUE_FUND_COLUMNS,
+      typeRows: CONSOLIDATED_REVENUE_TYPE_ROWS,
+      categoryFor: (r) => r.Revenue_Type,
+      // Revenue_Code 381000 (Interfund Group Transfer In) is an "Other
+      // Financing Source," reported on its own line below REVENUES TOTAL
+      // rather than inside the regular Other Sources revenue line.
+      isOtherFinancing: (r) => String(r.Revenue_Code || "").trim() === "381000",
+      caption: "Revenue Budget",
+      groupRowLabel: "Revenues",
+      totalRowLabel: "REVENUES TOTAL",
+      otherLineLabel: "Other Financial Sources",
+      grandTotalLabel: "Total Revenue and Other Financial Sources"
+    });
+  }
+
+  function renderConsolidatedExpenditureBudgetTable() {
+    return buildConsolidatedFundTable({
+      rows: cache.expenditures,
+      fundColumns: CONSOLIDATED_EXPENDITURE_FUND_COLUMNS,
+      typeRows: CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS.map((a) => ({ key: a, label: a })),
+      categoryFor: (r) => activityForDeptCode(r.Dept_Code),
+      // Rows classified under a financing activity (transfers, debt
+      // proceeds, fund balance) rather than a functional program area are
+      // reported on their own line below EXPENDITURES TOTAL instead.
+      isOtherFinancing: (r) => OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase()),
+      caption: "Expenditure Budget",
+      groupRowLabel: "Expenditures",
+      totalRowLabel: "EXPENDITURES TOTAL",
+      otherLineLabel: "Other Financial Uses",
+      grandTotalLabel: "Total Expenditure and Other Financial Uses"
+    });
   }
 
   // Flags any position whose FTE changed between the prior adopted year
@@ -1533,9 +1775,35 @@
       });
   }
 
+  function initConsolidatedFundTableContainer(containerId, renderFn, errorContext) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        container.innerHTML = renderFn();
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load " + errorContext, err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
+  function initConsolidatedFundTablesPage() {
+    initConsolidatedFundTableContainer("consolidated-revenue-budget-table", renderConsolidatedRevenueBudgetTable, "consolidated revenue budget");
+    initConsolidatedFundTableContainer("consolidated-expenditure-budget-table", renderConsolidatedExpenditureBudgetTable, "consolidated expenditure budget");
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initDepartmentPage();
     initFinancialSummaryPage();
+    initConsolidatedFundTablesPage();
   });
 
   window.WCBudgetData = {
@@ -1554,6 +1822,8 @@
     renderTable,
     renderDepartmentNarrative,
     renderFinancialSummary,
-    renderFilterControls
+    renderFilterControls,
+    renderConsolidatedRevenueBudgetTable,
+    renderConsolidatedExpenditureBudgetTable
   };
 })();
