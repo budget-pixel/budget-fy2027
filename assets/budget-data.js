@@ -615,7 +615,9 @@
 
   function renderStaffingTable(rows) {
     if (!rows.length) return "";
+    const showPrior = getShowPriorYears();
     const years = [2024, 2025, 2026, 2027];
+    const priorYears = years.filter((y) => y < 2027);
     const totals = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
     const bodyRows = rows
       .slice()
@@ -624,26 +626,47 @@
         years.forEach((y) => { totals[y] += r[y] || 0; });
         return (
           "<tr><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
-          years.map((y) => '<td class="wc-num">' + formatNumber(r[y] || 0) + "</td>").join("") +
+          years.map((y) => {
+            const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
+            return '<td class="' + classes.join(" ") + '">' + formatNumber(r[y] || 0) + "</td>";
+          }).join("") +
           "</tr>"
         );
       });
     bodyRows.push(
       '<tr class="wc-table-total-row"><td>Total FTE</td>' +
-        years.map((y) => '<td class="wc-num">' + formatNumber(totals[y]) + "</td>").join("") +
+        years.map((y) => {
+          const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
+          return '<td class="' + classes.join(" ") + '">' + formatNumber(totals[y]) + "</td>";
+        }).join("") +
         "</tr>"
     );
-    return renderTable({
-      caption: "Staffing / FTE",
-      columns: [
-        { label: "Position Name" },
-        { label: "FY 2024", num: true },
-        { label: "FY 2025", num: true },
-        { label: "FY 2026", num: true },
-        { label: "FY 2027", num: true }
-      ],
-      bodyRows: bodyRows
-    });
+    return (
+      '<section class="wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '">' +
+      '<div class="wc-data-table-wrap">' +
+      '<div class="wc-table-label-row">' +
+      '<p class="wc-table-label">Staffing / FTE</p>' +
+      '<div class="wc-fy-column-toggle-wrap">' +
+      '<label class="wc-fy-column-toggle-label">' +
+      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" aria-label="View Prior Years" ' +
+      (showPrior ? "checked" : "") + " />" +
+      '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
+      "</label>" +
+      "</div>" +
+      "</div>" +
+      '<div class="wc-data-table-scroll">' +
+      '<table class="wc-data-table wc-staffing-table">' +
+      "<thead><tr>" +
+      "<th>Position Name</th>" +
+      priorYears.map((y) => '<th class="wc-num wc-prior-year">FY ' + y + "</th>").join("") +
+      '<th class="wc-num">FY 2027</th>' +
+      "</tr></thead>" +
+      "<tbody>" + bodyRows.join("") + "</tbody>" +
+      "</table>" +
+      "</div>" +
+      "</div>" +
+      "</section>"
+    );
   }
 
   function renderMachineryTable(rows) {
@@ -755,18 +778,24 @@
     );
   }
 
-  function bindPerformanceToggle(container) {
+  function applyPriorYearsState(checked) {
+    document.querySelectorAll(".wc-performance-card, .wc-staffing-card").forEach((card) => {
+      card.classList.toggle("show-prior-years", checked);
+    });
+    document.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((cb) => {
+      cb.checked = checked;
+    });
+  }
+
+  function bindPriorYearsToggle(container) {
     if (!container) return;
     container.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((checkbox) => {
+      if (checkbox.getAttribute("data-wc-prior-years-bound") === "true") return;
+      checkbox.setAttribute("data-wc-prior-years-bound", "true");
       checkbox.addEventListener("change", () => {
         const checked = checkbox.checked;
         setShowPriorYears(checked);
-        document.querySelectorAll(".wc-performance-card").forEach((card) => {
-          card.classList.toggle("show-prior-years", checked);
-        });
-        document.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((cb) => {
-          cb.checked = checked;
-        });
+        applyPriorYearsState(checked);
       });
     });
   }
@@ -865,7 +894,7 @@
         renderDepartmentNarrative(narrativeEl, deptName, deptCode);
 
         mountOrHide(performanceEl, renderPerformanceTable(getDepartmentPerformanceMeasures(deptName, deptCode)));
-        bindPerformanceToggle(performanceEl);
+        bindPriorYearsToggle(performanceEl);
 
         mountOrHide(
           expenseEl,
@@ -880,6 +909,7 @@
         bindTooltipAnchors(revenueEl);
 
         mountOrHide(staffingEl, renderStaffingTable(getDepartmentStaffing(deptName, deptCode)));
+        bindPriorYearsToggle(staffingEl);
         mountOrHide(machineryEl, renderMachineryTable(getDepartmentMachinery(deptName, deptCode)));
       })
       .catch((err) => {
