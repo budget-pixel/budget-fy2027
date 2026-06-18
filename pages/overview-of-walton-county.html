@@ -636,7 +636,7 @@
   }
 
   .wc-commission-intro{
-    max-width:1100px;
+    width:100%;
     margin:0 auto 34px auto;
   }
 
@@ -668,7 +668,7 @@
 
   .wc-commission-grid{
     display:grid;
-    grid-template-columns:minmax(220px,.65fr) minmax(0,1.35fr);
+    grid-template-columns:minmax(260px,330px) minmax(0,1fr);
     gap:28px;
     align-items:start;
   }
@@ -676,7 +676,7 @@
   .wc-commission-map{
     display:flex;
     justify-content:center;
-    padding:18px;
+    padding:14px;
     background:#ffffff;
     border:3px solid #d1be78;
     border-radius:26px;
@@ -690,9 +690,9 @@
 
   .wc-commission-map img{
     display:block;
-    width:auto;
+    width:100%;
     max-width:100%;
-    height:380px;
+    height:auto;
     border-radius:18px;
     object-fit:contain;
   }
@@ -1034,18 +1034,26 @@
 
   .wc-constitutional-copy h3{
     display:flex;
-    justify-content:flex-start;
-    gap:10px;
+    flex-direction:column;
+    gap:4px;
     margin:0 0 16px 0;
     padding-bottom:10px;
     border-bottom:3px solid #d1be78;
-    color:#24344d;
-    font-size:22px;
     line-height:1.3;
+  }
+
+  .wc-constitutional-copy h3 span:first-child{
+    color:#006231;
+    font-size:13px;
     font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
   }
 
   .wc-constitutional-copy h3 span:last-child{
+    color:#24344d;
+    font-size:26px;
+    font-weight:800;
     white-space:nowrap;
   }
 
