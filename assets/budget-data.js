@@ -629,7 +629,7 @@
     { field: "FY2026_Budget", label: "FY 2026 Budget" }
   ];
 
-  function renderBudgetLinesToggle(rows, descriptionField, kind) {
+  function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName) {
     if (!rows || !rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
@@ -640,28 +640,33 @@
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
     const descField = descriptionField || "Note";
 
-    // Combine rows that share the same name (e.g. the same revenue source
-    // collected under several departments' Dept_Codes) into one line
-    // instead of repeating that name once per underlying row.
-    const sumFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
-    const grouped = new Map();
-    rows.forEach((r) => {
-      const name = r[nameField] || "";
-      const existing = grouped.get(name);
-      if (!existing) {
-        const merged = { codes: [r[codeField] || ""].filter(Boolean), desc: r[descField] || "", category: r[categoryField] || "" };
-        sumFields.forEach((f) => { merged[f] = r[f] || 0; });
-        grouped.set(name, merged);
-        return;
-      }
-      if (r[codeField] && !existing.codes.includes(r[codeField])) existing.codes.push(r[codeField]);
-      sumFields.forEach((f) => { existing[f] += r[f] || 0; });
-    });
-    const mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
-      const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.desc, [categoryField]: merged.category };
-      sumFields.forEach((f) => { row[f] = merged[f]; });
-      return row;
-    });
+    // On consolidated/county-wide summaries, combine rows that share the
+    // same name (e.g. the same revenue source collected under several
+    // departments' Dept_Codes) into one line. On a single department's own
+    // breakdown, every row is kept separate so distinct budget lines that
+    // happen to share an Object/Revenue Name aren't hidden from each other.
+    let mergedRows = rows;
+    if (combineByName) {
+      const sumFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+      const grouped = new Map();
+      rows.forEach((r) => {
+        const name = r[nameField] || "";
+        const existing = grouped.get(name);
+        if (!existing) {
+          const merged = { codes: [r[codeField] || ""].filter(Boolean), desc: r[descField] || "", category: r[categoryField] || "" };
+          sumFields.forEach((f) => { merged[f] = r[f] || 0; });
+          grouped.set(name, merged);
+          return;
+        }
+        if (r[codeField] && !existing.codes.includes(r[codeField])) existing.codes.push(r[codeField]);
+        sumFields.forEach((f) => { existing[f] += r[f] || 0; });
+      });
+      mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
+        const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.desc, [categoryField]: merged.category };
+        sumFields.forEach((f) => { row[f] = merged[f]; });
+        return row;
+      });
+    }
 
     const bodyRows = mergedRows
       .slice()
@@ -888,10 +893,10 @@
   // A single row right under a table: the "Last Updated" stamp on the
   // left and (for expense tables) the "View Budget Lines" toggle on the
   // right, instead of two separate stacked lines.
-  function renderTableFooterRow(budgetLineRows, descriptionField, kind) {
+  function renderTableFooterRow(budgetLineRows, descriptionField, kind, combineByName) {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     const updated = '<em>Last Updated: ' + escapeHtml(stamp) + "</em>";
-    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows, descriptionField, kind) : { button: "", detail: "" };
+    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows, descriptionField, kind, combineByName) : { button: "", detail: "" };
     return (
       '<div class="wc-table-footer-row">' +
       '<p class="wc-data-updated-note">' + updated + "</p>" +
@@ -1450,7 +1455,7 @@
       "</table>" +
       "</div>" +
       "</div>" +
-      renderTableFooterRow(allMatchingRows, null, "revenue") +
+      renderTableFooterRow(allMatchingRows, null, "revenue", true) +
       "</div>"
     );
   }
