@@ -618,8 +618,7 @@
     });
   }
 
-  function renderStaffingTable(rows) {
-    if (!rows.length) return "";
+  function renderStaffingGroup(rows, label) {
     const showPrior = getShowPriorYears();
     const years = [2024, 2025, 2026, 2027];
     const priorYears = years.filter((y) => y < 2027);
@@ -650,7 +649,7 @@
       '<section class="wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '">' +
       '<div class="wc-data-table-wrap">' +
       '<div class="wc-table-label-row">' +
-      '<p class="wc-table-label">Staffing / FTE</p>' +
+      '<p class="wc-table-label">' + escapeHtml(label) + "</p>" +
       '<div class="wc-fy-column-toggle-wrap">' +
       '<label class="wc-fy-column-toggle-label">' +
       '<input type="checkbox" class="wc-fy-column-toggle-checkbox" aria-label="View Prior Years" ' +
@@ -672,6 +671,21 @@
       "</div>" +
       "</section>"
     );
+  }
+
+  // When a department's staffing rows span more than one distinct Dept_Name
+  // (e.g. "Code Compliance" is split into "Code Compliance Street" and
+  // "Code Compliance Beach" in the sheet), render one labeled table per
+  // sub-unit instead of merging them into a single undifferentiated list.
+  function renderStaffingTable(rows) {
+    if (!rows.length) return "";
+    const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
+    if (groupNames.length <= 1) {
+      return renderStaffingGroup(rows, "Staffing / FTE");
+    }
+    return groupNames
+      .map((name) => renderStaffingGroup(rows.filter((r) => (r.Dept_Name || "") === name), name))
+      .join("");
   }
 
   function renderMachineryTable(rows) {
