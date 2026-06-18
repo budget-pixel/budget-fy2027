@@ -345,6 +345,40 @@ body.sidebar-pinned-right #content {
   margin-bottom: 0;
 }
 
+.tourism-admin-overview p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .9rem; line-height: 1.75; text-align: justify; color: var(--text);
+  margin: 0 0 14px;
+}
+.tourism-admin-overview p:last-child {
+  margin-bottom: 0;
+}
+
+.tourism-admin-overview h3 {
+  margin: 22px 0 14px;
+  color: var(--navy);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.tourism-admin-section {
+  margin: 0 0 40px;
+}
+
+.tourism-admin-section + .tourism-admin-section {
+  padding-top: 32px;
+  border-top: 2px solid var(--green);
+}
+
+.tourism-admin-section-title {
+  margin: 0 0 16px;
+  color: var(--navy);
+  font-size: 26px;
+  font-weight: 800;
+  border-left: 5px solid var(--gold);
+  padding-left: 14px;
+}
+
 .extension-video-frame {
   position: relative;
   width: 100%;

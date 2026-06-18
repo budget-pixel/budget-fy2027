@@ -787,6 +787,107 @@
     return '<section class="building-construction-supplemental-tables">' + pieces.join("") + "</section>";
   }
 
+  // Tourism Administration's page combines five separately budgeted
+  // divisions that each have their own rows in the sheets (and, across
+  // sheets, sometimes a slightly different spelling of the same division).
+  const TOURISM_ADMIN_SECTIONS = [
+    {
+      label: "Tourism Administration",
+      narrativeNames: ["Tourism Administration"],
+      expenseNames: ["Tourism Administration"],
+      revenueNames: ["Tourist Development Taxes"],
+      staffingNames: ["Tourism Administration"],
+      machineryNames: ["Tourism Administration"]
+    },
+    {
+      label: "Sales and Visitor Center",
+      narrativeNames: ["Sales and Visitor Center"],
+      expenseNames: ["Sales and Visitors Center"],
+      revenueNames: [],
+      staffingNames: ["Sales and Visitors Center"],
+      machineryNames: []
+    },
+    {
+      label: "Communications",
+      narrativeNames: ["Communications"],
+      expenseNames: ["Communications"],
+      revenueNames: [],
+      staffingNames: ["Communications"],
+      machineryNames: []
+    },
+    {
+      label: "Marketing",
+      narrativeNames: ["Marketing"],
+      expenseNames: ["Marketing"],
+      revenueNames: [],
+      staffingNames: ["Marketing"],
+      machineryNames: []
+    },
+    {
+      label: "North Walton",
+      narrativeNames: ["North Walton"],
+      expenseNames: ["North Walton Tourist Development Tax"],
+      revenueNames: [],
+      staffingNames: [],
+      machineryNames: []
+    }
+  ];
+
+  const TOURISM_ADMIN_OVERVIEW_PARAGRAPHS = [
+    "The mission of the Walton County Tourism Department and its divisions is to protect and strengthen the Walton County brand, while enhancing and supporting the tourism economy. As the Destination Marketing Organization responsible for promoting tourism and maintaining the local beaches as a primary attraction, we showcase the diverse attractions of these 16 beach neighborhoods and the rich heritage and natural beauty throughout the county. Through creative marketing, dynamic social media engagement, and close collaboration with meeting planners, Walton County Tourism creates exceptional experiences for all visitors, stimulating visitor spending and bolstering the local economy. In turn, Walton County Tourism uses this revenue to enhance community infrastructure and promote safety initiatives."
+  ];
+
+  const TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS = [
+    "In 2024, 4,782,600 visitors came to Walton County, accounting for $4,152,879,200 in direct spending and generating 3,607,200 room nights for accommodation partners. These figures, which saw a decrease from 2023, represent a $4,932,597,700 economic impact to Walton County. This generated more than $59 million in Tourist Development Tax revenues.",
+    "Tourism in Walton County supported 33,800 jobs (direct and indirect) and generated $1,400,623,500 in wages and salaries. An additional Walton County job is supported by every 142 visitors. Visitors to Walton County generated a net tax benefit of $68,309,500. Visitors to Walton County save local residents $2,082 in local taxes per household each year. Visitors to Walton County accounted for 71% of all retail spending. Walton County Tourism’s marketing efforts supported 70 local events with $700,000 in reimbursable funds through its event grant marketing program.",
+    "In 2024, the Visitor Center welcomed 20,676 people and generated $259,062.00 in branded merchandise. The sales division was responsible for generating 293 meeting and wedding leads for our partners. The sales team actively prospects, networks, makes sales calls and hosts familiarization tours and events in target markets, in addition to participating in travel and trade shows. Communications generated close to $5 million in earned (advertising equivalency) media value in 2024 and circulation/viewership of more than 2.4 billion impressions in 126 press hits across top travel and leisure media placements including publications like Conde Nast Traveler, Modern Luxury, Travel + Leisure, Southern Living and USA Today Travel. They also hosted 11 media visits and multiple desksides in core markets."
+  ];
+
+  function rowsForExactNames(rows, names) {
+    const norms = (names || []).map(normalizeDeptName);
+    return (rows || []).filter((r) => norms.includes(normalizeDeptName(r.Dept_Name)));
+  }
+
+  function renderTourismAdministrationSections() {
+    const overview =
+      '<section class="content-section tourism-admin-overview">' +
+      TOURISM_ADMIN_OVERVIEW_PARAGRAPHS.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+      "<h3>Highlights</h3>" +
+      TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+      "</section>";
+
+    const sections = TOURISM_ADMIN_SECTIONS.map((spec) => {
+      const narrativeRows = rowsForExactNames(cache.departmentNarratives, spec.narrativeNames)
+        .filter((r) => r.Narrative && r.Narrative.trim());
+      const narrativeHtml = narrativeRows.length
+        ? splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + escapeHtml(p) + "</p>").join("")
+        : "";
+
+      const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
+      const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
+      const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
+      const machineryRows = rowsForExactNames(cache.machinery, spec.machineryNames);
+
+      const body = [
+        narrativeHtml,
+        renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
+        renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
+        renderStaffingTable(staffingRows),
+        renderMachineryTable(machineryRows)
+      ].filter(Boolean).join("");
+
+      if (!body) return "";
+      return (
+        '<section class="tourism-admin-section">' +
+        '<h2 class="tourism-admin-section-title">' + escapeHtml(spec.label) + "</h2>" +
+        body +
+        "</section>"
+      );
+    }).filter(Boolean).join("");
+
+    return overview + sections;
+  }
+
   function renderMosquitoStateAidTables() {
     const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
     const revenueRows = rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid");
@@ -1031,10 +1132,28 @@
         }
         const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl] = containers;
 
-        renderDepartmentNarrative(narrativeEl, deptName, deptCode);
-
         mountOrHide(performanceEl, renderPerformanceTable(getDepartmentPerformanceMeasures(deptName, deptCode)));
         bindPriorYearsToggle(performanceEl);
+
+        if (normalizeDeptName(deptName) === "tourism administration") {
+          // Tourism Administration's page combines five separately budgeted
+          // divisions; each division's narrative, expenditures, revenue,
+          // and staffing are grouped together into one block per division
+          // rather than spread across the page's per-data-type containers.
+          mountOrHide(narrativeEl, renderTourismAdministrationSections());
+          bindTooltipAnchors(narrativeEl);
+          bindPriorYearsToggle(narrativeEl);
+          mountOrHide(expenseEl, "");
+          mountOrHide(revenueEl, "");
+          mountOrHide(staffingEl, "");
+          mountOrHide(machineryEl, "");
+          mountOrHide(stateAidEl, "");
+          mountOrHide(solidWasteEl, "");
+          mountOrHide(buildingConstructionEl, "");
+          return;
+        }
+
+        renderDepartmentNarrative(narrativeEl, deptName, deptCode);
 
         // Some departments break specific object codes out into their own
         // supplemental table below; exclude those codes here to avoid
