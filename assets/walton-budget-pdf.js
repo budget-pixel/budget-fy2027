@@ -211,6 +211,49 @@ nav#nav-menu .wc-nav-search-slot{
     box-shadow:none !important;
   }
 
+  /* YouTube/map embeds never render in printed/PDF output, so hide the
+     embed itself and collapse its two-column "statement + video" layout
+     to a single full-width column instead of leaving a blank gap; the
+     narrative text is justified so it fills that reclaimed width cleanly. */
+  .wc-video-frame,
+  .extension-video-frame,
+  .libraries-video-frame,
+  .mosquito-video-frame,
+  .recreation-parks-section,
+  .environmental-iframe-link,
+  .public-works-iframe-link,
+  .lifeguard-iframe-link,
+  .libraries-iframe-link{
+    display:none !important;
+  }
+
+  .extension-statement-media,
+  .libraries-statement-media,
+  .libraries-statement-lower,
+  .mosquito-statement-media,
+  .eagle-springs-statement-media,
+  .eagle-springs-grill-statement-media{
+    display:block !important;
+    grid-template-columns:none !important;
+  }
+
+  .statement-of-function h2,
+  .statement-of-function-style-heading,
+  .tourism-admin-section-title{
+    border-left:0 !important;
+    padding-left:0 !important;
+  }
+
+  .statement-of-function p,
+  .statement-of-function-style-heading + p,
+  .tourism-admin-overview p,
+  .tourism-admin-section p,
+  .libraries-statement-intro p,
+  .libraries-statement-rest p,
+  .content-section p{
+    text-align:justify !important;
+  }
+
   body{
     padding-top:0 !important;
     padding-bottom:.08in !important;
@@ -774,6 +817,26 @@ nav#nav-menu .wc-nav-search-slot{
     border:0 !important;
     border-radius:8px !important;
     background:#ffffff !important;
+  }
+
+  /* The on-page heading is an absolutely-positioned ::before that relies on
+     the card's normal padding-top for clearance; that padding is removed
+     above for print, so without this override the heading text overlaps
+     the table instead of sitting above it. */
+  .wc-performance-card::before{
+    position:static !important;
+    display:block !important;
+    top:auto !important;
+    left:auto !important;
+    transform:none !important;
+    margin:0 0 10px 0 !important;
+    padding:0 !important;
+    white-space:normal !important;
+    text-align:center !important;
+  }
+
+  .wc-fy-column-toggle-wrap{
+    display:none !important;
   }
 
   .wc-performance-table-wrap{
