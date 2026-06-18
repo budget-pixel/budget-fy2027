@@ -618,6 +618,27 @@
     });
   }
 
+  // Flags any position whose FTE changed between the prior adopted year
+  // (2026) and the proposed year (2027), so the table can call out
+  // staffing changes without someone having to write them up by hand.
+  function buildStaffingNotes(rows) {
+    return rows
+      .slice()
+      .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""))
+      .reduce((notes, r) => {
+        const before = r[2026] || 0;
+        const after = r[2027] || 0;
+        const delta = after - before;
+        if (Math.abs(delta) < 1e-9) return notes;
+        const verb = delta > 0 ? "Requested" : "Reduced";
+        notes.push(
+          verb + " " + formatNumber(Math.abs(delta)) + " FTE (" +
+          escapeHtml(r.Position_Name || "") + ") in Fiscal Year 2027."
+        );
+        return notes;
+      }, []);
+  }
+
   function renderStaffingGroup(rows, label) {
     const showPrior = getShowPriorYears();
     const years = [2024, 2025, 2026, 2027];
@@ -645,6 +666,12 @@
         }).join("") +
         "</tr>"
     );
+    const notes = buildStaffingNotes(rows);
+    const notesHtml = notes.length
+      ? '<div class="wc-staffing-notes"><p class="wc-staffing-notes-title">Staffing Notes:</p>' +
+        notes.map((n) => "<p>" + n + "</p>").join("") +
+        "</div>"
+      : "";
     return (
       '<section class="wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '">' +
       '<div class="wc-data-table-wrap">' +
@@ -668,6 +695,7 @@
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
       "</div>" +
+      notesHtml +
       "</div>" +
       "</section>"
     );
