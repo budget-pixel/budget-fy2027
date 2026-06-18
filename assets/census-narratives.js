@@ -212,20 +212,18 @@
         ? '<p class="wc-census-source"><em>Source: U.S. Census Bureau. Narrative shown is a default summary; live figures are temporarily unavailable.</em></p>'
         : '<p class="wc-census-source"><em>Source: U.S. Census Bureau, ACS 5-Year Estimates. Data current as of ' + escapeHtml(lastUpdatedLabel) + ".</em></p>";
 
-      const chartCardHtml =
-        '<div class="wc-revenue-topic-chart-card wc-census-card-stack">' + renderIframeCards(section.iframes) + "</div>";
+      const vizCardHtml =
+        '<div class="wc-census-viz-card wc-census-card-stack">' + renderIframeCards(section.iframes) + "</div>";
       const narrativeCardHtml =
-        '<div class="wc-revenue-topic-narrative-card">' +
-        '<h2 class="wc-revenue-topic-title">' + escapeHtml(section.title) + "</h2>" +
+        '<div class="wc-census-narrative-card">' +
+        "<h2>" + escapeHtml(section.title) + "</h2>" +
         narrativeHtml + sourceNote +
         "</div>";
 
-      const isReversed = index % 2 === 1;
       return (
-        '<div class="wc-revenue-topic-block">' +
-        '<div class="wc-revenue-topic-row' + (isReversed ? " wc-revenue-topic-row-reverse" : "") + '">' +
-        (isReversed ? narrativeCardHtml + chartCardHtml : chartCardHtml + narrativeCardHtml) +
-        "</div></div>"
+        '<section class="wc-census-topic-block">' +
+        narrativeCardHtml + vizCardHtml +
+        "</section>"
       );
     }).join("");
   }

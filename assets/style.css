@@ -312,6 +312,42 @@ body.sidebar-pinned-right #content {
 }
 .wc-revenue-topic-narrative-card p:last-child { margin-bottom: 0; }
 
+.wc-census-topic-block {
+  max-width: 1180px;
+  margin: 0 auto 40px;
+}
+.wc-census-narrative-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.wc-census-narrative-card h2 {
+  margin: 0 0 16px;
+  color: var(--navy);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.wc-census-narrative-card p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .92rem;
+  line-height: 1.75;
+  text-align: justify;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+.wc-census-narrative-card p:last-child { margin-bottom: 0; }
+.wc-census-viz-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #f4f8f5 0%, #eef7f1 100%);
+  border: 1px solid rgba(0,98,49,.14);
+  box-shadow: 0 6px 18px rgba(0,98,49,.06);
+}
 .wc-census-card-stack { display: flex; flex-direction: column; gap: 16px; }
 .wc-census-iframe-card {
   background: #ffffff;
