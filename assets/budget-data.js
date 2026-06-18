@@ -1376,45 +1376,63 @@
     const rows = cache.revenues || [];
     if (!rows.length) return "";
 
+    const lastIndex = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.length - 1;
     const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
     const bodyRows = CONSOLIDATED_REVENUE_SUMMARY_ROWS.map((spec) => {
       // Revenue_Code 381000 (Interfund Group Transfer In) is reported on
-      // the Summary of Interfund Transfers page instead, so exclude it here.
+      // the Summary of Interfund Transfers page instead, and the
+      // Self-Insurance Fund (503) is an Internal Service fund rather than
+      // a governmental one, so both are excluded here.
       const matching = rows.filter((r) =>
-        r.Revenue_Type === spec.type && String(r.Revenue_Code || "").trim() !== "381000"
+        r.Revenue_Type === spec.type &&
+        String(r.Revenue_Code || "").trim() !== "381000" &&
+        !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
       );
       return (
         "<tr><td>" + escapeHtml(spec.label) + "</td>" +
         CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
           const sum = matching.reduce((s, r) => s + (r[col.field] || 0), 0);
           totals[i] += sum;
-          return '<td class="wc-num">' + formatCurrency(sum) + "</td>";
+          return '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(sum) + "</td>";
         }).join("") +
         "</tr>"
       );
     });
     bodyRows.push(
       '<tr class="wc-table-total-row"><td>Total</td>' +
-      totals.map((t) => '<td class="wc-num">' + formatCurrency(t) + "</td>").join("") +
+      totals.map((t, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(t) + "</td>").join("") +
       "</tr>"
     );
 
+    const showPrior = getShowPriorYears();
     return (
+      '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
       '<div class="wc-table-wrap">' +
+      '<div class="wc-table-label-row">' +
       '<p class="wc-table-label">Consolidated Revenue Summary</p>' +
+      priorYearsToggleHtml(showPrior) +
+      "</div>" +
       '<div class="wc-data-table-scroll">' +
       '<table class="wc-data-table">' +
-      "<thead><tr><th></th>" + CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((c) => '<th class="wc-num">' + escapeHtml(c.label) + "</th>").join("") + "</tr></thead>" +
+      "<thead><tr><th></th>" +
+      CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((c, i) => '<th class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + escapeHtml(c.label) + "</th>").join("") +
+      "</tr></thead>" +
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
       "</div>" +
       lastUpdatedNoteHtml() +
+      "</div>" +
       "</div>"
     );
   }
 
   function initConsolidatedRevenueSummaryPage() {
-    initConsolidatedFundTableContainer("consolidated-revenue-summary-table", renderConsolidatedRevenueSummaryTable, "consolidated revenue summary");
+    initConsolidatedFundTableContainer(
+      "consolidated-revenue-summary-table",
+      renderConsolidatedRevenueSummaryTable,
+      "consolidated revenue summary",
+      bindPriorYearsToggle
+    );
   }
 
   // "Summary of Revenues" page: a narrative + bar-chart card for each major
@@ -2834,7 +2852,7 @@
       });
   }
 
-  function initConsolidatedFundTableContainer(containerId, renderFn, errorContext) {
+  function initConsolidatedFundTableContainer(containerId, renderFn, errorContext, onMounted) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -2847,6 +2865,7 @@
           return;
         }
         container.innerHTML = renderFn();
+        if (onMounted) onMounted(container);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load " + errorContext, err);
