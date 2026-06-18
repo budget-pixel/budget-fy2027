@@ -474,6 +474,11 @@ body.sidebar-pinned-right #content {
     0 6px 16px rgba(36,52,77,0.08);
 }
 
+.wc-video-frame-cover iframe {
+  width: 104% !important;
+  height: 104% !important;
+}
+
 .eagle-springs-grill-statement-media .wc-video-frame iframe,
 .eagle-springs-statement-media .wc-video-frame iframe {
   position: absolute;

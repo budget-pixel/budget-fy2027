@@ -752,6 +752,19 @@
     });
   }
 
+  function renderSolidWasteSupplementalTables() {
+    const franchiseRows = rowsForExactDepartment(cache.expenditures, "Solid Waste")
+      .filter((r) => String(r.Object_Code || "").trim() === "534000");
+    const transferRows = rowsForExactDepartment(cache.expenditures, "Solid Waste Transfer");
+    const pieces = [
+      renderTypeSummaryTable(franchiseRows, "expense", "Waste Collection and Disposal Franchise Services", "Solid Waste"),
+      renderTypeSummaryTable(transferRows, "expense", "Interfund Transfer", "Solid Waste Transfer")
+    ].filter(Boolean);
+
+    if (!pieces.length) return "";
+    return '<section class="solid-waste-supplemental-tables">' + pieces.join("") + "</section>";
+  }
+
   function renderMosquitoStateAidTables() {
     const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
     const revenueRows = rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid");
@@ -975,7 +988,8 @@
       "department-revenue-table",
       "department-staffing-table",
       "department-machinery-table",
-      "department-state-aid-tables"
+      "department-state-aid-tables",
+      "department-solid-waste-tables"
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
@@ -992,16 +1006,21 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl] = containers;
 
         renderDepartmentNarrative(narrativeEl, deptName, deptCode);
 
         mountOrHide(performanceEl, renderPerformanceTable(getDepartmentPerformanceMeasures(deptName, deptCode)));
         bindPriorYearsToggle(performanceEl);
 
+        // The 534000 (Franchise Services) account is broken out into its own
+        // table below for Solid Waste, so exclude it here to avoid double-counting.
+        const expenseRows = getDepartmentExpenses(deptName, deptCode).filter(
+          (r) => !(normalizeDeptName(deptName) === "solid waste" && String(r.Object_Code || "").trim() === "534000")
+        );
         mountOrHide(
           expenseEl,
-          renderTypeSummaryTable(getDepartmentExpenses(deptName, deptCode), "expense", "Expenditure Summary", deptName)
+          renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName)
         );
         bindTooltipAnchors(expenseEl);
 
@@ -1019,6 +1038,12 @@
           normalizeDeptName(deptName) === "mosquito control" ? renderMosquitoStateAidTables() : ""
         );
         bindTooltipAnchors(stateAidEl);
+
+        mountOrHide(
+          solidWasteEl,
+          normalizeDeptName(deptName) === "solid waste" ? renderSolidWasteSupplementalTables() : ""
+        );
+        bindTooltipAnchors(solidWasteEl);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
