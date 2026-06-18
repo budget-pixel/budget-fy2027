@@ -317,6 +317,30 @@ body.sidebar-pinned-right #content {
   .wc-revenue-topic-chart-card, .wc-revenue-topic-narrative-card { padding: 20px; }
   .wc-revenue-topic-chart-wrap { height: 260px; }
 }
+
+#consolidated-expense-summary-table { margin-bottom: 32px; }
+.wc-expense-activity-chart-card {
+  max-width: 1180px;
+  margin: 28px auto 0;
+  padding: 24px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #f4f8f5 0%, #eef7f1 100%);
+  border: 1px solid rgba(0,98,49,.14);
+  box-shadow: 0 6px 18px rgba(0,98,49,.06);
+}
+.wc-expense-activity-chart-wrap {
+  position: relative;
+  height: 360px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+@media (max-width: 900px) {
+  .wc-expense-activity-chart-card { padding: 20px; }
+  .wc-expense-activity-chart-wrap { height: 280px; }
+}
 .wc-table-label {
   font-size: .68rem; font-weight: 800; text-transform: uppercase;
   letter-spacing: .08em; color: var(--muted); margin-bottom: 8px;

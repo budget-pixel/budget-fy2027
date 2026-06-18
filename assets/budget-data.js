@@ -1463,6 +1463,292 @@
     );
   }
 
+  // "Summary of Expenses" page: a Consolidated Expense Summary showing just
+  // the 8 functional Activity classifications (the same level of detail as
+  // the Consolidated Revenue Summary's Revenue_Type rows), followed by one
+  // narrative + stacked-bar-chart section per Activity.
+  const EXPENSE_ACTIVITY_SECTIONS = [
+    { containerId: "expense-activity-general-government", activity: "General Government" },
+    { containerId: "expense-activity-public-safety", activity: "Public Safety" },
+    { containerId: "expense-activity-physical-environment", activity: "Physical Environment" },
+    { containerId: "expense-activity-transportation", activity: "Transportation" },
+    { containerId: "expense-activity-economic-environment", activity: "Economic Environment" },
+    { containerId: "expense-activity-human-services", activity: "Human Services" },
+    { containerId: "expense-activity-culture-and-recreation", activity: "Culture and Recreation" },
+    { containerId: "expense-activity-court-related-cost", activity: "Court Related Cost", title: "Court-Related Cost" }
+  ];
+
+  function renderConsolidatedExpenseSummaryTable() {
+    // The Activity sheet has a few inconsistently-cased entries (e.g.
+    // "economic Environment"), so matching is done case-insensitively.
+    // Interfund transfers/other financing rows are reported on the Summary
+    // of Interfund Transfers page instead, same as the revenue summary
+    // excludes Revenue_Code 381000; the Self-Insurance Fund (503) is an
+    // Internal Service fund rather than a governmental one.
+    const rows = (cache.expenditures || []).filter((r) =>
+      !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r)) &&
+      !OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase())
+    );
+    if (!rows.length) return "";
+
+    const lastIndex = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.length - 1;
+    const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
+    const allMatchingRows = [];
+    const bodyRows = EXPENSE_ACTIVITY_SECTIONS.map((section) => {
+      const activityNorm = section.activity.toLowerCase();
+      const matching = rows.filter((r) => activityForDeptCode(r.Dept_Code).toLowerCase() === activityNorm);
+      allMatchingRows.push(...matching);
+      return (
+        "<tr><td>" + escapeHtml(section.title || section.activity) + "</td>" +
+        CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
+          const sum = matching.reduce((s, r) => s + (r[col.field] || 0), 0);
+          totals[i] += sum;
+          return '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(sum) + "</td>";
+        }).join("") +
+        "</tr>"
+      );
+    });
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td>Total</td>' +
+      totals.map((t, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(t) + "</td>").join("") +
+      "</tr>"
+    );
+
+    const showPrior = getShowPriorYears();
+    return (
+      '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
+      '<div class="wc-table-wrap">' +
+      '<div class="wc-table-label-row">' +
+      '<p class="wc-table-label">Consolidated Expense Summary</p>' +
+      priorYearsToggleHtml(showPrior) +
+      "</div>" +
+      '<div class="wc-data-table-scroll">' +
+      '<table class="wc-data-table">' +
+      "<thead><tr><th></th>" +
+      CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((c, i) => '<th class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + escapeHtml(c.label) + "</th>").join("") +
+      "</tr></thead>" +
+      "<tbody>" + bodyRows.join("") + "</tbody>" +
+      "</table>" +
+      "</div>" +
+      "</div>" +
+      renderExpenseDepartmentBudgetLinesFooter(allMatchingRows) +
+      "</div>"
+    );
+  }
+
+  // The Consolidated Expense Summary's "View Budget Lines" detail shows
+  // department-level subtotals (with each department's category) rather
+  // than individual object-code lines, since the visible table above is
+  // already rolled up to the 8 broad categories.
+  function renderExpenseDepartmentBudgetLinesFooter(rows) {
+    const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    const updated = '<em>Last Updated: ' + escapeHtml(stamp) + "</em>";
+    if (!rows.length) {
+      return '<div class="wc-table-footer-row"><p class="wc-data-updated-note">' + updated + "</p></div>";
+    }
+
+    budgetLinesDetailCounter += 1;
+    const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
+    const showPrior = getShowPriorYears();
+
+    function activityIndex(activity) {
+      const norm = String(activity || "").toLowerCase();
+      const idx = EXPENSE_ACTIVITY_SECTIONS.findIndex((s) => s.activity.toLowerCase() === norm);
+      return idx === -1 ? EXPENSE_ACTIVITY_SECTIONS.length : idx;
+    }
+    function activityLabel(activity) {
+      const norm = String(activity || "").toLowerCase();
+      const match = EXPENSE_ACTIVITY_SECTIONS.find((s) => s.activity.toLowerCase() === norm);
+      return match ? (match.title || match.activity) : "Other";
+    }
+
+    const sumFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    const byDept = new Map();
+    rows.forEach((r) => {
+      const name = r.Dept_Name || "Unknown";
+      if (!byDept.has(name)) {
+        const entry = { Dept_Name: name, activity: activityForDeptCode(r.Dept_Code) };
+        sumFields.forEach((f) => { entry[f] = 0; });
+        byDept.set(name, entry);
+      }
+      const entry = byDept.get(name);
+      sumFields.forEach((f) => { entry[f] += r[f] || 0; });
+    });
+
+    const deptRows = Array.from(byDept.values()).sort((a, b) => {
+      const ai = activityIndex(a.activity);
+      const bi = activityIndex(b.activity);
+      if (ai !== bi) return ai - bi;
+      return a.Dept_Name.localeCompare(b.Dept_Name);
+    });
+
+    const bodyRows = deptRows.map((d) => {
+      const isZeroCurrent = (d.FY2027_Proposed || 0) === 0;
+      return (
+        "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
+        "<td>" + escapeHtml(activityLabel(d.activity)) + "</td>" +
+        "<td>" + escapeHtml(d.Dept_Name) + "</td>" +
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+          '<td class="wc-num wc-prior-year">' + formatCurrency(d[c.field] || 0) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(d.FY2027_Proposed || 0) + "</td></tr>"
+      );
+    });
+
+    const detailTable = renderTable({
+      columns: [{ label: "Category" }, { label: "Department" }].concat(
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
+        [{ label: "FY 2027 Proposed", num: true }]
+      ),
+      bodyRows: bodyRows
+    });
+
+    const toggleHeader = priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+
+    return (
+      '<div class="wc-table-footer-row">' +
+      '<p class="wc-data-updated-note">' + updated + "</p>" +
+      '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" aria-expanded="false">View Budget Lines</button>' +
+      "</div>" +
+      '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+      toggleHeader + detailTable +
+      "</div>"
+    );
+  }
+
+  function initConsolidatedExpenseSummaryPage() {
+    initConsolidatedFundTableContainer(
+      "consolidated-expense-summary-table",
+      renderConsolidatedExpenseSummaryTable,
+      "consolidated expense summary",
+      bindPriorYearsToggle
+    );
+  }
+
+  // One narrative banner + full-width stacked-bar chart (grouped by
+  // contributing department) per expense Activity classification.
+  function renderExpenseActivityChart(container, section, idPrefix) {
+    if (!container) return;
+    const expenseRows = cache.expenditures || [];
+    const activityNorm = section.activity.toLowerCase();
+
+    container.innerHTML =
+      '<div class="wc-expense-activity-chart-card">' +
+      '<div class="wc-expense-activity-chart-wrap"><canvas id="' + idPrefix + '"></canvas></div>' +
+      '<div class="wc-revenue-chart-legend" id="' + idPrefix + '-legend"></div>' +
+      lastUpdatedNoteHtml() +
+      "</div>";
+
+    if (typeof Chart === "undefined") return;
+
+    const byDept = new Map();
+    expenseRows
+      .filter((r) =>
+        activityForDeptCode(r.Dept_Code).toLowerCase() === activityNorm &&
+        !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
+      )
+      .forEach((r) => {
+        const name = r.Dept_Name || "Unknown";
+        if (!byDept.has(name)) byDept.set(name, []);
+        byDept.get(name).push(r);
+      });
+
+    const datasets = Array.from(byDept.entries()).map(([name, rowsForName], i) => ({
+      label: name,
+      data: REVENUE_TOPIC_CHART_YEARS.map((y) => rowsForName.reduce((s, r) => s + (r[y.field] || 0), 0)),
+      backgroundColor: REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length],
+      borderRadius: 6,
+      borderSkipped: false
+    }));
+
+    const canvas = document.getElementById(idPrefix);
+    if (!canvas || !datasets.length) return;
+
+    const chart = new Chart(canvas, {
+      type: "bar",
+      data: { labels: REVENUE_TOPIC_CHART_YEARS.map((y) => y.label), datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false } },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            grid: { display: true },
+            ticks: { callback: (v) => formatAbbreviatedCurrency(v) }
+          }
+        },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: "index",
+            intersect: false,
+            callbacks: {
+              label: (ctx) => ctx.dataset.label + ": " + formatAbbreviatedCurrency(ctx.parsed.y)
+            }
+          }
+        }
+      }
+    });
+
+    const legendEl = document.getElementById(idPrefix + "-legend");
+    if (legendEl) {
+      legendEl.innerHTML = datasets.map((d, i) =>
+        '<button type="button" class="wc-revenue-chart-legend-item" data-index="' + i + '">' +
+        '<span class="wc-revenue-chart-legend-swatch" style="background:' + d.backgroundColor + '"></span>' +
+        "<span>" + escapeHtml(d.label) + "</span>" +
+        "</button>"
+      ).join("");
+
+      legendEl.querySelectorAll(".wc-revenue-chart-legend-item").forEach((item) => {
+        const i = Number(item.dataset.index);
+        item.addEventListener("mouseenter", () => {
+          chart.setActiveElements(chart.data.datasets[i].data.map((_, di) => ({ datasetIndex: i, index: di })));
+          chart.update();
+        });
+        item.addEventListener("mouseleave", () => {
+          chart.setActiveElements([]);
+          chart.update();
+        });
+        item.addEventListener("click", () => {
+          const meta = chart.getDatasetMeta(i);
+          meta.hidden = meta.hidden === null ? !chart.data.datasets[i].hidden : !meta.hidden;
+          item.classList.toggle("is-hidden", !!meta.hidden);
+          chart.update();
+        });
+      });
+    }
+  }
+
+  function initExpenseActivityChartsPage() {
+    const sections = EXPENSE_ACTIVITY_SECTIONS.filter((s) => document.getElementById(s.containerId));
+    if (!sections.length) return;
+
+    sections.forEach((s) => {
+      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+    });
+
+    loadBudgetData()
+      .then((data) => {
+        sections.forEach((s) => {
+          const container = document.getElementById(s.containerId);
+          if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+            container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+            return;
+          }
+          renderExpenseActivityChart(container, s, "wc-expense-chart-" + s.containerId);
+        });
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load expense activity charts", err);
+        sections.forEach((s) => {
+          document.getElementById(s.containerId).innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+        });
+      });
+  }
+
   // "Summary of Revenues" page: a narrative + bar-chart card for each major
   // revenue source within each classification. Narrative text comes from
   // the same departmentNarratives sheet, keyed by the topic name below
@@ -2916,6 +3202,8 @@
     initConsolidatedRevenueSummaryPage();
     initRevenueTopicCardsPage();
     initFundFinancialSchedulesPage();
+    initConsolidatedExpenseSummaryPage();
+    initExpenseActivityChartsPage();
   });
 
   window.WCBudgetData = {
