@@ -19,6 +19,51 @@ function getYearAmount(project, year){
     .reduce((sum, item) => sum + Number(item.amount_value || 0), 0);
 }
 
+function isInHouseEngineeringProject(project){
+  const title = String(project.title || "").toLowerCase();
+  const accountCode = String(project.budget_account_code || "").trim();
+
+  return Boolean(project.has_in_house_engineering) ||
+    title.includes("in-house engineering") ||
+    accountCode === "534000";
+}
+
+function renderYearScheduleTable(year, label, projects, totalLabel){
+  const total = projects.reduce((sum, project) => sum + project.year_amount_value, 0);
+
+  if(!projects.length){
+    return "";
+  }
+
+  return `
+    <div class="wc-table-wrap">
+      <p class="wc-table-label">${year} ${escapeHtml(label)}</p>
+      <div class="wc-data-table-scroll">
+        <table class="wc-data-table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th class="wc-num">${year}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${projects.map(project => `
+              <tr>
+                <td>${escapeHtml(project.title)}</td>
+                <td class="wc-num">${money(project.year_amount_value)}</td>
+              </tr>
+            `).join("")}
+            <tr class="wc-table-total-row">
+              <td>Total ${year} ${escapeHtml(totalLabel || label)}</td>
+              <td class="wc-num">${money(total)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
 function renderFundSchedule(config){
   const years = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
   const mount = document.getElementById(config.mountId);
@@ -35,8 +80,11 @@ function renderFundSchedule(config){
     const projects = (Array.isArray(projectList) ? projectList : window.wcCipProjects || [])
       .filter(project => String(project.funding || "").toLowerCase() === config.funding);
 
-    function getYearProjects(year){
-      return projects
+    const scheduleProjects = projects.filter(project => !isInHouseEngineeringProject(project));
+    const inHouseProjects = projects.filter(isInHouseEngineeringProject);
+
+    function getYearProjects(projectSource, year){
+      return projectSource
         .map(project => ({
           ...project,
           year_amount_value: getYearAmount(project, year)
@@ -46,40 +94,13 @@ function renderFundSchedule(config){
     }
 
     const tables = years.map(year => {
-      const yearProjects = getYearProjects(year);
-      const total = yearProjects.reduce((sum, project) => sum + project.year_amount_value, 0);
+      const yearProjects = getYearProjects(scheduleProjects, year);
+      const yearInHouseProjects = getYearProjects(inHouseProjects, year);
 
-      if(!yearProjects.length){
-        return "";
-      }
-
-      return `
-        <div class="wc-table-wrap">
-          <p class="wc-table-label">${year} ${escapeHtml(config.label)} Schedule</p>
-          <div class="wc-data-table-scroll">
-            <table class="wc-data-table">
-              <thead>
-                <tr>
-                  <th>Project</th>
-                  <th class="wc-num">${year}</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${yearProjects.map(project => `
-                  <tr>
-                    <td>${escapeHtml(project.title)}</td>
-                    <td class="wc-num">${money(project.year_amount_value)}</td>
-                  </tr>
-                `).join("")}
-                <tr class="wc-table-total-row">
-                  <td>Total ${year} ${escapeHtml(config.label)}</td>
-                  <td class="wc-num">${money(total)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
+      return [
+        renderYearScheduleTable(year, config.label + " Schedule", yearProjects, config.label),
+        renderYearScheduleTable(year, "In-House Engineering Schedule", yearInHouseProjects, "In-House Engineering")
+      ].join("");
     }).join("");
 
     mount.innerHTML =
