@@ -921,6 +921,47 @@
     });
   }
 
+  // "Summary of Interfund Transfers" page: the two sides of fund-to-fund
+  // transfers, each derived from a single object/revenue code rather than
+  // hand-entered. Dept_Name is used as the description since the sheets
+  // don't carry a separate transfer-purpose narrative field.
+  function renderInterfundTransferTable(rows, fundLabel, caption) {
+    if (!rows.length) return "";
+    const sorted = rows.slice().sort((a, b) => {
+      const fa = fundNameForRow(a), fb = fundNameForRow(b);
+      return fa === fb ? (a.Dept_Name || "").localeCompare(b.Dept_Name || "") : fa.localeCompare(fb);
+    });
+    let total = 0;
+    const bodyRows = sorted.map((r) => {
+      const amt = r.FY2027_Proposed || 0;
+      total += amt;
+      return (
+        "<tr><td>" + escapeHtml(fundNameForRow(r)) + "</td><td>" + escapeHtml(r.Dept_Name || "") + '</td><td class="wc-num">' + formatCurrency(amt) + "</td></tr>"
+      );
+    });
+    bodyRows.push('<tr class="wc-table-total-row"><td colspan="2">Total</td><td class="wc-num">' + formatCurrency(total) + "</td></tr>");
+    return renderTable({
+      caption: caption,
+      columns: [{ label: fundLabel }, { label: "Description" }, { label: "Amount", num: true }],
+      bodyRows: bodyRows
+    });
+  }
+
+  function renderInterfundTransfersOutTable() {
+    const rows = (cache.expenditures || []).filter((r) => String(r.Object_Code || "").trim() === "591000");
+    return renderInterfundTransferTable(rows, "Fund (Transferring Out)", "Interfund Transfers Out");
+  }
+
+  function renderInterfundTransfersInTable() {
+    const rows = (cache.revenues || []).filter((r) => String(r.Revenue_Code || "").trim() === "381000");
+    return renderInterfundTransferTable(rows, "Fund (Receiving)", "Interfund Transfers In");
+  }
+
+  function initInterfundTransfersPage() {
+    initConsolidatedFundTableContainer("interfund-transfers-out-table", renderInterfundTransfersOutTable, "interfund transfers out");
+    initConsolidatedFundTableContainer("interfund-transfers-in-table", renderInterfundTransfersInTable, "interfund transfers in");
+  }
+
   // Flags any position whose FTE changed between the prior adopted year
   // (2026) and the proposed year (2027), so the table can call out
   // staffing changes without someone having to write them up by hand.
@@ -1994,6 +2035,7 @@
     initConsolidatedFundTablesPage();
     initMachinerySummaryPage();
     initPersonnelSummaryPage();
+    initInterfundTransfersPage();
   });
 
   window.WCBudgetData = {
@@ -2016,6 +2058,8 @@
     renderConsolidatedRevenueBudgetTable,
     renderConsolidatedExpenditureBudgetTable,
     renderMachinerySummary,
-    renderPersonnelSummary
+    renderPersonnelSummary,
+    renderInterfundTransfersOutTable,
+    renderInterfundTransfersInTable
   };
 })();
