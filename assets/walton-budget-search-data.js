@@ -2,7 +2,9 @@
 
 // walton-budget-search-data.js
 
-window.wcProjectSearchBaseUrl = "https://budget-pixel.github.io/walton-cip-project-search/?view=all&v=6&q=";
+window.wcProjectSearchBaseUrl = window.location.pathname.indexOf("/pages/") !== -1
+  ? "search.html?q="
+  : "pages/search.html?q=";
 
 window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Home", section:"Introduction and Overview", href:"home.html" },

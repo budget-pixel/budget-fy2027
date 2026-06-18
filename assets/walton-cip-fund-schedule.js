@@ -21,55 +21,71 @@ function getYearAmount(project, year){
 
 function renderFundSchedule(config){
   const years = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
-  const projects = wcCipProjects.filter(project => String(project.funding || "").toLowerCase() === config.funding);
+  const mount = document.getElementById(config.mountId);
 
-  function getYearProjects(year){
-    return projects
-      .map(project => ({
-        ...project,
-        year_amount_value: getYearAmount(project, year)
-      }))
-      .filter(project => project.year_amount_value > 0)
-      .sort((a, b) => b.year_amount_value - a.year_amount_value || a.title.localeCompare(b.title));
+  if(!mount){
+    return;
   }
 
-  const tables = years.map(year => {
-    const yearProjects = getYearProjects(year);
-    const total = yearProjects.reduce((sum, project) => sum + project.year_amount_value, 0);
+  mount.innerHTML = '<div class="wc-data-loading">Loading capital schedule...</div>';
 
-    if(!yearProjects.length){
-      return "";
+  const ready = window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || []);
+
+  ready.then(projectList => {
+    const projects = (Array.isArray(projectList) ? projectList : window.wcCipProjects || [])
+      .filter(project => String(project.funding || "").toLowerCase() === config.funding);
+
+    function getYearProjects(year){
+      return projects
+        .map(project => ({
+          ...project,
+          year_amount_value: getYearAmount(project, year)
+        }))
+        .filter(project => project.year_amount_value > 0)
+        .sort((a, b) => b.year_amount_value - a.year_amount_value || a.title.localeCompare(b.title));
     }
 
-    return `
-      <div class="wc-table-wrap">
-        <p class="wc-table-label">${year} ${escapeHtml(config.label)} Schedule</p>
-        <div class="wc-data-table-scroll">
-          <table class="wc-data-table">
-            <thead>
-              <tr>
-                <th>Project</th>
-                <th class="wc-num">${year}</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${yearProjects.map(project => `
-                <tr>
-                  <td>${escapeHtml(project.title)}</td>
-                  <td class="wc-num">${money(project.year_amount_value)}</td>
-                </tr>
-              `).join("")}
-              <tr class="wc-table-total-row">
-                <td>Total ${year} ${escapeHtml(config.label)}</td>
-                <td class="wc-num">${money(total)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }).join("");
+    const tables = years.map(year => {
+      const yearProjects = getYearProjects(year);
+      const total = yearProjects.reduce((sum, project) => sum + project.year_amount_value, 0);
 
-  document.getElementById(config.mountId).innerHTML =
-    tables || `<p class="wc-data-empty">No ${escapeHtml(config.label)} projects found.</p>`;
+      if(!yearProjects.length){
+        return "";
+      }
+
+      return `
+        <div class="wc-table-wrap">
+          <p class="wc-table-label">${year} ${escapeHtml(config.label)} Schedule</p>
+          <div class="wc-data-table-scroll">
+            <table class="wc-data-table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th class="wc-num">${year}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${yearProjects.map(project => `
+                  <tr>
+                    <td>${escapeHtml(project.title)}</td>
+                    <td class="wc-num">${money(project.year_amount_value)}</td>
+                  </tr>
+                `).join("")}
+                <tr class="wc-table-total-row">
+                  <td>Total ${year} ${escapeHtml(config.label)}</td>
+                  <td class="wc-num">${money(total)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    mount.innerHTML =
+      tables || `<p class="wc-data-empty">No ${escapeHtml(config.label)} projects found.</p>`;
+  }).catch(error => {
+    console.error("Walton CIP: failed to render capital schedule", error);
+    mount.innerHTML = `<p class="wc-data-empty">Capital schedule data could not be loaded.</p>`;
+  });
 }

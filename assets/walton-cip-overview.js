@@ -39,9 +39,12 @@ function escapeHtml(value){
 }
 
 function getFilteredProjects(){
-  return wcCipProjects.filter(project => {
+  const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
+
+  return projects.filter(project => {
     const department = String(project.dept || project.department || "").toLowerCase();
     const target = String(project.target || "").toLowerCase();
+    const targetYears = Array.isArray(project.target_years) ? project.target_years.join(" ").toLowerCase() : "";
     const funding = String(project.funding || "").toLowerCase();
 
     const content = [
@@ -67,7 +70,8 @@ function getFilteredProjects(){
 
     const matchesYear =
       filters.year === "all" ||
-      target.includes(filters.year);
+      target.includes(filters.year) ||
+      targetYears.includes(filters.year);
 
     const matchesFund =
       filters.fund === "all" ||
@@ -2071,4 +2075,21 @@ function renderProjects(){
   });
 }
 
-renderProjects();
+function initProjects(){
+  if(!app){
+    return;
+  }
+
+  app.innerHTML = '<div class="wc-data-loading">Loading capital project data...</div>';
+
+  const ready = window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || []);
+
+  ready.then(() => {
+    renderProjects();
+  }).catch(error => {
+    console.error("Walton CIP: failed to initialize project search", error);
+    app.innerHTML = '<div class="wc-project-empty">Capital project data could not be loaded.</div>';
+  });
+}
+
+initProjects();

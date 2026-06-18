@@ -331,24 +331,25 @@ function renderOverviewBadges(project){
   `;
 }
 
-const params = new URLSearchParams(window.location.search);
+function renderProjectPage(){
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("project");
+  const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
+  const project = projects.find(p => p.slug === slug);
+  const backHref = buildBackHref();
 
-const slug = params.get("project");
+  if(!project){
 
-const project = wcCipProjects.find(p => p.slug === slug);
-const backHref = buildBackHref();
+    app.innerHTML = `
+      <div class="wc-project-not-found">
+        <h1>Project Not Found</h1>
+        <p>The requested project could not be located.</p>
+        <p><a class="wc-project-back" href="${backHref}">&larr; Back to Project Index</a></p>
+      </div>
+    `;
 
-if(!project){
-
-  app.innerHTML = `
-    <div class="wc-project-not-found">
-      <h1>Project Not Found</h1>
-      <p>The requested project could not be located.</p>
-      <p><a class="wc-project-back" href="${backHref}">← Back to Project Index</a></p>
-    </div>
-  `;
-
-}else{
+    return;
+  }
 
   const category = getProjectValue(project,["category_label","category"]);
   const title = getProjectValue(project,["title"],"Untitled Project");
@@ -368,7 +369,7 @@ if(!project){
     <main class="wc-project-page">
 
       <div class="wc-project-actions">
-        <a class="wc-project-back" href="${backHref}">← Back to Project Search</a>
+        <a class="wc-project-back" href="${backHref}">&larr; Back to Project Search</a>
       </div>
 
       <section class="wc-project-hero">
@@ -435,7 +436,7 @@ if(!project){
 
       <div id="wcProjectLightbox" class="wc-project-lightbox" aria-hidden="true" onclick="if(event.target === this){ closeProjectLightbox(); }">
         <div class="wc-project-lightbox-inner">
-          <button class="wc-project-lightbox-close" type="button" aria-label="Close image" onclick="closeProjectLightbox()">×</button>
+          <button class="wc-project-lightbox-close" type="button" aria-label="Close image" onclick="closeProjectLightbox()">x</button>
           <img id="wcProjectLightboxImage" src="" alt="">
           <div id="wcProjectLightboxCaption" class="wc-project-lightbox-caption"></div>
         </div>
@@ -445,3 +446,21 @@ if(!project){
 
 }
 
+function initProjectPage(){
+  if(!app){
+    return;
+  }
+
+  app.innerHTML = '<div class="wc-data-loading">Loading capital project...</div>';
+
+  const ready = window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || []);
+
+  ready.then(() => {
+    renderProjectPage();
+  }).catch(error => {
+    console.error("Walton CIP: failed to initialize project detail", error);
+    app.innerHTML = '<div class="wc-project-not-found"><h1>Project Not Found</h1><p>Capital project data could not be loaded.</p></div>';
+  });
+}
+
+initProjectPage();

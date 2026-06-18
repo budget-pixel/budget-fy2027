@@ -62,8 +62,13 @@
 
     var links = [];
     var seenHrefs = {};
-    var wcProjectSearchBaseUrl = window.wcProjectSearchBaseUrl || "https://budget-pixel.github.io/walton-cip-project-search/?view=all&v=6&q=";
-    var wcCipAssetBaseUrl = window.wcCipAssetBaseUrl || "https://budget-pixel.github.io/walton-cip-project-search/";
+    var wcProjectSearchBaseUrl = window.wcProjectSearchBaseUrl || (window.location.pathname.indexOf("/pages/") !== -1 ? "search.html?q=" : "pages/search.html?q=");
+    var wcCipAssetBaseUrl = window.wcBudgetAssetBaseUrl || window.wcCipAssetBaseUrl || (window.location.pathname.indexOf("/pages/") !== -1 ? "../assets/" : "assets/");
+
+    function getLocalProjectHref(projectSlug){
+      var detailPage = window.location.pathname.indexOf("/pages/") !== -1 ? "cip-project.html" : "pages/cip-project.html";
+      return detailPage + "?project=" + encodeURIComponent(projectSlug);
+    }
 
     function isMobileNav(){
       return window.matchMedia && window.matchMedia("(max-width:768px)").matches;
@@ -175,15 +180,9 @@
     }
 
     function getLoadedProjects(){
-      if(window.wcProjects && Array.isArray(window.wcProjects)){
-        return window.wcProjects;
+      if(window.wcCipProjects && Array.isArray(window.wcCipProjects)){
+        return window.wcCipProjects;
       }
-
-      try{
-        if(typeof wcProjects !== "undefined" && Array.isArray(wcProjects)){
-          return wcProjects;
-        }
-      }catch(e){}
 
       return [];
     }
@@ -226,7 +225,7 @@
         var projectHref = "";
 
         if(projectSlug){
-          projectHref = "https://budget-pixel.github.io/walton-cip-project-search/project.html?project=" + encodeURIComponent(projectSlug);
+          projectHref = getLocalProjectHref(projectSlug);
         }else{
           projectHref = getProjectValue(project, [
             "href",
@@ -307,12 +306,22 @@
       addSearchLink(page.title, page.section, page.href, pageSearchText);
     });
 
-    var projectScript = document.createElement("script");
-    projectScript.src = wcCipAssetBaseUrl + "projects.js?v=6";
-    projectScript.onload = function(){
-      loadProjectSearchData();
-    };
-    document.head.appendChild(projectScript);
+    function loadProjectsWhenReady(){
+      var ready = window.wcCipProjectsReady || Promise.resolve(getLoadedProjects());
+      ready.then(loadProjectSearchData).catch(function(error){
+        console.error("Walton budget search: failed to load CIP projects", error);
+      });
+    }
+
+    if(window.wcCipProjectsReady || getLoadedProjects().length){
+      loadProjectsWhenReady();
+    }else{
+      var projectScript = document.createElement("script");
+      projectScript.id = "wc-cip-projects-loader";
+      projectScript.src = wcCipAssetBaseUrl + "walton-cip-projects.js?v=7";
+      projectScript.onload = loadProjectsWhenReady;
+      document.head.appendChild(projectScript);
+    }
 
     if(searchBox){
       searchBox.addEventListener("click", function(e){
