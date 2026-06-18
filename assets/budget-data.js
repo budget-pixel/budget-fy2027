@@ -39,7 +39,8 @@
     "tourism lifeguard services and beach safety": ["south walton fire lifeguard services"],
     "south walton fire and state control": ["south walton fire district", "state fire control"],
     "code compliance": ["code compliance beach", "code compliance street"],
-    "libraries": ["county libraries"]
+    "libraries": ["county libraries"],
+    "planning": ["planning short term rental"]
   };
 
   // Hover-tip copy for each budget category, shown via the same
@@ -590,8 +591,7 @@
   // Department-page expense/revenue tables: rolled up to category level
   // (Personnel Services, Operating Expenditures, Capital Outlay, etc.)
   // rather than individual object/revenue codes.
-  function renderTypeSummaryTable(rows, kind, caption) {
-    if (!rows.length) return "";
+  function renderTypeSummaryGroup(rows, kind, caption) {
     const isExpense = kind === "expense";
     const typeField = isExpense ? "Object_Type" : "Revenue_Type";
     const typeLabel = isExpense ? "Object Type" : "Revenue Type";
@@ -616,6 +616,27 @@
       columns: [{ label: typeLabel }, { label: "FY 2027 Proposed", num: true }],
       bodyRows: bodyRows
     });
+  }
+
+  // When a department's rows span more than one distinct Dept_Name (e.g.
+  // "Planning" includes a separately tracked "Planning Short-Term Rental"
+  // program), render one labeled table per sub-program instead of merging
+  // them into a single combined summary. The page's own department keeps
+  // the original caption (e.g. "Expenditure Summary"); other groups are
+  // captioned with their own Dept_Name.
+  function renderTypeSummaryTable(rows, kind, caption, deptName) {
+    if (!rows.length) return "";
+    const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
+    if (groupNames.length <= 1) {
+      return renderTypeSummaryGroup(rows, kind, caption);
+    }
+    const norm = normalizeDeptName(deptName || "");
+    return groupNames
+      .map((name) => {
+        const groupCaption = normalizeDeptName(name) === norm ? caption : name;
+        return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption);
+      })
+      .join("");
   }
 
   // Flags any position whose FTE changed between the prior adopted year
@@ -735,8 +756,8 @@
     const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
     const revenueRows = rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid");
     const pieces = [
-      renderTypeSummaryTable(expenseRows, "expense", "Mosquito Control State Aid Expenditure Summary"),
-      renderTypeSummaryTable(revenueRows, "revenue", "Mosquito Control State Aid Revenue Summary")
+      renderTypeSummaryTable(expenseRows, "expense", "Mosquito Control State Aid Expenditure Summary", "Mosquito Control State Aid"),
+      renderTypeSummaryTable(revenueRows, "revenue", "Mosquito Control State Aid Revenue Summary", "Mosquito Control State Aid")
     ].filter(Boolean);
 
     if (!pieces.length) return "";
@@ -980,13 +1001,13 @@
 
         mountOrHide(
           expenseEl,
-          renderTypeSummaryTable(getDepartmentExpenses(deptName, deptCode), "expense", "Expenditure Summary")
+          renderTypeSummaryTable(getDepartmentExpenses(deptName, deptCode), "expense", "Expenditure Summary", deptName)
         );
         bindTooltipAnchors(expenseEl);
 
         mountOrHide(
           revenueEl,
-          renderTypeSummaryTable(getDepartmentRevenues(deptName, deptCode), "revenue", "Revenue Summary")
+          renderTypeSummaryTable(getDepartmentRevenues(deptName, deptCode), "revenue", "Revenue Summary", deptName)
         );
         bindTooltipAnchors(revenueEl);
 
