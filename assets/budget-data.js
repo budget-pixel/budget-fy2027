@@ -31,11 +31,10 @@
     "purchasing": ["procurement"],
     "court technology and innovations": [
       "court technology court administration",
-      "court technology public defender",
       "court technology state attorney",
-      "court technology",
-      "court innovations"
+      "court technology"
     ],
+    "public defender": ["court technology public defender"],
     "statutory and other agency funding": ["statutory and other agency fund"],
     "south walton fire and state control": ["south walton fire district", "state fire control"],
     "code compliance": ["code compliance beach", "code compliance street"],
@@ -552,6 +551,16 @@
 
   // ---- rendering primitives ----
 
+  function priorYearsToggleHtml(showPrior, extraWrapClass) {
+    const label =
+      '<label class="wc-fy-column-toggle-label">' +
+      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" aria-label="View Prior Years" ' +
+      (showPrior ? "checked" : "") + " />" +
+      '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
+      "</label>";
+    return '<div class="wc-fy-column-toggle-wrap' + (extraWrapClass ? " " + extraWrapClass : "") + '">' + label + "</div>";
+  }
+
   function renderNotesHtml(title, notes) {
     if (!notes || !notes.length) return "";
     return (
@@ -566,34 +575,57 @@
   // The expandable "View Budget Lines" detail under an Expenditure Summary
   // table: every individual object-code line behind that table's rolled-up
   // totals, including any itemized sub-account (Project_Name) and Note.
+  const BUDGET_LINE_PRIOR_YEAR_COLUMNS = [
+    { field: "FY2020_Actual", label: "FY 2020 Actual" },
+    { field: "FY2021_Actual", label: "FY 2021 Actual" },
+    { field: "FY2022_Actual", label: "FY 2022 Actual" },
+    { field: "FY2023_Actual", label: "FY 2023 Actual" },
+    { field: "FY2024_Actual", label: "FY 2024 Actual" },
+    { field: "FY2025_Actual", label: "FY 2025 Actual" },
+    { field: "FY2026_Budget", label: "FY 2026 Budget" }
+  ];
+
   function renderBudgetLinesToggle(rows) {
     if (!rows || !rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
+    const showPrior = getShowPriorYears();
 
     const bodyRows = rows
       .slice()
       .sort((a, b) => String(a.Object_Code || "").localeCompare(String(b.Object_Code || "")))
-      .map((r) =>
-        "<tr><td>" + escapeHtml(r.Object_Code || "") + "</td>" +
-        "<td>" + escapeHtml(r.Object_Name || "") + "</td>" +
-        "<td>" + escapeHtml(r.Note || "") + "</td>" +
-        '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
-      );
+      .map((r) => {
+        const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
+        return (
+          "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
+          "<td>" + escapeHtml(r.Object_Code || "") + "</td>" +
+          "<td>" + escapeHtml(r.Object_Name || "") + "</td>" +
+          "<td>" + escapeHtml(r.Note || "") + "</td>" +
+          BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+            '<td class="wc-num wc-prior-year">' + formatCurrency(r[c.field] || 0) + "</td>"
+          ).join("") +
+          '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
+        );
+      });
 
     const detailTable = renderTable({
       columns: [
         { label: "Object Code" },
         { label: "Object Name" },
-        { label: "Itemized Description" },
-        { label: "FY 2027 Proposed", num: true }
-      ],
+        { label: "Itemized Description" }
+      ].concat(
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
+        [{ label: "FY 2027 Proposed", num: true }]
+      ),
       bodyRows: bodyRows
     });
 
+    const toggleHeader = priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" aria-expanded="false">View Budget Lines</button>',
-      detail: '<div class="wc-budget-lines-detail" id="' + detailId + '" hidden>' + detailTable + "</div>"
+      detail: '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+        toggleHeader + detailTable + "</div>"
     };
   }
 
@@ -619,13 +651,20 @@
     const columns = options.columns || [];
     const bodyRows = options.bodyRows || [];
     if (!bodyRows.length) return "";
+    const captionHtml = options.caption ? '<p class="wc-table-label">' + escapeHtml(options.caption) + "</p>" : "";
+    const headerHtml = options.toggleHtml
+      ? '<div class="wc-table-label-row">' + captionHtml + options.toggleHtml + "</div>"
+      : captionHtml;
     return (
       '<div class="wc-data-table-wrap">' +
-      (options.caption ? '<p class="wc-table-label">' + escapeHtml(options.caption) + "</p>" : "") +
+      headerHtml +
       '<div class="wc-data-table-scroll">' +
       '<table class="wc-data-table">' +
       "<thead><tr>" +
-      columns.map((c) => '<th class="' + (c.num ? "wc-num" : "") + '">' + escapeHtml(c.label) + "</th>").join("") +
+      columns.map((c) => {
+        const classes = (c.num ? ["wc-num"] : []).concat(c.classes || []);
+        return '<th class="' + classes.join(" ") + '">' + escapeHtml(c.label) + "</th>";
+      }).join("") +
       "</tr></thead>" +
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
@@ -723,30 +762,57 @@
     const typeField = isExpense ? "Object_Type" : "Revenue_Type";
     const typeLabel = isExpense ? "Object Type" : "Revenue Type";
 
+    const yearFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
     const totalsByType = new Map();
-    let grandTotal = 0;
+    const grandTotals = {};
+    yearFields.forEach((f) => { grandTotals[f] = 0; });
     rows.forEach((r) => {
       const type = r[typeField] || "Other";
-      const amt = r.FY2027_Proposed || 0;
-      totalsByType.set(type, (totalsByType.get(type) || 0) + amt);
-      grandTotal += amt;
+      const totals = totalsByType.get(type) || {};
+      yearFields.forEach((f) => {
+        const amt = r[f] || 0;
+        totals[f] = (totals[f] || 0) + amt;
+        grandTotals[f] += amt;
+      });
+      totalsByType.set(type, totals);
     });
 
     const bodyRows = Array.from(totalsByType.entries())
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([type, amt]) => "<tr>" + categoryCellHtml(type, isExpense) + '<td class="wc-num">' + formatCurrency(amt) + "</td></tr>");
+      .map(([type, totals]) =>
+        "<tr" + (totals.FY2027_Proposed === 0 ? ' class="wc-budget-line-zero-current"' : "") + ">" +
+        categoryCellHtml(type, isExpense) +
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+          '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
+      );
 
-    bodyRows.push('<tr class="wc-table-total-row"><td>Total</td><td class="wc-num">' + formatCurrency(grandTotal) + "</td></tr>");
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td>Total</td>' +
+      BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+        '<td class="wc-num wc-prior-year">' + formatCurrency(grandTotals[c.field]) + "</td>"
+      ).join("") +
+      '<td class="wc-num">' + formatCurrency(grandTotals.FY2027_Proposed) + "</td></tr>"
+    );
 
+    const showPrior = getShowPriorYears();
     const table = renderTable({
       caption: caption,
-      columns: [{ label: typeLabel }, { label: "FY 2027 Proposed", num: true }],
+      columns: [{ label: typeLabel }]
+        .concat(BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })))
+        .concat([{ label: "FY 2027 Proposed", num: true }]),
       bodyRows: bodyRows,
-      notes: notes
+      notes: notes,
+      toggleHtml: isExpense ? priorYearsToggleHtml(showPrior) : ""
     });
     if (!table) return "";
 
-    return table + renderTableFooterRow(isExpense ? rows : null);
+    return (
+      '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
+      table + renderTableFooterRow(isExpense ? rows : null) +
+      "</div>"
+    );
   }
 
   // A single row right under a table: the "Last Updated" stamp on the
@@ -1515,6 +1581,48 @@
     return '<section class="bcc-supplemental-tables">' + piece + "</section>";
   }
 
+  // The Court Innovation FTE (Project 1040) is budgeted under the Board of
+  // County Commissioners' Dept_Code rather than its own Dept_Name, and the
+  // court-ordinance distributions (Law Library, Juvenile Justice, Legal
+  // Aid, Innovative Program) are booked under a "Court Innovations"
+  // Dept_Name that shares that same Dept_Code — neither gets picked up by
+  // this page's normal Dept_Name alias matching. Both pools fund the same
+  // statutory program, so they're combined into one rolled-up table here
+  // rather than shown as two separate "Court Innovations" breakdowns.
+  function renderCourtInnovationsSupplementalTables() {
+    const rows = (cache.expenditures || []).filter(
+      (r) =>
+        (r.Dept_Code === "00101000" && r.Project_Code === "1040") ||
+        normalizeDeptName(r.Dept_Name) === "court innovations"
+    );
+    const expensePiece = renderTypeSummaryGroup(rows, "expense", "Expenditure Summary");
+
+    // The $65 court cost itself (Additional Court Cost — Law Library,
+    // Juvenile Justice, Legal Aid, Innovative Programs) is booked under
+    // Dept_Name "Court Innovation" (singular) in the revenues sheet.
+    const revenueRows = (cache.revenues || []).filter(
+      (r) => normalizeDeptName(r.Dept_Name) === "court innovation"
+    );
+    const revenuePiece = renderTypeSummaryGroup(revenueRows, "revenue", "Revenue Summary");
+
+    if (!expensePiece && !revenuePiece) return "";
+
+    const narrativeRows = cache.departmentNarratives || [];
+    const narrativeRow = narrativeRows.find((r) => normalizeDeptName(r.Dept_Name) === normalizeDeptName("Court Innovations"));
+    const narrativeHtml = narrativeRow && narrativeRow.Narrative
+      ? splitIntoParagraphs(narrativeRow.Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("")
+      : "";
+
+    return (
+      '<section class="court-innovations-supplemental-tables statement-of-function content-section">' +
+      "<h2>Court Innovations</h2>" +
+      narrativeHtml +
+      "</section>" +
+      expensePiece +
+      revenuePiece
+    );
+  }
+
   // Tourism Administration's page combines five separately budgeted
   // divisions that each have their own rows in the sheets (and, across
   // sheets, sometimes a slightly different spelling of the same division).
@@ -1876,7 +1984,7 @@
   }
 
   function applyPriorYearsState(checked) {
-    document.querySelectorAll(".wc-performance-card, .wc-staffing-card").forEach((card) => {
+    document.querySelectorAll(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card").forEach((card) => {
       card.classList.toggle("show-prior-years", checked);
     });
     document.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((cb) => {
@@ -1934,6 +2042,34 @@
       return;
     }
     container.hidden = false;
+
+    // "Court Innovations" gets its own dedicated section further down the
+    // page (next to the Project 1040 budget it funds), so it's excluded
+    // here to avoid showing that narrative twice.
+    if (normalizeDeptName(deptName) === "court technology and innovations") {
+      const rows = rowsForDepartment(cache.departmentNarratives, deptName, deptCode)
+        .filter((r) => r.Narrative && r.Narrative.trim() && normalizeDeptName(r.Dept_Name) !== "court innovations");
+      const seen = new Set();
+      const filteredParagraphs = [];
+      rows.forEach((r) => {
+        const text = r.Narrative.trim();
+        if (!seen.has(text)) {
+          seen.add(text);
+          filteredParagraphs.push(...splitIntoParagraphs(text));
+        }
+      });
+      if (!filteredParagraphs.length) {
+        container.innerHTML = "";
+        container.hidden = true;
+        return;
+      }
+      container.innerHTML =
+        '<section class="statement-of-function content-section">' +
+        "<h2>Court Technology - Court Administration</h2>" +
+        filteredParagraphs.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
+        "</section>";
+      return;
+    }
 
     if (normalizeDeptName(deptName) === "libraries") {
       const introParagraphs = paragraphs.slice(0, 2);
@@ -1995,7 +2131,8 @@
       "department-state-aid-tables",
       "department-solid-waste-tables",
       "department-building-construction-tables",
-      "department-bcc-tables"
+      "department-bcc-tables",
+      "department-court-innovations-tables"
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
@@ -2012,7 +2149,7 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl, courtInnovationsEl] = containers;
 
         // Some pages combine several separately budgeted divisions; for
         // those, narrative/expenditures/revenue/staffing/machinery (and,
@@ -2040,6 +2177,7 @@
           mountOrHide(solidWasteEl, "");
           mountOrHide(buildingConstructionEl, "");
           mountOrHide(bccEl, "");
+          mountOrHide(courtInnovationsEl, "");
           return;
         }
 
@@ -2051,6 +2189,7 @@
           mountOrHide(narrativeEl, renderTourismLifeguardIntro());
           mountOrHide(expenseEl, renderTourismLifeguardSections());
           bindTooltipAnchors(expenseEl);
+          bindPriorYearsToggle(expenseEl);
           mountOrHide(revenueEl, "");
           mountOrHide(staffingEl, "");
           mountOrHide(machineryEl, "");
@@ -2058,6 +2197,7 @@
           mountOrHide(solidWasteEl, "");
           mountOrHide(buildingConstructionEl, "");
           mountOrHide(bccEl, "");
+          mountOrHide(courtInnovationsEl, "");
           return;
         }
 
@@ -2075,12 +2215,14 @@
           renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName)
         );
         bindTooltipAnchors(expenseEl);
+        bindPriorYearsToggle(expenseEl);
 
         mountOrHide(
           revenueEl,
           renderTypeSummaryTable(getDepartmentRevenues(deptName, deptCode), "revenue", "Revenue Summary", deptName)
         );
         bindTooltipAnchors(revenueEl);
+        bindPriorYearsToggle(revenueEl);
 
         mountOrHide(staffingEl, renderStaffingTable(getDepartmentStaffing(deptName, deptCode)));
         bindPriorYearsToggle(staffingEl);
@@ -2096,6 +2238,7 @@
           normalizeDeptName(deptName) === "solid waste" ? renderSolidWasteSupplementalTables() : ""
         );
         bindTooltipAnchors(solidWasteEl);
+        bindPriorYearsToggle(solidWasteEl);
 
         mountOrHide(
           buildingConstructionEl,
@@ -2104,6 +2247,7 @@
             : ""
         );
         bindTooltipAnchors(buildingConstructionEl);
+        bindPriorYearsToggle(buildingConstructionEl);
 
         mountOrHide(
           bccEl,
@@ -2112,6 +2256,16 @@
             : ""
         );
         bindTooltipAnchors(bccEl);
+        bindPriorYearsToggle(bccEl);
+
+        mountOrHide(
+          courtInnovationsEl,
+          normalizeDeptName(deptName) === "court technology and innovations"
+            ? renderCourtInnovationsSupplementalTables()
+            : ""
+        );
+        bindTooltipAnchors(courtInnovationsEl);
+        bindPriorYearsToggle(courtInnovationsEl);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);

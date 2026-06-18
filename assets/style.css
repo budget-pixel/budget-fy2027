@@ -1176,6 +1176,7 @@ body.sidebar-pinned-right #content {
 }
 
 #department-expense-table { margin-top: 32px; }
+.court-innovations-supplemental-tables { margin-top: 32px; }
 
 .wc-data-table-wrap { margin: 24px 0; }
 .wc-data-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
@@ -1189,6 +1190,7 @@ body.sidebar-pinned-right #content {
   color: #fff; font-weight: 700; border-bottom: 3px solid var(--gold);
 }
 .wc-data-table tbody tr:hover td { background: rgba(0,98,49,.05); }
+.wc-data-table tbody tr.wc-table-total-row:hover td { background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%); }
 .wc-data-table tr.wc-table-group-row td {
   background: var(--light); color: var(--navy); font-weight: 800;
   text-transform: uppercase; font-size: .72rem; letter-spacing: .04em;
@@ -1214,12 +1216,19 @@ body.sidebar-pinned-right #content {
 .wc-staffing-card:not(.show-prior-years) .wc-staffing-table tr.wc-staffing-zero-current {
   display: none;
 }
-.wc-staffing-card .wc-fy-column-toggle-wrap {
+.wc-staffing-card .wc-fy-column-toggle-wrap,
+.wc-table-label-row .wc-fy-column-toggle-wrap {
   position: static !important;
   width: auto !important;
   height: 20px !important;
   flex: 0 0 auto !important;
   margin: 0 !important;
+}
+.wc-fy-column-toggle-wrap.wc-budget-lines-detail-header {
+  position: static !important;
+  width: fit-content !important;
+  height: 20px !important;
+  margin: 0 0 8px auto !important;
 }
 .wc-staffing-notes {
   margin-top: 10px;
@@ -1269,6 +1278,8 @@ body.sidebar-pinned-right #content {
 }
 .wc-budget-lines-detail .wc-data-table { font-size: .68rem; }
 .wc-budget-lines-detail .wc-data-table th, .wc-budget-lines-detail .wc-data-table td { padding: 6px 8px; }
+.wc-budget-lines-card:not(.show-prior-years) .wc-data-table .wc-prior-year { display: none; }
+.wc-budget-lines-card:not(.show-prior-years) .wc-data-table tr.wc-budget-line-zero-current { display: none; }
 
 .wc-filter-bar {
   display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
