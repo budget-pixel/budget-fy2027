@@ -134,29 +134,117 @@
 <h1 class="page-title">Sheriff's Office</h1>
 
 <div id="department-narrative"></div>
+<style>
+  .wc-image-card{
+    max-width:1200px;
+    margin:0 auto;
+    padding:12px;
+    background:#ffffff;
+    border:3px solid #d1be78;
+    border-radius:28px;
+    box-shadow:
+      0 12px 40px rgba(0,0,0,0.10),
+      0 4px 12px rgba(0,0,0,0.06),
+      0 0 0 1px rgba(209,190,120,0.35);
+    box-sizing:border-box;
+  }
+
+  #wso-header-slideshow{
+    position:relative;
+    width:100%;
+    height:420px;
+    overflow:hidden;
+    border-radius:18px;
+  }
+
+  #wso-header-slideshow img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0;
+    transition:opacity 1.2s ease-in-out;
+  }
+
+  #wso-header-slideshow img.is-active{
+    opacity:1;
+  }
+
+  .wso-header-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+    z-index:1;
+  }
+
+  .wso-header-title{
+    position:absolute;
+    left:24px;
+    bottom:20px;
+    z-index:2;
+  }
+
+  .wso-header-title h2{
+    margin:0;
+    color:#ffffff;
+    font-size:28px;
+    font-weight:800;
+    text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  @media (max-width: 768px){
+    .wc-image-card{
+      max-width:100%;
+      padding:8px;
+      border-width:2px;
+      border-radius:20px;
+      margin:0 12px;
+    }
+
+    #wso-header-slideshow{
+      height:240px;
+      border-radius:12px;
+    }
+
+    .wso-header-title h2{
+      font-size:20px;
+    }
+  }
+</style>
+<div class="wc-image-card">
+  <div id="wso-header-slideshow">
+    <img class="is-active" src="https://waltonso.org/wp-content/uploads/2025/04/Cardenas-Cover-2048x840.jpg" alt="Hispanic male deputy standing in front of patrol car smiling">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/Karen-and-Rushane-Cover-2048x840.jpg" alt="Karen and Rushane Cover">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/Dispatcher-Cover-2048x840.jpg" alt="Dispatcher with headset">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/WAR-Cover-2048x840.jpg" alt="Flight paramedics by helicopter">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/Jail-Cover-2048x840.jpg" alt="Jail Operations">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/Vet-Tech-Cover-2048x840.jpg" alt="Vet tech holding kitten">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/Posse-Cover-2048x840.jpg" alt="Sheriff posse member">
+    <img src="https://waltonso.org/wp-content/uploads/2025/04/Sheriff-Cover-2048x840.jpg" alt="Sheriff at desk">
+    <div class="wso-header-overlay"></div>
+    <div class="wso-header-title">
+      <h2>Walton County Sheriff's Office</h2>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    var slides = document.querySelectorAll("#wso-header-slideshow img");
+    if (slides.length < 2) return;
+    var current = 0;
+    setInterval(function () {
+      slides[current].classList.remove("is-active");
+      current = (current + 1) % slides.length;
+      slides[current].classList.add("is-active");
+    }, 4000);
+  })();
+</script>
 <div id="department-performance-table"></div>
 <div id="department-expense-table"></div>
 <div id="department-revenue-table"></div>
 <div id="department-staffing-table"></div>
 <div id="department-machinery-table"></div>
-<section class="wso-header-shell contains-media-block">
-  <div class="wso-header-container">
-    <div id="wso-header-slideshow">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Cardenas-Cover-2048x840.jpg" alt="Hispanic male deputy standing in front of patrol car smiling">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Karen-and-Rushane-Cover-2048x840.jpg" alt="Karen and Rushane Cover">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Dispatcher-Cover-2048x840.jpg" alt="Dispatcher with headset">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/WAR-Cover-2048x840.jpg" alt="Flight paramedics by helicopter">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Jail-Cover-2048x840.jpg" alt="Jail Operations">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Vet-Tech-Cover-2048x840.jpg" alt="Vet tech holding kitten">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Posse-Cover-2048x840.jpg" alt="Sheriff posse member">
-      <img src="https://waltonso.org/wp-content/uploads/2025/04/Sheriff-Cover-2048x840.jpg" alt="Sheriff at desk">
-      <div class="wso-header-overlay"></div>
-      <div class="wso-header-title">
-        <h2>Walton County Sheriff's Office</h2>
-      </div>
-    </div>
-  </div>
-</section>
 
 <nav class="page-nav" aria-label="Page navigation">
   <a class="prev" href="property-appraiser.html">Property Appraiser</a>
