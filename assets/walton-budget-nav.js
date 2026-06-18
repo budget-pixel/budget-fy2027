@@ -1457,6 +1457,7 @@
       footer.insertBefore(footerContainer, footer.firstChild);
     }
     var hasOpenGovNav = !!document.querySelector('nav#nav-menu.nav-menu');
+    var budgetPagePrefix = /\/pages\//.test(window.location.pathname) ? "" : "pages/";
     var desiredFooterHtml = `
       <div class="wc-budget-footer-inner">
         <div class="wc-budget-footer-brand" aria-label="Walton County">
@@ -1464,10 +1465,10 @@
         </div>
         ${hasOpenGovNav ? `
         <nav class="wc-budget-footer-links" aria-label="Budget footer links">
-          <a href="home.html">Home</a>
-          <a href="${wcCipProjectSearchUrl}">Capital Improvement Plan</a>
-          <a href="${wcCipProjectSearchUrl}" target="_blank" rel="noopener noreferrer">Project Search</a>
-          <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd48feef483c784fe0">Glossary & FAQ</a>
+          <a href="${budgetPagePrefix}home.html">Home</a>
+          <a href="${budgetPagePrefix}capital-improvement-plan.html">Capital Improvement Plan</a>
+          <a href="${budgetPagePrefix}search.html">Project Search</a>
+          <a href="${budgetPagePrefix}glossary-acronyms-and-frequently-asked-questions.html">Glossary & FAQ</a>
         </nav>
         ` : ``}
       </div>

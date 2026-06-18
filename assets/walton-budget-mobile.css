@@ -578,6 +578,30 @@
     padding:0 10px 6px 10px !important;
     gap:1px !important;
     line-height:1 !important;
+    position:sticky !important;
+  }
+
+  nav#nav-menu.nav-menu #sidebar-toggle{
+    position:absolute !important;
+    left:12px !important;
+    top:14px !important;
+    width:38px !important;
+    height:38px !important;
+    flex:0 0 38px !important;
+    margin:0 !important;
+    order:0 !important;
+    border-color:rgba(0,98,49,.35) !important;
+    color:#006231 !important;
+    background:#ffffff !important;
+    box-shadow:0 4px 14px rgba(36,52,77,.12) !important;
+    z-index:10020 !important;
+  }
+
+  nav#nav-menu.nav-menu #sidebar-toggle:hover,
+  nav#nav-menu.nav-menu #sidebar-toggle.is-active{
+    background:#006231 !important;
+    color:#ffffff !important;
+    border-color:#006231 !important;
   }
 
   nav#nav-menu.nav-menu > *{

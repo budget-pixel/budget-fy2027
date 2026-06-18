@@ -157,7 +157,7 @@ function renderDepartment(record){
 
       <div class="wc-performance-note">
         The code link shown for this department corresponds to a Strategic Priority Initiative identified by the Walton County Board of County Commissioners.
-        <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdf5cb414d7e5c7efb" target="_blank" rel="noopener noreferrer">View Strategic Priorities</a>.
+        <a href="${/\/pages\//.test(window.location.pathname) ? "strategic-initiatives.html" : "pages/strategic-initiatives.html"}">View Strategic Priorities</a>.
       </div>
     </section>
   `;

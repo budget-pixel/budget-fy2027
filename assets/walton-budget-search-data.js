@@ -4,7 +4,7 @@
 
 window.wcProjectSearchBaseUrl = "https://budget-pixel.github.io/walton-cip-project-search/?view=all&v=6&q=";
 
-window.wcBudgetPages = [
+window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Home", section:"Introduction and Overview", href:"home.html" },
   { title:"GFOA Distinguished Budget Presentation Award", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd25815ed4e2fe49b4" },
   { title:"Transmittal Letter", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdc3a5aa570050fba9" },
@@ -355,7 +355,97 @@ window.wcBudgetPages = [
     ]
   };
 
+  const localHrefMap = {
+    "Home": "home.html",
+    "GFOA Distinguished Budget Presentation Award": "gfoa-distinguished-budget-presentation-award.html",
+    "Transmittal Letter": "transmittal-letter.html",
+    "Budget-in-Brief": "budget-in-brief.html",
+    "Overview of Walton County": "overview-of-walton-county.html",
+    "Organizational Structure": "organizational-structure.html",
+    "Strategic Initiatives": "strategic-initiatives.html",
+    "Budget Process & Calendar": "budget-process-and-calendar.html",
+    "Fund Descriptions and Structure": "fund-descriptions-and-structure.html",
+    "Department to Fund Relationship": "department-to-fund-relationship.html",
+    "Financial Policies": "financial-policies.html",
+    "Consolidated Financial Schedules": "consolidated-financial-schedules.html",
+    "Fund Financial Schedules": "fund-financial-schedules.html",
+    "Summary of Revenues": "summary-of-revenues.html",
+    "Summary of Expenses": "summary-of-expenses.html",
+    "Summary of Interfund Transfers": "summary-of-interfund-transfers.html",
+    "Summary of Personnel": "summary-of-personnel.html",
+    "Summary of Machinery, Vehicles & Equipment": "summary-of-machinery-vehicles-and-equipment.html",
+    "Board of County Commissioners": "board-of-county-commissioners.html",
+    "Clerk of Courts & County Comptroller": "clerk-of-courts-and-county-comptroller.html",
+    "Property Appraiser": "property-appraiser.html",
+    "Sheriff's Office": "sheriffs-office.html",
+    "Supervisor of Elections": "supervisor-of-elections.html",
+    "Tax Collector": "tax-collector.html",
+    "Circuit Court": "circuit-court.html",
+    "County Court": "county-court.html",
+    "Court Technology & Innovations": "court-technology-and-innovations.html",
+    "Guardian Ad Litem": "guardian-ad-litem.html",
+    "Medical Examiner": "medical-examiner.html",
+    "Non-Profit Funding Program": "non-profit-funding-program.html",
+    "Public Defender": "public-defender.html",
+    "South Walton Fire & State Control": "south-walton-fire-and-state-control.html",
+    "State Attorney": "state-attorney.html",
+    "Statutory & Other Agency Funding": "statutory-and-other-agency-funding.html",
+    "Walton County Health Department": "walton-county-health-department.html",
+    "Building Construction and Maintenance": "building-construction-and-maintenance.html",
+    "Building Department": "building-department.html",
+    "Code Compliance": "code-compliance.html",
+    "County Administration": "county-administration.html",
+    "Eagle Springs Golf and Recreation Center": "eagle-springs-golf-and-recreation-center.html",
+    "Eagle Springs Grill": "eagle-springs-grill.html",
+    "Emergency Management": "emergency-management.html",
+    "Engineering Department": "engineering-department.html",
+    "Environmental Resources": "environmental-resources.html",
+    "Extension Office": "extension-office.html",
+    "Geographic Info Systems": "geographic-info-systems.html",
+    "Housing & Urban Development": "housing-and-urban-development.html",
+    "Human Resources": "human-resources.html",
+    "Libraries": "libraries.html",
+    "Mosquito Control": "mosquito-control.html",
+    "Mossy Head Wastewater Treatment Facility": "mossy-head-wastewater-treatment-facility.html",
+    "Office of Management and Budget": "office-of-management-and-budget.html",
+    "Office of the County Attorney": "office-of-the-county-attorney.html",
+    "Planning": "planning.html",
+    "Probation": "probation.html",
+    "Public Works": "public-works.html",
+    "Purchasing": "purchasing.html",
+    "Recreation": "recreation.html",
+    "Soil Conservation": "soil-conservation.html",
+    "Solid Waste": "solid-waste.html",
+    "Tourism Administration": "tourism-administration.html",
+    "Tourism Beach Operations": "tourism-beach-operations.html",
+    "Tourism Lifeguard Services and Beach Safety": "tourism-lifeguard-services-and-beach-safety.html",
+    "Veteran Services": "veteran-services.html",
+    "Capital Improvement Plan": "capital-improvement-plan.html",
+    "CIP Project Search": "search.html",
+    "Capital Projects Fund Schedule": "cip-capital-projects.html",
+    "Grant Funded Schedule": "cip-grants.html",
+    "Sheriff Fund Schedule": "cip-sheriff.html",
+    "Tourist Development Fund Schedule": "cip-tourist-development.html",
+    "Transportation Fund Schedule": "cip-transportation.html",
+    "Debt Overview": "debt-overview.html",
+    "Financial Forecast": "financial-forecast.html",
+    "Glossary, Acronyms, and Frequently Asked Questions": "glossary-acronyms-and-frequently-asked-questions.html",
+    "Statistical & Supplemental Information": "statistical-and-supplemental-information.html"
+  };
+
+  function normalizeBudgetPageHref(page){
+    const localHref = localHrefMap[page.title];
+    if(!localHref){
+      return page.href;
+    }
+
+    const isPagesPath = /\/pages\//.test(window.location.pathname);
+    return isPagesPath ? localHref : "pages/" + localHref;
+  }
+
   window.wcBudgetPages.forEach(function(page){
+    page.href = normalizeBudgetPageHref(page);
+
     const keywords = keywordMap[page.title] || [];
 
     page.keywords = Array.from(new Set([
