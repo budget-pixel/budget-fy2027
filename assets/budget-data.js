@@ -397,6 +397,7 @@
     return {
       Dept_Code: (row.Dept_Code || "").trim(),
       Dept_Name: (row.Dept_Name || "").trim(),
+      Note: (row.Note || "").trim(),
       Project_Code: (row.Project_Code || "").trim(),
       Project_Name: (row.Project_Name || "").trim(),
       Object_Code: (row.Object_Code || "").trim(),
@@ -417,6 +418,7 @@
     return {
       Dept_Code: (row.Dept_Code || "").trim(),
       Dept_Name: (row.Dept_Name || "").trim(),
+      Note: (row.Note || "").trim(),
       Project_Name: (row.Project_Name || "").trim(),
       Revenue_Code: (row.Revenue_Code || "").trim(),
       Revenue_Name: (row.Revenue_Name || "").trim(),
@@ -926,8 +928,9 @@
   // hand-entered. Dept_Name is used as the description since the sheets
   // don't carry a separate transfer-purpose narrative field.
   function renderInterfundTransferTable(rows, fundLabel, caption) {
-    if (!rows.length) return "";
-    const sorted = rows.slice().sort((a, b) => {
+    const nonZeroRows = rows.filter((r) => (r.FY2027_Proposed || 0) !== 0);
+    if (!nonZeroRows.length) return "";
+    const sorted = nonZeroRows.slice().sort((a, b) => {
       const fa = fundNameForRow(a), fb = fundNameForRow(b);
       return fa === fb ? (a.Dept_Name || "").localeCompare(b.Dept_Name || "") : fa.localeCompare(fb);
     });
@@ -935,8 +938,9 @@
     const bodyRows = sorted.map((r) => {
       const amt = r.FY2027_Proposed || 0;
       total += amt;
+      const description = r.Note || r.Dept_Name || "";
       return (
-        "<tr><td>" + escapeHtml(fundNameForRow(r)) + "</td><td>" + escapeHtml(r.Dept_Name || "") + '</td><td class="wc-num">' + formatCurrency(amt) + "</td></tr>"
+        "<tr><td>" + escapeHtml(fundNameForRow(r)) + "</td><td>" + escapeHtml(description) + '</td><td class="wc-num">' + formatCurrency(amt) + "</td></tr>"
       );
     });
     bodyRows.push('<tr class="wc-table-total-row"><td colspan="2">Total</td><td class="wc-num">' + formatCurrency(total) + "</td></tr>");
