@@ -11,11 +11,11 @@ var PRINT_CSS = `
   gap:6px !important;
   margin:0 !important;
   min-height:34px !important;
-  padding:0 11px !important;
+  padding:0 14px !important;
   border:0 !important;
   border-radius:9999px !important;
-  background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
-  color:#ffffff !important;
+  background:#ffffff !important;
+  color:#006231 !important;
   font-family:Arial, Helvetica, sans-serif !important;
   font-size:10px !important;
   font-weight:900 !important;
@@ -23,12 +23,13 @@ var PRINT_CSS = `
   letter-spacing:.04em !important;
   text-transform:uppercase !important;
   cursor:pointer !important;
-  box-shadow:0 5px 12px rgba(0,98,49,.18) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,0.16) !important;
   white-space:nowrap !important;
   appearance:none !important;
   -webkit-appearance:none !important;
   flex:0 0 auto !important;
   position:relative !important;
+  transition:box-shadow .22s ease, background-color .22s ease !important;
 }
 .wc-pdf-button svg{
   width:12px !important;
@@ -89,8 +90,9 @@ var PRINT_CSS = `
 
 .wc-pdf-button:hover,
 .wc-pdf-button:focus{
-  background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
-  color:#ffffff !important;
+  background:#ffffff !important;
+  color:#006231 !important;
+  box-shadow:0 4px 14px rgba(0,0,0,0.22) !important;
   outline:3px solid rgba(0,98,49,.22) !important;
   outline-offset:3px !important;
 }
@@ -125,7 +127,9 @@ nav#nav-menu .wc-nav-search-slot{
 
 @media(min-width:769px){
   .wc-print-button-slot{
-    top:21px !important;
+    top:50% !important;
+    transform:translateY(-50%) !important;
+    right:60px !important;
   }
 
   nav#nav-menu.nav-menu .wc-nav-search-slot{
@@ -137,7 +141,7 @@ nav#nav-menu .wc-nav-search-slot{
     min-height:34px !important;
     max-height:34px !important;
     margin-left:auto !important;
-    margin-right:120px !important;
+    margin-right:107px !important;
   }
 
   nav#nav-menu.nav-menu .wc-search-wrap,
@@ -166,7 +170,7 @@ nav#nav-menu .wc-nav-search-slot{
     min-height:28px !important;
     padding:0 8px !important;
     font-size:9px !important;
-    box-shadow:0 3px 8px rgba(0,98,49,.16) !important;
+    box-shadow:0 3px 8px rgba(0,0,0,.16) !important;
   }
 
   .wc-pdf-button svg{

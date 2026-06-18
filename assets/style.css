@@ -264,14 +264,17 @@ body.sidebar-pinned-right #content {
   flex: 0 0 42px;
   width: 42px;
   height: 42px;
-  background: none; border: 1px solid rgba(255,255,255,.45);
+  background: #ffffff;
+  border: 0;
   border-radius: 999px;
   cursor: pointer;
-  color: #fff;
+  color: #006231;
   padding: 0;
   margin-right: 2px;
   position: relative;
   z-index: 3;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.16);
+  transition: box-shadow .22s ease, background-color .22s ease;
 }
 #sidebar-toggle span {
   position: absolute;
@@ -291,7 +294,24 @@ body.sidebar-pinned-right #content {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
-#sidebar-toggle:hover { background: rgba(255,255,255,.14); }
+#sidebar-toggle:hover { background: #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
+
+@media (min-width: 769px) {
+  /* Move the hamburger out of the normal nav flow and pin it to the far
+     right edge of the screen, just past the PDF button, sized to match
+     the search bar's height. */
+  #sidebar-toggle {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    margin-right: 0;
+    z-index: 10020;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+  }
+}
 
 /* ── responsive ── */
 @media (max-width: 768px) {

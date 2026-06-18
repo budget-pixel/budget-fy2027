@@ -630,7 +630,7 @@
     border:0 !important;
     outline:0 !important;
     background:transparent !important;
-    color:#172033 !important;
+    color:#000000 !important;
     font-size:14px !important;
     line-height:1.35 !important;
     font-weight:600 !important;
