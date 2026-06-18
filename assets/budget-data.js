@@ -35,7 +35,7 @@
       "court technology"
     ],
     "public defender": ["court technology public defender"],
-    "statutory and other agency funding": ["statutory and other agency fund"],
+    "statutory and other agency funding": ["statutory and other agency fund", "statutory and other"],
     "south walton fire and state control": ["south walton fire", "state fire"],
     "code compliance": ["code compliance beach", "code compliance street"],
     "libraries": ["county libraries"],
@@ -616,11 +616,12 @@
     { field: "FY2026_Budget", label: "FY 2026 Budget" }
   ];
 
-  function renderBudgetLinesToggle(rows) {
+  function renderBudgetLinesToggle(rows, descriptionField) {
     if (!rows || !rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
     const showPrior = getShowPriorYears();
+    const descField = descriptionField || "Note";
 
     const bodyRows = rows
       .slice()
@@ -631,7 +632,7 @@
           "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
           "<td>" + escapeHtml(r.Object_Code || "") + "</td>" +
           "<td>" + escapeHtml(r.Object_Name || "") + "</td>" +
-          "<td>" + escapeHtml(r.Note || "") + "</td>" +
+          "<td>" + escapeHtml(r[descField] || "") + "</td>" +
           BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
             '<td class="wc-num wc-prior-year">' + formatCurrency(r[c.field] || 0) + "</td>"
           ).join("") +
@@ -787,7 +788,7 @@
   // Department-page expense/revenue tables: rolled up to category level
   // (Personnel Services, Operating Expenditures, Capital Outlay, etc.)
   // rather than individual object/revenue codes.
-  function renderTypeSummaryGroup(rows, kind, caption, notes) {
+  function renderTypeSummaryGroup(rows, kind, caption, notes, descriptionField) {
     const isExpense = kind === "expense";
     const typeField = isExpense ? "Object_Type" : "Revenue_Type";
     const typeLabel = isExpense ? "Object Type" : "Revenue Type";
@@ -839,7 +840,7 @@
 
     return (
       '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
-      table + renderTableFooterRow(isExpense ? rows : null) + renderNotesHtml("Expenditure Notes:", notes) +
+      table + renderTableFooterRow(isExpense ? rows : null, descriptionField) + renderNotesHtml("Expenditure Notes:", notes) +
       "</div>"
     );
   }
@@ -847,10 +848,10 @@
   // A single row right under a table: the "Last Updated" stamp on the
   // left and (for expense tables) the "View Budget Lines" toggle on the
   // right, instead of two separate stacked lines.
-  function renderTableFooterRow(budgetLineRows) {
+  function renderTableFooterRow(budgetLineRows, descriptionField) {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     const updated = '<em>Last Updated: ' + escapeHtml(stamp) + "</em>";
-    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows) : { button: "", detail: "" };
+    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows, descriptionField) : { button: "", detail: "" };
     return (
       '<div class="wc-table-footer-row">' +
       '<p class="wc-data-updated-note">' + updated + "</p>" +
@@ -945,8 +946,15 @@
   // `isOtherFinancing(row)` flags rows that should be excluded from the
   // regular category rows and instead reported on their own line below the
   // categories' subtotal (e.g. interfund transfers).
+  // The Self-Insurance Fund (503) is an Internal Service fund, not a
+  // governmental fund, so it's excluded from this schedule entirely rather
+  // than folded into "Non-Major Governmental Funds".
+  const CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES = new Set(["503"]);
+
   function buildConsolidatedFundTable(config) {
-    const rows = config.rows || [];
+    const rows = (config.rows || []).filter(
+      (r) => !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
+    );
     if (!rows.length || !(cache.funds || []).length) return "";
 
     const fundColumns = config.fundColumns;
@@ -2232,17 +2240,29 @@
 
         renderDepartmentNarrative(narrativeEl, deptName, deptCode);
 
-        // Some departments break specific object codes out into their own
-        // supplemental table below; exclude those codes here to avoid
-        // double-counting them in the main Expenditure Summary.
-        const excludedObjectCodes = EXPENSE_OBJECT_CODES_BROKEN_OUT[normalizeDeptName(deptName)] || [];
-        const expenseRows = getDepartmentExpenses(deptName, deptCode).filter(
-          (r) => !excludedObjectCodes.includes(String(r.Object_Code || "").trim())
-        );
-        mountOrHide(
-          expenseEl,
-          renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName)
-        );
+        // Statutory & Other Agency Funding is scattered across many
+        // unrelated Dept_Names (Economic Development Alliance, Human
+        // Services, Lakeview, Volunteer Fire, etc.), so it's pulled
+        // together by its shared Note value instead of by Dept_Name. Each
+        // row's Project_Name (e.g. "Lakeview Center (Mental Health)")
+        // identifies the specific agency/program, so that's used as the
+        // "Itemized Description" in the budget lines detail instead of
+        // the Note column (which is just "Statutory & Other" on every row).
+        let expenseHtml;
+        if (normalizeDeptName(deptName) === "statutory and other agency funding") {
+          const statutoryRows = (cache.expenditures || []).filter((r) => (r.Note || "").trim() === "Statutory & Other");
+          expenseHtml = renderTypeSummaryGroup(statutoryRows, "expense", "Expenditure Summary", null, "Project_Name");
+        } else {
+          // Some departments break specific object codes out into their own
+          // supplemental table below; exclude those codes here to avoid
+          // double-counting them in the main Expenditure Summary.
+          const excludedObjectCodes = EXPENSE_OBJECT_CODES_BROKEN_OUT[normalizeDeptName(deptName)] || [];
+          const expenseRows = getDepartmentExpenses(deptName, deptCode).filter(
+            (r) => !excludedObjectCodes.includes(String(r.Object_Code || "").trim())
+          );
+          expenseHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName);
+        }
+        mountOrHide(expenseEl, expenseHtml);
         bindTooltipAnchors(expenseEl);
         bindPriorYearsToggle(expenseEl);
 
