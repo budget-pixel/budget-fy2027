@@ -215,6 +215,7 @@ body.sidebar-pinned-right #content {
 
 /* ── table label (above walton-styled table) ── */
 .wc-table-wrap { margin: 28px 0; }
+.wc-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
 .wc-data-updated-note { margin: 8px 0 0; font-size: .72rem; color: var(--muted); }
 
 #general-government-tax-topics,
@@ -223,6 +224,7 @@ body.sidebar-pinned-right #content {
 #permits-fees-topics,
 #judgments-fines-topics,
 #miscellaneous-revenue-topics { padding-top: 32px; }
+#consolidated-revenue-summary-table { margin-bottom: 32px; }
 .wc-revenue-topic-block {
   max-width: 1180px;
   margin: 0 auto 40px;

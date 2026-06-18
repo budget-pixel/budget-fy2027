@@ -629,22 +629,48 @@
     { field: "FY2026_Budget", label: "FY 2026 Budget" }
   ];
 
-  function renderBudgetLinesToggle(rows, descriptionField) {
+  function renderBudgetLinesToggle(rows, descriptionField, kind) {
     if (!rows || !rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
     const showPrior = getShowPriorYears();
+    const isExpense = kind !== "revenue";
+    const codeField = isExpense ? "Object_Code" : "Revenue_Code";
+    const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const descField = descriptionField || "Note";
 
-    const bodyRows = rows
+    // Combine rows that share the same name (e.g. the same revenue source
+    // collected under several departments' Dept_Codes) into one line
+    // instead of repeating that name once per underlying row.
+    const sumFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    const grouped = new Map();
+    rows.forEach((r) => {
+      const name = r[nameField] || "";
+      const existing = grouped.get(name);
+      if (!existing) {
+        const merged = { codes: [r[codeField] || ""].filter(Boolean), desc: r[descField] || "" };
+        sumFields.forEach((f) => { merged[f] = r[f] || 0; });
+        grouped.set(name, merged);
+        return;
+      }
+      if (r[codeField] && !existing.codes.includes(r[codeField])) existing.codes.push(r[codeField]);
+      sumFields.forEach((f) => { existing[f] += r[f] || 0; });
+    });
+    const mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
+      const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.desc };
+      sumFields.forEach((f) => { row[f] = merged[f]; });
+      return row;
+    });
+
+    const bodyRows = mergedRows
       .slice()
-      .sort((a, b) => String(a.Object_Code || "").localeCompare(String(b.Object_Code || "")))
+      .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")))
       .map((r) => {
         const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
         return (
           "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
-          "<td>" + escapeHtml(r.Object_Code || "") + "</td>" +
-          "<td>" + escapeHtml(r.Object_Name || "") + "</td>" +
+          "<td>" + escapeHtml(r[codeField] || "") + "</td>" +
+          "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
           "<td>" + escapeHtml(r[descField] || "") + "</td>" +
           BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
             '<td class="wc-num wc-prior-year">' + formatCurrency(r[c.field] || 0) + "</td>"
@@ -655,8 +681,8 @@
 
     const detailTable = renderTable({
       columns: [
-        { label: "Object Code" },
-        { label: "Object Name" },
+        { label: isExpense ? "Object Code" : "Revenue Code" },
+        { label: isExpense ? "Object Name" : "Revenue Name" },
         { label: "Itemized Description" }
       ].concat(
         BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
@@ -861,10 +887,10 @@
   // A single row right under a table: the "Last Updated" stamp on the
   // left and (for expense tables) the "View Budget Lines" toggle on the
   // right, instead of two separate stacked lines.
-  function renderTableFooterRow(budgetLineRows, descriptionField) {
+  function renderTableFooterRow(budgetLineRows, descriptionField, kind) {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     const updated = '<em>Last Updated: ' + escapeHtml(stamp) + "</em>";
-    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows, descriptionField) : { button: "", detail: "" };
+    const toggle = budgetLineRows ? renderBudgetLinesToggle(budgetLineRows, descriptionField, kind) : { button: "", detail: "" };
     return (
       '<div class="wc-table-footer-row">' +
       '<p class="wc-data-updated-note">' + updated + "</p>" +
@@ -1378,6 +1404,7 @@
 
     const lastIndex = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.length - 1;
     const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
+    const allMatchingRows = [];
     const bodyRows = CONSOLIDATED_REVENUE_SUMMARY_ROWS.map((spec) => {
       // Revenue_Code 381000 (Interfund Group Transfer In) is reported on
       // the Summary of Interfund Transfers page instead, and the
@@ -1388,6 +1415,7 @@
         String(r.Revenue_Code || "").trim() !== "381000" &&
         !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
       );
+      allMatchingRows.push(...matching);
       return (
         "<tr><td>" + escapeHtml(spec.label) + "</td>" +
         CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
@@ -1420,8 +1448,8 @@
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
       "</div>" +
-      lastUpdatedNoteHtml() +
       "</div>" +
+      renderTableFooterRow(allMatchingRows, null, "revenue") +
       "</div>"
     );
   }
