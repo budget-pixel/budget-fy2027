@@ -61,6 +61,9 @@
   const EXPENSE_GROUP_NOTES = {
     "public safety": [
       "Under Florida Statutes §125.0104(5)(c), eligible counties may allocate up to 10% of Tourist Development Tax revenues to reimburse public safety expenses necessitated by increased tourism and visitor impacts."
+    ],
+    "south walton fire": [
+      "The rise in the budget is attributed to contractual obligations, specifically, the contractual provision for incremental adjustments within the agreement with the South Walton Fire District, tied to the Consumer Price Index Municipal Class Size D - South, calculated from April of the preceding year to April of the current year."
     ]
   };
 
