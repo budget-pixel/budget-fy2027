@@ -35,8 +35,6 @@
       "court innovations"
     ],
     "statutory and other agency funding": ["statutory and other agency fund"],
-    "tourism beach operations": ["beach operations", "beach renourishment", "beach tram"],
-    "tourism lifeguard services and beach safety": ["south walton fire lifeguard services"],
     "south walton fire and state control": ["south walton fire district", "state fire control"],
     "code compliance": ["code compliance beach", "code compliance street"],
     "libraries": ["county libraries"],
@@ -50,6 +48,18 @@
   const EXPENSE_OBJECT_CODES_BROKEN_OUT = {
     "solid waste": ["534000"],
     "building construction and maintenance": ["562000", "563000", "543000"]
+  };
+
+  // Friendlier display captions for sub-group tables whose raw Dept_Name
+  // in the sheet reads awkwardly on its own.
+  const DEPT_NAME_DISPLAY_OVERRIDES = {};
+
+  // Explanatory notes shown under a sub-group's Expenditure Summary table,
+  // in the same italic callout style as the staffing notes.
+  const EXPENSE_GROUP_NOTES = {
+    "public safety": [
+      "Under Florida Statutes §125.0104(5)(c), eligible counties may allocate up to 10% of Tourist Development Tax revenues to reimburse public safety expenses necessitated by increased tourism and visitor impacts."
+    ]
   };
 
   // Hover-tip copy for each budget category, shown via the same
@@ -96,6 +106,14 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  // Escapes narrative text for safe HTML rendering, then converts
+  // markdown-style **bold** spans into <strong> tags (used for Statement of
+  // Function, Mission, Budget Highlights, and any other narrative content
+  // pulled from Google Sheets).
+  function formatNarrativeText(value) {
+    return escapeHtml(value).replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>");
   }
 
   // Splits a raw narrative cell's text into paragraphs. Google Sheets cells
@@ -499,6 +517,15 @@
 
   // ---- rendering primitives ----
 
+  function renderNotesHtml(title, notes) {
+    if (!notes || !notes.length) return "";
+    return (
+      '<div class="wc-staffing-notes"><p class="wc-staffing-notes-title">' + escapeHtml(title) + "</p>" +
+      notes.map((n) => "<p>" + escapeHtml(n) + "</p>").join("") +
+      "</div>"
+    );
+  }
+
   function renderTable(options) {
     const columns = options.columns || [];
     const bodyRows = options.bodyRows || [];
@@ -514,6 +541,7 @@
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +
       "</div>" +
+      renderNotesHtml("Expenditure Notes:", options.notes) +
       "</div>"
     );
   }
@@ -600,7 +628,7 @@
   // Department-page expense/revenue tables: rolled up to category level
   // (Personnel Services, Operating Expenditures, Capital Outlay, etc.)
   // rather than individual object/revenue codes.
-  function renderTypeSummaryGroup(rows, kind, caption) {
+  function renderTypeSummaryGroup(rows, kind, caption, notes) {
     const isExpense = kind === "expense";
     const typeField = isExpense ? "Object_Type" : "Revenue_Type";
     const typeLabel = isExpense ? "Object Type" : "Revenue Type";
@@ -623,7 +651,8 @@
     return renderTable({
       caption: caption,
       columns: [{ label: typeLabel }, { label: "FY 2027 Proposed", num: true }],
-      bodyRows: bodyRows
+      bodyRows: bodyRows,
+      notes: notes
     });
   }
 
@@ -637,13 +666,15 @@
     if (!rows.length) return "";
     const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
     if (groupNames.length <= 1) {
-      return renderTypeSummaryGroup(rows, kind, caption);
+      return renderTypeSummaryGroup(rows, kind, caption, EXPENSE_GROUP_NOTES[normalizeDeptName(deptName || "")]);
     }
     const norm = normalizeDeptName(deptName || "");
     return groupNames
       .map((name) => {
-        const groupCaption = normalizeDeptName(name) === norm ? caption : name;
-        return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption);
+        const nameNorm = normalizeDeptName(name);
+        const groupCaption = nameNorm === norm ? caption : (DEPT_NAME_DISPLAY_OVERRIDES[nameNorm] || name);
+        const notes = nameNorm === norm ? null : EXPENSE_GROUP_NOTES[nameNorm];
+        return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption, notes);
       })
       .join("");
   }
@@ -851,16 +882,16 @@
   function renderTourismAdministrationSections() {
     const overview =
       '<section class="content-section tourism-admin-overview">' +
-      TOURISM_ADMIN_OVERVIEW_PARAGRAPHS.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+      TOURISM_ADMIN_OVERVIEW_PARAGRAPHS.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
       "<h3>Highlights</h3>" +
-      TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+      TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
       "</section>";
 
     const sections = TOURISM_ADMIN_SECTIONS.map((spec) => {
       const narrativeRows = rowsForExactNames(cache.departmentNarratives, spec.narrativeNames)
         .filter((r) => r.Narrative && r.Narrative.trim());
       const narrativeHtml = narrativeRows.length
-        ? splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + escapeHtml(p) + "</p>").join("")
+        ? splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("")
         : "";
 
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
@@ -887,6 +918,159 @@
 
     return overview + sections;
   }
+
+  // Tourism Beach Operations' page combines three separately budgeted
+  // programs. The narrative/performance sheets call the main program
+  // "Tourism Beach Operations" while the expenditure/staffing/machinery
+  // sheets call it plain "Beach Operations" for the same Dept_Code.
+  const TOURISM_BEACH_SECTIONS = [
+    {
+      label: "Beach Operations",
+      narrativeNames: ["Tourism Beach Operations"],
+      expenseNames: ["Beach Operations"],
+      revenueNames: [],
+      staffingNames: ["Beach Operations"],
+      machineryNames: ["Beach Operations"],
+      performanceNames: ["Tourism Beach Operations"]
+    },
+    {
+      label: "Beach Renourishment",
+      narrativeNames: ["Beach Renourishment"],
+      expenseNames: ["Beach Renourishment"],
+      revenueNames: [],
+      staffingNames: [],
+      machineryNames: []
+    },
+    {
+      label: "Beach Tram",
+      narrativeNames: ["Beach Tram"],
+      expenseNames: ["Beach Tram"],
+      revenueNames: [],
+      staffingNames: ["Beach Tram"],
+      machineryNames: ["Beach Tram"]
+    }
+  ];
+
+  function renderTourismBeachOperationsSections() {
+    return TOURISM_BEACH_SECTIONS.map((spec) => {
+      const narrativeRows = rowsForExactNames(cache.departmentNarratives, spec.narrativeNames)
+        .filter((r) => r.Narrative && r.Narrative.trim());
+      const narrativeHtml = narrativeRows.length
+        ? splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("")
+        : "";
+
+      const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
+      const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
+      const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
+      const machineryRows = rowsForExactNames(cache.machinery, spec.machineryNames);
+      const performanceRows = rowsForExactNames(cache.performanceMeasures, spec.performanceNames || []);
+
+      const body = [
+        narrativeHtml,
+        renderPerformanceTable(performanceRows),
+        renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
+        renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
+        renderStaffingTable(staffingRows),
+        renderMachineryTable(machineryRows)
+      ].filter(Boolean).join("");
+
+      if (!body) return "";
+      return (
+        '<section class="tourism-admin-section">' +
+        '<h2 class="tourism-admin-section-title">' + escapeHtml(spec.label) + "</h2>" +
+        body +
+        "</section>"
+      );
+    }).filter(Boolean).join("");
+  }
+
+  // Tourism Lifeguard Services and Beach Safety's page combines two
+  // separately budgeted programs, each with their own narrative and
+  // expenditure rows in the sheets.
+  const TOURISM_LIFEGUARD_SECTIONS = [
+    {
+      label: "South Walton Fire Lifeguard Services",
+      narrativeNames: ["South Walton Fire Lifeguard Services"],
+      expenseNames: ["South Walton Fire Lifeguard Services"],
+      revenueNames: [],
+      staffingNames: [],
+      machineryNames: []
+    },
+    {
+      label: "Public Safety",
+      narrativeNames: ["Public Safety"],
+      expenseNames: ["Public Safety"],
+      revenueNames: [],
+      staffingNames: [],
+      machineryNames: []
+    }
+  ];
+
+  // The page's narrative container sits beside the map embed in a two-column
+  // grid, so only the first program's narrative (no table) renders there;
+  // both programs' tables render together, full-width, below the grid.
+  function renderTourismLifeguardIntro() {
+    const introSpec = TOURISM_LIFEGUARD_SECTIONS[0];
+    const narrativeRows = rowsForExactNames(cache.departmentNarratives, introSpec.narrativeNames)
+      .filter((r) => r.Narrative && r.Narrative.trim());
+    if (!narrativeRows.length) return "";
+    return (
+      '<section class="statement-of-function content-section">' +
+      "<h2>" + escapeHtml(introSpec.label) + "</h2>" +
+      splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
+      "</section>"
+    );
+  }
+
+  function renderTourismLifeguardSections() {
+    return TOURISM_LIFEGUARD_SECTIONS.map((spec, index) => {
+      // The first program's narrative already renders above (next to the
+      // map embed), so only show it again here for any later program.
+      const narrativeRows = index === 0
+        ? []
+        : rowsForExactNames(cache.departmentNarratives, spec.narrativeNames).filter((r) => r.Narrative && r.Narrative.trim());
+      const narrativeHtml = narrativeRows.length
+        ? splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("")
+        : "";
+
+      const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
+      const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
+      const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
+      const machineryRows = rowsForExactNames(cache.machinery, spec.machineryNames);
+
+      const body = [
+        narrativeHtml,
+        renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
+        renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
+        renderStaffingTable(staffingRows),
+        renderMachineryTable(machineryRows)
+      ].filter(Boolean).join("");
+
+      if (!body) return "";
+      // The first program's name already heads the page (next to the map
+      // embed above), so don't repeat it as a section title here too. Later
+      // programs use the same small uppercase heading style as that intro
+      // for visual consistency, scoped to its own class so it doesn't
+      // affect unrelated paragraphs (table captions, notes) in this section.
+      const titleHtml = index === 0 ? "" : '<h2 class="statement-of-function-style-heading">' + escapeHtml(spec.label) + "</h2>";
+      return (
+        '<section class="tourism-admin-section">' +
+        titleHtml +
+        body +
+        "</section>"
+      );
+    }).filter(Boolean).join("");
+  }
+
+  const COMBINED_SECTION_RENDERERS = {
+    "tourism administration": renderTourismAdministrationSections,
+    "tourism beach operations": renderTourismBeachOperationsSections
+  };
+
+  // Departments whose combined sections (above) already render their own
+  // Performance Measures table inline, so the page's standalone
+  // performance container should stay empty instead of duplicating it.
+  const DEPTS_WITH_PERFORMANCE_FOLDED_IN = new Set(["tourism beach operations"]);
 
   function renderMosquitoStateAidTables() {
     const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
@@ -1061,11 +1245,11 @@
         '<section class="statement-of-function content-section libraries-statement-media">' +
         "<h2>Statement of Function</h2>" +
         '<div class="libraries-statement-intro">' +
-        introParagraphs.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+        introParagraphs.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
         "</div>" +
         '<div class="libraries-statement-lower">' +
         '<div class="libraries-statement-rest">' +
-        remainingParagraphs.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+        remainingParagraphs.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
         "</div>" +
         '<div class="libraries-video-frame">' +
         '<iframe src="https://www.youtube.com/embed/gJ7QNzqj8ks?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Libraries budget video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
@@ -1078,7 +1262,7 @@
     container.innerHTML =
       '<section class="statement-of-function content-section">' +
       "<h2>Statement of Function</h2>" +
-      paragraphs.map((p) => "<p>" + escapeHtml(p) + "</p>").join("") +
+      paragraphs.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
       "</section>";
   }
 
@@ -1132,18 +1316,42 @@
         }
         const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl] = containers;
 
-        mountOrHide(performanceEl, renderPerformanceTable(getDepartmentPerformanceMeasures(deptName, deptCode)));
+        // Some pages combine several separately budgeted divisions; for
+        // those, narrative/expenditures/revenue/staffing/machinery (and,
+        // for Beach Operations, performance measures) are grouped together
+        // into one block per division rather than spread across the page's
+        // per-data-type containers.
+        const combinedSectionsRenderer = COMBINED_SECTION_RENDERERS[normalizeDeptName(deptName)];
+        const performanceFoldedIntoSections = DEPTS_WITH_PERFORMANCE_FOLDED_IN.has(normalizeDeptName(deptName));
+
+        mountOrHide(
+          performanceEl,
+          performanceFoldedIntoSections ? "" : renderPerformanceTable(getDepartmentPerformanceMeasures(deptName, deptCode))
+        );
         bindPriorYearsToggle(performanceEl);
 
-        if (normalizeDeptName(deptName) === "tourism administration") {
-          // Tourism Administration's page combines five separately budgeted
-          // divisions; each division's narrative, expenditures, revenue,
-          // and staffing are grouped together into one block per division
-          // rather than spread across the page's per-data-type containers.
-          mountOrHide(narrativeEl, renderTourismAdministrationSections());
+        if (combinedSectionsRenderer) {
+          mountOrHide(narrativeEl, combinedSectionsRenderer());
           bindTooltipAnchors(narrativeEl);
           bindPriorYearsToggle(narrativeEl);
           mountOrHide(expenseEl, "");
+          mountOrHide(revenueEl, "");
+          mountOrHide(staffingEl, "");
+          mountOrHide(machineryEl, "");
+          mountOrHide(stateAidEl, "");
+          mountOrHide(solidWasteEl, "");
+          mountOrHide(buildingConstructionEl, "");
+          return;
+        }
+
+        // Tourism Lifeguard Services and Beach Safety's narrative container
+        // sits beside a map embed in a two-column grid, so only the first
+        // program's narrative goes there; both programs' expense tables
+        // render together, full-width, in the expense container below it.
+        if (normalizeDeptName(deptName) === "tourism lifeguard services and beach safety") {
+          mountOrHide(narrativeEl, renderTourismLifeguardIntro());
+          mountOrHide(expenseEl, renderTourismLifeguardSections());
+          bindTooltipAnchors(expenseEl);
           mountOrHide(revenueEl, "");
           mountOrHide(staffingEl, "");
           mountOrHide(machineryEl, "");
