@@ -15,6 +15,7 @@
 
 <div id="layout">
   <aside id="sidebar" aria-label="Budget navigation">
+<div class="wc-sidebar-header">FY 2027 Budget</div>
 <div class="nav-section">
   <button class="nav-section-toggle">Introduction and Overview<span class="arrow">▶</span></button>
   <div class="nav-section-links"><a href="../pages/home.html">Home</a>
@@ -133,63 +134,12 @@
 <div class="page-eyebrow">Department Information</div>
 <h1 class="page-title">Libraries</h1>
 
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Expenditure Budget</p>
-  <div data-report-table-container-id="6989dbbea6376f80ba7f7b69-1">
-    <div data-table-scroll-container="true">
-      <table data-report-table-id="6989dbbea6376f80ba7f7b69-1">
-        <thead><tr><th>Row labels</th><th>FY 2020 Actuals</th><th>FY 2021 Actuals</th><th>FY 2022 Actuals</th><th>FY 2023 Actuals</th><th>FY 2024 Actuals</th><th>FY 2025 Actuals</th><th>FY 2026 Budget</th><th>Empty Values</th></tr></thead>
-        <tbody><tr><td>Personnel Budgeti</td><td>$735,121</td><td>$834,070</td><td>$884,533</td><td>$1,098,531</td><td>$1,268,347</td><td>$1,311,223</td><td>$1,353,263</td><td>–</td></tr>
-<tr><td>Operating Expendituresi</td><td>$136,546</td><td>$157,970</td><td>$234,691</td><td>$218,959</td><td>$222,597</td><td>$231,706</td><td>$369,700</td><td>–</td></tr>
-<tr><td>Capital Budgeti</td><td>$48,397</td><td>$48,689</td><td>$175,680</td><td>$331,647</td><td>$565,673</td><td>$180,743</td><td>$172,000</td><td>–</td></tr>
-<tr><td>Total</td><td>$920,063</td><td>$1,040,729</td><td>$1,294,904</td><td>$1,649,136</td><td>$2,056,617</td><td>$1,723,672</td><td>$1,894,963</td><td>–</td></tr>
-</tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Expenditure Budget</p>
-  <div data-report-table-container-id="6989dbbea6376f80ba7f7b69-2">
-    <div data-table-scroll-container="true">
-      <table data-report-table-id="6989dbbea6376f80ba7f7b69-2">
-        <thead><tr><th>Revenue Description</th><th>FY 2027</th></tr></thead>
-        <tbody><tr><td>Library Rentals</td><td>$3,000</td></tr>
-<tr><td>General Fund Revenues</td><td>$2,134,655</td></tr>
-<tr><td>Library Fines &amp; Fees</td><td>$18,000</td></tr>
-<tr><td></td><td>$2,155,655</td></tr>
-</tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Staffing / FTE</p>
-  <div data-report-table-container-id="6989dbbea6376f80ba7f7b69-3">
-    <div data-table-scroll-container="true">
-      <table data-report-table-id="6989dbbea6376f80ba7f7b69-3">
-        <thead><tr><th>Position Name</th><th>2023-2024</th><th>2024-2025</th><th>2025-2026</th><th>2026-2027</th></tr></thead>
-        <tbody><tr><td>Allocated FTE Count</td><td></td><td></td><td></td><td></td></tr>
-<tr><td>Library Technology Specialist</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-<tr><td>Interlibrary Loan Coordinator</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-<tr><td>Director of Libraries</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-<tr><td>Library Youth Services Clerk</td><td>2</td><td>2</td><td>5</td><td>5</td></tr>
-<tr><td>Library Clerk</td><td>8.5</td><td>8.5</td><td>8.5</td><td>8.5</td></tr>
-<tr><td>Library Branch Manager</td><td>3</td><td>3</td><td>3</td><td>3</td></tr>
-<tr><td>Library Technical Services Coordinator</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-<tr><td>Outreach Librarian</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-<tr><td>Library Administrative Specialist</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-<tr><td>ALLOCATED FTE COUNT</td><td>19.5</td><td>19.5</td><td>22.5</td><td>22.5</td></tr>
-</tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div class="wc-table-wrap">
-  <div id="wc-performance-measures" data-department="County Libraries"></div>
-</div>
-<script src="../assets/walton-performance-data.js"></script>
-<script src="../assets/walton-performance-measures.js"></script>
+<div id="department-narrative"></div>
+<div id="department-performance-table"></div>
+<div id="department-expense-table"></div>
+<div id="department-revenue-table"></div>
+<div id="department-staffing-table"></div>
+<div id="department-machinery-table"></div>
 
 <nav class="page-nav" aria-label="Page navigation">
   <a class="prev" href="human-resources.html">Human Resources</a>
@@ -281,6 +231,7 @@ window.wcBudgetPages = [
   {title:"Statistical & Supplemental Information",section:"Glossary, Statistical, and Supplemental Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
 ];
 </script>
+<script src="../assets/budget-data.js"></script>
 <script src="../assets/walton-budget-nav.js"></script>
 <script src="../assets/walton-budget-pdf.js"></script>
 <script src="../assets/nav.js"></script>

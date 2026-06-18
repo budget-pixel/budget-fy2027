@@ -15,6 +15,7 @@
 
 <div id="layout">
   <aside id="sidebar" aria-label="Budget navigation">
+<div class="wc-sidebar-header">FY 2027 Budget</div>
 <div class="nav-section">
   <button class="nav-section-toggle">Introduction and Overview<span class="arrow">▶</span></button>
   <div class="nav-section-links"><a href="../pages/home.html">Home</a>
@@ -133,6 +134,12 @@
 <div class="page-eyebrow">Constitutional Officers</div>
 <h1 class="page-title">Sheriff's Office</h1>
 
+<div id="department-narrative"></div>
+<div id="department-performance-table"></div>
+<div id="department-expense-table"></div>
+<div id="department-revenue-table"></div>
+<div id="department-staffing-table"></div>
+<div id="department-machinery-table"></div>
 <section class="wso-header-shell contains-media-block">
   <div class="wso-header-container">
     <div id="wso-header-slideshow">
@@ -152,228 +159,6 @@
   </div>
 </section>
 
-<section class="page-text wc-function-statement">
-  <h2>Statement of Function</h2>
-  <p>The Sheriff is a separately elected Constitutional Officer of the County. Functions under the Sheriff include Corrections, Court Services, Law Enforcement, Animal Services, and Fire Rescue. The Corrections division operates the County detention facility, which involves inmate housing, medical services, food services, and prisoner transportation. The Court Services area provides bailiffs, courtroom security, and general jury/judicial protective services to the County courts. The Law enforcement function includes uniformed road patrol, criminal investigations, crime scene investigations, K-9 units, and the E911 Communications Center. Additionally, the Walton County Sheriff's Office has taken on other responsibilities, including the operations of the animal control facility and units, and the operations of Walton County Fire Rescue Services within the county.</p>
-
-  <p>The Sheriff&rsquo;s Office operates as a separate entity setting its policies and procedures, employee hiring, and line-item budget management.</p>
-
-  <p class="wc-function-link"><a href="https://waltonso.org/" target="_blank" rel="noopener">Sheriff's Office Website</a></p>
-</section><style>
-  .wso-header-shell{
-    width:100%;
-    margin:0 auto 28px;
-    padding:0;
-    box-sizing:border-box;
-    background:#ffffff;
-    overflow:hidden;
-  }
-
-  .wso-header-container{
-    width:100%;
-    margin:0 auto;
-    box-sizing:border-box;
-  }
-
-  #wso-header-slideshow{
-    position:relative;
-    width:100%;
-    height:clamp(320px, 42vw, 540px);
-    margin:0 auto;
-    overflow:hidden;
-    border-radius:28px;
-    background:#24344d;
-    font-family:Arial, Helvetica, sans-serif;
-    isolation:isolate;
-    box-shadow:
-      0 10px 24px rgba(36,52,77,0.14),
-      0 3px 8px rgba(36,52,77,0.08),
-      0 1px 0 rgba(255,255,255,0.05) inset;
-  }
-
-  #wso-header-slideshow::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border:1px solid rgba(209,190,120,0.32);
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,0.08),
-      inset 0 -18px 28px rgba(0,0,0,0.06);
-    z-index:5;
-    pointer-events:none;
-    border-radius:28px;
-  }
-
-  #wso-header-slideshow img{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    max-width:none;
-    object-fit:cover;
-    object-position:center 30%;
-    opacity:0;
-    animation:wsoHeaderFade 32s infinite;
-    z-index:1;
-  }
-
-  #wso-header-slideshow img:nth-of-type(1){ animation-delay:0s; }
-  #wso-header-slideshow img:nth-of-type(2){ animation-delay:4s; }
-  #wso-header-slideshow img:nth-of-type(3){ animation-delay:8s; }
-  #wso-header-slideshow img:nth-of-type(4){ animation-delay:12s; }
-  #wso-header-slideshow img:nth-of-type(5){ animation-delay:16s; }
-  #wso-header-slideshow img:nth-of-type(6){ animation-delay:20s; }
-  #wso-header-slideshow img:nth-of-type(7){ animation-delay:24s; }
-  #wso-header-slideshow img:nth-of-type(8){ animation-delay:28s; }
-
-  @keyframes wsoHeaderFade{
-    0%{ opacity:0; }
-    3%{ opacity:1; }
-    12%{ opacity:1; }
-    16%{ opacity:0; }
-    100%{ opacity:0; }
-  }
-
-  @media(prefers-reduced-motion:reduce){
-    #wso-header-slideshow img{
-      animation:none;
-      opacity:0;
-    }
-
-    #wso-header-slideshow img:first-of-type{
-      opacity:1;
-    }
-  }
-
-  .wso-header-overlay{
-    position:absolute;
-    inset:0;
-    background:
-      radial-gradient(circle at center, rgba(255,255,255,0) 54%, rgba(20,30,45,0.12) 100%),
-      linear-gradient(to bottom, rgba(20,30,45,0.04) 0%, rgba(20,30,45,0.08) 58%, rgba(20,30,45,0.12) 100%),
-      linear-gradient(90deg, rgba(0,98,49,0.10) 0%, rgba(0,98,49,0) 28%, rgba(0,98,49,0) 72%, rgba(209,190,120,0.08) 100%);
-    z-index:2;
-    pointer-events:none;
-  }
-
-  .wso-header-title{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:3;
-    pointer-events:none;
-    text-align:center;
-    padding:0 40px;
-    box-sizing:border-box;
-  }
-
-  .wso-header-title h2{
-    margin:0;
-    color:#ffffff;
-    font-size:clamp(36px,5vw,70px);
-    line-height:1.05;
-    font-weight:800;
-    text-shadow:
-      0 10px 30px rgba(0,0,0,.35),
-      0 4px 10px rgba(0,0,0,.25);
-  }
-
-  .wso-header-title h2::after{
-    content:"";
-    display:block;
-    width:118px;
-    height:5px;
-    margin:24px auto 0 auto;
-    border-radius:999px;
-    background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
-    box-shadow:0 0 18px rgba(209,190,120,0.36);
-  }
-
-  .wc-function-statement p{
-    font-family:Arial, Helvetica, sans-serif;
-    text-align:justify;
-  }
-
-  .wc-function-statement .wc-function-link{
-    margin-top:26px;
-    text-align:left;
-  }
-
-  @media(max-width:768px){
-    #wso-header-slideshow{
-      height:360px;
-      border-radius:20px;
-    }
-
-    #wso-header-slideshow::before{
-      border-radius:20px;
-    }
-
-    .wso-header-title{
-      padding:0 22px;
-    }
-  }
-</style>
-
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Expenditure Budget</p>
-  <div data-report-table-container-id="6989dbbccae62897761aea36-0">
-    <div data-table-scroll-container="true">
-      <table data-report-table-id="6989dbbccae62897761aea36-0">
-        <thead><tr><th>Row labels</th><th>FY 2020 Actuals</th><th>FY 2021 Actuals</th><th>FY 2022 Actuals</th><th>FY 2023 Actuals</th><th>FY 2024 Actuals</th><th>FY 2025 Actuals</th><th>FY 2026 Budget</th><th>Empty Values</th></tr></thead>
-        <tbody><tr><td>Personnel Budgeti</td><td>$38,265,648</td><td>$41,913,887</td><td>$46,282,407</td><td>$55,685,255</td><td>$64,494,102</td><td>$71,706,111</td><td>$78,826,289</td><td>–</td></tr>
-<tr><td>Operating Expendituresi</td><td>$14,182,472</td><td>$14,381,935</td><td>$14,292,080</td><td>$14,299,157</td><td>$15,294,014</td><td>$17,700,353</td><td>$21,086,289</td><td>–</td></tr>
-<tr><td>Capital Budgeti</td><td>$4,381,112</td><td>$3,615,500</td><td>$5,432,389</td><td>$10,311,694</td><td>$21,087,964</td><td>$33,662,820</td><td>$14,203,650</td><td>–</td></tr>
-<tr><td>Other Uses</td><td>–</td><td>$1,000,000</td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
-<tr><td>Total</td><td>$56,829,232</td><td>$60,911,322</td><td>$66,006,876</td><td>$80,296,105</td><td>$100,876,080</td><td>$123,069,284</td><td>$114,116,228</td><td>–</td></tr>
-</tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Expenditure Budget</p>
-  <div data-report-table-container-id="6989dbbccae62897761aea36-1">
-    <div data-table-scroll-container="true">
-      <table data-report-table-id="6989dbbccae62897761aea36-1">
-        <thead><tr><th>Revenue Description</th><th>FY 2027</th></tr></thead>
-        <tbody><tr><td>Interest</td><td>$505,000</td></tr>
-<tr><td>Inmate Housing Revenue</td><td>$3,500,000</td></tr>
-<tr><td>Interst</td><td>$1,000,000</td></tr>
-<tr><td>Supplemental Fire Support</td><td>$10,000</td></tr>
-<tr><td>Ambulance Fees</td><td>$3,000,000</td></tr>
-<tr><td>Transfer in from E911 Fund</td><td>$480,000</td></tr>
-<tr><td>Civil Process Fees</td><td>$60,000</td></tr>
-<tr><td>Available Funds from Prior Year</td><td>$4,110,000</td></tr>
-<tr><td>Transfer in Ad Valorem Revenue for Public Safety</td><td>$98,004,256</td></tr>
-<tr><td>Fire Rescue Non-Ad Valorem Assessment</td><td>$1,400,000</td></tr>
-<tr><td>Animal Shelter Fees</td><td>$18,000</td></tr>
-<tr><td>Inmate Work Crew Fees</td><td>$58,972</td></tr>
-<tr><td>Reimbursements for School Resource Officers</td><td>$1,370,000</td></tr>
-<tr><td>Surplus Equipment Sales</td><td>$100,000</td></tr>
-<tr><td>Inmate Fees, Air Fees, Seized Tag Fees</td><td>$500,000</td></tr>
-<tr><td></td><td>$114,116,228</td></tr>
-</tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Staffing / FTE</p>
-  <div data-report-table-container-id="6989dbbccae62897761aea36-2">
-    <div data-table-scroll-container="true">
-      <table data-report-table-id="6989dbbccae62897761aea36-2">
-        <thead><tr><th>Position Name</th><th>2023-2024</th><th>2024-2025</th><th>2025-2026</th><th>2026-2027</th></tr></thead>
-        <tbody><tr><td>Allocated FTE Count</td><td></td><td></td><td></td><td></td></tr>
-<tr><td>Sheriff</td><td>630</td><td>668</td><td>668</td><td>669</td></tr>
-<tr><td>ALLOCATED FTE COUNT</td><td>630</td><td>668</td><td>668</td><td>669</td></tr>
-</tbody>
-      </table>
-    </div>
-  </div>
-</div>
 <nav class="page-nav" aria-label="Page navigation">
   <a class="prev" href="property-appraiser.html">Property Appraiser</a>
   <a class="next" href="supervisor-of-elections.html">Supervisor of Elections</a>
@@ -464,6 +249,7 @@ window.wcBudgetPages = [
   {title:"Statistical & Supplemental Information",section:"Glossary, Statistical, and Supplemental Information",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
 ];
 </script>
+<script src="../assets/budget-data.js"></script>
 <script src="../assets/walton-budget-nav.js"></script>
 <script src="../assets/nav.js"></script>
 </body>

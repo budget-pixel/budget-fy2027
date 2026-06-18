@@ -15,6 +15,7 @@
 
 <div id="layout">
   <aside id="sidebar" aria-label="Budget navigation">
+<div class="wc-sidebar-header">FY 2027 Budget</div>
 <div class="nav-section">
   <button class="nav-section-toggle">Introduction and Overview<span class="arrow">▶</span></button>
   <div class="nav-section-links"><a href="../pages/home.html">Home</a>
@@ -132,6 +133,878 @@
 
 <div class="page-eyebrow">Glossary, Statistical, and Supplemental Information</div>
 <h1 class="page-title">Glossary, Acronyms, and Frequently Asked Questions</h1>
+
+<section class="wc-help-faq-section">
+  <style>
+  .wc-help-faq-section,
+  .wc-help-faq-section *,
+  .wc-help-faq-section *::before,
+  .wc-help-faq-section *::after{
+    box-sizing:border-box !important;
+  }
+
+  .wc-help-faq-section{
+    width:100% !important;
+    max-width:100% !important;
+    padding:54px 24px !important;
+    background:#ffffff !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+    overflow-x:hidden !important;
+  }
+
+  .wc-help-faq-shell{
+    width:100% !important;
+    max-width:1180px !important;
+    margin:0 auto !important;
+    display:grid !important;
+    grid-template-columns:360px minmax(0,1fr) !important;
+    gap:24px !important;
+    align-items:start !important;
+  }
+
+  .wc-budget-contact-card{
+    width:100% !important;
+    border-radius:30px !important;
+    background:#f8faf9 !important;
+    border:1px solid rgba(209,190,120,0.38) !important;
+    box-shadow:0 12px 28px rgba(36,52,77,0.07) !important;
+    overflow:hidden !important;
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease !important;
+  }
+
+  .wc-budget-contact-card:hover{
+    transform:translateY(-3px) !important;
+    border-color:rgba(0,98,49,0.24) !important;
+    box-shadow:0 18px 34px rgba(0,98,49,0.10) !important;
+  }
+
+  .wc-budget-contact-content{
+    padding:30px 28px !important;
+  }
+
+  .wc-budget-contact-content h2{
+    margin:0 0 12px 0 !important;
+    color:#172033 !important;
+    font-size:30px !important;
+    line-height:1.08 !important;
+    font-weight:800 !important;
+    letter-spacing:-.02em !important;
+  }
+
+  .wc-budget-contact-content p{
+    margin:0 0 22px 0 !important;
+    color:#475467 !important;
+    font-size:15px !important;
+    line-height:1.68 !important;
+  }
+
+  .wc-budget-contact-details{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin:0 0 24px 0 !important;
+    text-align:center !important;
+  }
+
+  .wc-budget-contact-details a{
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    color:#006231 !important;
+    text-decoration:none !important;
+    font-size:15px !important;
+    font-weight:800 !important;
+    overflow-wrap:anywhere !important;
+    justify-content:center !important;
+  }
+
+  .wc-budget-contact-details a:hover{
+    text-decoration:underline !important;
+  }
+
+  .wc-budget-contact-actions{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+    padding:24px 28px 28px 28px !important;
+    background:#006231 !important;
+  }
+
+  .wc-budget-contact-actions a{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:48px !important;
+    padding:0 16px !important;
+    border-radius:16px !important;
+    background:rgba(255,255,255,0.12) !important;
+    border:1px solid rgba(255,255,255,0.16) !important;
+    color:#ffffff !important;
+    text-decoration:none !important;
+    font-size:14px !important;
+    font-weight:800 !important;
+    transition:transform .18s ease, background .18s ease, color .18s ease !important;
+  }
+
+  .wc-budget-contact-actions a:hover{
+    transform:translateY(-2px) !important;
+    background:#ffffff !important;
+    color:#006231 !important;
+  }
+
+  .wc-faq-panel{
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  .wc-faq-hero{
+    position:relative !important;
+    overflow:hidden !important;
+    padding:36px 32px !important;
+    margin:0 0 20px 0 !important;
+    border-radius:30px !important;
+    background:#006231 !important;
+    box-shadow:0 14px 30px rgba(0,98,49,0.13) !important;
+    color:#ffffff !important;
+    text-align:left !important;
+  }
+
+  .wc-faq-hero h2{
+    margin:0 0 10px 0 !important;
+    color:#ffffff !important;
+    font-size:34px !important;
+    line-height:1.12 !important;
+    font-weight:800 !important;
+    letter-spacing:-.02em !important;
+    text-align:left !important;
+  }
+
+  .wc-faq-hero p{
+    max-width:760px !important;
+    margin:0 !important;
+    color:rgba(255,255,255,0.88) !important;
+    font-size:16px !important;
+    line-height:1.65 !important;
+    text-align:left !important;
+  }
+
+  .wc-faq-list{
+    display:grid !important;
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    gap:10px !important;
+    width:100% !important;
+    align-items:start !important;
+  }
+
+  .wc-faq-card{
+    width:100% !important;
+    border:1px solid rgba(209,190,120,0.38) !important;
+    border-radius:14px !important;
+    background:#ffffff !important;
+    box-shadow:0 5px 14px rgba(36,52,77,0.04) !important;
+    overflow:hidden !important;
+    transition:box-shadow .2s ease, border-color .2s ease, transform .2s ease !important;
+  }
+
+  .wc-faq-card:hover{
+    border-color:rgba(0,98,49,0.24) !important;
+    box-shadow:0 8px 18px rgba(0,98,49,0.07) !important;
+    transform:translateY(-1px) !important;
+  }
+
+  .wc-faq-card summary{
+    list-style:none !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:14px !important;
+    padding:13px 52px 13px 16px !important;
+    color:#172033 !important;
+    font-size:15px !important;
+    line-height:1.25 !important;
+    font-weight:800 !important;
+    cursor:pointer !important;
+    outline:none !important;
+    -webkit-tap-highlight-color:transparent !important;
+    text-align:center !important;
+    position:relative !important;
+  }
+
+  .wc-faq-card summary::-webkit-details-marker{
+    display:none !important;
+  }
+
+  .wc-faq-card summary:focus,
+  .wc-faq-card summary:focus-visible,
+  .wc-faq-card summary:active,
+  .wc-faq-card:focus,
+  .wc-faq-card:focus-visible,
+  .wc-faq-card[open] summary{
+    outline:none !important;
+    box-shadow:none !important;
+    border:none !important;
+  }
+
+  .wc-faq-card summary::after{
+    content:"+" !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:24px !important;
+    height:24px !important;
+    flex:0 0 24px !important;
+    border-radius:999px !important;
+    background:rgba(0,98,49,0.08) !important;
+    color:#006231 !important;
+    font-size:17px !important;
+    font-weight:800 !important;
+    position:absolute !important;
+    right:16px !important;
+  }
+
+  .wc-faq-card[open]{
+    border-color:rgba(0,98,49,0.32) !important;
+  }
+
+  .wc-faq-card[open] summary{
+    color:#006231 !important;
+  }
+
+  .wc-faq-card[open] summary::after{
+    content:"&ndash;" !important;
+    background:#006231 !important;
+    color:#ffffff !important;
+  }
+
+  .wc-faq-card p{
+    margin:0 !important;
+    padding:0 16px 16px 16px !important;
+    color:#475467 !important;
+    font-size:14px !important;
+    line-height:1.55 !important;
+  }
+
+  @media(max-width:960px){
+    .wc-help-faq-shell{
+      grid-template-columns:1fr !important;
+    }
+  }
+
+  @media(max-width:640px){
+    .wc-help-faq-section{
+      padding:38px 16px !important;
+    }
+
+    .wc-budget-contact-content{
+      padding:28px 22px !important;
+    }
+
+    .wc-budget-contact-actions{
+      padding:22px !important;
+    }
+
+    .wc-budget-contact-content h2{
+      font-size:28px !important;
+    }
+
+    .wc-budget-contact-content p{
+      font-size:15px !important;
+    }
+
+    .wc-faq-hero{
+      padding:32px 22px !important;
+      border-radius:24px !important;
+    }
+
+    .wc-faq-hero h2{
+      font-size:30px !important;
+    }
+
+    .wc-faq-hero p{
+      font-size:15px !important;
+    }
+
+    .wc-faq-card summary{
+      padding:13px 50px 13px 14px !important;
+      font-size:14px !important;
+    }
+
+    .wc-faq-card p{
+      padding-left:14px !important;
+      padding-right:14px !important;
+      font-size:14px !important;
+    }
+
+    .wc-faq-list{
+      grid-template-columns:1fr !important;
+    }
+  }
+  </style>
+  <div class="wc-help-faq-shell">
+    <aside class="wc-budget-contact-card">
+      <div class="wc-budget-contact-content">
+        <h2>Need Help Understanding the Budget?</h2>
+        <p>Contact the Walton County Office of Management and Budget for assistance with the annual budget, capital improvement plan, financial reports, or budget terminology.</p>
+
+        <div class="wc-budget-contact-details">
+          <a href="tel:18508928470">
+            <span aria-hidden="true">&#128222;</span>
+            <span>(850) 892-8470</span>
+          </a>
+          <a href="mailto:budget@mywaltonfl.gov">
+            <span aria-hidden="true">&#9993;&#65039;</span>
+            <span>budget@mywaltonfl.gov</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="wc-budget-contact-actions">
+        <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdb4696f0b333f2246" target="_blank" rel="noopener noreferrer">Budget Publication</a>
+        <a href="https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd4a9d93e5ac05a153" target="_blank" rel="noopener noreferrer">Capital Improvement Plan</a>
+        <a href="https://budget-pixel.github.io/walton-cip-project-search/?view=all&amp;v=6" target="_blank" rel="noopener noreferrer">Project Search</a>
+      </div>
+    </aside>
+
+    <div class="wc-faq-panel">
+      <header class="wc-faq-hero">
+        <h2>Frequently Asked Questions</h2>
+        <p>Review common questions about Walton County&rsquo;s budget process, revenues, taxes, and capital improvement planning.</p>
+      </header>
+
+      <div class="wc-faq-list">
+        <details class="wc-faq-card">
+          <summary>What is the purpose of the County budget?</summary>
+          <p>The budget is an annual financial plan for Walton County. It specifies the level of services to be provided in the coming year as set by the Board of County Commissioners.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>How and when is the budget prepared?</summary>
+          <p>Florida law requires an annual budget, including all such funds as required by law, to be prepared, approved, and adopted for each fiscal year. The budget process must be conducted in accordance with Chapters 125, 129, 200, and 218 of the Florida Statutes. For Walton County, this process begins in February and ends in September with the legal adoption of the budget.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>Where does the County obtain its revenues?</summary>
+          <p>Walton County receives revenues from local, state, and federal taxes, fees, licenses, grants, and payments for services.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>How is the money used?</summary>
+          <p>County funds are used to pay for salaries, operating expenses, equipment, supplies, capital improvements, debt service, general government services, public safety, transportation infrastructure, cultural and recreational activities, economic development, solid waste collection, and other services specified in the County budget.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is a mill of tax?</summary>
+          <p>One mill is equal to $1.00 for each $1,000 of assessed property value. County property taxes on a $250,000 single-family home, with a $50,000 homestead exemption and millage rate of 3.6000, would be $720.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is property tax?</summary>
+          <p>Property tax is a tax based on taxable property value. When the County adopts its annual budget, it determines the tax rate that must be applied to property to generate the necessary property tax revenue.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is the difference between ad valorem tax and property tax?</summary>
+          <p>There is no difference between ad valorem tax and property tax. They are different names for the same tax.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>Why is the County collecting more property taxes if the millage rate is constant?</summary>
+          <p>Property tax collections can increase even when the millage rate remains constant if taxable property values within the County increase. Taxable value is determined by subtracting all exemptions from assessed value as established by the Property Appraiser.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is an operating budget?</summary>
+          <p>An operating budget is an annual financial plan for recurring expenditures such as salaries, utilities, supplies, contractual services, and other ongoing costs.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is a capital improvement budget?</summary>
+          <p>A capital improvement budget is a long-range plan for the construction, purchase, repair, or replacement of physical assets such as buildings, streets, parks, drainage systems, and other infrastructure.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>How is the Capital Improvement Program funded?</summary>
+          <p>The County&rsquo;s capital projects are typically funded through current revenues, grants, debt financing, or a combination of funding sources.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is a budget appropriation?</summary>
+          <p>A budget appropriation is a specific amount of money that has been approved for use in a particular manner by the Board of County Commissioners.</p>
+        </details>
+
+        <details class="wc-faq-card">
+          <summary>What is the difference between recurring and non-recurring revenues?</summary>
+          <p>Recurring revenue is income from sources that continue from year to year, where a similar amount can be expected annually. Property taxes and franchise fees are examples of recurring revenue. Non-recurring revenues are limited, temporary, or variable, such as surplus land sales or one-time grants.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  (function(){
+    const section = document.querySelector('.wc-help-faq-section');
+    if(!section) return;
+
+    const cards = section.querySelectorAll('.wc-faq-card');
+    cards.forEach(card => {
+      card.addEventListener('toggle', () => {
+        if(card.open){
+          cards.forEach(other => {
+            if(other !== card){
+              other.removeAttribute('open');
+            }
+          });
+        }
+      });
+    });
+  })();
+</script>
+
+<div class="wc-glossary-section">
+  <style>
+    .wc-glossary-section,
+    .wc-glossary-section *,
+    .wc-glossary-section *::before,
+    .wc-glossary-section *::after{
+      box-sizing:border-box !important;
+    }
+
+    .wc-glossary-section{
+      width:100% !important;
+      max-width:100% !important;
+      padding:54px 24px !important;
+      background:#ffffff !important;
+      font-family:Arial, Helvetica, sans-serif !important;
+      overflow-x:hidden !important;
+    }
+
+    .wc-glossary-shell{
+      width:100% !important;
+      max-width:1180px !important;
+      margin:0 auto !important;
+    }
+
+    .wc-glossary-hero{
+      position:relative !important;
+      overflow:hidden !important;
+      padding:42px 34px !important;
+      margin:0 0 24px 0 !important;
+      border-radius:30px !important;
+      background:#006231 !important;
+      box-shadow:0 18px 38px rgba(0,98,49,0.16) !important;
+      color:#ffffff !important;
+      text-align:left !important;
+    }
+
+
+
+    .wc-glossary-hero h1{
+      position:relative !important;
+      z-index:1 !important;
+      margin:0 0 12px 0 !important;
+      color:#ffffff !important;
+      font-size:38px !important;
+      line-height:1.12 !important;
+      font-weight:800 !important;
+      letter-spacing:-.02em !important;
+      text-align:left !important;
+    }
+
+    .wc-glossary-hero p{
+      position:relative !important;
+      z-index:1 !important;
+      max-width:760px !important;
+      margin:0 !important;
+      color:rgba(255,255,255,0.88) !important;
+      font-size:16px !important;
+      line-height:1.65 !important;
+      text-align:left !important;
+    }
+
+    .wc-glossary-search-panel{
+      display:flex !important;
+      align-items:center !important;
+      gap:14px !important;
+      width:100% !important;
+      margin:0 0 22px 0 !important;
+      padding:16px !important;
+      border:1px solid rgba(209,190,120,0.42) !important;
+      border-radius:24px !important;
+      background:#ffffff !important;
+      box-shadow:0 10px 24px rgba(36,52,77,0.06) !important;
+    }
+
+    .wc-glossary-viewall{
+      flex:0 0 auto !important;
+      min-height:46px !important;
+      padding:0 18px !important;
+      border:none !important;
+      border-radius:999px !important;
+      background:#006231 !important;
+      color:#ffffff !important;
+      font-family:Arial, Helvetica, sans-serif !important;
+      font-size:14px !important;
+      font-weight:700 !important;
+      cursor:pointer !important;
+    }
+
+    .wc-glossary-viewall:hover{
+      background:#0b7741 !important;
+    }
+
+    .wc-glossary-search-label{
+      flex:0 0 auto !important;
+      display:inline-flex !important;
+      align-items:center !important;
+      min-height:42px !important;
+      padding:0 16px !important;
+      border-radius:999px !important;
+      background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+      color:#ffffff !important;
+      font-size:12px !important;
+      line-height:1 !important;
+      font-weight:800 !important;
+      letter-spacing:.08em !important;
+      text-transform:uppercase !important;
+      white-space:nowrap !important;
+    }
+
+    #searchBar{
+      display:block !important;
+      width:100% !important;
+      min-height:46px !important;
+      margin:0 !important;
+      padding:0 18px !important;
+      border:1px solid rgba(0,98,49,0.18) !important;
+      border-radius:999px !important;
+      background:#f8faf9 !important;
+      color:#172033 !important;
+      font-family:Arial, Helvetica, sans-serif !important;
+      font-size:15px !important;
+      line-height:1 !important;
+      outline:none !important;
+      box-shadow:none !important;
+    }
+
+    #searchBar:focus{
+      border-color:#006231 !important;
+      background:#ffffff !important;
+      box-shadow:0 0 0 4px rgba(0,98,49,0.10) !important;
+    }
+
+    #searchResults{
+      display:grid !important;
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:14px !important;
+      width:100% !important;
+      margin:0 !important;
+      padding:0 !important;
+    }
+
+    #searchResults p{
+      display:block !important;
+      width:100% !important;
+      min-width:0 !important;
+      margin:0 !important;
+      padding:20px 22px !important;
+      border:1px solid rgba(209,190,120,0.42) !important;
+      border-radius:20px !important;
+      background:#ffffff !important;
+      color:#475467 !important;
+      font-size:14px !important;
+      line-height:1.6 !important;
+      box-shadow:0 8px 20px rgba(36,52,77,0.05) !important;
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease !important;
+    }
+
+    #searchResults p:hover{
+      background:#ffffff !important;
+      transform:translateY(-2px) !important;
+      border-color:rgba(0,98,49,0.28) !important;
+      box-shadow:0 12px 26px rgba(0,98,49,0.09) !important;
+    }
+
+    #searchResults strong{
+      display:block !important;
+      margin:0 0 8px 0 !important;
+      color:#006231 !important;
+      font-size:16px !important;
+      line-height:1.25 !important;
+      font-weight:800 !important;
+    }
+
+    #searchResults span{
+      display:block !important;
+      color:#475467 !important;
+      font-size:14px !important;
+      line-height:1.6 !important;
+    }
+
+    .wc-glossary-empty{
+      display:none;
+      width:100% !important;
+      padding:26px !important;
+      border-radius:20px !important;
+      background:#f8faf9 !important;
+      color:#475467 !important;
+      text-align:center !important;
+      font-size:15px !important;
+      line-height:1.5 !important;
+      border:1px solid rgba(209,190,120,0.30) !important;
+    }
+
+    .wc-glossary-empty.is-visible{
+      display:block !important;
+    }
+
+    @media(max-width:860px){
+      .wc-glossary-search-panel{
+        align-items:stretch !important;
+        flex-direction:column !important;
+      }
+
+      .wc-glossary-search-label{
+        justify-content:center !important;
+        width:100% !important;
+      }
+
+      #searchResults{
+        grid-template-columns:1fr !important;
+      }
+    }
+
+    @media(max-width:640px){
+      .wc-glossary-section{
+        padding:38px 16px !important;
+      }
+
+      .wc-glossary-hero{
+        padding:32px 22px !important;
+        border-radius:24px !important;
+      }
+
+      .wc-glossary-hero h1{
+        font-size:30px !important;
+      }
+
+      .wc-glossary-hero p{
+        font-size:15px !important;
+      }
+
+      #searchResults p{
+        padding:18px 16px !important;
+      }
+    }
+  </style>
+
+  <div class="wc-glossary-shell">
+    <header class="wc-glossary-hero">
+      <h1>Budget Glossary and Acronyms</h1>
+      <p>Search common financial terms and acronyms used throughout Walton County&rsquo;s budget documents.</p>
+    </header>
+
+    <div class="wc-glossary-search-panel">
+      <span class="wc-glossary-search-label">Search Terms</span>
+      <input type="text" id="searchBar" placeholder="Type a term to view its definition...">
+      <button type="button" id="viewAllTerms" class="wc-glossary-viewall">View All Terms</button>
+    </div>
+
+    <div id="searchResults"></div>
+    <div class="wc-glossary-empty" id="glossaryEmpty">No matching terms found. Try another keyword or acronym.</div>
+  </div>
+
+  <script>
+        const glossary = [
+        { term: "Account", definition: "A separate financial reporting unit for budgeting, management, or accounting purposes. All budgetary transactions, whether revenue or expenditure, are recorded in accounts. Several related accounts may be grouped together in a fund." },
+        { term: "Accrual Basis", definition: "In accrual-basis accounting, income is realized in the accounting period in which it is earned, regardless of when the cash from these revenues is received. Expenses are recorded as they are owed, instead of when they are paid. In these funds depreciation expense is budgeted and expenditures for capital outlays are not included in budget totals." },
+        { term: "Ad Valorem Taxes", definition: "A tax levied on the assessed value (net of any exemptions) of real or personal property. This is commonly referred to as &ldquo;property tax.&rdquo;" },
+	{ term: "Intergovernmental Revenue", definition: "Funds received from federal, state and other local government sources in the form of grants, shared revenues, and payments in lieu of taxes." },
+	{ term: "Internal Service Funds", definition: "Funds such as Fleet Management and Health Insurance which are services provided to other departments of the county on a cost reimbursement basis." },
+	{ term: "Legally Adopted Budget", definition: "The total of the budgets of each County fund including budgeted transactions between funds. Approved by the Board of County Commissioners in conformance with Florida State Statutes Chapters 200.65 and 129." },
+	{ term: "Levy", definition: "To impose taxes, special assessments, or service charges; or, another term used for millage rate." },
+	{ term: "Line Item Budget", definition: "A budget that lists each account category separately along with the dollar amount budgeted for each account, such as office supplies, overtime, or rolling stock purchases." },
+	{ term: "Long Term Debt", definition: "Debt with a maturity of more than one year after the date of issuance." },
+	{ term: "Major Funds", definition: "Funds whose revenues, expenditures/expenses, assets, or liabilities (excluding extraordinary items) are at least 10 percent of corresponding totals for al governmental or enterprise funds and at least 5 percent of the aggregate amount for all governmental and enterprise funds. Any other fund may be reported as a major fund if the government&rsquo;s officials believe that fund is particularly important to financial statement users." },
+	{ term: "Mandate", definition: "Any responsibility, action or procedure that is imposed by one sphere of government on another through legislative, administrative, executive, or judicial action as a direct order, or that is required as a condition of aid." },
+	{ term: "Mill", definition: "The property tax rate, which is based on the valuation of property. A tax rate of one mill produces one dollar of taxes on each $1,000 of assessed property valuation." },
+	{ term: "Millage Rate", definition: "A rate expressed in thousands. As used with ad valorem (property) taxes, the rate expresses the dollars of tax per one thousand dollars of taxable values." },
+	{ term: "Modified Accrual Basis", definition: "The basis of accounting adopted for a governmental fund; as appropriate for fund type, should be used in measuring financial positions and operating results. Under it, revenues are recognized when they become both &ldquo;measurable&rdquo; and &ldquo;available to finance expenditures of the current period.&rdquo; Expenditures are recognized when the related fund liability is incurred except for: (1) inventories of materials and supplies which may be considered expenditures either when purchased or when used; (2) prepaid insurance and similar items which need not be reported; (3) accumulated unpaid vacation, sick pay, and other employee benefit amounts which need not be recognized in the current period, but for which larger-than-normal accumulations must be disclosed in the notes to the financial statement; (4) interest on special assessment indebtedness which may be recorded when due rather than accrued, if approximately offset by interest earnings on special assessment levies; and (5) principal and interest on long-term debt which are generally recognized when due. All governmental funds and Expendable Trust Funds are accounted for using the modified accrual basis of accounting." },
+	{ term: "MSBU", definition: "Municipal Services Benefit District - A specific taxing unit established by the Board of County Commissioners via an adopted ordinance which derives a specific benefit for which a special assessment is imposed to defray part or all of the cost of providing that benefit." },
+	{ term: "Net Budget", definition: "The legally adopted budget less all interfund transactions. These amounts in the budget represent transfers and interfund reimbursements, which appear in both fund budgets and therefore inflate the budget total. By subtracting these amounts from the legally adopted budget, the net budget reflects the current position of the operating costs of the county." },
+	{ term: "Non-Major Fund", definition: "Funds that are not considered Major and can be reported in the aggregate as defined by GASB 34 Requirements." },
+	{ term: "Object Code", definition: "An account to which an expense or expenditure is recorded in order to accumulate and categorize the various types of payments that are made by governments. Certain object codes are mandated by the State of Florida Uniform Accounting System." },
+	{ term: "Objective", definition: "A defined method to accomplish an established goal." },
+	{ term: "Operating Expenditures", definition: "Includes expenditures for goods and services, which primarily benefit the current period, and are not defined as personal services or capital outlays." },
+	{ term: "Operating Transfers", definition: "Legally authorized transfers from a fund receiving revenue to the fund through which the resources are to be expended, transfers of tax revenues from a Special Revenue Fund to a Debt Service Fund, transfers from the General Fund to a Special Revenue or Capital Projects Fund, operating subsidy transfers from the General or a Special Revenue Fund to an Enterprise Fund, and transfers from an Enterprise Fund, other than payments in lieu of taxes, to finance General Fund expenditures." },
+	{ term: "Performance Measure", definition: "Specific qualitative and/or quantitative measures of work performed as an objective of a department." },
+	{ term: "Personal Property", definition: "Livestock, commercial equipment and furnishings, attachments to mobile homes, railroad cars, and similar possessions that are taxable under state law." },
+	{ term: "Personnel", definition: "Authorized Positions - Number of positions authorized for a department/division. They may be full-time or part-time positions that are filled all year long rather than only seasonal or temporary positions." },
+	{ term: "Proprietary Funds", definition: "Enterprise Funds or Internal Service Funds in which operating revenues result from exchange transactions associated with the principal activity of the fund." },
+	{ term: "Property Appraiser", definition: "The elected county official responsible for setting property valuations for tax purposes and for preparing the annual tax roll." },
+	{ term: "Purpose", definition: "A broad statement of the goals, in terms of meeting public service needs, that a department is organized to meet." },
+	{ term: "Real Property", definition: "Land and the buildings and other structures attached to it that are taxable under state law." },
+	{ term: "Reserve for Contingencies", definition: "An amount set aside, consistent with statutory authority that can subsequently be appropriated to meet unexpected needs." },
+	{ term: "Retained Earnings", definition: "An equity account reflecting the accumulated earnings of an Enterprise or Internal Service Fund." },
+	{ term: "Resolution", definition: "A special or temporary order of a legislative body; an order of a legislative body requiring less legal formality than an ordinance or statute." },
+	{ term: "Revenue Bonds", definition: "Debt, which is secured only by specific identified revenues. Revenue bonds are explicitly not secured by the full faith and credit of the government. If bondholders are not repaid, they have a legal claim only against the revenues used to secure the debt." },
+	{ term: "Rolled Back Rate", definition: "The millage rate which would generate the same ad valorem tax revenue as was generated the previous year, excluding changes in taxable valuation resulting from new construction, annexation, or de-annexation. If the proposed aggregate millage rate exceeds the aggregate rolled-back rate, then by law the advertisement for the public hearings to adopt the millage and budget must contain a prominent notice of the tax increase. The advertisement must state the percentage by which the rolled-back rate is exceeded as the percentage of the proposed tax increase. The rolled-back rate is used in the same manner for individual millage levies." },
+	{ term: "SHIP", definition: "State Housing Initiatives Partnership" },
+	{ term: "Sales Tax", definition: "Taxes imposed upon the sale of designated goods, rentals, leases and specific services as part of the sale (Section 212.054 F.S.). These taxes are collected and retained by the State with the exception of the Local Government Half-Cent Sales Tax Program (effective July 1, 1988) which returns to the cities and counties almost all the funds collected for that portion of the tax on the basis of specific formulas. In Florida, local governments may use the half-cent sales tax for any lawful purpose. The Local Option Sales Tax program is a county levied tax, which allows counties to levy for a period up to 15 years, a one-cent discretionary surcharge on all transactions subject to taxation under Florida." },
+	{ term: "Service Level", definition: "Services or products which comprise actual or expected output of a given program. Focus is on results, not measures of workload." },
+	{ term: "Special Assessments", definition: "Collections resulting from compulsory levies against certain properties to defray all or part of the cost of specific improvements or services presumed to be of general benefit to the public and of special benefit to the assessed property." },
+	{ term: "Special Revenue Fund", definition: "A governmental accounting fund used to account for the proceeds of specific revenue sources that are legally restricted to expenditures for specified purposes." },
+	{ term: "State Shared Revenues", definition: "Revenues collected by the state and proportionately shared with counties and/or municipalities on the basis of specific formulas. Such revenues include: Intangible Personal Property Taxes, Insurance Agents County Licenses, Mobile Home Licenses, Alcoholic Beverage Licenses and Local Government Half-Cent Sales Tax." },
+	{ term: "Statute", definition: "A written law enacted by a duly organized and constituted legislative body." },
+	{ term: "Tax Rate", definition: "The amount of tax stated in terms of a unit of the tax base; for example, five mills equal five dollars per thousands of taxable value." },
+	{ term: "Taxes", definition: "Compulsory charges levied by a government for the purpose of financing services performed for the common benefit. This term does not include specific charges made against particular persons or property for current or permanent benefits such as special assessments. Neither does the term include charge for services rendered only to those paying such charges as, for example, wastewater service charges." },
+	{ term: "Taxable Valuation", definition: "The value used for computing the ad valorem taxes levied against property. The taxable value is the assessed value less any exemptions allowed by law. The most common exemption is the $25,000 homestead exemption allowed if the owner uses the property as the principal residence. There are also exemptions for disability, government owned and non-profit owned property." },
+	{ term: "Tourist Development Tax", definition: "The local government Tourist Development Tax was established by Florida Statute 125.0104 in 1977 to provide counties with an option to raise additional revenue for tourism related projects or activities." },
+	{ term: "Transfers In/Out", definition: "Amounts transferred from one fund to another to assist in financing the services of the recipient fund. Transfers do not constitute revenues or expenditures of the governmental unit but only of the individual funds. Thus, they are budgeted and accounted for separately from other revenues and expenditures." },
+	{ term: "TRIM", definition: "Truth in Millage. (See below)." },
+	{ term: "Truth In Millage Law", definition: "Also called the TRIM bill. A 1980 law enacted by the Florida legislature, which changed the budget process for local taxing agencies. It was designed to keep the public informed about the taxing intention of the various taxing authorities." },
+	{ term: "Uniform Accounting System", definition: "The chart of accounts prescribed by the Office of the State Comptroller designed to standardize financial information to facilitate comparison and evaluation of reports." },
+	{ term: "Unencumbered Balance", definition: "The amount of an appropriation that is neither expended nor encumbered. It is essentially the amount of funds still available for future needs." },
+	{ term: "Unincorporated Area", definition: "That portion of the County, which is not within the boundaries of any municipality." },
+        { term: "VA", definition: "Veteran&rsquo;s Administration" },
+	{ term: "Adjusted Final Millage", definition: "Under Florida law, the actual tax rate levied by a local government when tax bills are issued. The rate is adjusted for corrected errors in property assessments for tax purposes and for changes in assessments made by property appraisal adjustment boards in each county. Usually, such changes are very slight, and the adjusted millage sometimes does not change from the levy set by the taxing authority." },
+	{ term: "Adopted Budget", definition: "The financial plan of revenues and expenditures for a fiscal year as approved by the Board of County Commissioners." },
+	{ term: "Agency Funds", definition: "Funds in which the assets equal the liabilities and do not involve measurement of results in operations." },
+	{ term: "Aggregate Millage Rate", definition: "A rate obtained by dividing the sum of all ad valorem taxes levied by the governing body (Board of County Commissioners for County Government) by the taxable value of the county or municipality. Expresses an average tax rate." },
+	{ term: "Amendment", definition: "A change to an adopted budget, which may increase or decrease a fund total. The change must be approved by the Board of County Commissioners." },
+	{ term: "Appropriation", definition: "A legal authorization granted by a legislative body to make expenditures and to incur obligations for specific purposes. An appropriation is usually limited in amount and as to time when it is expended." },
+	{ term: "Assessed Valuation", definition: "A valuation established for real estate or specific personal property by a government as a basis for levying taxes. Assessed valuation is required to approach 100% of market value in Florida. Real property is appraised as to assessed valuation at time of construction or major remodeling and all property is reappraised as to assessed valuation every two years. " },
+	{ term: "Assets", definition: "Physical items or rights that have value and are owned by the reporting entity." },
+	{ term: "Balanced Budget", definition: "As defined in Chapter 192.01 (2)(b), Florida Statutes, a budget where the total of estimated receipts including balances brought forward (revenues), shall equal the total of the appropriations and reserves (expenses)." },
+	{ term: "BCC", definition: "Board of County Commissioners" },
+	{ term: "Board of County Commissioners", definition: "The governing body of Walton County composed of five persons elected countywide." },
+	{ term: "Budget", definition: "A plan of financial operation embodying an estimate of proposed expenditures for a given period and the proposed means of financing those expenditures. The budget plan is identified as to the period for which it will be effective and if it is a proposed budget or has been approved and adopted by the Board of County Commissioners and/or management, but only within the limitations specified by state statutes and/or administrative rules and regulations." },
+	{ term: "Budget Adjustment", definition: "A revision to the adopted budget occurring during the affected fiscal year as approved by the Board of County Commissioners via an amendment or a transfer." },
+	{ term: "Budget Document", definition: "The official written statement of the annual fiscal year financial plan for the County as presented by the County Administrator." },
+	{ term: "Budget Hearing", definition: "The public hearing conducted by the Board of County Commissioners to consider and adopt the annual budget." },
+	{ term: "Budget Message", definition: "A brief written statement presented by the County Administrator to explain principal budget issues and to provide policy recommendations to the Board of County Commissioners." },
+	{ term: "ACFR", definition: "Annual Comprehensive Financial Report" },
+	{ term: "Capital Improvements", definition: "Physical assets, constructed or purchased, that have a minimum useful life of five years. These may include buildings, recreational facilities, road and drainage structures, water and wastewater structures, and equipment." },
+	{ term: "Capital Outlay", definition: "Fixed assets which have a value of $5,000 or more and have a useful economic lifetime of more than one year; or assets of any value if the nature of the item is such that it must be controlled for custody purposes as a fixed asset. " },
+	{ term: "Capital Project", definition: "A project to acquire or improve an asset with an anticipated life exceeding one year and includes land acquisition, construction, repair or structural improvement of a facility, engineering and design for a facility, and acquisition or repair of equipment. Detailed information for a capital improvement is to include the time frame for completion, the location, description, the estimated total expenditure, and the proposed method of financing. " },
+	{ term: "Capital Projects Funds", definition: "Account for financial resources to be used for the acquisition or construction of major capital facilities (other than those financed by the proprietary funds)." },
+	{ term: "Cash Basis", definition: "A basis of accounting in which transactions are recognized only when cash is increased or decreased." },
+	{ term: "CIP", definition: "Capital Improvement Program" },
+	{ term: "Constitutional Officers", definition: "Elected County government officials other than members of the Board of County Commissioners. The Clerk of Circuit Court, Property Appraiser, Sheriff, Supervisor of Elections and Tax Collector are Constitutional Officers, so called because their positions are authorized in the State Constitution." },
+	{ term: "Consumer Price Index (CPI) ", definition: "A statistical description of price levels provided by the U.S. Department of Labor. The index is used as a measure of the increase in the cost of living (i.e., economic inflation)." },
+	{ term: "Contingency", definition: "A budgetary reserve to provide for emergency or unanticipated expenditures during the fiscal year." },
+	{ term: "County Administrator", definition: "The Chief Executive Officer of the County appointed by the Board of County Commissioners." },
+	{ term: "Debt Service", definition: "Payments of principal and interest to bondholders. Generally, annual debt service for a bond issue is comprised of two payments each year. One payment on the bond anniversary date will be equal to the annual principal payment and six months of accumulated interest and the other payment will be 180 days later and be equal to six months of accumulated interest." },
+	{ term: "Department", definition: "An organizational unit of the County responsible for carrying out a major governmental function." },
+	{ term: "Dependent Special District", definition: "A special district whose governing body and budget are established by the Board of County Commissioners." },
+	{ term: "Depreciation", definition: "The periodic expiration of an asset&rsquo;s useful life." },
+	{ term: "Distinguished Budget Presentation Awards", definition: "A voluntary awards program administered by the Government Finance Officers Association (GFOA) to encourage governments to prepare effective budget documents." },
+	{ term: "Division", definition: "A basic organizational unit of the County, which is functionally unique in its service delivery." },
+	{ term: "Employee (or Fringe) Benefits", definition: "Contributions made by a government to meet commitments or obligations for employee fringe benefits. Included is the government&rsquo;s share of costs for Social Security and the various pension, medical, and life insurance plans." },
+	{ term: "Encumbrance", definition: "The commitment of appropriated funds to purchase an item or service." },
+	{ term: "Exemption", definition: "Amounts determined by State law to be deducted from the assessed value of property for tax purposes. Tax rates are applied to the balance, which is called the non-exempt portion of the assessment. A 1980 amendment to the Florida Constitution sets the exemptions of homesteads at $25,000. That means that a homeowner with property assessed at $50,000 would have to pay taxes on $25,000 of the assessment. Additionally, in 2008, Amendment I was passed which stated that homestead residents would receive an additional $25,000 exemption on property values exceeding $50,000. Eligible homeowners must apply for the exemptions by March 1 of the first year of residence; thereafter renewal is automatic. Other exemptions apply to agricultural land and property owned by widows, the blind, the permanently and totally disabled people who meet certain income criteria." },
+	{ term: "Expenditures", definition: "Decreases in net financial resources. Expenditures include operating expenses, capital outlays and debt service payments, which require current or future use of current assets." },
+	{ term: "Expenses", definition: "Decreases in net total assets. Expenses represent the total cost of operations during a specific period regardless of the timing of related expenditures." },
+	{ term: "FBIP", definition: "Florida Boating Improvement Program" },
+	{ term: "Fiduciary Funds", definition: "Funds that account for assets belonging to others, such as performance bonds and escrows, which are under county control. Agency and expendable trust funds are accounted for like governmental funds." },
+	{ term: "Final Millage", definition: "The tax rate adopted in the final public budget hearing of a taxing authority." },
+	{ term: "Fiscal Year", definition: "A 12-month period of time to which the annual operating budget applies and at the end of which a government determines its financial position and the results of its operations. In Florida, the fiscal year for all local governments extends from October 1 to September 30." },
+	{ term: "Fixed Assets", definition: "Assets of a long-term character such as land, buildings, improvements other than buildings, machinery, equipment and furniture whose cost is in excess of a specific amount and whose life expectancy is in excess of one year. Such assets are entered into a computer program, which controls the location and value of each item until it loses its usefulness, and is traded on a replacement asset or is otherwise disposed of." },
+	{ term: "Functions", definition: "Expenditure classification according to the principal purpose for which the expenditures were made. The Florida Uniform Accounting System specifies the functions to be identified such as: general government service, public safety, physical environment, etc." },
+	{ term: "Fund", definition: "A fiscal and accounting entity with a self-balancing set of accounts recording cash and other financial resources, together with all related liabilities and residual equities or balances, and changes therein, which are segregated for the purpose of carrying on specific activities or attaining certain objectives in accordance with special regulations, restrictions, or limitations of that fund." },
+	{ term: "Fund Accounting", definition: "The accounts of the County are organized on the basis of funds and account groups, each of which is considered a separate accounting entity. The operations of each fund are accounted for with a separate set of self-balancing accounts that comprise its assets, liabilities, fund equity, revenues and expenditures, or expenses, as appropriate. Government resources are allocated to and accounted for in individual funds based upon the purposes for which they are to be spent and the means by which spending activities are controlled." },
+	{ term: "Fund Balance", definition: "A term used to express the equity (assets minus liabilities) of governmental funds and trust funds." },
+	{ term: "FY", definition: "Fiscal Year" },
+	{ term: "General Fund", definition: "The main operating fund for Walton County, which is used to account for all financial resources, except those required to be accounted for in another fund. The majority of funding is from ad valorem taxes. The collection and disbursement of monies to the constitutional officers is accounted for in this fund." },
+	{ term: "GAAP", definition: "Generally Accepted Accounting Principles - Uniform minimum standards and guidelines for financial accounting and reporting. They govern the form and content of the basic financial statements of an entity. GAAP encompasses the conventions, rules, and procedures necessary to define accepted accounting practices at a particular time. They include not only broad guidelines of general applications, but also detailed practices and procedures. GAAP provides a standard by which to measure financial presentations. The primary authoritative statement on the application of GAAP to state and local governments are National Committee on Governmental Accounting (NCGA) pronouncements. Every government should prepare and publish financial statements in conformity with GAAP. The objectives of government GAAP financial reports are different from, and much broader than, the objectives of business GAAP financial reports." },
+	{ term: "GASB", definition: "Governmental Accounting Standards Board- nonprofit organization responsible for establishing and improving accounting and financial reporting standards for governmental units." },
+	{ term: "GIS", definition: "Geographic Information System-Technology to acquire, convert, integrate, maintain, document, analyze, coordinate and distribute geographic information for a variety of County needs." },
+	{ term: "Goal", definition: "A statement that describes the purpose toward which an endeavor is directed, such as a target or target area." },
+	{ term: "Grants", definition: "A contribution by a government or other organization to support a particular function. Grants may be classified as either operational or capital, depending upon the grantee." },
+	{ term: "Homestead Exemption", definition: "Refer to definition for exempt, exemption, non-exempt." },
+	{ term: "HUD", definition: "Department of Housing and Urban Development" },
+	{ term: "Impact Fees", definition: "Fees charged to land developers at the time of development for the cost of construction of facilities to serve the development site (roads, parks, etc.)." },
+	{ term: "Infrastructure", definition: " The physical assets of a government (e.g., streets, water, sewer, public buildings and parks)." },
+	{ term: "Interfund Transfers", definition: " Budgeted amounts transferred from one governmental accounting fund to another for work or services provided. These represent a &ldquo;double counting&rdquo; of expenditures. Therefore, these amounts are deducted from the total County operating budget to calculate the &ldquo;net&rdquo; budget." },
+	{ term: "Capital Expenditures", definition: " Funds used by Walton County to acquire, upgrade, and maintain physical assets such as property, buildings, or equipment. These expenditures are typically for assets with a useful life longer than one year and are considered investments in Walton County&rsquo;s infrastructure and operations." },
+	{ term: "RBA/NBA", definition: " Acronyms for Regional Beach Access and Neighborhood Beach Access. RBA refers to large, public beach access points with parking, restrooms, and amenities, serving the wider region. NBA refers to smaller, more localized access points serving specific neighborhoods with limited facilities, provided and maintained by Walton County." }
+        ];
+        (function initWaltonGlossarySearch(){
+            const section = document.querySelector('.wc-glossary-section');
+            if (!section) return;
+
+            const searchBar = section.querySelector('#searchBar');
+            const resultsContainer = section.querySelector('#searchResults');
+            const emptyMessage = section.querySelector('#glossaryEmpty');
+            const viewAllButton = section.querySelector('#viewAllTerms');
+            let showingAllTerms = false;
+
+            if (!searchBar || !resultsContainer || !emptyMessage || !viewAllButton) return;
+
+            function escapeHtml(value){
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function displayResults(terms, hasQuery) {
+                if (!hasQuery && !showingAllTerms) {
+                    resultsContainer.innerHTML = '';
+                    emptyMessage.classList.remove('is-visible');
+                    return;
+                }
+
+                if (!terms.length) {
+                    resultsContainer.innerHTML = '';
+                    emptyMessage.classList.add('is-visible');
+                    return;
+                }
+
+                emptyMessage.classList.remove('is-visible');
+                resultsContainer.innerHTML = terms.map(item => `
+                    <p>
+                        <strong>${escapeHtml(item.term)}</strong>
+                        <span>${escapeHtml(item.definition)}</span>
+                    </p>
+                `).join('');
+            }
+
+            function runSearch(){
+                showingAllTerms = false;
+                viewAllButton.textContent = 'View All Terms';
+                const searchQuery = searchBar.value.trim().toLowerCase();
+                const filteredTerms = searchQuery
+                    ? glossary.filter(item =>
+                        item.term.toLowerCase().includes(searchQuery) ||
+                        item.definition.toLowerCase().includes(searchQuery)
+                      )
+                    : [];
+
+                displayResults(filteredTerms, Boolean(searchQuery));
+            }
+
+            searchBar.oninput = runSearch;
+            searchBar.onkeyup = runSearch;
+            searchBar.onchange = runSearch;
+
+            viewAllButton.addEventListener('click', function(){
+                showingAllTerms = !showingAllTerms;
+
+                if(showingAllTerms){
+                    searchBar.value = '';
+                    displayResults(glossary, true);
+                    viewAllButton.textContent = 'Hide Terms';
+                } else {
+                    resultsContainer.innerHTML = '';
+                    emptyMessage.classList.remove('is-visible');
+                    viewAllButton.textContent = 'View All Terms';
+                }
+            });
+        })();
+    </script>
+</div>
 
 <nav class="page-nav" aria-label="Page navigation">
   <a class="prev" href="financial-forecast.html">Financial Forecast</a>

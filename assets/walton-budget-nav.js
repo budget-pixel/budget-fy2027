@@ -508,11 +508,17 @@
     margin-top:0 !important;
     padding:10px 28px !important;
     box-sizing:border-box !important;
-    background:#ffffff !important;
+    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
     border-top:0 !important;
-    border-bottom:4px solid #006231 !important;
+    border-bottom:3px solid #d1be78 !important;
     box-shadow:0 1px 4px rgba(36,52,77,0.04) !important;
     font-family:Arial, Helvetica, sans-serif !important;
+  }
+  nav#nav-menu .wc-split-brand-top{
+    color:#ffffff !important;
+  }
+  nav#nav-menu .wc-split-brand-bottom{
+    color:rgba(255,255,255,.82) !important;
   }
   nav#nav-menu.nav-menu::before{
     display:none !important;
@@ -598,25 +604,25 @@
     margin:0 auto !important;
     display:flex !important;
     align-items:center !important;
-    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+    background:#ffffff !important;
     border-radius:999px !important;
     padding:9px 14px !important;
     box-sizing:border-box !important;
-    box-shadow:0 8px 18px rgba(0,98,49,0.14) !important;
+    box-shadow:0 4px 14px rgba(0,0,0,0.16) !important;
     transition:box-shadow .22s ease, background-color .22s ease !important;
   }
   nav#nav-menu .wc-search-box:hover,
   nav#nav-menu .wc-search-box:focus-within{
     transform:none !important;
-    box-shadow:0 8px 18px rgba(0,98,49,0.14) !important;
+    box-shadow:0 4px 14px rgba(0,0,0,0.22) !important;
   }
   nav#nav-menu .wc-search-icon{
     width:18px !important;
     height:18px !important;
     flex-shrink:0 !important;
     margin-right:10px !important;
-    color:#ffffff !important;
-    stroke:#ffffff !important;
+    color:#006231 !important;
+    stroke:#006231 !important;
     fill:none !important;
   }
   nav#nav-menu #wcTocSearch{
@@ -624,14 +630,14 @@
     border:0 !important;
     outline:0 !important;
     background:transparent !important;
-    color:#ffffff !important;
+    color:#172033 !important;
     font-size:14px !important;
     line-height:1.35 !important;
     font-weight:600 !important;
     font-family:Arial, Helvetica, sans-serif !important;
   }
   nav#nav-menu #wcTocSearch::placeholder{
-    color:rgba(255,255,255,.72) !important;
+    color:rgba(23,32,51,.48) !important;
     opacity:1 !important;
   }
   nav#nav-menu .wc-nav-search-results{
@@ -704,7 +710,7 @@
   nav#nav-menu .dropdown-item-title{
     margin:0 !important;
     padding:11px 18px !important;
-    color:#24344d !important;
+    color:#ffffff !important;
     font-size:13px !important;
     line-height:1 !important;
     font-weight:700 !important;
@@ -714,7 +720,7 @@
   }
   nav#nav-menu .nav-menu-item:hover,
   nav#nav-menu .dropdown-item:hover{
-    background:rgba(0,98,49,0.06) !important;
+    background:rgba(255,255,255,0.16) !important;
   }
   nav#nav-menu .dropdown{
     margin-top:12px !important;
