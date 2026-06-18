@@ -43,6 +43,15 @@
     "planning": ["planning short term rental"]
   };
 
+  // Object codes pulled out into their own supplemental Expenditure Summary
+  // table on certain department pages (see render*SupplementalTables below)
+  // and therefore excluded from that department's main summary table so
+  // amounts aren't counted twice.
+  const EXPENSE_OBJECT_CODES_BROKEN_OUT = {
+    "solid waste": ["534000"],
+    "building construction and maintenance": ["562000", "563000", "543000"]
+  };
+
   // Hover-tip copy for each budget category, shown via the same
   // "i" bubble treatment used on the site's static FY-history tables.
   const TYPE_TOOLTIPS = {
@@ -765,6 +774,19 @@
     return '<section class="solid-waste-supplemental-tables">' + pieces.join("") + "</section>";
   }
 
+  function renderBuildingConstructionSupplementalTables() {
+    const rows = rowsForExactDepartment(cache.expenditures, "Building Construction and Maintenance");
+    const parksRows = rows.filter((r) => ["562000", "563000"].includes(String(r.Object_Code || "").trim()));
+    const utilityRows = rows.filter((r) => String(r.Object_Code || "").trim() === "543000");
+    const pieces = [
+      renderTypeSummaryTable(parksRows, "expense", "Parks, Recreation, and Public Facilities Capital Program", "Building Construction and Maintenance"),
+      renderTypeSummaryTable(utilityRows, "expense", "County-Wide Utilities", "Building Construction and Maintenance")
+    ].filter(Boolean);
+
+    if (!pieces.length) return "";
+    return '<section class="building-construction-supplemental-tables">' + pieces.join("") + "</section>";
+  }
+
   function renderMosquitoStateAidTables() {
     const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
     const revenueRows = rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid");
@@ -989,7 +1011,8 @@
       "department-staffing-table",
       "department-machinery-table",
       "department-state-aid-tables",
-      "department-solid-waste-tables"
+      "department-solid-waste-tables",
+      "department-building-construction-tables"
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
@@ -1006,17 +1029,19 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl] = containers;
 
         renderDepartmentNarrative(narrativeEl, deptName, deptCode);
 
         mountOrHide(performanceEl, renderPerformanceTable(getDepartmentPerformanceMeasures(deptName, deptCode)));
         bindPriorYearsToggle(performanceEl);
 
-        // The 534000 (Franchise Services) account is broken out into its own
-        // table below for Solid Waste, so exclude it here to avoid double-counting.
+        // Some departments break specific object codes out into their own
+        // supplemental table below; exclude those codes here to avoid
+        // double-counting them in the main Expenditure Summary.
+        const excludedObjectCodes = EXPENSE_OBJECT_CODES_BROKEN_OUT[normalizeDeptName(deptName)] || [];
         const expenseRows = getDepartmentExpenses(deptName, deptCode).filter(
-          (r) => !(normalizeDeptName(deptName) === "solid waste" && String(r.Object_Code || "").trim() === "534000")
+          (r) => !excludedObjectCodes.includes(String(r.Object_Code || "").trim())
         );
         mountOrHide(
           expenseEl,
@@ -1044,6 +1069,14 @@
           normalizeDeptName(deptName) === "solid waste" ? renderSolidWasteSupplementalTables() : ""
         );
         bindTooltipAnchors(solidWasteEl);
+
+        mountOrHide(
+          buildingConstructionEl,
+          normalizeDeptName(deptName) === "building construction and maintenance"
+            ? renderBuildingConstructionSupplementalTables()
+            : ""
+        );
+        bindTooltipAnchors(buildingConstructionEl);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
