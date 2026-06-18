@@ -299,6 +299,11 @@
     return rowsByDeptName(rows, deptName);
   }
 
+  function rowsForExactDepartment(rows, deptName) {
+    const norm = normalizeDeptName(deptName);
+    return (rows || []).filter((r) => normalizeDeptName(r.Dept_Name) === norm);
+  }
+
   function getDepartmentNameFromPage() {
     const explicit = document.querySelector("[data-department]");
     if (explicit && explicit.dataset.department && explicit.dataset.department.trim()) {
@@ -684,6 +689,18 @@
     });
   }
 
+  function renderMosquitoStateAidTables() {
+    const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
+    const revenueRows = rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid");
+    const pieces = [
+      renderTypeSummaryTable(expenseRows, "expense", "Mosquito Control State Aid Expenditure Summary"),
+      renderTypeSummaryTable(revenueRows, "revenue", "Mosquito Control State Aid Revenue Summary")
+    ].filter(Boolean);
+
+    if (!pieces.length) return "";
+    return '<section class="mosquito-state-aid-tables">' + pieces.join("") + "</section>";
+  }
+
   function getShowPriorYears() {
     try {
       return localStorage.getItem(PRIOR_YEARS_KEY) === "1";
@@ -894,7 +911,8 @@
       "department-expense-table",
       "department-revenue-table",
       "department-staffing-table",
-      "department-machinery-table"
+      "department-machinery-table",
+      "department-state-aid-tables"
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
@@ -911,7 +929,7 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl] = containers;
 
         renderDepartmentNarrative(narrativeEl, deptName, deptCode);
 
@@ -933,6 +951,11 @@
         mountOrHide(staffingEl, renderStaffingTable(getDepartmentStaffing(deptName, deptCode)));
         bindPriorYearsToggle(staffingEl);
         mountOrHide(machineryEl, renderMachineryTable(getDepartmentMachinery(deptName, deptCode)));
+        mountOrHide(
+          stateAidEl,
+          normalizeDeptName(deptName) === "mosquito control" ? renderMosquitoStateAidTables() : ""
+        );
+        bindTooltipAnchors(stateAidEl);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
