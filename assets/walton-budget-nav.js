@@ -1042,6 +1042,11 @@
     overflow:hidden !important;
     z-index:1 !important;
   }
+  body.wc-cip-overview-page footer[role="contentinfo"]{
+    margin-top:18px !important;
+    min-height:118px !important;
+    border-top-width:3px !important;
+  }
   footer[role="contentinfo"] *{
     visibility:visible !important;
     opacity:1 !important;
@@ -1059,6 +1064,11 @@
     background:#ffffff !important;
     box-sizing:border-box !important;
     overflow:hidden !important;
+  }
+  body.wc-cip-overview-page footer[role="contentinfo"] .footer-container{
+    min-height:68px !important;
+    padding-top:18px !important;
+    padding-bottom:0 !important;
   }
   footer[role="contentinfo"] .logo-container{
     display:none !important;
@@ -1157,6 +1167,11 @@
     font-weight:600 !important;
     text-align:center !important;
     overflow:visible !important;
+  }
+  body.wc-cip-overview-page .wc-budget-footer-bottom{
+    min-height:40px !important;
+    padding-top:10px !important;
+    padding-bottom:24px !important;
   }
   
   /* STANDALONE WALTON HEADER */
@@ -1360,20 +1375,37 @@
     if(!document.body){
       return;
     }
+    function getFooterAnchor(appContainer){
+      if(!appContainer || !appContainer.parentNode){
+        return null;
+      }
+
+      return appContainer.parentNode.querySelector(".page-nav") || appContainer;
+    }
+    function insertFooterAfterAnchor(footer, anchor){
+      if(!footer || !anchor || !anchor.parentNode){
+        return;
+      }
+
+      anchor.parentNode.insertBefore(footer, anchor.nextSibling);
+    }
+
     var footer = document.querySelector('footer[role="contentinfo"]');
     if(!footer){
       footer = document.createElement('footer');
       footer.setAttribute('role', 'contentinfo');
       var appContainer = document.getElementById('app');
-      if(appContainer && appContainer.parentNode){
-        appContainer.parentNode.insertBefore(footer, appContainer.nextSibling);
+      var footerAnchor = getFooterAnchor(appContainer);
+      if(footerAnchor){
+        insertFooterAfterAnchor(footer, footerAnchor);
       }else{
         document.body.appendChild(footer);
       }
     }
     var appContainer = document.getElementById('app');
-    if(appContainer && appContainer.parentNode && footer.previousElementSibling !== appContainer){
-      appContainer.parentNode.insertBefore(footer, appContainer.nextSibling);
+    var footerAnchor = getFooterAnchor(appContainer);
+    if(footerAnchor && footer.previousElementSibling !== footerAnchor){
+      insertFooterAfterAnchor(footer, footerAnchor);
     }
     var footerContainer = footer.querySelector('.footer-container');
     if(!footerContainer){
