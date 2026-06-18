@@ -42,40 +42,34 @@ function renderFundSchedule(config){
     }
 
     return `
-      <section class="wc-year-table-block">
-        <div class="wc-year-table-heading">
-          <h2>${year} ${escapeHtml(config.label)} Schedule</h2>
-          <strong>${money(total)}</strong>
-        </div>
-
-        <div class="wc-table-wrap">
-          <table class="wc-transport-table">
+      <div class="wc-table-wrap">
+        <p class="wc-table-label">${year} ${escapeHtml(config.label)} Schedule</p>
+        <div class="wc-data-table-scroll">
+          <table class="wc-data-table">
             <thead>
               <tr>
                 <th>Project</th>
-                <th>${year}</th>
+                <th class="wc-num">${year}</th>
               </tr>
             </thead>
             <tbody>
               ${yearProjects.map(project => `
                 <tr>
                   <td>${escapeHtml(project.title)}</td>
-                  <td class="amount">${money(project.year_amount_value)}</td>
+                  <td class="wc-num">${money(project.year_amount_value)}</td>
                 </tr>
               `).join("")}
-            </tbody>
-            <tfoot>
-              <tr>
+              <tr class="wc-table-total-row">
                 <td>Total ${year} ${escapeHtml(config.label)}</td>
-                <td class="amount">${money(total)}</td>
+                <td class="wc-num">${money(total)}</td>
               </tr>
-            </tfoot>
+            </tbody>
           </table>
         </div>
-      </section>
+      </div>
     `;
   }).join("");
 
   document.getElementById(config.mountId).innerHTML =
-    tables || `<div class="wc-empty-message">No ${escapeHtml(config.label)} projects found.</div>`;
+    tables || `<p class="wc-data-empty">No ${escapeHtml(config.label)} projects found.</p>`;
 }

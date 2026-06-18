@@ -1286,13 +1286,7 @@ body.sidebar-pinned-right #content {
 
 .wc-data-table-wrap { margin: 24px 0; }
 .wc-data-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
-.wc-data-table-scroll { width: 100%; overflow: auto; max-height: 600px; border: 1px solid var(--border); border-radius: 12px; }
-#consolidated-fund-financial-schedule .wc-data-table-scroll,
-#major-fund-financial-schedules .wc-data-table-scroll,
-#non-major-fund-financial-schedules .wc-data-table-scroll {
-  max-height: none;
-  overflow-y: visible;
-}
+.wc-data-table-scroll { width: 100%; overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 12px; }
 .wc-data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .85rem; }
 .wc-data-table th, .wc-data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: normal; }
 .wc-data-table th.wc-num, .wc-data-table td.wc-num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -1505,7 +1499,6 @@ body.sidebar-pinned-right #content {
 
   .wc-filter-bar { flex-direction: column; align-items: stretch; }
   .wc-filter-field { min-width: 0; }
-  .wc-data-table-scroll { max-height: 480px; }
   .wc-data-table th, .wc-data-table td { padding: 7px 8px; font-size: .8rem; }
 }
 

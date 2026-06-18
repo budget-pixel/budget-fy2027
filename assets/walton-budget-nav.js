@@ -5,10 +5,6 @@
   var wcBudgetAssetBaseUrl = (document.currentScript && document.currentScript.src)
     ? document.currentScript.src.replace(/[^/]+$/, "")
     : "../assets/";
-  var wcCipAssetBaseUrl = "https://budget-pixel.github.io/walton-cip-project-search/";
-  var wcCipProjectSearchUrl = wcCipAssetBaseUrl + "?view=all&v=6";
-  var wcCapitalImprovementPlanPageId = "capital-improvement-plan";
-  window.wcCipAssetBaseUrl = wcCipAssetBaseUrl;
   (function(c,l,a,r,i,t,y){
     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
     t=l.createElement(r);
@@ -1344,76 +1340,6 @@
       }
     });
   }
-  function getNormalizedWcNavText(element){
-    return (element && element.textContent ? element.textContent : "").trim().replace(/\s+/g, " ").toLowerCase();
-  }
-  function isCapitalImprovementPlanElement(element){
-    if(!element){
-      return false;
-    }
-    var href = element.getAttribute && element.getAttribute("href");
-    return (element.getAttribute && element.getAttribute("data-id") === wcCapitalImprovementPlanPageId) ||
-      (href && href.indexOf(wcCapitalImprovementPlanPageId) !== -1) ||
-      getNormalizedWcNavText(element) === "capital improvement plan";
-  }
-  function getCapitalImprovementPlanNavigationTarget(element){
-    if(!element || !element.closest){
-      return null;
-    }
-    var target = element.closest('a, button, li, [role="button"], .nav-menu-item, .dropdown-item');
-    if(isCapitalImprovementPlanElement(target)){
-      return target;
-    }
-    var title = element.closest(".nav-menu-item-title, .dropdown-item-title");
-    if(title && isCapitalImprovementPlanElement(title)){
-      return title.closest('a, button, li, [role="button"], .nav-menu-item, .dropdown-item') || title;
-    }
-    return null;
-  }
-  function updateCapitalImprovementPlanLinks(){
-    document.querySelectorAll("a").forEach(function(link){
-      if(isCapitalImprovementPlanElement(link)){
-        link.href = wcCipProjectSearchUrl;
-        link.removeAttribute("target");
-        link.removeAttribute("rel");
-      }
-    });
-    document.querySelectorAll('[data-id="' + wcCapitalImprovementPlanPageId + '"]').forEach(function(element){
-      element.setAttribute("data-wc-cip-target-url", wcCipProjectSearchUrl);
-      if(!element.hasAttribute("tabindex")){
-        element.setAttribute("tabindex", "0");
-      }
-      if(!element.hasAttribute("role")){
-        element.setAttribute("role", "link");
-      }
-    });
-  }
-  function handleCapitalImprovementPlanNavigation(event){
-    var target = getCapitalImprovementPlanNavigationTarget(event.target);
-    if(!target){
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    if(event.type === "click" && (event.metaKey || event.ctrlKey || event.shiftKey)){
-      window.open(wcCipProjectSearchUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-    window.location.href = wcCipProjectSearchUrl;
-  }
-  function bindCapitalImprovementPlanNavigation(){
-    if(document.documentElement.getAttribute("data-wc-cip-navigation-bound") === "true"){
-      return;
-    }
-    document.documentElement.setAttribute("data-wc-cip-navigation-bound", "true");
-    document.addEventListener("click", handleCapitalImprovementPlanNavigation, true);
-    document.addEventListener("keydown", function(event){
-      if(event.key !== "Enter" && event.key !== " "){
-        return;
-      }
-      handleCapitalImprovementPlanNavigation(event);
-    }, true);
-  }
   function renderStandaloneBudgetNav(){
     if(!document.body){
       return;
@@ -1490,13 +1416,10 @@
       initWcNavSearch();
       hideOpenGovMoreButton();
       renderWaltonBudgetFooter();
-      updateCapitalImprovementPlanLinks();
-      bindCapitalImprovementPlanNavigation();
       lockHorizontalPageScroll();
       return;
     }
     wcBudgetNavStarted = true;
-    bindCapitalImprovementPlanNavigation();
     if(document.querySelector("nav#nav-menu.nav-menu")){
       loadWaltonBudgetSearchModules(function(){
         initWcNavSearch();
@@ -1506,24 +1429,19 @@
       setTimeout(initWcNavSearch, 2000);
       hideOpenGovMoreButton();
       renderWaltonBudgetFooter();
-      updateCapitalImprovementPlanLinks();
       setTimeout(hideOpenGovMoreButton, 500);
       setTimeout(hideOpenGovMoreButton, 1500);
       setTimeout(renderWaltonBudgetFooter, 500);
       setTimeout(renderWaltonBudgetFooter, 1500);
-      setTimeout(updateCapitalImprovementPlanLinks, 500);
-      setTimeout(updateCapitalImprovementPlanLinks, 1500);
       return;
     }
     renderStandaloneBudgetNav();
     loadWaltonPerformanceMobile();
     if(document.getElementById('app')){
       renderWaltonBudgetFooter();
-      updateCapitalImprovementPlanLinks();
     }else{
       document.addEventListener('DOMContentLoaded', function(){
         renderWaltonBudgetFooter();
-        updateCapitalImprovementPlanLinks();
       }, { once:true });
     }
   }
@@ -1556,8 +1474,6 @@
       ensureWaltonSplitLogoStyles();
       hideOpenGovMoreButton();
       renderWaltonBudgetFooter();
-      updateCapitalImprovementPlanLinks();
-      bindCapitalImprovementPlanNavigation();
       lockHorizontalPageScroll();
       if(document.querySelector("nav#nav-menu.nav-menu")){
         if(typeof window.initWaltonBudgetSearch === "function"){

@@ -1730,20 +1730,6 @@ function renderProjects(){
 
     <section class="wc-cip-main-section">
       <div class="wc-cip-main-inner">
-        <div class="wc-cip-sticky-nav-shell">
-          <nav class="wc-cip-proxy-nav" aria-label="Capital Improvement Plan navigation">
-            ${isStandaloneSearchPage
-              ? `<a class="wc-cip-proxy-link" href="capital-improvement-plan.html">Overview</a>`
-              : `<button type="button" class="wc-cip-proxy-button is-active">Overview</button>`}
-            <a class="wc-cip-proxy-link" href="cip-transportation.html">Transportation</a>
-            <a class="wc-cip-proxy-link" href="cip-capital-projects.html">Capital Fund</a>
-            <a class="wc-cip-proxy-link" href="cip-sheriff.html">Sheriff</a>
-            <a class="wc-cip-proxy-link" href="cip-tourist-development.html">Tourist Development</a>
-            <a class="wc-cip-proxy-link" href="cip-grants.html">Grants</a>
-            <a class="wc-cip-proxy-link wc-cip-proxy-search ${isStandaloneSearchPage ? "is-active" : ""}" href="search.html">Project Search</a>
-          </nav>
-        </div>
-
         ${!isStandaloneSearchPage ? `
         <div class="wc-video-hero">
           <iframe class="wc-video-frame" src="https://www.youtube.com/embed/9KzURzB0E-U?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=9KzURzB0E-U&amp;controls=0&amp;modestbranding=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" title="Final Budget 2025-2026" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
