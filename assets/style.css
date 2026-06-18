@@ -319,6 +319,14 @@ body.sidebar-pinned-right #content {
   font-size: .68rem; font-weight: 800; text-transform: uppercase;
   letter-spacing: .08em; color: var(--muted); margin-bottom: 8px;
 }
+.wc-fund-section-heading {
+  margin: 36px 0 8px;
+  color: var(--navy);
+  font-size: 1.3rem;
+  font-weight: 800;
+  border-left: 4px solid var(--gold);
+  padding-left: 10px;
+}
 
 /* ── prev/next nav ── */
 .page-nav {
@@ -1181,6 +1189,12 @@ body.sidebar-pinned-right #content {
 .wc-data-table-wrap { margin: 24px 0; }
 .wc-data-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
 .wc-data-table-scroll { width: 100%; overflow: auto; max-height: 600px; border: 1px solid var(--border); border-radius: 12px; }
+#consolidated-fund-financial-schedule .wc-data-table-scroll,
+#major-fund-financial-schedules .wc-data-table-scroll,
+#non-major-fund-financial-schedules .wc-data-table-scroll {
+  max-height: none;
+  overflow-y: visible;
+}
 .wc-data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .85rem; }
 .wc-data-table th, .wc-data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: normal; }
 .wc-data-table th.wc-num, .wc-data-table td.wc-num { text-align: right; font-variant-numeric: tabular-nums; }

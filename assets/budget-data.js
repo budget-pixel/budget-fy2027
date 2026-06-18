@@ -12,7 +12,8 @@
     machinery: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=203949583&single=true&output=csv",
     departmentNarratives: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=445845528&single=true&output=csv",
     funds: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=968844446&single=true&output=csv",
-    activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv"
+    activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv",
+    fundBalances: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=78843155&single=true&output=csv"
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
@@ -102,6 +103,7 @@
     departmentNarratives: [],
     funds: [],
     activities: [],
+    fundBalances: [],
     errors: {}
   };
   let loadPromise = null;
@@ -528,6 +530,16 @@
     };
   }
 
+  function normalizeFundBalanceRow(row) {
+    return {
+      Year: (row.Year || "").trim(),
+      Fund_Code: (row.Fund || "").trim(),
+      Fund_Description: (row["Fund Description"] || "").trim(),
+      Object_Description: (row["Object Description"] || "").trim(),
+      Fund_Balance: toNumber(row["Fund Balance"])
+    };
+  }
+
   // The expenditure/revenue sheets don't have a Fund column directly; the
   // fund is encoded as the leading 3 digits of each row's Dept_Code, which
   // line up with Fund_Code values in the funds sheet (e.g. "00104000" and
@@ -556,7 +568,8 @@
       ["machinery", DATA_SOURCES.machinery, normalizeMachineryRow],
       ["departmentNarratives", DATA_SOURCES.departmentNarratives, normalizeNarrativeRow],
       ["funds", DATA_SOURCES.funds, normalizeFundRow],
-      ["activities", DATA_SOURCES.activities, normalizeActivityRow]
+      ["activities", DATA_SOURCES.activities, normalizeActivityRow],
+      ["fundBalances", DATA_SOURCES.fundBalances, normalizeFundBalanceRow]
     ];
 
     cache.datasetCount = specs.length;
@@ -1100,6 +1113,196 @@
       otherLineLabel: "Other Financial Uses",
       grandTotalLabel: "Total Expenditure and Other Financial Uses"
     });
+  }
+
+  // "Fund Financial Schedules" page: a Beginning Fund Balance -> Revenues
+  // (by the same categories as the Consolidated Revenue Budget) ->
+  // Expenditures (by the same activities as the Consolidated Expenditure
+  // Budget) -> Change in Fund Balance -> Estimated Ending Fund Balance
+  // roll-forward, either for one fund (a single "FY 2027 Proposed" column)
+  // or several funds combined into side-by-side columns (the consolidated
+  // schedule at the top of the page).
+  const FUND_SCHEDULE_MAJOR_FUNDS = [
+    { code: "001", label: "General Fund" },
+    { code: "101", label: "Transportation Fund" },
+    { code: "107", label: "Fine & Forfeiture Fund" },
+    { code: "111", label: "Tourist Development Fund" },
+    { code: "112", label: "Solid Waste Fund" },
+    { code: "300", label: "Capital Projects Fund" }
+  ];
+
+  const FUND_SCHEDULE_NON_MAJOR_FUNDS = [
+    { code: "103", label: "Building Fund" },
+    { code: "109", label: "E911 Fund" },
+    { code: "110", label: "Housing & Urban Development Fund" },
+    { code: "105", label: "Mosquito Control Fund" },
+    { code: "114", label: "Recreation Plat Fee Fund" },
+    { code: "113", label: "Preservation Fund" },
+    { code: "115", label: "Sidewalk Fund" }
+  ];
+
+  // FY2027's Beginning Fund Balance is simply FY2026's recorded balance,
+  // so the sheet only needs FY2026 (and prior) filled in. For a prior-year
+  // column (e.g. FY2024 Actual), the beginning balance is the year before
+  // that column's own fiscal year.
+  function fundBalanceForYear(fundCodes, year) {
+    const codes = Array.isArray(fundCodes) ? fundCodes : [fundCodes];
+    return (cache.fundBalances || [])
+      .filter((r) => codes.includes(r.Fund_Code) && r.Year === String(year))
+      .reduce((sum, r) => sum + (r.Fund_Balance || 0), 0);
+  }
+
+  const FUND_SCHEDULE_YEAR_COLUMNS = BUDGET_LINE_PRIOR_YEAR_COLUMNS.concat([
+    { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
+  ]);
+
+  function fiscalYearForField(field) {
+    return Number(field.slice(2, 6));
+  }
+
+  // One or more fund codes combined into a single Beginning Fund Balance ->
+  // Revenues -> Other Financial Sources -> Expenditures -> Other Financial
+  // Uses -> Change in Fund Balance -> Estimated Ending Fund Balance
+  // roll-forward, with a year column per FUND_SCHEDULE_YEAR_COLUMNS entry
+  // (prior years hidden behind the same "View Prior Years" toggle used
+  // elsewhere on the site).
+  function buildFundFinancialSchedule(fundCodes, caption) {
+    const revenueRows = cache.revenues || [];
+    const expenseRows = cache.expenditures || [];
+    if ((!revenueRows.length && !expenseRows.length) || !(cache.fundBalances || []).length) return "";
+
+    const isExcludedFund = (r) => CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r));
+    const inFund = (r) => fundCodes.includes(fundCodeForRow(r)) && !isExcludedFund(r);
+
+    function sumFor(rows, predicate, field) {
+      return rows.reduce((sum, r) => {
+        if (!inFund(r) || !predicate(r)) return sum;
+        return sum + (r[field] || 0);
+      }, 0);
+    }
+
+    function rowValues(predicate, rows) {
+      return FUND_SCHEDULE_YEAR_COLUMNS.map((c) => sumFor(rows, predicate, c.field));
+    }
+
+    function rowHtml(label, values, rowClass) {
+      return (
+        "<tr" + (rowClass ? ' class="' + rowClass + '"' : "") + "><td>" + escapeHtml(label) + "</td>" +
+        values.map((v, i) =>
+          '<td class="wc-num' + (i < values.length - 1 ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>"
+        ).join("") +
+        "</tr>"
+      );
+    }
+
+    const isOtherFinancingRevenue = (r) => String(r.Revenue_Code || "").trim() === "381000";
+    const isOtherFinancingExpense = (r) => OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase());
+
+    const bodyRows = [];
+
+    const beginningValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c) => fundBalanceForYear(fundCodes, fiscalYearForField(c.field) - 1));
+    bodyRows.push(rowHtml("Beginning Fund Balance", beginningValues, "wc-table-subtotal-row"));
+
+    bodyRows.push(
+      '<tr class="wc-table-group-row"><td>Revenues</td>' +
+      FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
+    );
+    const revenueTypeRows = CONSOLIDATED_REVENUE_TYPE_ROWS
+      .map((spec) => ({ label: spec.label, values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows) }))
+      .sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1]);
+    revenueTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
+    const revenueTypeValues = revenueTypeRows.map((row) => row.values);
+    const revenueSubtotalValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => revenueTypeValues.reduce((s, v) => s + v[i], 0));
+    bodyRows.push(rowHtml("Total Revenues", revenueSubtotalValues, "wc-table-subtotal-row"));
+
+    const otherSourcesValues = rowValues(isOtherFinancingRevenue, revenueRows);
+    bodyRows.push(rowHtml("Other Financial Sources", otherSourcesValues));
+    const revenueTotalValues = revenueSubtotalValues.map((v, i) => v + otherSourcesValues[i]);
+    bodyRows.push(rowHtml("Total Revenue and Other Financial Sources", revenueTotalValues, "wc-table-subtotal-row"));
+
+    bodyRows.push(
+      '<tr class="wc-table-group-row"><td>Expenditures</td>' +
+      FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
+    );
+    const expenseTypeRows = CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS
+      .map((activity) => ({ label: activity, values: rowValues((r) => activityForDeptCode(r.Dept_Code) === activity && !isOtherFinancingExpense(r), expenseRows) }))
+      .sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1]);
+    expenseTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
+    const expenseTypeValues = expenseTypeRows.map((row) => row.values);
+    const expenseSubtotalValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => expenseTypeValues.reduce((s, v) => s + v[i], 0));
+    bodyRows.push(rowHtml("Expenditures Total", expenseSubtotalValues, "wc-table-subtotal-row"));
+
+    const otherUsesValues = rowValues(isOtherFinancingExpense, expenseRows);
+    bodyRows.push(rowHtml("Other Financial Uses", otherUsesValues));
+    const expenseTotalValues = expenseSubtotalValues.map((v, i) => v + otherUsesValues[i]);
+    bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-subtotal-row"));
+
+    const changeValues = revenueTotalValues.map((v, i) => v - expenseTotalValues[i]);
+    bodyRows.push(rowHtml("Change in Fund Balance", changeValues, "wc-table-subtotal-row"));
+
+    const endingValues = changeValues.map((v, i) => v + beginningValues[i]);
+    bodyRows.push(rowHtml("Estimated Ending Fund Balance", endingValues, "wc-table-total-row"));
+
+    const showPrior = getShowPriorYears();
+    const headerCells = ["ROW LABELS"].concat(
+      FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => ({ label: c.label.toUpperCase(), prior: i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 }))
+    );
+
+    return (
+      '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
+      '<div class="wc-table-wrap">' +
+      '<div class="wc-table-label-row">' +
+      '<p class="wc-table-label">' + escapeHtml(caption) + "</p>" +
+      priorYearsToggleHtml(showPrior) +
+      "</div>" +
+      '<div class="wc-data-table-scroll">' +
+      '<table class="wc-data-table">' +
+      "<thead><tr><th>" + escapeHtml(headerCells[0]) + "</th>" +
+      headerCells.slice(1).map((h) => '<th class="wc-num' + (h.prior ? " wc-prior-year" : "") + '">' + escapeHtml(h.label) + "</th>").join("") +
+      "</tr></thead>" +
+      "<tbody>" + bodyRows.join("") + "</tbody>" +
+      "</table>" +
+      "</div>" +
+      lastUpdatedNoteHtml() +
+      "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderFundFinancialScheduleSection(funds) {
+    return funds
+      .map((f) => buildFundFinancialSchedule([f.code], f.label))
+      .filter(Boolean)
+      .join("");
+  }
+
+  function initFundFinancialSchedulesPage() {
+    const consolidatedEl = document.getElementById("consolidated-fund-financial-schedule");
+    const majorEl = document.getElementById("major-fund-financial-schedules");
+    const nonMajorEl = document.getElementById("non-major-fund-financial-schedules");
+    const containers = [consolidatedEl, majorEl, nonMajorEl];
+    if (!containers.some(Boolean)) return;
+
+    showLoadingState(containers);
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          showErrorState(containers);
+          return;
+        }
+        const allFundCodes = FUND_SCHEDULE_MAJOR_FUNDS.concat(FUND_SCHEDULE_NON_MAJOR_FUNDS).map((f) => f.code);
+        mountOrHide(consolidatedEl, buildFundFinancialSchedule(allFundCodes, "Consolidated Fund Financial Schedule"));
+        mountOrHide(majorEl, renderFundFinancialScheduleSection(FUND_SCHEDULE_MAJOR_FUNDS));
+        mountOrHide(nonMajorEl, renderFundFinancialScheduleSection(FUND_SCHEDULE_NON_MAJOR_FUNDS));
+        bindPriorYearsToggle(consolidatedEl);
+        bindPriorYearsToggle(majorEl);
+        bindPriorYearsToggle(nonMajorEl);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load budget data", err);
+        showErrorState(containers);
+      });
   }
 
   // "Summary of Interfund Transfers" page: the two sides of fund-to-fund
@@ -2665,6 +2868,7 @@
     initInterfundTransfersPage();
     initConsolidatedRevenueSummaryPage();
     initRevenueTopicCardsPage();
+    initFundFinancialSchedulesPage();
   });
 
   window.WCBudgetData = {
