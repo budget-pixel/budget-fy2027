@@ -496,25 +496,23 @@
     position:sticky !important;
     top:0 !important;
     z-index:9999 !important;
-    display:flex !important;
+    display:grid !important;
+    grid-template-columns:auto 1fr auto !important;
     align-items:center !important;
-    justify-content:space-between !important;
-    gap:24px !important;
+    column-gap:24px !important;
     min-height:74px !important;
     margin-top:0 !important;
-    padding:10px 28px !important;
+    padding:10px clamp(20px, 4vw, 48px) !important;
     box-sizing:border-box !important;
-    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+    background:#ffffff !important;
     border-top:0 !important;
-    border-bottom:3px solid #d1be78 !important;
-    box-shadow:0 1px 4px rgba(36,52,77,0.04) !important;
+    border-bottom:1px solid rgba(36,52,77,0.10) !important;
+    box-shadow:none !important;
+    transition:box-shadow .2s ease !important;
     font-family:Arial, Helvetica, sans-serif !important;
   }
-  nav#nav-menu .wc-split-brand-top{
-    color:#ffffff !important;
-  }
-  nav#nav-menu .wc-split-brand-bottom{
-    color:rgba(255,255,255,.82) !important;
+  nav#nav-menu.nav-menu.is-scrolled{
+    box-shadow:0 6px 18px rgba(23,32,51,0.10) !important;
   }
   nav#nav-menu.nav-menu::before{
     display:none !important;
@@ -574,17 +572,16 @@
     text-decoration:none !important;
   }
   nav#nav-menu .wc-nav-search-slot{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:flex-end !important;
-    flex:0 0 460px !important;
-    width:460px !important;
-    min-width:460px !important;
-    max-width:460px !important;
-    margin-left:auto !important;
-    margin-right:0 !important;
-    position:relative !important;
-    z-index:2 !important;
+    display:none !important;
+    position:absolute !important;
+    top:100% !important;
+    right:0 !important;
+    margin-top:14px !important;
+    width:min(380px, calc(100vw - 56px)) !important;
+    z-index:10001 !important;
+  }
+  nav#nav-menu.is-search-open .wc-nav-search-slot{
+    display:block !important;
   }
   nav#nav-menu .wc-search-wrap{
     width:100% !important;
@@ -596,15 +593,15 @@
   nav#nav-menu .wc-search-box{
     position:relative !important;
     width:100% !important;
-    max-width:460px !important;
-    margin:0 auto !important;
+    margin:0 !important;
     display:flex !important;
     align-items:center !important;
     background:#ffffff !important;
+    border:1px solid rgba(36,52,77,0.12) !important;
     border-radius:999px !important;
     padding:9px 14px !important;
     box-sizing:border-box !important;
-    box-shadow:0 4px 14px rgba(0,0,0,0.16) !important;
+    box-shadow:0 10px 24px rgba(23,32,51,0.14) !important;
     transition:box-shadow .22s ease, background-color .22s ease !important;
   }
   nav#nav-menu .wc-search-box:hover,
@@ -684,6 +681,135 @@
     color:rgba(36,52,77,0.68) !important;
     font-size:13px !important;
     font-weight:600 !important;
+  }
+  nav#nav-menu .wc-nav-links{
+    grid-column:2 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+    margin:0 !important;
+    padding:0 !important;
+    list-style:none !important;
+  }
+  nav#nav-menu .wc-nav-links a{
+    display:inline-flex !important;
+    align-items:center !important;
+    padding:9px 14px !important;
+    border-radius:999px !important;
+    color:#24344d !important;
+    font-size:13px !important;
+    font-weight:700 !important;
+    letter-spacing:.01em !important;
+    text-decoration:none !important;
+    white-space:nowrap !important;
+  }
+  nav#nav-menu .wc-nav-links a:hover{
+    background:rgba(0,98,49,0.08) !important;
+    color:#006231 !important;
+  }
+  nav#nav-menu .wc-nav-actions{
+    grid-column:3 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    gap:8px !important;
+    position:relative !important;
+  }
+  nav#nav-menu .wc-nav-search-toggle,
+  nav#nav-menu .wc-nav-menu-toggle{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:40px !important;
+    height:40px !important;
+    flex:0 0 auto !important;
+    border-radius:999px !important;
+    border:1px solid rgba(36,52,77,0.14) !important;
+    background:#ffffff !important;
+    color:#006231 !important;
+    cursor:pointer !important;
+    position:relative !important;
+  }
+  nav#nav-menu .wc-nav-search-toggle:hover,
+  nav#nav-menu .wc-nav-menu-toggle:hover{
+    background:rgba(0,98,49,0.06) !important;
+  }
+  nav#nav-menu .wc-nav-search-toggle svg{
+    width:18px !important;
+    height:18px !important;
+    stroke:currentColor !important;
+    fill:none !important;
+  }
+  nav#nav-menu .wc-nav-menu-toggle{
+    display:none !important;
+    color:#24344d !important;
+  }
+  nav#nav-menu .wc-nav-menu-toggle span{
+    position:absolute !important;
+    left:11px !important;
+    width:16px !important;
+    height:2px !important;
+    border-radius:999px !important;
+    background:currentColor !important;
+  }
+  nav#nav-menu .wc-nav-menu-toggle span:nth-child(1){top:13px !important}
+  nav#nav-menu .wc-nav-menu-toggle span:nth-child(2){top:19px !important}
+  nav#nav-menu .wc-nav-menu-toggle span:nth-child(3){top:25px !important}
+  @media (max-width:860px){
+    nav#nav-menu.nav-menu{
+      display:flex !important;
+      flex-wrap:wrap !important;
+      justify-content:space-between !important;
+    }
+    nav#nav-menu .wc-nav-links{
+      order:5 !important;
+      flex:1 0 100% !important;
+      display:none !important;
+      flex-direction:column !important;
+      align-items:stretch !important;
+      padding-top:10px !important;
+      margin-top:6px !important;
+      border-top:1px solid rgba(36,52,77,0.08) !important;
+    }
+    nav#nav-menu.is-menu-open .wc-nav-links{
+      display:flex !important;
+    }
+    nav#nav-menu .wc-nav-links a{
+      justify-content:flex-start !important;
+      border-radius:12px !important;
+    }
+    nav#nav-menu .wc-nav-menu-toggle{
+      display:inline-flex !important;
+    }
+  }
+  .wc-breadcrumb{
+    display:flex !important;
+    align-items:center !important;
+    gap:8px !important;
+    width:100% !important;
+    padding:10px clamp(20px, 4vw, 48px) !important;
+    box-sizing:border-box !important;
+    background:#006231 !important;
+    color:#ffffff !important;
+    font-size:12px !important;
+    font-weight:700 !important;
+    letter-spacing:.01em !important;
+    font-family:Arial, Helvetica, sans-serif !important;
+  }
+  .wc-breadcrumb a{
+    color:#ffffff !important;
+    text-decoration:none !important;
+    opacity:.92 !important;
+  }
+  .wc-breadcrumb a:hover{
+    text-decoration:underline !important;
+  }
+  .wc-breadcrumb-sep{
+    opacity:.55 !important;
+  }
+  .wc-breadcrumb-current{
+    opacity:.92 !important;
   }
   nav#nav-menu .nav-menu-list{
     display:flex !important;
@@ -1035,7 +1161,7 @@
     margin:48px 0 0 0 !important;
     padding:0 0 4px 0 !important;
     background:#ffffff !important;
-    border-top:4px solid #006231 !important;
+    border-top:1px solid rgba(36,52,77,0.10) !important;
     box-shadow:none !important;
     font-family:Arial, Helvetica, sans-serif !important;
     box-sizing:border-box !important;
@@ -1130,8 +1256,8 @@
     min-height:38px !important;
     padding:10px 16px !important;
     border-radius:999px !important;
-    color:#ffffff !important;
-    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+    color:#24344d !important;
+    background:transparent !important;
     border:0 !important;
     text-decoration:none !important;
     font-size:12px !important;
@@ -1140,13 +1266,12 @@
     letter-spacing:.07em !important;
     text-transform:uppercase !important;
     white-space:nowrap !important;
-    box-shadow:0 8px 18px rgba(0,98,49,0.14) !important;
-    transition:transform .2s ease, box-shadow .2s ease !important;
+    box-shadow:none !important;
+    transition:background .2s ease, color .2s ease !important;
   }
   .wc-budget-footer-links a:hover{
-    transform:translateY(-1px) !important;
-    box-shadow:0 12px 24px rgba(0,98,49,0.20) !important;
-    background:linear-gradient(135deg,#006231 0%,#0b7741 100%) !important;
+    background:rgba(0,98,49,0.08) !important;
+    color:#006231 !important;
   }
   .wc-budget-footer-bottom{
     display:block !important;
@@ -1242,6 +1367,76 @@
   }
   style.textContent = css;
   loadWaltonMobileStylesheet();
+  var WC_NAV_LINKS = [
+    { label:"Our County", href:"../index.html#county" },
+    { label:"Budget Overview", href:"../index.html#budget" },
+    { label:"Departments", href:"../index.html#departments" },
+    { label:"Capital Projects", href:"../index.html#projects" },
+    { label:"Financials", href:"summary-of-revenues.html" }
+  ];
+  function ensureWcNavChrome(){
+    var nav = document.querySelector("nav#nav-menu.nav-menu");
+    if(!nav){
+      return;
+    }
+    if(!nav.querySelector(".wc-nav-links")){
+      var linksWrap = document.createElement("div");
+      linksWrap.className = "wc-nav-links";
+      linksWrap.innerHTML = WC_NAV_LINKS.map(function(link){
+        return '<a href="' + link.href + '">' + link.label + '</a>';
+      }).join("");
+      nav.appendChild(linksWrap);
+    }
+    if(!nav.querySelector(".wc-nav-actions")){
+      var actions = document.createElement("div");
+      actions.className = "wc-nav-actions";
+      actions.innerHTML = `
+        <button type="button" class="wc-nav-search-toggle" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+          </svg>
+        </button>
+        <button type="button" class="wc-nav-menu-toggle" aria-label="Open navigation menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      `;
+      nav.appendChild(actions);
+      var searchToggle = actions.querySelector(".wc-nav-search-toggle");
+      var menuToggle = actions.querySelector(".wc-nav-menu-toggle");
+      searchToggle.addEventListener("click", function(){
+        var open = !nav.classList.contains("is-search-open");
+        nav.classList.toggle("is-search-open", open);
+        if(open){
+          setTimeout(function(){
+            var input = nav.querySelector("#wcTocSearch");
+            if(input){
+              input.focus();
+            }
+          }, 40);
+        }
+      });
+      menuToggle.addEventListener("click", function(){
+        var open = !nav.classList.contains("is-menu-open");
+        nav.classList.toggle("is-menu-open", open);
+        menuToggle.setAttribute("aria-expanded", String(open));
+      });
+      document.addEventListener("click", function(e){
+        if(!nav.contains(e.target)){
+          nav.classList.remove("is-search-open");
+          nav.classList.remove("is-menu-open");
+          menuToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
+    if(!nav.dataset.wcScrollBound){
+      nav.dataset.wcScrollBound = "true";
+      var onScroll = function(){
+        nav.classList.toggle("is-scrolled", window.scrollY > 4);
+      };
+      window.addEventListener("scroll", onScroll, { passive:true });
+      onScroll();
+    }
+  }
   function getWaltonSplitBrandHtml(linkHref, linkLabel){
     if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.getHtml === "function"){
       var splitLogoHtml = window.WaltonSplitLogo.getHtml("", "");
@@ -1384,6 +1579,32 @@
     `;
     document.body.insertBefore(header, document.body.firstChild);
   }
+  function ensureWcBreadcrumb(){
+    var eyebrow = document.querySelector(".page-eyebrow");
+    var title = document.querySelector(".page-title");
+    if(!eyebrow || !title){
+      return;
+    }
+    var anchor = document.querySelector("nav#nav-menu.nav-menu") || document.querySelector(".wc-standalone-budget-nav");
+    if(!anchor || !anchor.parentNode){
+      return;
+    }
+    var eyebrowText = eyebrow.textContent.trim();
+    var titleText = title.textContent.trim();
+    var html = '<a href="../index.html">Home</a><span class="wc-breadcrumb-sep">/</span>' +
+      (eyebrowText ? '<span>' + eyebrowText + '</span><span class="wc-breadcrumb-sep">/</span>' : '') +
+      '<span class="wc-breadcrumb-current">' + titleText + '</span>';
+    var crumb = document.querySelector(".wc-breadcrumb");
+    if(!crumb){
+      crumb = document.createElement("nav");
+      crumb.className = "wc-breadcrumb";
+      crumb.setAttribute("aria-label", "Breadcrumb");
+      anchor.parentNode.insertBefore(crumb, anchor.nextSibling);
+    }
+    if(crumb.innerHTML !== html){
+      crumb.innerHTML = html;
+    }
+  }
   function renderWaltonBudgetFooter(){
     if(!document.body){
       return;
@@ -1459,6 +1680,8 @@
     ensureWaltonSplitLogoStyles();
     if(wcBudgetNavStarted){
       initWcNavSearch();
+      ensureWcNavChrome();
+      ensureWcBreadcrumb();
       hideOpenGovMoreButton();
       renderWaltonBudgetFooter();
       lockHorizontalPageScroll();
@@ -1470,8 +1693,12 @@
         initWcNavSearch();
       });
       loadWaltonPerformanceMobile();
+      ensureWcNavChrome();
+      ensureWcBreadcrumb();
       setTimeout(initWcNavSearch, 800);
       setTimeout(initWcNavSearch, 2000);
+      setTimeout(ensureWcBreadcrumb, 800);
+      setTimeout(ensureWcBreadcrumb, 2000);
       hideOpenGovMoreButton();
       renderWaltonBudgetFooter();
       setTimeout(hideOpenGovMoreButton, 500);
@@ -1482,6 +1709,9 @@
     }
     renderStandaloneBudgetNav();
     loadWaltonPerformanceMobile();
+    ensureWcBreadcrumb();
+    setTimeout(ensureWcBreadcrumb, 800);
+    setTimeout(ensureWcBreadcrumb, 2000);
     if(document.getElementById('app')){
       renderWaltonBudgetFooter();
     }else{
@@ -1529,7 +1759,9 @@
         }else{
           initWcNavSearch();
         }
+        ensureWcNavChrome();
       }
+      ensureWcBreadcrumb();
     }catch(error){
       if(window.console && typeof window.console.error === "function"){
         window.console.error("Walton County budget nav repair failed:", error);

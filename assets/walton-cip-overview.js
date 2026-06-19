@@ -225,64 +225,6 @@ function getStatusClass(statusText){
   return "wc-status-planning";
 }
 
-function initBudgetCounters(){
-  const section = document.querySelector(".wc-budget-strip");
-  const counters = document.querySelectorAll(".wc-budget-count");
-
-  if(!section || !counters.length){
-    return;
-  }
-
-  function formatValue(value, decimals){
-    return Number(value).toLocaleString("en-US", {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals
-    });
-  }
-
-  function animateCounters(){
-    counters.forEach(counter => {
-      const target = Number(counter.dataset.target || 0);
-      const prefix = counter.dataset.prefix || "";
-      const suffix = counter.dataset.suffix || "";
-      const decimals = Number(counter.dataset.decimals || 0);
-      const duration = 1100;
-      const startTime = performance.now();
-
-      function update(now){
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const currentValue = target * eased;
-
-        counter.textContent = prefix + formatValue(currentValue, decimals) + suffix;
-
-        if(progress < 1){
-          requestAnimationFrame(update);
-        }else{
-          counter.textContent = prefix + formatValue(target, decimals) + suffix;
-        }
-      }
-
-      counter.textContent = prefix + formatValue(0, decimals) + suffix;
-      requestAnimationFrame(update);
-    });
-  }
-
-  if("IntersectionObserver" in window){
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting){
-          animateCounters();
-          observer.disconnect();
-        }
-      });
-    }, { threshold: .35 });
-
-    observer.observe(section);
-  }else{
-    animateCounters();
-  }
-}
 
 function renderProjects(){
   if(!isStandaloneSearchPage && document.body && document.body.classList){
@@ -343,131 +285,6 @@ function renderProjects(){
         min-height:34px;
         padding:7px 14px;
         font-size:12px;
-      }
-
-      .wc-video-hero{
-        position:relative;
-        width:100%;
-        height:clamp(280px, 42vh, 420px);
-        overflow:hidden;
-        background:#24344d;
-        font-family:Arial, Helvetica, sans-serif;
-        border-radius:18px;
-        isolation:isolate;
-        box-shadow:
-          0 10px 24px rgba(36,52,77,0.14),
-          0 3px 8px rgba(36,52,77,0.08),
-          0 1px 0 rgba(255,255,255,0.05) inset;
-      }
-
-      .wc-video-hero::before{
-        content:"";
-        position:absolute;
-        inset:0;
-        border:1px solid rgba(209,190,120,0.32);
-        border-radius:18px;
-        box-shadow:
-          inset 0 0 0 1px rgba(255,255,255,0.08),
-          inset 0 -18px 28px rgba(0,0,0,0.06);
-        z-index:4;
-        pointer-events:none;
-      }
-
-      .wc-video-frame{
-        position:absolute;
-        top:50%;
-        left:50%;
-        width:100vw;
-        height:56.25vw;
-        min-width:177.78vh;
-        min-height:100%;
-        transform:translate(-50%, -50%);
-        border:0;
-        pointer-events:none;
-        z-index:1;
-      }
-
-      .wc-video-overlay{
-        position:absolute;
-        inset:0;
-        background:
-          radial-gradient(circle at center, rgba(255,255,255,0) 54%, rgba(20,30,45,0.12) 100%),
-          linear-gradient(to bottom, rgba(20,30,45,0.04) 0%, rgba(20,30,45,0.08) 58%, rgba(20,30,45,0.12) 100%),
-          linear-gradient(90deg, rgba(0,98,49,0.10) 0%, rgba(0,98,49,0) 28%, rgba(0,98,49,0) 72%, rgba(209,190,120,0.08) 100%);
-        z-index:2;
-        pointer-events:none;
-      }
-
-      .wc-video-content{
-        position:relative;
-        z-index:3;
-        width:100%;
-        max-width:980px;
-        height:100%;
-        margin:0 auto;
-        padding:0 28px;
-        box-sizing:border-box;
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-        text-align:center;
-        color:#ffffff;
-      }
-
-      .wc-video-title-box{
-        display:inline-block;
-        max-width:820px;
-        padding:22px 34px 24px 34px;
-        border-radius:16px;
-        background:linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.13) 100%);
-        border:1px solid rgba(255,255,255,0.30);
-        backdrop-filter:blur(16px) saturate(130%);
-        -webkit-backdrop-filter:blur(16px) saturate(130%);
-        box-shadow:
-          0 8px 18px rgba(0,0,0,0.16),
-          inset 0 1px 0 rgba(255,255,255,0.26),
-          0 0 18px rgba(209,190,120,0.10);
-        animation:wcHeroFadeIn 1.4s ease forwards;
-      }
-
-      @keyframes wcHeroFadeIn{
-        from{ opacity:0; transform:translateY(22px); }
-        to{ opacity:1; transform:translateY(0); }
-      }
-
-      .wc-video-content span{
-        display:inline-block;
-        margin-bottom:12px;
-        font-size:11px;
-        font-weight:700;
-        letter-spacing:.18em;
-        text-transform:uppercase;
-        color:#f1dc94;
-        text-shadow:0 2px 10px rgba(0,0,0,0.34);
-      }
-
-      .wc-video-content h1{
-        max-width:760px;
-        margin:0;
-        font-size:clamp(28px, 4vw, 48px);
-        line-height:1.1;
-        font-weight:800;
-        color:#ffffff;
-        text-shadow:
-          0 10px 30px rgba(0,0,0,.35),
-          0 4px 10px rgba(0,0,0,.25);
-      }
-
-      .wc-video-content h1::after{
-        content:"";
-        display:block;
-        width:82px;
-        height:3px;
-        margin:16px auto 0 auto;
-        border-radius:999px;
-        background:linear-gradient(90deg,#b89b48 0%,#f3e4a8 50%,#d1be78 100%);
-        box-shadow:0 0 18px rgba(209,190,120,0.36);
       }
 
       .wc-cip-main-section{
@@ -638,8 +455,7 @@ function renderProjects(){
         text-align:center;
       }
 
-      .wc-intro-inner h2,
-      .wc-budget-strip-title{
+      .wc-intro-inner h2{
         margin:0 0 10px 0;
         color:#172033;
         font-size:30px;
@@ -655,12 +471,12 @@ function renderProjects(){
         height:3px;
         margin:10px auto 0 auto;
         border-radius:999px;
-        background:linear-gradient(90deg,#006231 0%,#0b7d45 100%);
+        background:linear-gradient(90deg,#006231 0%,#0b7741 100%);
       }
 
       .wc-intro-inner p{
         margin:0 0 12px 0;
-        color:#344054;
+        color:#24344d;
         font-size:14px;
         line-height:1.55;
         text-align:justify;
@@ -679,61 +495,16 @@ function renderProjects(){
         background:linear-gradient(90deg, rgba(0,98,49,0) 0%, rgba(0,98,49,0.18) 20%, rgba(0,98,49,0.28) 50%, rgba(0,98,49,0.18) 80%, rgba(0,98,49,0) 100%);
       }
 
-      .wc-budget-strip-section{
+      .wc-cip-page-header{
         max-width:980px;
         margin:0 auto;
-        padding:8px 18px 28px 18px;
-      }
-
-      .wc-budget-strip-title{
-        margin:0 0 12px 0;
-        line-height:1.15;
-      }
-
-      .wc-budget-strip-title::after{
-        content:"";
-        display:block;
-        width:68px;
-        height:3px;
-        background:#d1be78;
-        border-radius:4px;
-        margin:10px auto 0 auto;
-      }
-
-      .wc-budget-strip{
-        display:grid;
-        grid-template-columns:repeat(5, minmax(0,1fr));
-        gap:10px;
-        margin:22px 0 28px 0;
-        padding:14px;
-        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
-        border-radius:14px;
-        box-shadow:0 10px 24px rgba(0,0,0,.10);
+        padding:32px 18px 8px;
+        box-sizing:border-box;
         font-family:Arial, Helvetica, sans-serif;
       }
 
-      .wc-budget-item{
-        padding:0 6px;
-        text-align:center;
-      }
-
-      .wc-budget-label{
-        display:block;
-        margin-bottom:7px;
-        color:rgba(255,255,255,.76);
-        font-size:9px;
-        font-weight:700;
-        letter-spacing:.12em;
-        text-transform:uppercase;
-      }
-
-      .wc-budget-item strong{
-        display:block;
-        color:#ffffff;
-        font-size:22px;
-        line-height:1.1;
-        font-weight:800;
-        font-variant-numeric:tabular-nums;
+      .wc-budget-strip-section{
+        padding:8px 0 28px 0;
       }
 
       .wc-cip-feature-section,
@@ -834,13 +605,13 @@ function renderProjects(){
         height:3px;
         margin:10px 0 0 0;
         border-radius:999px;
-        background:linear-gradient(90deg,#006231 0%,#0b7d45 100%);
+        background:linear-gradient(90deg,#006231 0%,#0b7741 100%);
       }
 
       .wc-cip-feature-content p,
       .wc-cip-content p{
         margin:0;
-        color:#344054;
+        color:#24344d;
         font-size:13px;
         line-height:1.55;
         text-align:left;
@@ -902,7 +673,7 @@ function renderProjects(){
         position:relative;
         padding:0 0 0 17px;
         margin:0 0 12px 0;
-        color:#344054;
+        color:#24344d;
         font-size:13px;
         line-height:1.5;
         text-align:left;
@@ -920,7 +691,7 @@ function renderProjects(){
         width:8px;
         height:8px;
         border-radius:999px;
-        background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
+        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
         box-shadow:0 0 0 3px rgba(0,98,49,0.10);
       }
 
@@ -948,44 +719,7 @@ function renderProjects(){
       }
 
       .wc-project-index-header{
-        text-align:center;
         margin-bottom:22px;
-      }
-
-      .wc-project-index-header span{
-        display:block;
-        margin-bottom:8px;
-        color:#006231;
-        font-size:11px;
-        font-weight:700;
-        letter-spacing:.14em;
-        text-transform:uppercase;
-      }
-
-      .wc-project-index-header h2{
-        margin:0;
-        color:#172033;
-        font-size:30px;
-        line-height:1.12;
-        font-weight:700;
-      }
-
-      .wc-project-index-header h2::after{
-        content:"";
-        display:block;
-        width:64px;
-        height:3px;
-        margin:10px auto 0 auto;
-        border-radius:999px;
-        background:linear-gradient(90deg,#006231 0%,#0b7d45 100%);
-      }
-
-      .wc-project-index-header p{
-        max-width:780px;
-        margin:12px auto 0 auto;
-        color:#475467;
-        font-size:14px;
-        line-height:1.55;
       }
 
       .wc-project-full-search-row{
@@ -1001,7 +735,7 @@ function renderProjects(){
         min-height:50px;
         padding:0 24px;
         border-radius:999px;
-        background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
+        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
         color:#ffffff;
         font-family:Arial, Helvetica, sans-serif;
         font-size:14px;
@@ -1047,7 +781,7 @@ function renderProjects(){
         text-indent:0 !important;
         border-radius:10px;
         border:1px solid rgba(0,98,49,0.16);
-        background:#f8faf8;
+        background:#f4f7f5;
         font-size:13px;
         color:#172033;
         outline:none;
@@ -1059,7 +793,7 @@ function renderProjects(){
       }
 
       .wc-project-search::placeholder{
-        color:#98a2b3;
+        color:#5a6e7f;
         opacity:1;
       }
 
@@ -1097,7 +831,7 @@ function renderProjects(){
       }
 
       .wc-project-filter-label{
-        color:#475467;
+        color:#5a6e7f;
         font-size:10px;
         font-weight:800;
         letter-spacing:.12em;
@@ -1127,7 +861,7 @@ function renderProjects(){
       }
 
       .wc-project-filter.active{
-        background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
+        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
         color:#ffffff;
         border-color:#006231;
       }
@@ -1138,7 +872,7 @@ function renderProjects(){
         justify-content:space-between;
         gap:12px;
         margin:0 0 10px 0;
-        color:#475467;
+        color:#5a6e7f;
         font-size:12px;
         font-weight:700;
       }
@@ -1231,7 +965,7 @@ function renderProjects(){
       }
 
       .wc-project-description{
-        color:#475467;
+        color:#5a6e7f;
         font-size:12px;
         line-height:1.5;
         position:relative;
@@ -1297,7 +1031,7 @@ function renderProjects(){
         min-height:64px;
         padding:9px 10px;
         border-radius:10px;
-        background:#f8faf8;
+        background:#f4f7f5;
         border:1px solid rgba(0,98,49,0.08);
         display:flex;
         flex-direction:column;
@@ -1308,7 +1042,7 @@ function renderProjects(){
       .wc-project-metric span{
         display:block;
         margin-bottom:4px;
-        color:#667085;
+        color:#5a6e7f;
         font-size:9px;
         font-weight:700;
         letter-spacing:.10em;
@@ -1365,7 +1099,7 @@ function renderProjects(){
         padding:7px 9px;
         border-radius:999px;
         background:rgba(52,64,84,0.08);
-        color:#344054;
+        color:#24344d;
         border:1px solid rgba(52,64,84,0.16);
         font-size:10px;
         font-weight:800;
@@ -1374,15 +1108,15 @@ function renderProjects(){
       }
 
       .wc-status-planning{ background:rgba(209,190,120,0.18); color:#8b6d12; }
-      .wc-status-design{ background:rgba(9,127,187,0.12); color:#0b5f8a; }
+      .wc-status-design{ background:rgba(90,110,127,0.12); color:#5a6e7f; }
       .wc-status-construction{ background:rgba(0,98,49,0.12); color:#006231; }
-      .wc-status-complete{ background:rgba(52,64,84,0.10); color:#344054; }
+      .wc-status-complete{ background:rgba(52,64,84,0.10); color:#24344d; }
 
       .wc-project-empty{
         display:none;
         padding:24px 16px;
         text-align:center;
-        color:#667085;
+        color:#5a6e7f;
         font-size:13px;
       }
 
@@ -1392,7 +1126,7 @@ function renderProjects(){
         padding:11px 18px;
         border:0;
         border-radius:999px;
-        background:linear-gradient(135deg,#006231 0%,#0b7d45 100%);
+        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
         color:#ffffff;
         font-family:Arial, Helvetica, sans-serif;
         font-size:12px;
@@ -1420,10 +1154,6 @@ function renderProjects(){
           width:100%;
         }
 
-        .wc-budget-strip{
-          grid-template-columns:repeat(2,1fr);
-        }
-
         .wc-project-row{
           flex-wrap:wrap !important;
         }
@@ -1443,24 +1173,6 @@ function renderProjects(){
           margin-left:0 !important;
           margin-right:0 !important;
           padding:0 12px 0 12px;
-        }
-
-        .wc-video-hero{
-          height:300px;
-          border-radius:16px;
-        }
-
-        .wc-video-hero::before{
-          border-radius:16px;
-        }
-
-        .wc-video-content{
-          padding:0 18px;
-        }
-
-        .wc-video-title-box{
-          padding:18px 20px 20px 20px;
-          border-radius:14px;
         }
 
         .wc-cip-sticky-nav-shell{
@@ -1510,8 +1222,7 @@ function renderProjects(){
           padding:0 12px;
         }
 
-        .wc-intro-inner h2,
-        .wc-budget-strip-title{
+        .wc-intro-inner h2{
           font-size:26px;
         }
 
@@ -1519,20 +1230,6 @@ function renderProjects(){
           font-size:13px;
           line-height:1.5;
           text-align:left;
-        }
-
-        .wc-budget-strip-section{
-          padding:4px 0 22px 0;
-        }
-
-        .wc-budget-strip{
-          grid-template-columns:1fr;
-          padding:13px;
-          margin-bottom:22px;
-        }
-
-        .wc-budget-item strong{
-          font-size:20px;
         }
 
         .wc-cip-feature-section,
@@ -1597,22 +1294,6 @@ function renderProjects(){
         .wc-project-index-header{
           margin-bottom:18px;
           padding:0 4px;
-        }
-
-        .wc-project-index-header span{
-          font-size:11px;
-          letter-spacing:.12em;
-        }
-
-        .wc-project-index-header h2{
-          font-size:26px;
-          line-height:1.12;
-        }
-
-        .wc-project-index-header p{
-          font-size:13px;
-          line-height:1.5;
-          margin-top:10px;
         }
 
         .wc-project-full-search-row{
@@ -1801,10 +1482,6 @@ function renderProjects(){
           padding:22px 8px !important;
         }
 
-        .wc-project-index-header h2{
-          font-size:24px;
-        }
-
         .wc-project-toolbar{
           padding:10px !important;
         }
@@ -1829,17 +1506,10 @@ function renderProjects(){
     <section class="wc-cip-main-section">
       <div class="wc-cip-main-inner">
         ${!isStandaloneSearchPage ? `
-        <div class="wc-video-hero">
-          <iframe class="wc-video-frame" src="https://www.youtube.com/embed/9KzURzB0E-U?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=9KzURzB0E-U&amp;controls=0&amp;modestbranding=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" title="Final Budget 2025-2026" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-
-          <div class="wc-video-overlay"></div>
-
-          <div class="wc-video-content">
-            <div class="wc-video-title-box">
-              <span>Walton County, Florida</span>
-              <h1>Capital Improvement Plan Fiscal Year 2027-2031</h1>
-            </div>
-          </div>
+        <div class="wc-cip-page-header">
+          <div class="page-eyebrow">Capital Projects</div>
+          <h1 class="page-title">Capital Improvement Plan</h1>
+          <p class="page-intro">Walton County&rsquo;s five-year capital improvement plan for fiscal years 2027 through 2031, outlining infrastructure investments, funding strategies, and project timelines.</p>
         </div>
 
         <section class="wc-intro-section" id="wc-cip-overview">
@@ -1868,32 +1538,34 @@ function renderProjects(){
         </section>
 
         <section class="wc-budget-strip-section" id="wc-cip-at-glance">
-          <h2 class="wc-budget-strip-title">Fiscal Year 2027 CIP at a Glance</h2>
-          <div class="wc-budget-strip">
-            <div class="wc-budget-item">
-              <span class="wc-budget-label">Transportation Fund CIP</span>
-              <strong class="wc-budget-count" data-target="5.2" data-prefix="$" data-suffix="M" data-decimals="1">$5.2M</strong>
+          <div class="wc-intro-inner">
+          <h2>Fiscal Year 2027 CIP at a Glance</h2>
+          <div class="wc-metrics-strip">
+            <div class="wc-metric-card">
+              <div class="wc-metric-label">Transportation Fund CIP</div>
+              <div class="wc-metric-value">$5.2M</div>
             </div>
 
-            <div class="wc-budget-item">
-              <span class="wc-budget-label">Capital Fund CIP</span>
-              <strong class="wc-budget-count" data-target="17.9" data-prefix="$" data-suffix="M" data-decimals="1">$17.9M</strong>
+            <div class="wc-metric-card">
+              <div class="wc-metric-label">Capital Fund CIP</div>
+              <div class="wc-metric-value">$17.9M</div>
             </div>
 
-            <div class="wc-budget-item">
-              <span class="wc-budget-label">Sheriff&rsquo;s Office CIP</span>
-              <strong class="wc-budget-count" data-target="10" data-prefix="$" data-suffix="M" data-decimals="0">$10M</strong>
+            <div class="wc-metric-card">
+              <div class="wc-metric-label">Sheriff&rsquo;s Office CIP</div>
+              <div class="wc-metric-value">$10M</div>
             </div>
 
-            <div class="wc-budget-item">
-              <span class="wc-budget-label">Tourist Development Fund CIP</span>
-              <strong class="wc-budget-count" data-target="9.8" data-prefix="$" data-suffix="M" data-decimals="1">$9.8M</strong>
+            <div class="wc-metric-card">
+              <div class="wc-metric-label">Tourist Development Fund CIP</div>
+              <div class="wc-metric-value">$9.8M</div>
             </div>
 
-            <div class="wc-budget-item">
-              <span class="wc-budget-label">Grant Funded CIP</span>
-              <strong class="wc-budget-count" data-target="14.2" data-prefix="$" data-suffix="M" data-decimals="1">$14.2M</strong>
+            <div class="wc-metric-card">
+              <div class="wc-metric-label">Grant Funded CIP</div>
+              <div class="wc-metric-value">$14.2M</div>
             </div>
+          </div>
           </div>
         </section>
 
@@ -1982,9 +1654,9 @@ function renderProjects(){
       <div class="wc-project-index-inner">
 
         <div class="wc-project-index-header" id="wc-project-search">
-          <span>Capital Project Search</span>
-          <h2>Searchable Project Index</h2>
-          <p>
+          <div class="page-eyebrow">Capital Projects</div>
+          <h1 class="page-title">Project Search</h1>
+          <p class="page-intro">
             Browse, search, and filter Walton County capital improvement projects by department, year, and funding source. This project index is populated from the CIP export and is designed to help residents quickly locate projects relevant to their community.
           </p>
         </div>
@@ -2057,8 +1729,6 @@ function renderProjects(){
     </section>
     ` : ""}
   `;
-
-  initBudgetCounters();
 
   const searchField = document.querySelector(".wc-project-search");
 

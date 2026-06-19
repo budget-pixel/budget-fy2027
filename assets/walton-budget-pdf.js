@@ -1020,51 +1020,11 @@ nav#nav-menu .wc-nav-search-slot{
     });
   }
 
-  function ensurePdfButton() {
-    var pdfButton = document.getElementById("wcDownloadPdf");
-
-  if (!pdfButton) {
-    pdfButton = document.createElement("button");
-    pdfButton.type = "button";
-    pdfButton.id = "wcDownloadPdf";
-    pdfButton.className = "wc-pdf-button";
-    pdfButton.setAttribute("aria-label", "Print or save this page as a PDF");
-    pdfButton.setAttribute("title", "Click here to generate a Portable Document Format version of this page.");
-    pdfButton.setAttribute("data-tooltip", "Click here to generate a Portable Document Format version of this page.");
-    pdfButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v10m0 0l-4-4m4 4l4-4M5 15v4h14v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>PDF';
-  }
-
-    if (!pdfButton.dataset.wcPdfBound) {
-      pdfButton.addEventListener("click", function () {
-        window.print();
-      });
-      pdfButton.dataset.wcPdfBound = "true";
-    }
-
-    var nav = document.querySelector("nav#nav-menu.nav-menu");
-    var buttonSlot = document.querySelector(".wc-print-button-slot");
-    if (!buttonSlot) {
-      buttonSlot = document.createElement("div");
-      buttonSlot.className = "wc-print-button-slot";
-    }
-
-    if (!buttonSlot.contains(pdfButton)) {
-      buttonSlot.appendChild(pdfButton);
-    }
-
-    buttonSlot.classList.toggle("wc-print-button-slot-fixed-fallback", !nav);
-    if (nav && buttonSlot.parentNode !== nav) {
-      nav.appendChild(buttonSlot);
-    } else if (!nav && document.body && buttonSlot.parentNode !== document.body) {
-      document.body.appendChild(buttonSlot);
-    }
-  }
 
   function init() {
     injectStyles();
     ensurePrintBrandPill();
     ensureStatementPanel();
-    ensurePdfButton();
   }
 
   if (document.readyState === "loading") {
@@ -1077,12 +1037,5 @@ nav#nav-menu .wc-nav-search-slot{
   window.addEventListener("beforeprint", function () {
     ensurePrintBrandPill();
     ensureStatementPanel();
-  });
-
-  new MutationObserver(function () {
-    ensurePdfButton();
-  }).observe(document.documentElement, {
-    childList: true,
-    subtree: true
   });
 })();

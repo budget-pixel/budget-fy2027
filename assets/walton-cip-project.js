@@ -373,7 +373,8 @@ function renderProjectPage(){
       </div>
 
       <section class="wc-project-hero">
-        <h1 class="wc-project-title">
+        <div class="page-eyebrow">${displayValue(category, "Capital Projects")}</div>
+        <h1 class="wc-project-title page-title">
           ${displayValue(title)}
         </h1>
       </section>
