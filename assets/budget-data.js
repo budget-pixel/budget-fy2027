@@ -957,7 +957,7 @@
   const CONSOLIDATED_REVENUE_FUND_COLUMNS = [
     { code: "001", label: "General Fund" },
     { code: "101", label: "Transportation Fund" },
-    { code: "107", label: "Fine & Forfeiture Fund" },
+    { code: "107", label: "Sheriff Fund" },
     { code: "111", label: "Tourist Development Fund" },
     { code: "112", label: "Solid Waste Fund" },
     { code: "300", label: "Capital Projects Fund" }
@@ -1865,9 +1865,9 @@
   ];
 
   const REVENUE_TOPIC_CHART_COLORS = [
-    "#006231", "#097FBB", "#D1BE78", "#FFDE59", "#3A9FD6", "#2F8F5B",
-    "#A3955C", "#C7AA3F", "#065A86", "#00401F", "#BFAE6A", "#FFE98A",
-    "#4D4D4D", "#7A7A7A", "#00A651", "#000000", "#6FAF8F", "#5B7C99",
+    "#003f28", "#097FBB", "#D1BE78", "#FFDE59", "#3A9FD6", "#2F6F4D",
+    "#A3955C", "#C7AA3F", "#065A86", "#002b1b", "#BFAE6A", "#FFE98A",
+    "#4D4D4D", "#7A7A7A", "#005236", "#000000", "#6FAF8F", "#5B7C99",
     "#8A8F98", "#7A9E7E", "#355C7D", "#9BA3AF", "#4B6F52", "#6D8299"
   ];
 

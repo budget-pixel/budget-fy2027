@@ -1282,7 +1282,7 @@
     box-sizing:border-box !important;
     background:#ffffff !important;
     box-shadow:
-      0 14px 34px rgba(0,98,49,0.08),
+      0 14px 34px rgba(0,63,40,0.08),
       0 4px 12px rgba(36,52,77,0.06) !important;
   }
   [data-table-scroll-container="true"]{
@@ -1306,7 +1306,7 @@
     vertical-align:middle !important;
   }
   [data-report-table-id] thead th{
-    background:linear-gradient(135deg,#006231 0%,#0b7d45 100%) !important;
+    background:linear-gradient(135deg,#003f28 0%,#005236 100%) !important;
     color:#ffffff !important;
     font-weight:700 !important;
     text-align:center !important;
@@ -1325,7 +1325,7 @@
   }
   [data-report-table-id] tbody tr:nth-child(even) th,
   [data-report-table-id] tbody tr:nth-child(even) td{
-    background:rgba(0,98,49,0.04) !important;
+    background:rgba(0,63,40,0.04) !important;
   }
   [data-report-table-id] tbody tr:hover th,
   [data-report-table-id] tbody tr:hover td{
@@ -1414,7 +1414,7 @@
     width:11px !important;
     height:11px !important;
     margin:0 !important;
-    accent-color:#006231 !important;
+    accent-color:#003f28 !important;
     cursor:pointer !important;
   }
   .wc-fy-column-toggle-text{
@@ -1439,7 +1439,7 @@
     border:1px solid #d1be78 !important;
     border-radius:999px !important;
     background:#ffffff !important;
-    color:#006231 !important;
+    color:#003f28 !important;
     font-family:Arial, Helvetica, sans-serif !important;
     font-size:10px !important;
     line-height:1 !important;
@@ -1453,7 +1453,7 @@
   .wc-budget-line-tooltip-anchor:focus{
     background:#d1be78 !important;
     color:#172033 !important;
-    outline:2px solid rgba(0,98,49,0.22) !important;
+    outline:2px solid rgba(0,63,40,0.22) !important;
     outline-offset:2px !important;
   }
   .wc-budget-line-tooltip-bubble{
@@ -1497,7 +1497,7 @@
   }
   [data-report-table-id] thead th:first-child{
     z-index:12 !important;
-    background:linear-gradient(135deg,#006231 0%,#0b7d45 100%) !important;
+    background:linear-gradient(135deg,#003f28 0%,#005236 100%) !important;
     color:#ffffff !important;
   }
   [data-report-table-id] tbody tr:nth-child(even) th:first-child,
