@@ -23,8 +23,8 @@
       }
     }
 
-    var sidebar = document.getElementById("sidebar");
-    var searchHost = sidebar || nav;
+    var sidebar = null;
+    var searchHost = nav;
     var existingSearchSlot = searchHost.querySelector(".wc-nav-search-slot");
 
     if(existingSearchSlot){
@@ -39,23 +39,40 @@
     slot.className = "wc-nav-search-slot";
 
     slot.innerHTML = `
-      <div class="wc-search-wrap">
-        <div class="wc-search-box">
-          <svg class="wc-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
-          </svg>
+      <div class="wc-nav-search-results" role="presentation">
+        <div class="wc-search-panel">
+          <div class="wc-search-wrap">
+            <div class="wc-search-box">
+              <svg class="wc-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+              </svg>
 
-          <input
-            type="search"
-            id="wcTocSearch"
-            placeholder="Search the budget publications..."
-            aria-label="Search table of contents"
-            autocomplete="off"
-          >
+              <input
+                type="search"
+                id="wcTocSearch"
+                placeholder="Search departments, budgets, publications, personnel..."
+                aria-label="Search the Walton County budget website"
+                autocomplete="off"
+              >
+
+              <span class="wc-search-esc" aria-hidden="true">Esc</span>
+
+              <button type="button" class="wc-search-close" aria-label="Close search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="wc-search-recent" aria-label="Recent searches"></div>
+          </div>
+
+          <div class="wc-search-scroll" role="listbox" aria-label="Search results">
+            <div class="wc-search-kicker">Search Results</div>
+            <div class="wc-search-results-inner"></div>
+          </div>
         </div>
       </div>
-
-      <div class="wc-nav-search-results" role="listbox" aria-label="Search results"></div>
     `;
 
     if(sidebar){
@@ -73,9 +90,14 @@
     }
 
     var results = slot.querySelector(".wc-nav-search-results");
+    var resultsInner = slot.querySelector(".wc-search-results-inner");
+    var recentHost = slot.querySelector(".wc-search-recent");
     var input = slot.querySelector("#wcTocSearch");
     var searchBox = slot.querySelector(".wc-search-box");
     var searchIcon = slot.querySelector(".wc-search-icon");
+    var closeButton = slot.querySelector(".wc-search-close");
+    var recentStorageKey = "wcBudgetRecentSearches";
+    var activeResultIndex = -1;
 
     var links = [];
     var seenHrefs = {};
@@ -130,6 +152,72 @@
       }
 
       return String(value).toLowerCase().replace(/[^a-z0-9$%\.\s-]/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    function getRecentSearches(){
+      try{
+        var parsed = JSON.parse(window.localStorage.getItem(recentStorageKey) || "[]");
+        return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 6) : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function saveRecentSearch(value){
+      value = String(value || "").trim();
+      if(!value){
+        return;
+      }
+      var normalized = value.toLowerCase();
+      var next = [value].concat(getRecentSearches().filter(function(item){
+        return String(item).toLowerCase() !== normalized;
+      })).slice(0, 6);
+      try{
+        window.localStorage.setItem(recentStorageKey, JSON.stringify(next));
+      }catch(e){}
+      renderRecentSearches();
+    }
+
+    function renderRecentSearches(){
+      if(!recentHost){
+        return;
+      }
+      var recent = getRecentSearches();
+      if(!recent.length){
+        recent = ["Budget Overview", "Public Works", "Capital Projects", "Personnel Summary"];
+      }
+      recentHost.innerHTML =
+        '<div class="wc-search-recent-label">Recent Searches</div>' +
+        '<div class="wc-search-recent-pills">' +
+          recent.map(function(term){
+            return '<button type="button" class="wc-search-recent-pill" data-query="' + term.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;") + '">' + term.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</button>';
+          }).join("") +
+        '</div>';
+    }
+
+    function openSearchMode(){
+      if(window.WaltonBudgetGlobalSearch && window.WaltonBudgetGlobalSearch.nav && window.WaltonBudgetGlobalSearch.nav !== nav){
+        window.WaltonBudgetGlobalSearch.close();
+      }
+      var wasOpen = nav.classList.contains("is-search-open");
+      nav.classList.add("is-search-open");
+      document.body.classList.add("wc-global-search-open");
+      document.body.style.overflow = "hidden";
+      renderRecentSearches();
+      renderResults(input.value);
+      if(!wasOpen && document.activeElement !== input){
+        setTimeout(function(){
+          input.focus();
+        }, 60);
+      }
+    }
+
+    function closeSearchMode(){
+      nav.classList.remove("is-search-open");
+      document.body.classList.remove("wc-global-search-open");
+      document.body.style.overflow = "";
+      results.classList.remove("is-active");
+      input.blur();
     }
 
     function addSearchLink(title, section, href, extraSearchText){
@@ -278,12 +366,12 @@
       }
     }
 
-    var GROUP_ORDER = ["Our County", "Budget Overview", "Officers & Agencies", "Departments", "Capital Projects", "Financials"];
+    var GROUP_ORDER = ["Our County", "Publications", "Budget", "Officers & Agencies", "Departments", "Capital Projects", "Financials"];
     var SECTION_GROUP_MAP = {
       "our county": "Our County",
-      "introduction and overview": "Budget Overview",
-      "financial structure, policies, and process": "Budget Overview",
-      "budget overview": "Budget Overview",
+      "introduction and overview": "Publications",
+      "financial structure, policies, and process": "Budget",
+      "budget overview": "Budget",
       "departments": "Departments",
       "constitutional officers": "Officers & Agencies",
       "autonomous entities": "Officers & Agencies",
@@ -314,11 +402,13 @@
         var resultLink = document.createElement("a");
         resultLink.className = "wc-nav-search-result";
         resultLink.href = item.href;
-        resultLink.innerHTML = `<strong>${item.title}</strong><span>${item.section}</span>`;
+        resultLink.setAttribute("role", "option");
+        resultLink.setAttribute("aria-selected", "false");
+        resultLink.innerHTML = `<strong>${item.title}</strong>`;
         group.appendChild(resultLink);
       });
 
-      results.appendChild(group);
+      resultsInner.appendChild(group);
     }
 
     function renderGroupedResults(items){
@@ -347,28 +437,75 @@
       });
     }
 
+    function findBestSearchMatch(query){
+      var normalizedQuery = normalizeSearchText(query);
+      if(!normalizedQuery){
+        return null;
+      }
+
+      var exactMatch = links.find(function(item){
+        return normalizeSearchText(item.title) === normalizedQuery;
+      });
+      if(exactMatch){
+        return exactMatch;
+      }
+
+      var titleMatch = links.find(function(item){
+        return normalizeSearchText(item.title).indexOf(normalizedQuery) !== -1;
+      });
+      if(titleMatch){
+        return titleMatch;
+      }
+
+      return links.find(function(item){
+        return item.searchText.indexOf(normalizedQuery) !== -1;
+      }) || null;
+    }
+
     function renderResults(query){
       var normalizedQuery = query.toLowerCase().trim();
-      results.innerHTML = "";
+      resultsInner.innerHTML = "";
+      activeResultIndex = -1;
+      renderRecentSearches();
 
       if(!normalizedQuery){
-        renderGroupedResults(links.slice(0, 28));
+        var defaultLinks = links.filter(function(item){
+          return groupLabelFor(item.section) !== "Departments";
+        }).slice(0, 3);
+        renderGroupedResults(defaultLinks);
         results.classList.add("is-active");
         return;
       }
 
       var matches = links.filter(function(item){
         return item.searchText.indexOf(normalizedQuery) !== -1;
-      }).slice(0, 20);
+      }).slice(0, 3);
 
       if(!matches.length){
-        results.innerHTML = '<div class="wc-nav-search-empty">No matching sections found.</div>';
+        resultsInner.innerHTML = '<div class="wc-nav-search-empty">No matching sections found.</div>';
         results.classList.add("is-active");
         return;
       }
 
       renderGroupedResults(matches);
       results.classList.add("is-active");
+    }
+
+    function getResultLinks(){
+      return Array.prototype.slice.call(resultsInner.querySelectorAll(".wc-nav-search-result"));
+    }
+
+    function setActiveResult(index){
+      var resultLinks = getResultLinks();
+      activeResultIndex = resultLinks.length ? (index + resultLinks.length) % resultLinks.length : -1;
+      resultLinks.forEach(function(link, i){
+        var active = i === activeResultIndex;
+        link.classList.toggle("is-active-result", active);
+        link.setAttribute("aria-selected", active ? "true" : "false");
+        if(active){
+          link.scrollIntoView({ block:"nearest" });
+        }
+      });
     }
 
     var budgetPages = window.wcBudgetPages || [];
@@ -428,22 +565,81 @@
     });
 
     input.addEventListener("focus", function(){
+      openSearchMode();
       renderResults(input.value);
     });
 
     input.addEventListener("keydown", function(e){
       if(e.key === "Escape"){
-        results.classList.remove("is-active");
-        input.blur();
+        closeSearchMode();
+        closeMobileSearch();
+      }
+      if(e.key === "ArrowDown"){
+        e.preventDefault();
+        setActiveResult(activeResultIndex + 1);
+      }
+      if(e.key === "ArrowUp"){
+        e.preventDefault();
+        setActiveResult(activeResultIndex - 1);
+      }
+      if(e.key === "Enter"){
+        var resultLinks = getResultLinks();
+        if(activeResultIndex >= 0 && resultLinks[activeResultIndex]){
+          e.preventDefault();
+          saveRecentSearch(input.value || resultLinks[activeResultIndex].querySelector("strong").textContent);
+          window.location.href = resultLinks[activeResultIndex].href;
+          return;
+        }
+        saveRecentSearch(input.value);
+      }
+    });
+
+    slot.addEventListener("click", function(e){
+      var target = e.target && e.target.closest ? e.target : null;
+      if(!target){
+        return;
+      }
+      var recentButton = target.closest(".wc-search-recent-pill");
+      if(recentButton){
+        input.value = recentButton.getAttribute("data-query") || "";
+        saveRecentSearch(input.value);
+        var recentMatch = findBestSearchMatch(input.value);
+        if(recentMatch){
+          window.location.href = recentMatch.href;
+        }else{
+          renderResults(input.value);
+          input.focus();
+        }
+        return;
+      }
+
+      var resultLink = target.closest(".wc-nav-search-result");
+      if(resultLink){
+        saveRecentSearch(input.value || resultLink.querySelector("strong").textContent);
+      }
+    });
+
+    if(closeButton){
+      closeButton.addEventListener("click", function(){
+        closeSearchMode();
+      });
+    }
+
+    document.addEventListener("click", function(e){
+      if(results && e.target === results){
+        closeSearchMode();
+        return;
+      }
+      if(!slot.contains(e.target) && !nav.contains(e.target)){
+        closeSearchMode();
         closeMobileSearch();
       }
     });
 
-    document.addEventListener("click", function(e){
-      if(!slot.contains(e.target)){
-        results.classList.remove("is-active");
-        closeMobileSearch();
-      }
-    });
+    window.WaltonBudgetGlobalSearch = {
+      nav:nav,
+      open:openSearchMode,
+      close:closeSearchMode
+    };
   };
 })();

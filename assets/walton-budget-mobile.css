@@ -150,14 +150,53 @@
     background-size:36px 36px !important;
   }
 
+  nav#nav-menu .wc-nav-search-slot{
+    position:fixed !important;
+    inset:0 !important;
+    pointer-events:none !important;
+  }
+  nav#nav-menu.is-search-open .wc-nav-search-slot{
+    pointer-events:auto !important;
+  }
   nav#nav-menu .wc-search-wrap{
-    left:0 !important;
-    padding:0 16px !important;
+    position:sticky !important;
+    top:0 !important;
+    left:auto !important;
+    right:auto !important;
+    width:100% !important;
+    padding:18px 18px 0 !important;
+    transform:none !important;
+  }
+  nav#nav-menu.is-search-open .wc-search-wrap{
+    transform:none !important;
   }
   nav#nav-menu .wc-nav-search-results{
-    width:100% !important;
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
     max-width:none !important;
+    height:100vh !important;
+    max-height:none !important;
     border-radius:0 !important;
+    padding:calc(var(--wc-nav-search-top, var(--wc-header-h, 72px)) + 20px) 12px 24px !important;
+  }
+  nav#nav-menu .wc-search-panel{
+    width:100% !important;
+    max-height:78vh !important;
+    border-radius:22px !important;
+  }
+  nav#nav-menu .wc-search-scroll{
+    padding:16px 18px 18px !important;
+  }
+  nav#nav-menu #wcTocSearch{
+    font-size:19px !important;
+  }
+  nav#nav-menu .wc-nav-search-result{
+    grid-template-columns:1fr !important;
+    gap:4px !important;
+  }
+  nav#nav-menu .wc-nav-search-result span{
+    text-align:left !important;
   }
   /* MOBILE REPORT TABLES */
 
