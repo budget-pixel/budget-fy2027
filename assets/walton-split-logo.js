@@ -122,11 +122,47 @@
     (root || document).querySelectorAll(".wc-split-brand-text").forEach(equalizeBrandTextWidth);
   }
 
+  function scheduleEqualize(root){
+    window.requestAnimationFrame(function(){
+      equalizeAll(root);
+    });
+  }
+
+  function bindAutoEqualize(){
+    if(window.__waltonSplitLogoAutoEqualizeBound){
+      return;
+    }
+    window.__waltonSplitLogoAutoEqualizeBound = true;
+
+    if(document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", function(){
+        scheduleEqualize();
+      });
+    }else{
+      scheduleEqualize();
+    }
+
+    window.addEventListener("load", function(){
+      scheduleEqualize();
+    });
+    window.addEventListener("resize", function(){
+      scheduleEqualize();
+    }, { passive:true });
+
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(function(){
+        scheduleEqualize();
+      });
+    }
+  }
+
   window.WaltonSplitLogo = {
     injectStyles: injectStyles,
     getHtml: getHtml,
-    equalizeAll: equalizeAll
+    equalizeAll: equalizeAll,
+    scheduleEqualize: scheduleEqualize
   };
 
   injectStyles();
+  bindAutoEqualize();
 })();

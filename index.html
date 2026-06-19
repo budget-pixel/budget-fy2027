@@ -80,8 +80,7 @@
     gap:6px;
     margin-left:auto;
   }
-  .wc-top-links a,
-  .wc-search-focus{
+  .wc-top-links a{
     display:inline-flex;
     align-items:center;
     min-height:38px;
@@ -95,8 +94,7 @@
     white-space:nowrap;
     cursor:pointer;
   }
-  .wc-top-links a:hover,
-  .wc-search-focus:hover{
+  .wc-top-links a:hover{
     background:rgba(255,255,255,.14);
     color:var(--wc-gold-2);
   }
@@ -606,8 +604,7 @@
       padding-top:8px;
     }
     .wc-story-nav.is-menu-open .wc-top-links{display:flex}
-    .wc-top-links a,
-    .wc-search-focus{
+    .wc-top-links a{
       justify-content:flex-start;
       border-radius:14px;
       background:rgba(0,98,49,.06);
@@ -651,11 +648,10 @@
     </button>
     <div class="wc-top-links">
       <a href="#county">Our County</a>
-      <a href="#budget">Budget Overview</a>
-      <a href="#departments">Departments</a>
-      <a href="#projects">Capital Projects</a>
-      <a href="pages/summary-of-revenues.html">Financials</a>
-      <button class="wc-search-focus" type="button">Search</button>
+      <a href="pages/budget-overview.html">Budget Overview</a>
+      <a href="pages/departments.html">Departments</a>
+      <a href="pages/capital-improvement-plan.html">Capital Projects</a>
+      <a href="pages/financials.html">Financials</a>
     </div>
   </nav>
   <div class="wc-hero-inner">
@@ -665,7 +661,7 @@
       <p class="wc-hero-subtitle">FY 2027 Proposed Budget</p>
       <p class="wc-hero-copy">Investing in infrastructure, public safety, environmental stewardship, and quality of life for a stronger Walton County.</p>
       <div class="wc-hero-actions">
-        <a class="wc-button" href="#budget">Explore the Budget</a>
+        <a class="wc-button" href="pages/budget-overview.html">Explore the Budget</a>
         <a class="wc-button secondary" href="pages/capital-improvement-plan.html">View Capital Plan</a>
       </div>
     </div>
@@ -781,8 +777,8 @@
       </div>
       <div class="wc-explorer-grid">
         <a class="wc-explorer-card" href="pages/board-of-county-commissioners.html"><span class="wc-mini">CO</span><h3>Constitutional Officers</h3><p>Countywide elected offices and their FY 2027 budgets.</p><span class="wc-card-link">Explore Offices</span></a>
-        <a class="wc-explorer-card" href="pages/county-administration.html"><span class="wc-mini">DE</span><h3>Departments</h3><p>Operational departments, programs, staffing, and services.</p><span class="wc-card-link">View Departments</span></a>
-        <a class="wc-explorer-card" href="pages/summary-of-revenues.html"><span class="wc-mini">FS</span><h3>Financial Summaries</h3><p>Revenue, expense, fund, transfer, and personnel summaries.</p><span class="wc-card-link">Open Financials</span></a>
+        <a class="wc-explorer-card" href="pages/departments.html"><span class="wc-mini">DE</span><h3>Departments</h3><p>Operational departments, programs, staffing, and services.</p><span class="wc-card-link">View Departments</span></a>
+        <a class="wc-explorer-card" href="pages/financials.html"><span class="wc-mini">FS</span><h3>Financial Summaries</h3><p>Revenue, expense, fund, transfer, and personnel summaries.</p><span class="wc-card-link">Open Financials</span></a>
         <a class="wc-explorer-card" href="pages/capital-improvement-plan.html"><span class="wc-mini">CP</span><h3>Capital Projects</h3><p>Five-year infrastructure investments and project schedules.</p><span class="wc-card-link">View Capital Plan</span></a>
         <a class="wc-explorer-card" href="pages/strategic-initiatives.html"><span class="wc-mini">SI</span><h3>Strategic Initiatives</h3><p>Priorities that guide county investment and service planning.</p><span class="wc-card-link">Read Priorities</span></a>
         <a class="wc-explorer-card" href="pages/overview-of-walton-county.html"><span class="wc-mini">OC</span><h3>County Profile</h3><p>Demographics, context, and the story behind Walton County.</p><span class="wc-card-link">See Profile</span></a>
@@ -797,8 +793,6 @@
 </div>
 
 <script src="assets/walton-split-logo.js"></script>
-<script src="assets/walton-budget-search-data.js"></script>
-<script src="assets/walton-budget-search.js"></script>
 <script src="assets/budget-data.js"></script>
 <script src="assets/walton-cip-projects.js"></script>
 <script>
@@ -832,16 +826,10 @@
         .replace(/"/g, "&quot;");
     }
 
-    function initLogoAndSearch(){
+    function initLogo(){
       if(window.WaltonSplitLogo){
         $(".logo-container").innerHTML = window.WaltonSplitLogo.getHtml("", "");
         window.WaltonSplitLogo.equalizeAll();
-      }
-      if(typeof window.initWaltonBudgetSearch === "function"){
-        window.initWaltonBudgetSearch({
-          nav:$("#nav-menu"),
-          getWaltonSplitBrandHtml:window.WaltonSplitLogo && window.WaltonSplitLogo.getHtml
-        });
       }
     }
 
@@ -859,16 +847,6 @@
           nav.classList.remove("is-menu-open");
           toggle.setAttribute("aria-expanded", "false");
         });
-      });
-      $(".wc-search-focus").addEventListener("click", function(){
-        var open = !nav.classList.contains("is-search-open");
-        nav.classList.toggle("is-search-open", open);
-        if(open){
-          setTimeout(function(){
-            var input = $("#wcTocSearch");
-            if(input) input.focus();
-          }, 40);
-        }
       });
       document.addEventListener("click", function(e){
         if(!nav.contains(e.target)){
@@ -984,7 +962,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function(){
-      initLogoAndSearch();
+      initLogo();
       initMenu();
       loadCensusSnapshot();
       updateRevenueCards();

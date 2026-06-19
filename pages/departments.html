@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Departments — Walton County FY 2027 Budget</title>
+<style>
+  :root{
+    --wc-green:#006231;
+    --wc-green-2:#0b7741;
+    --wc-gold:#d1be78;
+    --wc-ink:#172033;
+    --wc-muted:#607184;
+    --wc-line:rgba(23,32,51,.12);
+    --wc-soft:#f5f8f4;
+    --wc-shadow:0 18px 44px rgba(23,32,51,.10);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    color:var(--wc-ink);
+    background:
+      radial-gradient(circle at top left, rgba(209,190,120,.18), transparent 34rem),
+      linear-gradient(180deg,#fbfcfa 0%,#f4f8f2 48%,#ffffff 100%);
+    font-family:Arial, Helvetica, sans-serif;
+    line-height:1.5;
+  }
+  a{color:inherit}
+
+  .wc-directory-shell{
+    width:min(1320px, calc(100% - 32px));
+    margin:14px auto 34px;
+  }
+
+  .wc-story-nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    gap:24px;
+    min-height:76px;
+    width:100vw;
+    margin-left:calc(50% - 50vw);
+    padding:22px clamp(28px, 6vw, 86px);
+    border:0;
+    border-radius:0;
+    background:linear-gradient(180deg, rgba(0,62,40,.96), rgba(0,62,40,.88));
+    box-shadow:none;
+  }
+  .logo-container{
+    flex:0 0 auto;
+    min-width:284px;
+  }
+  .wc-story-nav .wc-split-brand{height:52px !important}
+  .wc-story-nav .wc-split-brand-top{
+    color:#ffffff !important;
+    font-size:24px !important;
+  }
+  .wc-story-nav .wc-split-brand-bottom{
+    color:rgba(255,255,255,.82) !important;
+  }
+  .wc-story-nav .wc-split-brand-seal,
+  .wc-story-nav .wc-seal-mark{
+    width:46px !important;
+    height:46px !important;
+    flex-basis:46px !important;
+    background-size:42px 42px !important;
+  }
+  .wc-top-links{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    margin-left:auto;
+  }
+  .wc-top-links a{
+    display:inline-flex;
+    align-items:center;
+    min-height:38px;
+    padding:0 12px;
+    border:0;
+    border-radius:999px;
+    background:transparent;
+    color:rgba(255,255,255,.92);
+    font:700 14px/1 Arial, Helvetica, sans-serif;
+    text-decoration:none;
+    white-space:nowrap;
+  }
+  .wc-top-links a:hover{
+    background:rgba(255,255,255,.14);
+    color:var(--wc-gold);
+  }
+  .wc-top-links a[aria-current="page"]{
+    color:var(--wc-gold);
+  }
+  .wc-menu-toggle{
+    display:none;
+    width:42px;
+    height:42px;
+    border:1px solid rgba(255,255,255,.5);
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    color:#ffffff;
+    cursor:pointer;
+    position:relative;
+  }
+  .wc-menu-toggle span{
+    position:absolute;
+    left:12px;
+    width:16px;
+    height:2px;
+    border-radius:999px;
+    background:currentColor;
+  }
+  .wc-menu-toggle span:nth-child(1){top:14px}
+  .wc-menu-toggle span:nth-child(2){top:20px}
+  .wc-menu-toggle span:nth-child(3){top:26px}
+
+  .wc-breadcrumb{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:44px 0 24px;
+    color:var(--wc-muted);
+    font-size:13px;
+    font-weight:800;
+  }
+  .wc-breadcrumb a{
+    color:var(--wc-green);
+    text-decoration:none;
+  }
+  .wc-breadcrumb span[aria-hidden="true"]{
+    color:rgba(96,113,132,.52);
+  }
+
+  .wc-page-hero{
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) minmax(280px, 420px);
+    gap:28px;
+    align-items:end;
+    margin-bottom:34px;
+    padding:42px;
+    border:1px solid rgba(255,255,255,.72);
+    border-radius:32px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.72)),
+      radial-gradient(circle at top right, rgba(209,190,120,.20), transparent 26rem);
+    box-shadow:var(--wc-shadow);
+  }
+  .wc-page-hero h1{
+    margin:0;
+    color:var(--wc-ink);
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(48px, 6vw, 88px);
+    line-height:.98;
+    font-weight:500;
+    letter-spacing:0;
+  }
+  .wc-page-hero p{
+    max-width:760px;
+    margin:20px 0 0;
+    color:var(--wc-muted);
+    font-size:20px;
+    line-height:1.65;
+  }
+  .wc-hero-stat{
+    padding:24px;
+    border-radius:24px;
+    background:linear-gradient(135deg, var(--wc-green), var(--wc-green-2));
+    color:#ffffff;
+  }
+  .wc-hero-stat strong{
+    display:block;
+    font-size:48px;
+    line-height:1;
+  }
+  .wc-hero-stat span{
+    display:block;
+    margin-top:10px;
+    color:rgba(255,255,255,.78);
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+
+  .wc-directory-tools{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin:0 0 20px;
+  }
+  .wc-department-search{
+    position:relative;
+    flex:1;
+  }
+  .wc-department-search svg{
+    position:absolute;
+    left:18px;
+    top:50%;
+    width:20px;
+    height:20px;
+    transform:translateY(-50%);
+    color:var(--wc-green);
+  }
+  #departmentSearch{
+    width:100%;
+    min-height:58px;
+    padding:0 20px 0 52px;
+    border:1px solid var(--wc-line);
+    border-radius:999px;
+    background:#ffffff;
+    color:var(--wc-ink);
+    font:800 16px/1.3 Arial, Helvetica, sans-serif;
+    box-shadow:0 12px 28px rgba(23,32,51,.07);
+    outline:0;
+  }
+  #departmentSearch:focus{
+    border-color:rgba(0,98,49,.35);
+    box-shadow:0 16px 34px rgba(0,98,49,.11);
+  }
+  .wc-result-count{
+    flex:0 0 auto;
+    color:var(--wc-muted);
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .wc-department-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:18px;
+  }
+  .wc-department-card{
+    display:flex;
+    flex-direction:column;
+    min-height:320px;
+    padding:24px;
+    border:1px solid var(--wc-line);
+    border-radius:24px;
+    background:#ffffff;
+    box-shadow:0 14px 34px rgba(23,32,51,.07);
+    text-decoration:none;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .wc-department-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(0,98,49,.28);
+    box-shadow:0 22px 48px rgba(23,32,51,.12);
+  }
+  .wc-department-card h2{
+    margin:0;
+    color:var(--wc-ink);
+    font-size:24px;
+    line-height:1.16;
+  }
+  .wc-department-card p{
+    margin:16px 0 0;
+    color:var(--wc-muted);
+    font-size:15px;
+    line-height:1.62;
+  }
+  .wc-card-metrics{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:10px;
+    margin:auto 0 20px;
+    padding-top:24px;
+  }
+  .wc-card-metric{
+    padding:12px;
+    border-radius:16px;
+    background:var(--wc-soft);
+  }
+  .wc-card-metric strong{
+    display:block;
+    color:var(--wc-green);
+    font-size:20px;
+    line-height:1.1;
+  }
+  .wc-card-metric span{
+    display:block;
+    margin-top:5px;
+    color:var(--wc-muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .wc-view-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:44px;
+    padding:0 15px;
+    border-radius:999px;
+    background:var(--wc-green);
+    color:#ffffff;
+    font-size:14px;
+    font-weight:900;
+  }
+  .wc-empty-state{
+    display:none;
+    padding:30px;
+    border:1px dashed rgba(96,113,132,.35);
+    border-radius:22px;
+    background:#ffffff;
+    color:var(--wc-muted);
+    font-weight:800;
+  }
+  .wc-empty-state.is-visible{display:block}
+
+  .wc-directory-footer{
+    margin:60px 0 0;
+    padding:26px;
+    border-radius:24px;
+    background:#003f28;
+    color:#ffffff;
+  }
+  .wc-directory-footer p{
+    margin:8px 0 0;
+    color:rgba(255,255,255,.72);
+  }
+
+  @media(max-width:1080px){
+    .wc-story-nav{
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    .logo-container{min-width:246px}
+    .wc-menu-toggle{
+      display:inline-flex;
+      margin-left:auto;
+    }
+    .wc-top-links{
+      order:4;
+      display:none;
+      flex:1 0 100%;
+      justify-content:flex-start;
+      padding-top:8px;
+    }
+    .wc-story-nav.is-menu-open .wc-top-links{display:flex}
+    .wc-page-hero{grid-template-columns:1fr}
+    .wc-department-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+  }
+
+  @media(max-width:720px){
+    .wc-directory-shell{width:min(100% - 20px, 680px)}
+    .logo-container{min-width:0}
+    .wc-story-nav .wc-split-brand-left,
+    .wc-story-nav .wc-split-brand-right{display:none !important}
+    .wc-top-links{
+      flex-direction:column;
+      align-items:stretch;
+    }
+    .wc-top-links a{
+      border-radius:14px;
+      background:rgba(255,255,255,.12);
+    }
+    .wc-page-hero{
+      padding:28px;
+      border-radius:24px;
+    }
+    .wc-page-hero p{font-size:17px}
+    .wc-directory-tools{
+      display:block;
+    }
+    .wc-result-count{display:block;margin:14px 0 0}
+    .wc-department-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wc-directory-shell">
+  <nav id="nav-menu" class="wc-story-nav nav-menu" aria-label="Primary navigation">
+    <div class="logo-container"></div>
+    <button class="wc-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="wc-top-links">
+      <a href="../index.html#county">Our County</a>
+      <a href="budget-overview.html">Budget Overview</a>
+      <a href="departments.html" aria-current="page">Departments</a>
+      <a href="capital-improvement-plan.html">Capital Projects</a>
+      <a href="financials.html">Financials</a>
+    </div>
+  </nav>
+
+  <main>
+    <nav class="wc-breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html">Home</a>
+      <span aria-hidden="true">/</span>
+      <span>Departments</span>
+    </nav>
+
+    <section class="wc-page-hero">
+      <div>
+        <h1>Departments</h1>
+        <p>Explore Walton County departments, budgets, staffing, performance measures, and services.</p>
+      </div>
+      <div class="wc-hero-stat">
+        <strong id="departmentTotal">0</strong>
+        <span>Departments</span>
+      </div>
+    </section>
+
+    <section aria-label="Department directory">
+      <div class="wc-directory-tools">
+        <label class="wc-department-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+          </svg>
+          <input id="departmentSearch" type="search" placeholder="Search Departments..." autocomplete="off" aria-label="Search departments">
+        </label>
+        <div class="wc-result-count" id="departmentResultCount">Loading departments</div>
+      </div>
+      <div class="wc-empty-state" id="departmentEmpty">No departments match that search.</div>
+      <div class="wc-department-grid" id="departmentGrid"></div>
+    </section>
+  </main>
+
+  <footer class="wc-directory-footer">
+    <strong>Walton County FY 2027 Proposed Budget</strong>
+    <p>Prepared by the Walton County Office of Management and Budget.</p>
+  </footer>
+</div>
+
+<script src="../assets/walton-split-logo.js"></script>
+<script src="../assets/walton-budget-search-data.js"></script>
+<script src="../assets/budget-data.js"></script>
+<script>
+  (function(){
+    var fallbackDepartments = [
+      ["Building Construction and Maintenance", "building-construction-and-maintenance.html"],
+      ["Building Department", "building-department.html"],
+      ["Code Compliance", "code-compliance.html"],
+      ["County Administration", "county-administration.html"],
+      ["Eagle Springs Golf and Recreation Center", "eagle-springs-golf-and-recreation-center.html"],
+      ["Eagle Springs Grill", "eagle-springs-grill.html"],
+      ["Emergency Management", "emergency-management.html"],
+      ["Engineering Department", "engineering-department.html"],
+      ["Environmental Resources", "environmental-resources.html"],
+      ["Extension Office", "extension-office.html"],
+      ["Geographic Info Systems", "geographic-info-systems.html"],
+      ["Housing & Urban Development", "housing-and-urban-development.html"],
+      ["Human Resources", "human-resources.html"],
+      ["Libraries", "libraries.html"],
+      ["Mosquito Control", "mosquito-control.html"],
+      ["Mossy Head Wastewater Treatment Facility", "mossy-head-wastewater-treatment-facility.html"],
+      ["Office of Management and Budget", "office-of-management-and-budget.html"],
+      ["Office of the County Attorney", "office-of-the-county-attorney.html"],
+      ["Planning", "planning.html"],
+      ["Probation", "probation.html"],
+      ["Public Works", "public-works.html"],
+      ["Purchasing", "purchasing.html"],
+      ["Recreation", "recreation.html"],
+      ["Soil Conservation", "soil-conservation.html"],
+      ["Solid Waste", "solid-waste.html"],
+      ["Tourism Administration", "tourism-administration.html"],
+      ["Tourism Beach Operations", "tourism-beach-operations.html"],
+      ["Tourism Lifeguard Services and Beach Safety", "tourism-lifeguard-services-and-beach-safety.html"],
+      ["Veteran Services", "veteran-services.html"]
+    ];
+
+    var aliasMap = {
+      "sheriffs office": ["walton county sheriffs office", "sheriff"],
+      "clerk of courts and county comptroller": ["clerk of court", "clerk of circuit court"],
+      "engineering department": ["public works engineering services", "engineering services"],
+      "environmental resources": ["environmental services"],
+      "probation": ["probation services"],
+      "purchasing": ["procurement"],
+      "code compliance": ["code compliance beach", "code compliance street"],
+      "libraries": ["county libraries"],
+      "planning": ["planning short term rental"]
+    };
+
+    var departments = [];
+
+    function $(selector){
+      return document.querySelector(selector);
+    }
+
+    function escapeHtml(value){
+      return String(value === undefined || value === null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function normalize(value){
+      return String(value || "")
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    function formatCurrency(value){
+      var n = Number(value) || 0;
+      if(!n) return "Not listed";
+      if(Math.abs(n) >= 1000000){
+        return "$" + (n / 1000000).toLocaleString("en-US", { maximumFractionDigits:1 }) + "M";
+      }
+      return "$" + Math.round(n).toLocaleString("en-US");
+    }
+
+    function formatFte(value){
+      var n = Number(value) || 0;
+      if(!n) return "Not listed";
+      return n.toLocaleString("en-US", { maximumFractionDigits:2 }).replace(/\.00$/, "");
+    }
+
+    function descriptionFromNarrative(text){
+      var clean = String(text || "").replace(/\s+/g, " ").trim();
+      if(!clean) return "View budget, staffing, performance measures, and service information for this Walton County department.";
+      return clean.length > 190 ? clean.slice(0, 187).replace(/\s+\S*$/, "") + "..." : clean;
+    }
+
+    function aliasesFor(name){
+      var key = normalize(name);
+      return [key].concat(aliasMap[key] || []);
+    }
+
+    function rowMatchesDepartment(row, name){
+      var dept = normalize(row && row.Dept_Name);
+      return aliasesFor(name).indexOf(dept) !== -1;
+    }
+
+    function buildBaseDepartments(){
+      var pages = Array.isArray(window.wcBudgetPages) ? window.wcBudgetPages : [];
+      var items = pages
+        .filter(function(page){
+          return page && page.section === "Departments" && page.title !== "Departments";
+        })
+        .map(function(page){
+          return { name:page.title, href:page.href };
+        });
+
+      if(!items.length){
+        items = fallbackDepartments.map(function(item){
+          return { name:item[0], href:item[1] };
+        });
+      }
+
+      var seen = {};
+      return items
+        .filter(function(item){
+          var key = normalize(item.name);
+          if(seen[key]) return false;
+          seen[key] = true;
+          return true;
+        })
+        .sort(function(a, b){ return a.name.localeCompare(b.name); });
+    }
+
+    function enrichDepartments(data){
+      var narratives = Array.isArray(data && data.departmentNarratives) ? data.departmentNarratives : [];
+      var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
+      var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
+
+      departments = buildBaseDepartments().map(function(dept){
+        var narrative = narratives.find(function(row){ return rowMatchesDepartment(row, dept.name); });
+        var budget = expenditures.reduce(function(sum, row){
+          return rowMatchesDepartment(row, dept.name) ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
+        }, 0);
+        var fte = staffing.reduce(function(sum, row){
+          return rowMatchesDepartment(row, dept.name) ? sum + (Number(row["2027"]) || 0) : sum;
+        }, 0);
+
+        return {
+          name:dept.name,
+          href:dept.href,
+          description:descriptionFromNarrative(narrative && narrative.Narrative),
+          budget:formatCurrency(budget),
+          fte:formatFte(fte)
+        };
+      });
+    }
+
+    function renderDepartments(){
+      var grid = $("#departmentGrid");
+      var empty = $("#departmentEmpty");
+      var input = $("#departmentSearch");
+      var count = $("#departmentResultCount");
+      var query = normalize(input && input.value);
+      var matches = departments.filter(function(dept){
+        return !query || normalize(dept.name + " " + dept.description).indexOf(query) !== -1;
+      });
+
+      $("#departmentTotal").textContent = String(departments.length);
+      count.textContent = matches.length + " of " + departments.length + " departments";
+      empty.classList.toggle("is-visible", matches.length === 0);
+
+      grid.innerHTML = matches.map(function(dept){
+        return '<a class="wc-department-card" href="' + escapeHtml(dept.href) + '">' +
+          '<h2>' + escapeHtml(dept.name) + '</h2>' +
+          '<p>' + escapeHtml(dept.description) + '</p>' +
+          '<div class="wc-card-metrics">' +
+            '<div class="wc-card-metric"><strong>' + escapeHtml(dept.budget) + '</strong><span>FY 2027 Budget</span></div>' +
+            '<div class="wc-card-metric"><strong>' + escapeHtml(dept.fte) + '</strong><span>Personnel</span></div>' +
+          '</div>' +
+          '<span class="wc-view-button">View Department &rarr;</span>' +
+        '</a>';
+      }).join("");
+    }
+
+    function initChrome(){
+      var nav = $("#nav-menu");
+      var toggle = $(".wc-menu-toggle");
+      if(window.WaltonSplitLogo){
+        $(".logo-container").innerHTML = window.WaltonSplitLogo.getHtml("../index.html", "Go to Home");
+        window.WaltonSplitLogo.equalizeAll();
+      }
+      if(toggle && nav){
+        toggle.addEventListener("click", function(){
+          var open = !nav.classList.contains("is-menu-open");
+          nav.classList.toggle("is-menu-open", open);
+          toggle.setAttribute("aria-expanded", String(open));
+        });
+      }
+    }
+
+    function initDirectory(){
+      departments = buildBaseDepartments().map(function(dept){
+        return {
+          name:dept.name,
+          href:dept.href,
+          description:descriptionFromNarrative(""),
+          budget:"Loading",
+          fte:"Loading"
+        };
+      });
+      renderDepartments();
+
+      if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
+        window.WCBudgetData.loadBudgetData()
+          .then(function(data){
+            enrichDepartments(data);
+            renderDepartments();
+          })
+          .catch(function(){
+            departments = departments.map(function(dept){
+              dept.budget = "Not listed";
+              dept.fte = "Not listed";
+              return dept;
+            });
+            renderDepartments();
+          });
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      initChrome();
+      initDirectory();
+      $("#departmentSearch").addEventListener("input", renderDepartments);
+    });
+  })();
+</script>
+</body>
+</html>

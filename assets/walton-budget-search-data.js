@@ -14,6 +14,8 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Overview of Walton County", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd2e29b2249e0a5b99" },
   { title:"Organizational Structure", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1af21806371d68e7" },
   { title:"Strategic Initiatives", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbda2feb1e35a5b122d" },
+  { title:"Budget Overview", section:"Budget Overview", href:"budget-overview.html" },
+  { title:"Departments", section:"Departments", href:"departments.html" },
   { title:"Budget Process & Calendar", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdeb3f9f1b409e86d5" },
   { title:"Fund Descriptions and Structure", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd623edf6822e6e54d" },
   { title:"Department to Fund Relationship", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdcf5e99561d6ee920" },
@@ -25,6 +27,7 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Summary of Interfund Transfers", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0c507ca05e715043" },
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
   { title:"Summary of Machinery, Vehicles & Equipment", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfdb1a2c2915743e4" },
+  { title:"Financials", section:"Financials", href:"financials.html" },
   { title:"Board of County Commissioners", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc6947be859271a418" },
   { title:"Clerk of Courts & County Comptroller", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbcc965cb8dc61a1909" },
   { title:"Property Appraiser", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc872420fe4b9ad729" },
@@ -42,35 +45,35 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"State Attorney", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfba867c19eddf0d3" },
   { title:"Statutory & Other Agency Funding", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdd8b75e8172b9646a" },
   { title:"Walton County Health Department", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd55c6cf9367a9f70d" },
-  { title:"Building Construction and Maintenance", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe4a1b46dae2cd66cc" },
-  { title:"Building Department", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd8e620c6522929798" },
-  { title:"Code Compliance", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd5e724bfe505af7d1" },
-  { title:"County Administration", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd15a00b5b02701878" },
-  { title:"Eagle Springs Golf and Recreation Center", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd67c50a9caf8aa87f" },
-  { title:"Eagle Springs Grill", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfe52b05dd76fe3e9" },
-  { title:"Emergency Management", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfa0047aa8047423d" },
-  { title:"Engineering Department", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0fd7d79954f0d697" },
-  { title:"Environmental Resources", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdd658e0914c4e22af" },
-  { title:"Extension Office", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbde2e896043bd2da11" },
-  { title:"Geographic Info Systems", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbee3bceee932fc0d87" },
-  { title:"Housing & Urban Development", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe639ac21532bb2142" },
-  { title:"Human Resources", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe479fad77bfe0b08c" },
-  { title:"Libraries", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbea6376f80ba7f7b69" },
-  { title:"Mosquito Control", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeba6bb0c34fe13bcc" },
-  { title:"Mossy Head Wastewater Treatment Facility", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe3d7c82948e99141a" },
-  { title:"Office of Management and Budget", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe31d617f90d821387" },
-  { title:"Office of the County Attorney", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbed0f2f4405191cf7e" },
-  { title:"Planning", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeee8cc7637f457744" },
-  { title:"Probation", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeaab1d7fbd1d2ba62" },
-  { title:"Public Works", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe512b64f66f25b84d" },
-  { title:"Purchasing", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe30c197fb7c61e522" },
-  { title:"Recreation", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeb2d7e817998fc5b3" },
-  { title:"Soil Conservation", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbec41205b833c4df0e" },
-  { title:"Solid Waste", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe3d0fefca6b1a531e" },
-  { title:"Tourism Administration", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe794aa4891a3dc024" },
-  { title:"Tourism Beach Operations", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbed36e2967b08392bf" },
-  { title:"Tourism Lifeguard Services and Beach Safety", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbecf8c02d147a19f9f" },
-  { title:"Veteran Services", section:"Department Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbf22a7f73b8c6a62b4" },
+  { title:"Building Construction and Maintenance", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe4a1b46dae2cd66cc" },
+  { title:"Building Department", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd8e620c6522929798" },
+  { title:"Code Compliance", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd5e724bfe505af7d1" },
+  { title:"County Administration", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd15a00b5b02701878" },
+  { title:"Eagle Springs Golf and Recreation Center", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd67c50a9caf8aa87f" },
+  { title:"Eagle Springs Grill", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfe52b05dd76fe3e9" },
+  { title:"Emergency Management", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfa0047aa8047423d" },
+  { title:"Engineering Department", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0fd7d79954f0d697" },
+  { title:"Environmental Resources", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdd658e0914c4e22af" },
+  { title:"Extension Office", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbde2e896043bd2da11" },
+  { title:"Geographic Info Systems", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbee3bceee932fc0d87" },
+  { title:"Housing & Urban Development", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe639ac21532bb2142" },
+  { title:"Human Resources", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe479fad77bfe0b08c" },
+  { title:"Libraries", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbea6376f80ba7f7b69" },
+  { title:"Mosquito Control", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeba6bb0c34fe13bcc" },
+  { title:"Mossy Head Wastewater Treatment Facility", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe3d7c82948e99141a" },
+  { title:"Office of Management and Budget", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe31d617f90d821387" },
+  { title:"Office of the County Attorney", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbed0f2f4405191cf7e" },
+  { title:"Planning", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeee8cc7637f457744" },
+  { title:"Probation", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeaab1d7fbd1d2ba62" },
+  { title:"Public Works", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe512b64f66f25b84d" },
+  { title:"Purchasing", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe30c197fb7c61e522" },
+  { title:"Recreation", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbeb2d7e817998fc5b3" },
+  { title:"Soil Conservation", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbec41205b833c4df0e" },
+  { title:"Solid Waste", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe3d0fefca6b1a531e" },
+  { title:"Tourism Administration", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe794aa4891a3dc024" },
+  { title:"Tourism Beach Operations", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbed36e2967b08392bf" },
+  { title:"Tourism Lifeguard Services and Beach Safety", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbecf8c02d147a19f9f" },
+  { title:"Veteran Services", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbf22a7f73b8c6a62b4" },
   { title:"Capital Improvement Plan", section:"Capital Improvement Plan", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd4a9d93e5ac05a153" },
   { title:"Debt Overview", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd7fa91d193bd3f319" },
   { title:"Financial Forecast", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd986e584c322f6216" },
@@ -106,6 +109,14 @@ window.wcBudgetPages = window.wcBudgetPages || [
 
     "Strategic Initiatives": [
       "strategic plan", "goals", "priorities", "initiatives", "objectives", "county priorities", "strategic priorities", "performance", "vision", "mission"
+    ],
+
+    "Budget Overview": [
+      "budget overview", "overview hub", "budget process", "calendar", "transmittal", "budget message", "county profile", "fund structure", "financial policies", "strategic initiatives"
+    ],
+
+    "Departments": [
+      "departments", "department directory", "services", "office directory", "county services", "browse departments", "department budgets", "department staffing", "performance measures"
     ],
 
     "Budget Process & Calendar": [
@@ -150,6 +161,10 @@ window.wcBudgetPages = window.wcBudgetPages || [
 
     "Summary of Machinery, Vehicles & Equipment": [
       "machinery", "vehicles", "equipment", "fleet", "capital equipment", "mve", "vehicle replacement", "equipment replacement", "heavy equipment", "trucks", "public works equipment"
+    ],
+
+    "Financials": [
+      "financials", "financial hub", "financial summaries", "revenues", "expenses", "fund schedules", "debt", "forecast", "transfers", "personnel", "equipment", "supplemental"
     ],
 
     "Board of County Commissioners": [
@@ -364,6 +379,8 @@ window.wcBudgetPages = window.wcBudgetPages || [
     "Overview of Walton County": "overview-of-walton-county.html",
     "Organizational Structure": "organizational-structure.html",
     "Strategic Initiatives": "strategic-initiatives.html",
+    "Budget Overview": "budget-overview.html",
+    "Departments": "departments.html",
     "Budget Process & Calendar": "budget-process-and-calendar.html",
     "Fund Descriptions and Structure": "fund-descriptions-and-structure.html",
     "Department to Fund Relationship": "department-to-fund-relationship.html",
@@ -375,6 +392,7 @@ window.wcBudgetPages = window.wcBudgetPages || [
     "Summary of Interfund Transfers": "summary-of-interfund-transfers.html",
     "Summary of Personnel": "summary-of-personnel.html",
     "Summary of Machinery, Vehicles & Equipment": "summary-of-machinery-vehicles-and-equipment.html",
+    "Financials": "financials.html",
     "Board of County Commissioners": "board-of-county-commissioners.html",
     "Clerk of Courts & County Comptroller": "clerk-of-courts-and-county-comptroller.html",
     "Property Appraiser": "property-appraiser.html",
