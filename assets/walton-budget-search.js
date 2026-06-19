@@ -278,12 +278,73 @@
       }
     }
 
-    function renderResultItem(item){
-      var resultLink = document.createElement("a");
-      resultLink.className = "wc-nav-search-result";
-      resultLink.href = item.href;
-      resultLink.innerHTML = `<strong>${item.title}</strong><span>${item.section}</span>`;
-      results.appendChild(resultLink);
+    var GROUP_ORDER = ["Our County", "Budget Overview", "Departments", "Capital Projects", "Financials"];
+    var SECTION_GROUP_MAP = {
+      "our county": "Our County",
+      "introduction and overview": "Budget Overview",
+      "financial structure, policies, and process": "Budget Overview",
+      "budget overview": "Budget Overview",
+      "departments": "Departments",
+      "constitutional officers": "Departments",
+      "autonomous entities": "Departments",
+      "capital improvement plan": "Capital Projects",
+      "financial summaries": "Financials",
+      "debt and financial forecast": "Financials",
+      "financials": "Financials"
+    };
+
+    function groupLabelFor(section){
+      var key = String(section || "").toLowerCase().trim();
+      if(key.indexOf("cip project") === 0){
+        return "Capital Projects";
+      }
+      return SECTION_GROUP_MAP[key] || section || "More";
+    }
+
+    function renderResultGroup(label, items){
+      var group = document.createElement("div");
+      group.className = "wc-search-group";
+
+      var heading = document.createElement("div");
+      heading.className = "wc-search-group-label";
+      heading.textContent = label;
+      group.appendChild(heading);
+
+      items.forEach(function(item){
+        var resultLink = document.createElement("a");
+        resultLink.className = "wc-nav-search-result";
+        resultLink.href = item.href;
+        resultLink.innerHTML = `<strong>${item.title}</strong><span>${item.section}</span>`;
+        group.appendChild(resultLink);
+      });
+
+      results.appendChild(group);
+    }
+
+    function renderGroupedResults(items){
+      var groups = {};
+      var order = [];
+
+      items.forEach(function(item){
+        var label = groupLabelFor(item.section);
+        if(!groups[label]){
+          groups[label] = [];
+          order.push(label);
+        }
+        groups[label].push(item);
+      });
+
+      order.sort(function(a, b){
+        var ai = GROUP_ORDER.indexOf(a);
+        var bi = GROUP_ORDER.indexOf(b);
+        if(ai === -1) ai = GROUP_ORDER.length;
+        if(bi === -1) bi = GROUP_ORDER.length;
+        return ai - bi;
+      });
+
+      order.forEach(function(label){
+        renderResultGroup(label, groups[label]);
+      });
     }
 
     function renderResults(query){
@@ -291,14 +352,14 @@
       results.innerHTML = "";
 
       if(!normalizedQuery){
-        links.forEach(renderResultItem);
+        renderGroupedResults(links.slice(0, 28));
         results.classList.add("is-active");
         return;
       }
 
       var matches = links.filter(function(item){
         return item.searchText.indexOf(normalizedQuery) !== -1;
-      }).slice(0, 12);
+      }).slice(0, 20);
 
       if(!matches.length){
         results.innerHTML = '<div class="wc-nav-search-empty">No matching sections found.</div>';
@@ -306,7 +367,7 @@
         return;
       }
 
-      matches.forEach(renderResultItem);
+      renderGroupedResults(matches);
       results.classList.add("is-active");
     }
 

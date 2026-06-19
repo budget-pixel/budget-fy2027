@@ -18,6 +18,7 @@
     --wc-white:#ffffff;
     --wc-shadow:0 22px 54px rgba(23,32,51,.12);
     --wc-radius:28px;
+    --wc-header-h:76px;
   }
 
   *,*::before,*::after{box-sizing:border-box}
@@ -142,38 +143,61 @@
   .wc-menu-toggle span:nth-child(2){top:20px}
   .wc-menu-toggle span:nth-child(3){top:26px}
 
-  .wc-nav-search-slot{
-    display:none;
+  .wc-top-links{
+    transition:opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  .wc-story-nav.is-search-open .wc-top-links{
+    opacity:0;
+    transform:translateY(-8px);
+    pointer-events:none;
+  }
+  .wc-search-wrap{
     position:absolute;
-    top:100%;
-    right:clamp(28px, 6vw, 86px);
-    z-index:60;
-    width:min(380px, calc(100vw - 56px));
-    margin-top:14px;
-  }
-  .wc-story-nav.is-search-open .wc-nav-search-slot{
-    display:block;
-  }
-  .wc-search-wrap{width:100%}
-  .wc-search-box{
+    top:0;
+    left:var(--wc-search-left, 220px);
+    right:0;
+    height:100%;
     display:flex;
     align-items:center;
-    min-height:42px;
-    padding:9px 13px;
-    border:1px solid rgba(36,52,77,.12);
-    border-radius:999px;
-    background:#ffffff;
-    box-shadow:0 8px 20px rgba(23,32,51,.08);
+    padding:0 clamp(20px, 5vw, 60px) 0 0;
+    box-sizing:border-box;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:translateY(-6px);
+    transition:opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1), visibility .3s;
+  }
+  .wc-story-nav.is-search-open .wc-search-wrap{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transform:translateY(0);
+  }
+  .wc-search-box{
+    width:100%;
+    max-width:560px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-height:auto;
+    padding:0 0 10px;
+    border:0;
+    border-radius:0;
+    border-bottom:1px solid rgba(255,255,255,.32);
+    background:transparent;
+    box-shadow:none;
+    transition:border-color .2s ease;
   }
   .wc-search-box:focus-within{
-    border-color:rgba(0,98,49,.32);
-    box-shadow:0 10px 24px rgba(0,98,49,.12);
+    border-color:rgba(255,255,255,.6);
+    box-shadow:none;
   }
   .wc-search-icon{
-    width:17px;
-    height:17px;
-    margin-right:8px;
-    color:var(--wc-green);
+    width:16px;
+    height:16px;
+    margin-right:0;
+    flex:0 0 auto;
+    color:rgba(255,255,255,.8);
   }
   #wcTocSearch{
     width:100%;
@@ -181,47 +205,76 @@
     border:0;
     outline:0;
     background:transparent;
-    color:var(--wc-ink);
-    font:700 13px/1.35 Arial, Helvetica, sans-serif;
+    color:#ffffff;
+    font:500 17px/1.3 Georgia, "Times New Roman", serif;
+    letter-spacing:.01em;
   }
-  #wcTocSearch::placeholder{color:rgba(96,113,132,.75)}
+  #wcTocSearch::placeholder{color:rgba(255,255,255,.52)}
   .wc-nav-search-results{
     position:absolute;
-    top:calc(100% + 10px);
+    top:100%;
+    left:0;
     right:0;
     display:none;
-    width:min(420px, 88vw);
-    max-height:440px;
+    width:100%;
+    max-height:calc(100vh - var(--wc-header-h, 76px));
     overflow:auto;
-    padding:8px;
-    border:1px solid rgba(209,190,120,.42);
-    border-radius:18px;
-    background:#ffffff;
-    box-shadow:0 22px 48px rgba(23,32,51,.18);
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    border:0;
+    border-radius:0;
+    background:rgba(0,20,13,.22);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    box-shadow:none;
+    opacity:0;
+    transition:opacity .25s ease;
   }
-  .wc-nav-search-results.is-active{display:block}
+  .wc-nav-search-results.is-active{display:block;opacity:1}
+  .wc-search-group{
+    max-width:760px;
+    margin:0 auto;
+    padding:30px clamp(24px, 6vw, 86px) 6px;
+  }
+  .wc-search-group + .wc-search-group{
+    border-top:1px solid rgba(255,255,255,.12);
+    padding-top:28px;
+  }
+  .wc-search-group-label{
+    margin:0 0 12px;
+    color:rgba(255,255,255,.55);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+  }
   .wc-nav-search-result{
     display:block;
-    padding:12px 13px;
-    border-radius:13px;
+    padding:14px 2px;
+    border-bottom:1px solid rgba(255,255,255,.12);
+    border-radius:0;
     text-decoration:none;
+    transition:background .2s ease;
   }
-  .wc-nav-search-result:hover{background:rgba(0,98,49,.07)}
+  .wc-nav-search-result:last-child{border-bottom:0}
+  .wc-nav-search-result:hover{background:rgba(255,255,255,.05)}
   .wc-nav-search-result strong{
     display:block;
-    margin-bottom:3px;
-    color:var(--wc-green);
-    font-size:14px;
-    line-height:1.25;
+    margin-bottom:2px;
+    color:#ffffff;
+    font-size:15px;
+    font-weight:600;
+    line-height:1.3;
   }
   .wc-nav-search-result span,
   .wc-nav-search-empty{
     display:block;
-    color:var(--wc-muted);
+    color:rgba(255,255,255,.55);
     font-size:12px;
-    font-weight:700;
+    font-weight:600;
   }
-  .wc-nav-search-empty{padding:14px}
+  .wc-nav-search-empty{padding:30px clamp(24px, 6vw, 86px)}
 
   .wc-hero{
     position:relative;
@@ -522,9 +575,9 @@
     }
     .logo-container{min-width:0}
     .wc-story-nav .wc-split-brand-text{display:none !important}
-    .wc-nav-search-slot{
-      right:18px;
-      width:calc(100vw - 36px);
+    .wc-search-wrap{
+      left:0;
+      padding:0 20px;
     }
     .wc-top-links{
       order:4;
@@ -539,11 +592,6 @@
       justify-content:flex-start;
       border-radius:14px;
       background:rgba(0,98,49,.06);
-    }
-    .wc-nav-search-results{
-      left:0;
-      right:auto;
-      width:100%;
     }
     .wc-hero{min-height:650px}
     .wc-hero-inner{padding:32px 18px 30px}
@@ -591,7 +639,7 @@
     <div class="wc-hero-panel wc-reveal">
       <span class="wc-kicker">Walton County, Florida</span>
       <h1>Fiscal Year 2027 Proposed Budget</h1>
-      <p class="wc-hero-copy">Investing in infrastructure, public safety, and quality of life for a stronger Walton County.</p>
+      <p class="wc-hero-copy">Investing in infrastructure, public safety, and quality of life for a better Walton County.</p>
       <div class="wc-hero-actions">
         <a class="wc-button" href="pages/budget-overview.html">Explore the Budget</a>
         <a class="wc-button secondary" href="pages/capital-improvement-plan.html">View Capital Plan</a>
@@ -703,21 +751,57 @@
           toggle.setAttribute("aria-expanded", "false");
         });
       });
+
+      function syncHeaderMetrics(){
+        var navRect = nav.getBoundingClientRect();
+        document.documentElement.style.setProperty("--wc-header-h", navRect.height + "px");
+        var logo = $(".logo-container");
+        if(logo){
+          var logoRect = logo.getBoundingClientRect();
+          document.documentElement.style.setProperty("--wc-search-left", Math.max(0, logoRect.right - navRect.left + 24) + "px");
+        }
+      }
+
+      function closeSearch(){
+        nav.classList.remove("is-search-open");
+        document.body.style.overflow = "";
+      }
+
+      function openSearch(){
+        syncHeaderMetrics();
+        nav.classList.add("is-search-open");
+        document.body.style.overflow = "hidden";
+        setTimeout(function(){
+          var input = $("#wcTocSearch");
+          if(input) input.focus();
+        }, 60);
+      }
+
       if(searchToggle){
         searchToggle.addEventListener("click", function(){
-          var open = !nav.classList.contains("is-search-open");
-          nav.classList.toggle("is-search-open", open);
-          if(open){
-            setTimeout(function(){
-              var input = $("#wcTocSearch");
-              if(input) input.focus();
-            }, 40);
+          if(nav.classList.contains("is-search-open")){
+            closeSearch();
+          }else{
+            openSearch();
           }
         });
       }
+      window.addEventListener("resize", function(){
+        if(nav.classList.contains("is-search-open")) syncHeaderMetrics();
+      });
       document.addEventListener("click", function(e){
+        var resultsEl = $(".wc-nav-search-results");
+        if(resultsEl && e.target === resultsEl){
+          closeSearch();
+          return;
+        }
         if(!nav.contains(e.target)){
-          nav.classList.remove("is-search-open");
+          closeSearch();
+        }
+      });
+      document.addEventListener("keydown", function(e){
+        if(e.key === "Escape" && nav.classList.contains("is-search-open")){
+          closeSearch();
         }
       });
     }

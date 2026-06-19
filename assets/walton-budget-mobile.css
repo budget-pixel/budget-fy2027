@@ -150,10 +150,14 @@
     background-size:36px 36px !important;
   }
 
+  nav#nav-menu .wc-search-wrap{
+    left:0 !important;
+    padding:0 16px !important;
+  }
   nav#nav-menu .wc-nav-search-results{
     width:100% !important;
-    max-height:280px !important;
-    border-radius:16px !important;
+    max-width:none !important;
+    border-radius:0 !important;
   }
   /* MOBILE REPORT TABLES */
 
