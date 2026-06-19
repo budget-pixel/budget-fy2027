@@ -24,7 +24,8 @@
   // normalized department name to the additional normalized Dept_Name
   // values it should also match across every dataset.
   const DEPT_ALIASES = {
-    "sheriffs office": ["walton county sheriffs office", "sheriff"],
+    "sheriff s office": ["walton county sheriff s office", "walton county sheriffs office", "sheriff"],
+    "sheriffs office": ["walton county sheriff s office", "walton county sheriffs office", "sheriff"],
     "clerk of courts and county comptroller": ["clerk of court", "clerk of circuit court"],
     "engineering department": ["public works engineering services", "engineering services"],
     "environmental resources": ["environmental services"],
@@ -33,6 +34,9 @@
     "court technology and innovations": [
       "court technology court administration",
       "court technology state attorney",
+      "court technology public defender",
+      "court technology innovations",
+      "court innovations",
       "court technology"
     ],
     "public defender": ["court technology public defender"],
@@ -40,7 +44,24 @@
     "south walton fire and state control": ["south walton fire", "state fire"],
     "code compliance": ["code compliance beach", "code compliance street"],
     "libraries": ["county libraries"],
-    "planning": ["planning short term rental"]
+    "planning": ["planning short term rental"],
+    "tourism administration": [
+      "sales and visitor center",
+      "sales and visitors center",
+      "communications",
+      "marketing",
+      "north walton",
+      "north walton tourist development tax"
+    ],
+    "tourism beach operations": [
+      "beach operations",
+      "beach renourishment",
+      "beach tram"
+    ],
+    "tourism lifeguard services and beach safety": [
+      "south walton fire lifeguard services",
+      "public safety"
+    ]
   };
 
   // Object codes pulled out into their own supplemental Expenditure Summary

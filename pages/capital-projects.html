@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capital Projects — Walton County FY 2027 Budget</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
+<nav id="nav-menu" class="nav-menu">
+  <div class="logo-container"></div>
+</nav>
+
+<div id="layout">
+<main id="content">
+
+<div class="page-eyebrow">Capital Projects</div>
+<h1 class="page-title">Capital Projects</h1>
+<p class="page-intro">Explore Walton County's capital improvement plan, fund schedules, and searchable project detail.</p>
+
+<section aria-label="Capital projects directory">
+  <ul class="wc-directory-list" id="capitalDirectory"></ul>
+</section>
+
+</main>
+</div>
+
+<script src="../assets/walton-budget-search-data.js"></script>
+<script src="../assets/walton-budget-nav.js"></script>
+<script src="../assets/walton-budget-pdf.js"></script>
+<script>
+  (function(){
+    var pages = [
+      {
+        title:"Capital Improvement Plan Overview",
+        href:"capital-improvement-plan.html",
+        description:"Review the County's capital improvement plan overview, priorities, totals, and project portfolio context."
+      },
+      {
+        title:"Project Search",
+        href:"search.html",
+        description:"Search capital projects by name, fund, department, district, and project detail."
+      },
+      {
+        title:"Capital Projects Fund Schedule",
+        href:"cip-capital-projects.html",
+        description:"View the capital projects fund schedule and related project appropriations."
+      },
+      {
+        title:"Grant Funded Schedule",
+        href:"cip-grants.html",
+        description:"Browse capital projects supported by federal, state, and other grant funding sources."
+      },
+      {
+        title:"Sheriff Fund Schedule",
+        href:"cip-sheriff.html",
+        description:"Review capital projects associated with Sheriff and public safety funding."
+      },
+      {
+        title:"Tourist Development Fund Schedule",
+        href:"cip-tourist-development.html",
+        description:"Explore tourism-related capital investments funded through tourist development resources."
+      },
+      {
+        title:"Transportation Fund Schedule",
+        href:"cip-transportation.html",
+        description:"Review transportation capital investments, road work, and infrastructure schedules."
+      }
+    ];
+
+    function escapeHtml(value){
+      return String(value === undefined || value === null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderDirectory(){
+      var list = document.getElementById("capitalDirectory");
+      if(!list) return;
+
+      list.innerHTML = pages.map(function(page){
+        return '<li><a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
+          '<div class="wc-directory-item-main">' +
+            '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +
+            '<span class="wc-directory-item-desc">' + escapeHtml(page.description) + '</span>' +
+          '</div>' +
+          '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
+        '</a></li>';
+      }).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", renderDirectory);
+  })();
+</script>
+</body>
+</html>

@@ -278,15 +278,15 @@
       }
     }
 
-    var GROUP_ORDER = ["Our County", "Budget Overview", "Departments", "Capital Projects", "Financials"];
+    var GROUP_ORDER = ["Our County", "Budget Overview", "Officers & Agencies", "Departments", "Capital Projects", "Financials"];
     var SECTION_GROUP_MAP = {
       "our county": "Our County",
       "introduction and overview": "Budget Overview",
       "financial structure, policies, and process": "Budget Overview",
       "budget overview": "Budget Overview",
       "departments": "Departments",
-      "constitutional officers": "Departments",
-      "autonomous entities": "Departments",
+      "constitutional officers": "Officers & Agencies",
+      "autonomous entities": "Officers & Agencies",
       "capital improvement plan": "Capital Projects",
       "financial summaries": "Financials",
       "debt and financial forecast": "Financials",

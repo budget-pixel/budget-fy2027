@@ -20,25 +20,6 @@
 <h1 class="page-title">Departments</h1>
 <p class="page-intro">Explore Walton County departments, budgets, staffing, performance measures, and services.</p>
 
-<section aria-label="Related directories">
-  <ul class="wc-directory-list">
-    <li><a class="wc-directory-item" href="constitutional-officers.html">
-      <div class="wc-directory-item-main">
-        <span class="wc-directory-item-title">Constitutional Officers</span>
-        <span class="wc-directory-item-desc">Independently elected officers including the Sheriff, Tax Collector, Property Appraiser, and Supervisor of Elections.</span>
-      </div>
-      <span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>
-    </a></li>
-    <li><a class="wc-directory-item" href="autonomous-entities.html">
-      <div class="wc-directory-item-main">
-        <span class="wc-directory-item-title">Autonomous Entities</span>
-        <span class="wc-directory-item-desc">Courts, the State Attorney and Public Defender, and other statutorily funded agencies.</span>
-      </div>
-      <span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>
-    </a></li>
-  </ul>
-</section>
-
 <section aria-label="Department directory">
   <ul class="wc-directory-list" id="departmentList"></ul>
 </section>
@@ -93,7 +74,24 @@
       "purchasing": ["procurement"],
       "code compliance": ["code compliance beach", "code compliance street"],
       "libraries": ["county libraries"],
-      "planning": ["planning short term rental"]
+      "planning": ["planning short term rental"],
+      "tourism administration": [
+        "sales and visitor center",
+        "sales and visitors center",
+        "communications",
+        "marketing",
+        "north walton",
+        "north walton tourist development tax"
+      ],
+      "tourism beach operations": [
+        "beach operations",
+        "beach renourishment",
+        "beach tram"
+      ],
+      "tourism lifeguard services and beach safety": [
+        "south walton fire lifeguard services",
+        "public safety"
+      ]
     };
 
     var departments = [];
@@ -151,12 +149,16 @@
 
     function buildBaseDepartments(){
       var pages = Array.isArray(window.wcBudgetPages) ? window.wcBudgetPages : [];
+      var localHrefByTitle = {};
+      fallbackDepartments.forEach(function(item){
+        localHrefByTitle[normalize(item[0])] = item[1];
+      });
       var items = pages
         .filter(function(page){
           return page && page.section === "Departments" && page.title !== "Departments";
         })
         .map(function(page){
-          return { name:page.title, href:page.href };
+          return { name:page.title, href:localHrefByTitle[normalize(page.title)] || page.href };
         });
 
       if(!items.length){
@@ -204,6 +206,8 @@
       var list = $("#departmentList");
 
       list.innerHTML = departments.map(function(dept){
+        var personnelStat = dept.fte === "Not listed" ? "" :
+          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fte) + '</strong><span>Personnel</span></div>';
         return '<li><a class="wc-directory-item" href="' + escapeHtml(dept.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(dept.name) + '</span>' +
@@ -211,7 +215,7 @@
           '</div>' +
           '<div class="wc-directory-item-meta">' +
             '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.budget) + '</strong><span>FY 2027 Budget</span></div>' +
-            '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fte) + '</strong><span>Personnel</span></div>' +
+            personnelStat +
           '</div>' +
           '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
         '</a></li>';

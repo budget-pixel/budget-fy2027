@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Constitutional Officers — Walton County FY 2027 Budget</title>
+<title>Constitutional Officers & Other Agencies — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
@@ -16,12 +16,18 @@
 <div id="layout">
 <main id="content">
 
-<div class="page-eyebrow">Constitutional Officers</div>
-<h1 class="page-title">Constitutional Officers</h1>
-<p class="page-intro">Explore Walton County's independently elected constitutional officers, their budgets, staffing, and services.</p>
+<div class="page-eyebrow">Constitutional Officers & Other Agencies</div>
+<h1 class="page-title">Constitutional Officers & Other Agencies</h1>
+<p class="page-intro">Explore Walton County's independently elected constitutional officers and autonomous entities, their budgets, staffing, and services.</p>
 
-<section aria-label="Constitutional Officers directory">
+<section aria-label="Constitutional Officers directory" class="page-text">
+  <h2>Constitutional Officers</h2>
   <ul class="wc-directory-list" id="officerList"></ul>
+</section>
+
+<section aria-label="Other Agencies directory" class="page-text" style="margin-top:40px;">
+  <h2>Other Agencies</h2>
+  <ul class="wc-directory-list" id="entityList"></ul>
 </section>
 
 </main>
@@ -33,21 +39,62 @@
 <script src="../assets/walton-budget-pdf.js"></script>
 <script>
   (function(){
-    var fallbackOfficers = [
-      ["Board of County Commissioners", "board-of-county-commissioners.html"],
-      ["Clerk of Courts & County Comptroller", "clerk-of-courts-and-county-comptroller.html"],
-      ["Property Appraiser", "property-appraiser.html"],
-      ["Sheriff's Office", "sheriffs-office.html"],
-      ["Supervisor of Elections", "supervisor-of-elections.html"],
-      ["Tax Collector", "tax-collector.html"]
+    var GROUPS = [
+      {
+        listId:"officerList",
+        section:"Constitutional Officers",
+        fallback:[
+          ["Board of County Commissioners", "board-of-county-commissioners.html"],
+          ["Clerk of Courts & County Comptroller", "clerk-of-courts-and-county-comptroller.html"],
+          ["Property Appraiser", "property-appraiser.html"],
+          ["Sheriff's Office", "sheriffs-office.html"],
+          ["Supervisor of Elections", "supervisor-of-elections.html"],
+          ["Tax Collector", "tax-collector.html"]
+        ],
+        aliasMap:{
+          "sheriff s office": ["walton county sheriff s office", "walton county sheriffs office", "sheriff"],
+          "sheriffs office": ["walton county sheriff s office", "walton county sheriffs office", "sheriff"],
+          "clerk of courts and county comptroller": ["clerk of court", "clerk of circuit court"]
+        },
+        defaultDescription:"View budget, staffing, performance measures, and service information for this constitutional officer."
+      },
+      {
+        listId:"entityList",
+        section:"Autonomous Entities",
+        fallback:[
+          ["Circuit Court", "circuit-court.html"],
+          ["County Court", "county-court.html"],
+          ["Court Technology & Innovations", "court-technology-and-innovations.html"],
+          ["Guardian Ad Litem", "guardian-ad-litem.html"],
+          ["Medical Examiner", "medical-examiner.html"],
+          ["Non-Profit Funding Program", "non-profit-funding-program.html"],
+          ["Public Defender", "public-defender.html"],
+          ["South Walton Fire & State Control", "south-walton-fire-and-state-control.html"],
+          ["State Attorney", "state-attorney.html"],
+          ["Statutory & Other Agency Funding", "statutory-and-other-agency-funding.html"],
+          ["Walton County Health Department", "walton-county-health-department.html"]
+        ],
+        aliasMap:{
+          "court technology and innovations": [
+            "court technology innovations",
+            "court technology court administration",
+            "court technology state attorney",
+            "court technology public defender",
+            "court technology",
+            "court innovations"
+          ],
+          "south walton fire and state control": ["south walton fire", "state fire"],
+          "statutory and other agency funding": [
+            "statutory and other agency fund",
+            "statutory other agency funding",
+            "statutory other agency fund",
+            "statutory and other",
+            "statutory other"
+          ]
+        },
+        defaultDescription:"View budget, staffing, performance measures, and service information for this entity."
+      }
     ];
-
-    var aliasMap = {
-      "sheriffs office": ["walton county sheriffs office", "sheriff"],
-      "clerk of courts and county comptroller": ["clerk of court", "clerk of circuit court"]
-    };
-
-    var officers = [];
 
     function $(selector){
       return document.querySelector(selector);
@@ -84,34 +131,51 @@
       return n.toLocaleString("en-US", { maximumFractionDigits:2 }).replace(/\.00$/, "");
     }
 
-    function descriptionFromNarrative(text){
+    function descriptionFromNarrative(text, fallback){
       var clean = String(text || "").replace(/\s+/g, " ").trim();
-      if(!clean) return "View budget, staffing, performance measures, and service information for this constitutional officer.";
+      if(!clean) return fallback;
       return clean.length > 190 ? clean.slice(0, 187).replace(/\s+\S*$/, "") + "..." : clean;
     }
 
-    function aliasesFor(name){
+    function aliasesFor(name, aliasMap){
       var key = normalize(name);
       return [key].concat(aliasMap[key] || []);
     }
 
-    function rowMatchesOfficer(row, name){
+    function rowMatches(row, name, aliasMap){
       var dept = normalize(row && row.Dept_Name);
-      return aliasesFor(name).indexOf(dept) !== -1;
+      return aliasesFor(name, aliasMap).indexOf(dept) !== -1;
     }
 
-    function buildBaseOfficers(){
+    function expenditureRowsForItem(rows, item, group){
+      if(normalize(item.name) === "statutory and other agency funding"){
+        return rows.filter(function(row){
+          return String(row && row.Note || "").trim() === "Statutory & Other";
+        });
+      }
+      return rows.filter(function(row){
+        return rowMatches(row, item.name, group.aliasMap);
+      });
+    }
+
+    function buildBaseItems(group){
       var pages = Array.isArray(window.wcBudgetPages) ? window.wcBudgetPages : [];
+      var localHrefByTitle = {};
+      group.fallback.forEach(function(item){
+        localHrefByTitle[normalize(item[0])] = item[1];
+      });
       var items = pages
         .filter(function(page){
-          return page && page.section === "Constitutional Officers";
+          return page &&
+            page.section === group.section &&
+            page.title !== "Constitutional Officers & Other Agencies";
         })
         .map(function(page){
-          return { name:page.title, href:page.href };
+          return { name:page.title, href:localHrefByTitle[normalize(page.title)] || page.href };
         });
 
       if(!items.length){
-        items = fallbackOfficers.map(function(item){
+        items = group.fallback.map(function(item){
           return { name:item[0], href:item[1] };
         });
       }
@@ -127,42 +191,46 @@
         .sort(function(a, b){ return a.name.localeCompare(b.name); });
     }
 
-    function enrichOfficers(data){
+    function enrichItems(group, baseItems, data){
       var narratives = Array.isArray(data && data.departmentNarratives) ? data.departmentNarratives : [];
       var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
 
-      officers = buildBaseOfficers().map(function(officer){
-        var narrative = narratives.find(function(row){ return rowMatchesOfficer(row, officer.name); });
-        var budget = expenditures.reduce(function(sum, row){
-          return rowMatchesOfficer(row, officer.name) ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
+      return baseItems.map(function(item){
+        var narrative = narratives.find(function(row){ return rowMatches(row, item.name, group.aliasMap); });
+        var budgetRows = expenditureRowsForItem(expenditures, item, group);
+        var budget = budgetRows.reduce(function(sum, row){
+          return sum + (Number(row.FY2027_Proposed) || 0);
         }, 0);
         var fte = staffing.reduce(function(sum, row){
-          return rowMatchesOfficer(row, officer.name) ? sum + (Number(row["2027"]) || 0) : sum;
+          return rowMatches(row, item.name, group.aliasMap) ? sum + (Number(row["2027"]) || 0) : sum;
         }, 0);
 
         return {
-          name:officer.name,
-          href:officer.href,
-          description:descriptionFromNarrative(narrative && narrative.Narrative),
+          name:item.name,
+          href:item.href,
+          description:descriptionFromNarrative(narrative && narrative.Narrative, group.defaultDescription),
           budget:formatCurrency(budget),
           fte:formatFte(fte)
         };
       });
     }
 
-    function renderOfficers(){
-      var list = $("#officerList");
+    function renderItems(group, items){
+      var list = $("#" + group.listId);
+      if(!list) return;
 
-      list.innerHTML = officers.map(function(officer){
-        return '<li><a class="wc-directory-item" href="' + escapeHtml(officer.href) + '">' +
+      list.innerHTML = items.map(function(item){
+        var personnelStat = item.fte === "Not listed" ? "" :
+          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.fte) + '</strong><span>Personnel</span></div>';
+        return '<li><a class="wc-directory-item" href="' + escapeHtml(item.href) + '">' +
           '<div class="wc-directory-item-main">' +
-            '<span class="wc-directory-item-title">' + escapeHtml(officer.name) + '</span>' +
-            '<span class="wc-directory-item-desc">' + escapeHtml(officer.description) + '</span>' +
+            '<span class="wc-directory-item-title">' + escapeHtml(item.name) + '</span>' +
+            '<span class="wc-directory-item-desc">' + escapeHtml(item.description) + '</span>' +
           '</div>' +
           '<div class="wc-directory-item-meta">' +
-            '<div class="wc-directory-item-stat"><strong>' + escapeHtml(officer.budget) + '</strong><span>FY 2027 Budget</span></div>' +
-            '<div class="wc-directory-item-stat"><strong>' + escapeHtml(officer.fte) + '</strong><span>Personnel</span></div>' +
+            '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.budget) + '</strong><span>FY 2027 Budget</span></div>' +
+            personnelStat +
           '</div>' +
           '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
         '</a></li>';
@@ -170,30 +238,40 @@
     }
 
     function initDirectory(){
-      officers = buildBaseOfficers().map(function(officer){
-        return {
-          name:officer.name,
-          href:officer.href,
-          description:descriptionFromNarrative(""),
-          budget:"Loading",
-          fte:"Loading"
-        };
+      var groupItems = GROUPS.map(function(group){
+        var baseItems = buildBaseItems(group);
+        var loadingItems = baseItems.map(function(item){
+          return {
+            name:item.name,
+            href:item.href,
+            description:descriptionFromNarrative("", group.defaultDescription),
+            budget:"Loading",
+            fte:"Loading"
+          };
+        });
+        renderItems(group, loadingItems);
+        return { group:group, baseItems:baseItems };
       });
-      renderOfficers();
 
       if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
         window.WCBudgetData.loadBudgetData()
           .then(function(data){
-            enrichOfficers(data);
-            renderOfficers();
+            groupItems.forEach(function(entry){
+              renderItems(entry.group, enrichItems(entry.group, entry.baseItems, data));
+            });
           })
           .catch(function(){
-            officers = officers.map(function(officer){
-              officer.budget = "Not listed";
-              officer.fte = "Not listed";
-              return officer;
+            groupItems.forEach(function(entry){
+              renderItems(entry.group, entry.baseItems.map(function(item){
+                return {
+                  name:item.name,
+                  href:item.href,
+                  description:descriptionFromNarrative("", entry.group.defaultDescription),
+                  budget:"Not listed",
+                  fte:"Not listed"
+                };
+              }));
             });
-            renderOfficers();
           });
       }
     }

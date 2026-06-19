@@ -15,6 +15,7 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Organizational Structure", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1af21806371d68e7" },
   { title:"Strategic Initiatives", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbda2feb1e35a5b122d" },
   { title:"Budget Overview", section:"Budget Overview", href:"budget-overview.html" },
+  { title:"Constitutional Officers & Other Agencies", section:"Constitutional Officers", href:"constitutional-officers.html" },
   { title:"Departments", section:"Departments", href:"departments.html" },
   { title:"Budget Process & Calendar", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdeb3f9f1b409e86d5" },
   { title:"Fund Descriptions and Structure", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd623edf6822e6e54d" },
@@ -74,7 +75,14 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Tourism Beach Operations", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbed36e2967b08392bf" },
   { title:"Tourism Lifeguard Services and Beach Safety", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbecf8c02d147a19f9f" },
   { title:"Veteran Services", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbf22a7f73b8c6a62b4" },
-  { title:"Capital Improvement Plan", section:"Capital Improvement Plan", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd4a9d93e5ac05a153" },
+  { title:"Capital Projects", section:"Capital Improvement Plan", href:"capital-projects.html" },
+  { title:"Capital Improvement Plan Overview", section:"Capital Improvement Plan", href:"capital-improvement-plan.html" },
+  { title:"CIP Project Search", section:"Capital Improvement Plan", href:"search.html" },
+  { title:"Capital Projects Fund Schedule", section:"Capital Improvement Plan", href:"cip-capital-projects.html" },
+  { title:"Grant Funded Schedule", section:"Capital Improvement Plan", href:"cip-grants.html" },
+  { title:"Sheriff Fund Schedule", section:"Capital Improvement Plan", href:"cip-sheriff.html" },
+  { title:"Tourist Development Fund Schedule", section:"Capital Improvement Plan", href:"cip-tourist-development.html" },
+  { title:"Transportation Fund Schedule", section:"Capital Improvement Plan", href:"cip-transportation.html" },
   { title:"Debt Overview", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd7fa91d193bd3f319" },
   { title:"Financial Forecast", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd986e584c322f6216" },
   { title:"Glossary, Acronyms, and Frequently Asked Questions", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd48feef483c784fe0" },
@@ -355,8 +363,36 @@ window.wcBudgetPages = window.wcBudgetPages || [
       "veterans", "veteran services", "va", "benefits", "veterans assistance", "claims", "military", "service members"
     ],
 
-    "Capital Improvement Plan": [
-      "cip", "capital improvement plan", "capital projects", "projects", "infrastructure projects", "roads", "facilities", "parks projects", "project search", "capital spending", "five year plan", "construction projects"
+    "Capital Projects": [
+      "cip", "capital directory", "capital projects", "projects", "infrastructure projects", "roads", "facilities", "parks projects", "project search", "capital spending", "five year plan", "construction projects", "capital improvement plan"
+    ],
+
+    "Capital Improvement Plan Overview": [
+      "cip overview", "capital improvement plan overview", "capital plan overview", "capital improvement plan", "overview", "capital priorities", "capital spending overview"
+    ],
+
+    "CIP Project Search": [
+      "project search", "cip search", "capital project search", "project lookup", "search projects", "capital projects"
+    ],
+
+    "Capital Projects Fund Schedule": [
+      "capital projects fund", "capital schedule", "capital projects schedule", "project appropriations", "in-house engineering"
+    ],
+
+    "Grant Funded Schedule": [
+      "grant funded", "grants", "grant schedule", "federal grants", "state grants", "grant projects"
+    ],
+
+    "Sheriff Fund Schedule": [
+      "sheriff fund", "fine and forfeiture", "public safety capital", "law enforcement capital"
+    ],
+
+    "Tourist Development Fund Schedule": [
+      "tourist development", "tdt", "tourism capital", "tourist development fund", "bed tax projects"
+    ],
+
+    "Transportation Fund Schedule": [
+      "transportation fund", "roads", "road projects", "transportation projects", "gas tax", "road schedule"
     ],
 
     "Debt Overview": [
@@ -384,6 +420,7 @@ window.wcBudgetPages = window.wcBudgetPages || [
     "Organizational Structure": "organizational-structure.html",
     "Strategic Initiatives": "strategic-initiatives.html",
     "Budget Overview": "budget-overview.html",
+    "Constitutional Officers & Other Agencies": "constitutional-officers.html",
     "Departments": "departments.html",
     "Budget Process & Calendar": "budget-process-and-calendar.html",
     "Fund Descriptions and Structure": "fund-descriptions-and-structure.html",
@@ -443,7 +480,8 @@ window.wcBudgetPages = window.wcBudgetPages || [
     "Tourism Beach Operations": "tourism-beach-operations.html",
     "Tourism Lifeguard Services and Beach Safety": "tourism-lifeguard-services-and-beach-safety.html",
     "Veteran Services": "veteran-services.html",
-    "Capital Improvement Plan": "capital-improvement-plan.html",
+    "Capital Projects": "capital-projects.html",
+    "Capital Improvement Plan Overview": "capital-improvement-plan.html",
     "CIP Project Search": "search.html",
     "Capital Projects Fund Schedule": "cip-capital-projects.html",
     "Grant Funded Schedule": "cip-grants.html",

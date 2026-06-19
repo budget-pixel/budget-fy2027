@@ -1465,8 +1465,9 @@
   var WC_NAV_LINKS = [
     { label:"Our County", href:"our-county.html" },
     { label:"Budget Overview", href:"budget-overview.html" },
+    { label:"Officers & Agencies", href:"constitutional-officers.html" },
     { label:"Departments", href:"departments.html" },
-    { label:"Capital Projects", href:"capital-improvement-plan.html" },
+    { label:"Capital Projects", href:"capital-projects.html" },
     { label:"Financials", href:"financials.html" }
   ];
   function ensureWcNavChrome(){
@@ -1738,13 +1739,15 @@
     }else if(eyebrowText === "Departments"){
       sectionCrumb = '<a href="departments.html">Departments</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Constitutional Officers"){
-      sectionCrumb = '<a href="constitutional-officers.html">Constitutional Officers</a><span class="wc-breadcrumb-sep">/</span>';
+      sectionCrumb = '<a href="constitutional-officers.html">Constitutional Officers & Other Agencies</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Autonomous Entities"){
-      sectionCrumb = '<a href="autonomous-entities.html">Autonomous Entities</a><span class="wc-breadcrumb-sep">/</span>';
+      sectionCrumb = '<a href="constitutional-officers.html">Constitutional Officers & Other Agencies</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Introduction and Overview" || eyebrowText === "Financial Structure, Policies, and Process"){
       sectionCrumb = '<a href="budget-overview.html">Budget Overview</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Financial Summaries" || eyebrowText === "Debt and Financial Forecast" || eyebrowText === "Glossary, Statistical, and Supplemental Information"){
       sectionCrumb = '<a href="financials.html">Financials</a><span class="wc-breadcrumb-sep">/</span>';
+    }else if(eyebrowText === "Capital Projects" || eyebrowText === "Capital Improvement Plan"){
+      sectionCrumb = '<a href="capital-projects.html">Capital Projects</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText){
       sectionCrumb = '<span>' + eyebrowText + '</span><span class="wc-breadcrumb-sep">/</span>';
     }
@@ -1819,7 +1822,7 @@
         ${hasOpenGovNav ? `
         <nav class="wc-budget-footer-links" aria-label="Budget footer links">
           <a href="../index.html">Home</a>
-          <a href="${budgetPagePrefix}capital-improvement-plan.html">Capital Improvement Plan</a>
+          <a href="${budgetPagePrefix}capital-projects.html">Capital Projects</a>
           <a href="${budgetPagePrefix}search.html">Project Search</a>
           <a href="${budgetPagePrefix}glossary-acronyms-and-frequently-asked-questions.html">Glossary & FAQ</a>
         </nav>
