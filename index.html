@@ -337,41 +337,10 @@
     font-size:16px;
   }
 
-  .wc-snapshot{
-    display:grid;
-    grid-template-columns:repeat(4, minmax(0,1fr));
-    gap:14px;
-    padding:18px;
-    border-radius:28px;
-    background:linear-gradient(135deg, var(--wc-green-3), var(--wc-green));
-    box-shadow:var(--wc-shadow);
-  }
-  .wc-snapshot-card{
-    min-height:150px;
-    padding:22px;
-    border-radius:20px;
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.12);
-    color:#ffffff;
-  }
-  .wc-snapshot-icon,
   .wc-invest-icon{
     width:36px;
     height:36px;
     color:var(--wc-gold);
-  }
-  .wc-snapshot-card strong{
-    display:block;
-    margin-top:16px;
-    font-size:clamp(28px, 3vw, 42px);
-    line-height:1;
-  }
-  .wc-snapshot-card span{
-    display:block;
-    margin-top:8px;
-    color:rgba(255,255,255,.78);
-    font-size:14px;
-    font-weight:800;
   }
 
   .wc-budget-grid{
@@ -621,7 +590,6 @@
       display:block;
     }
     .wc-section-heading p{margin-top:12px}
-    .wc-snapshot,
     .wc-budget-grid,
     .wc-invest-grid,
     .wc-projects-grid,
@@ -647,7 +615,7 @@
       <span></span><span></span><span></span>
     </button>
     <div class="wc-top-links">
-      <a href="#county">Our County</a>
+      <a href="pages/our-county.html">Our County</a>
       <a href="pages/budget-overview.html">Budget Overview</a>
       <a href="pages/departments.html">Departments</a>
       <a href="pages/capital-improvement-plan.html">Capital Projects</a>
@@ -669,45 +637,12 @@
 
 <div class="wc-home-shell">
   <main>
-    <section class="wc-section wc-reveal" id="county">
-      <div class="wc-section-heading">
-        <div>
-          <span>County Snapshot</span>
-          <h2>Fast-growing, deeply rooted, and planning ahead.</h2>
-        </div>
-        <p>Key demographic indicators are loaded from the county Census data source when available.</p>
-      </div>
-      <div class="wc-snapshot">
-        <div class="wc-snapshot-card">
-          <svg class="wc-snapshot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <strong data-census-value="population2010">75,305</strong>
-          <span>Population</span>
-        </div>
-        <div class="wc-snapshot-card">
-          <svg class="wc-snapshot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <strong data-census-value="waltonMedianAge">44.6</strong>
-          <span>Median Age</span>
-        </div>
-        <div class="wc-snapshot-card">
-          <svg class="wc-snapshot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
-          <strong data-census-value="homeownershipRate" data-suffix="%">74.9%</strong>
-          <span>Homeownership Rate</span>
-        </div>
-        <div class="wc-snapshot-card">
-          <svg class="wc-snapshot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M2 19h20"/><path d="M8 10h8"/><path d="M8 14h3"/><path d="M14 14h2"/></svg>
-          <strong data-census-value="waltonMedianHouseholdIncome">$74,629</strong>
-          <span>Median Household Income</span>
-        </div>
-      </div>
-    </section>
-
     <section class="wc-section wc-reveal" id="budget">
       <div class="wc-section-heading">
         <div>
           <span>Budget At A Glance</span>
           <h2>The revenues that support countywide service delivery.</h2>
         </div>
-        <p>Figures update from the budget feed when available and fall back to the adopted homepage values.</p>
       </div>
       <div class="wc-budget-grid">
         <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong>$163.4M</strong><span>Ad valorem revenue</span></div>
@@ -759,7 +694,6 @@
           <span>Featured Capital Projects</span>
           <h2>Investments moving from plans to places.</h2>
         </div>
-        <p>Project cards are populated from the Capital Projects Google Sheet.</p>
       </div>
       <div class="wc-projects-grid" id="featuredProjects">
         <div class="wc-project-empty">Loading featured capital projects...</div>
@@ -772,7 +706,6 @@
           <span>Explore County Services</span>
           <h2>A clearer way into the budget.</h2>
         </div>
-        <p>Start with the story you want to understand, then move into the supporting detail.</p>
       </div>
       <div class="wc-explorer-grid">
         <a class="wc-explorer-card" href="pages/board-of-county-commissioners.html"><span class="wc-mini">CO</span><h3>Constitutional Officers</h3><p>Countywide elected offices and their FY 2027 budgets.</p><span class="wc-card-link">Explore Offices</span></a>
@@ -780,7 +713,7 @@
         <a class="wc-explorer-card" href="pages/financials.html"><span class="wc-mini">FS</span><h3>Financial Summaries</h3><p>Revenue, expense, fund, transfer, and personnel summaries.</p><span class="wc-card-link">Open Financials</span></a>
         <a class="wc-explorer-card" href="pages/capital-improvement-plan.html"><span class="wc-mini">CP</span><h3>Capital Projects</h3><p>Five-year infrastructure investments and project schedules.</p><span class="wc-card-link">View Capital Plan</span></a>
         <a class="wc-explorer-card" href="pages/strategic-initiatives.html"><span class="wc-mini">SI</span><h3>Strategic Initiatives</h3><p>Priorities that guide county investment and service planning.</p><span class="wc-card-link">Read Priorities</span></a>
-        <a class="wc-explorer-card" href="pages/overview-of-walton-county.html"><span class="wc-mini">OC</span><h3>County Profile</h3><p>Demographics, context, and the story behind Walton County.</p><span class="wc-card-link">See Profile</span></a>
+        <a class="wc-explorer-card" href="pages/our-county.html"><span class="wc-mini">OC</span><h3>County Profile</h3><p>Demographics, context, and the story behind Walton County.</p><span class="wc-card-link">Explore County</span></a>
       </div>
     </section>
   </main>
@@ -854,25 +787,14 @@
       });
     }
 
-    function loadCensusSnapshot(){
-      fetch("assets/census-data.json", { cache:"no-store" })
-        .then(function(response){ return response.ok ? response.json() : null; })
-        .then(function(data){
-          var values = data && data.values ? data.values : {};
-          document.querySelectorAll("[data-census-value]").forEach(function(el){
-            var key = el.getAttribute("data-census-value");
-            if(values[key] === undefined || values[key] === null || values[key] === "") return;
-            var suffix = el.getAttribute("data-suffix") || "";
-            el.textContent = String(values[key]) + suffix;
-          });
-        })
-        .catch(function(){});
-    }
-
     function updateRevenueCards(){
       if(!window.WCBudgetData || typeof window.WCBudgetData.loadBudgetData !== "function") return;
       window.WCBudgetData.loadBudgetData().then(function(data){
-        var rows = Array.isArray(data.revenues) ? data.revenues : [];
+        var rows = Array.isArray(data.revenues) ? data.revenues.filter(function(row){
+          var fundCode = String(row.Dept_Code || "").trim().slice(0, 3);
+          var revenueCode = String(row.Revenue_Code || "").trim();
+          return fundCode !== "503" && revenueCode !== "381000";
+        }) : [];
         if(!rows.length) return;
 
         function sumWhere(predicate){
@@ -963,7 +885,6 @@
     document.addEventListener("DOMContentLoaded", function(){
       initLogo();
       initMenu();
-      loadCensusSnapshot();
       updateRevenueCards();
       initProjects();
       initReveal();

@@ -703,7 +703,7 @@
     grid-column:2 !important;
     display:flex !important;
     align-items:center !important;
-    justify-content:center !important;
+    justify-content:flex-end !important;
     gap:4px !important;
     margin:0 !important;
     padding:0 !important;
@@ -808,29 +808,38 @@
     display:flex !important;
     align-items:center !important;
     gap:8px !important;
-    width:100% !important;
-    padding:10px clamp(20px, 4vw, 48px) !important;
+    flex-wrap:wrap !important;
+    width:min(980px, calc(100% - 32px)) !important;
+    margin:0 auto 22px !important;
+    padding:0 !important;
     box-sizing:border-box !important;
-    background:#006231 !important;
-    color:#ffffff !important;
-    font-size:12px !important;
-    font-weight:700 !important;
-    letter-spacing:.01em !important;
+    background:transparent !important;
+    color:#607184 !important;
+    font-size:13px !important;
+    font-weight:800 !important;
+    letter-spacing:0 !important;
     font-family:Arial, Helvetica, sans-serif !important;
   }
+  #content > .wc-breadcrumb{
+    width:100% !important;
+    margin:-12px 0 24px !important;
+  }
   .wc-breadcrumb a{
-    color:#ffffff !important;
+    color:#006231 !important;
     text-decoration:none !important;
-    opacity:.92 !important;
+    opacity:1 !important;
   }
   .wc-breadcrumb a:hover{
-    text-decoration:underline !important;
+    color:#0b7741 !important;
+    text-decoration:none !important;
   }
   .wc-breadcrumb-sep{
-    opacity:.55 !important;
+    color:rgba(96,113,132,.52) !important;
+    opacity:1 !important;
   }
   .wc-breadcrumb-current{
-    opacity:.92 !important;
+    color:#607184 !important;
+    opacity:1 !important;
   }
   nav#nav-menu .nav-menu-list{
     display:flex !important;
@@ -1407,7 +1416,7 @@
   style.textContent = css;
   loadWaltonMobileStylesheet();
   var WC_NAV_LINKS = [
-    { label:"Our County", href:"../index.html#county" },
+    { label:"Our County", href:"our-county.html" },
     { label:"Budget Overview", href:"budget-overview.html" },
     { label:"Departments", href:"departments.html" },
     { label:"Capital Projects", href:"capital-improvement-plan.html" },
@@ -1633,14 +1642,17 @@
     if(!eyebrow || !title){
       return;
     }
-    var anchor = document.querySelector("nav#nav-menu.nav-menu") || document.querySelector(".wc-standalone-budget-nav");
+    var content = document.getElementById("content");
+    var anchor = content || document.querySelector("nav#nav-menu.nav-menu") || document.querySelector(".wc-standalone-budget-nav");
     if(!anchor || !anchor.parentNode){
       return;
     }
     var eyebrowText = eyebrow.textContent.trim();
     var titleText = title.textContent.trim();
     var sectionCrumb = "";
-    if(eyebrowText === "Departments"){
+    if(titleText === "Overview of Walton County" || titleText === "Organizational Structure" || titleText === "Statistical & Supplemental Information" || titleText === "Glossary, Acronyms, and Frequently Asked Questions" || titleText === "Strategic Initiatives"){
+      sectionCrumb = '<a href="our-county.html">Our County</a><span class="wc-breadcrumb-sep">/</span>';
+    }else if(eyebrowText === "Departments"){
       sectionCrumb = '<a href="departments.html">Departments</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Introduction and Overview" || eyebrowText === "Financial Structure, Policies, and Process"){
       sectionCrumb = '<a href="budget-overview.html">Budget Overview</a><span class="wc-breadcrumb-sep">/</span>';
@@ -1657,7 +1669,11 @@
       crumb = document.createElement("nav");
       crumb.className = "wc-breadcrumb";
       crumb.setAttribute("aria-label", "Breadcrumb");
-      anchor.parentNode.insertBefore(crumb, anchor.nextSibling);
+      if(content){
+        content.insertBefore(crumb, content.firstChild);
+      }else{
+        anchor.parentNode.insertBefore(crumb, anchor.nextSibling);
+      }
     }
     if(crumb.innerHTML !== html){
       crumb.innerHTML = html;

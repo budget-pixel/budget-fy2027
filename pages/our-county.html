@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Budget Overview — Walton County FY 2027 Budget</title>
+<title>Our County — Walton County FY 2027 Budget</title>
 <style>
   :root{
     --wc-green:#006231;
@@ -12,7 +12,6 @@
     --wc-ink:#172033;
     --wc-muted:#607184;
     --wc-line:rgba(23,32,51,.12);
-    --wc-soft:#f5f8f4;
     --wc-shadow:0 18px 44px rgba(23,32,51,.10);
   }
   *,*::before,*::after{box-sizing:border-box}
@@ -50,18 +49,10 @@
     background:linear-gradient(180deg, rgba(0,62,40,.96), rgba(0,62,40,.88));
     box-shadow:none;
   }
-  .logo-container{
-    flex:0 0 auto;
-    min-width:284px;
-  }
+  .logo-container{flex:0 0 auto;min-width:284px}
   .wc-story-nav .wc-split-brand{height:52px !important}
-  .wc-story-nav .wc-split-brand-top{
-    color:#ffffff !important;
-    font-size:24px !important;
-  }
-  .wc-story-nav .wc-split-brand-bottom{
-    color:rgba(255,255,255,.82) !important;
-  }
+  .wc-story-nav .wc-split-brand-top{color:#ffffff !important;font-size:24px !important}
+  .wc-story-nav .wc-split-brand-bottom{color:rgba(255,255,255,.82) !important}
   .wc-story-nav .wc-split-brand-seal,
   .wc-story-nav .wc-seal-mark{
     width:46px !important;
@@ -89,13 +80,8 @@
     text-decoration:none;
     white-space:nowrap;
   }
-  .wc-top-links a:hover{
-    background:rgba(255,255,255,.14);
-    color:var(--wc-gold);
-  }
-  .wc-top-links a[aria-current="page"]{
-    color:var(--wc-gold);
-  }
+  .wc-top-links a:hover{background:rgba(255,255,255,.14);color:var(--wc-gold)}
+  .wc-top-links a[aria-current="page"]{color:var(--wc-gold)}
   .wc-menu-toggle{
     display:none;
     width:42px;
@@ -128,16 +114,9 @@
     font-size:13px;
     font-weight:800;
   }
-  .wc-breadcrumb a{
-    color:var(--wc-green);
-    text-decoration:none;
-  }
-  .wc-breadcrumb-sep{
-    color:rgba(96,113,132,.52);
-  }
-  .wc-breadcrumb-current{
-    color:var(--wc-muted);
-  }
+  .wc-breadcrumb a{color:var(--wc-green);text-decoration:none}
+  .wc-breadcrumb-sep{color:rgba(96,113,132,.52)}
+  .wc-breadcrumb-current{color:var(--wc-muted)}
   .page-eyebrow{
     margin:4px 0 14px;
     color:var(--wc-green);
@@ -166,10 +145,7 @@
     gap:16px;
     margin:0 0 20px;
   }
-  .wc-hub-search{
-    position:relative;
-    flex:1;
-  }
+  .wc-hub-search{position:relative;flex:1}
   .wc-hub-search svg{
     position:absolute;
     left:18px;
@@ -205,7 +181,7 @@
   }
   .wc-hub-grid{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:18px;
   }
   .wc-hub-card{
@@ -277,20 +253,11 @@
     background:#003f28;
     color:#ffffff;
   }
-  .wc-hub-footer p{
-    margin:8px 0 0;
-    color:rgba(255,255,255,.72);
-  }
+  .wc-hub-footer p{margin:8px 0 0;color:rgba(255,255,255,.72)}
   @media(max-width:1080px){
-    .wc-story-nav{
-      flex-wrap:wrap;
-      gap:12px;
-    }
+    .wc-story-nav{flex-wrap:wrap;gap:12px}
     .logo-container{min-width:246px}
-    .wc-menu-toggle{
-      display:inline-flex;
-      margin-left:auto;
-    }
+    .wc-menu-toggle{display:inline-flex;margin-left:auto}
     .wc-top-links{
       order:4;
       display:none;
@@ -299,21 +266,14 @@
       padding-top:8px;
     }
     .wc-story-nav.is-menu-open .wc-top-links{display:flex}
-    .wc-hub-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
   }
   @media(max-width:720px){
     .wc-hub-shell{width:min(100% - 20px, 680px)}
     .logo-container{min-width:0}
     .wc-story-nav .wc-split-brand-left,
     .wc-story-nav .wc-split-brand-right{display:none !important}
-    .wc-top-links{
-      flex-direction:column;
-      align-items:stretch;
-    }
-    .wc-top-links a{
-      border-radius:14px;
-      background:rgba(255,255,255,.12);
-    }
+    .wc-top-links{flex-direction:column;align-items:stretch}
+    .wc-top-links a{border-radius:14px;background:rgba(255,255,255,.12)}
     .wc-hub-tools{display:block}
     .wc-result-count{display:block;margin:14px 0 0}
     .wc-hub-grid{grid-template-columns:1fr}
@@ -328,8 +288,8 @@
       <span></span><span></span><span></span>
     </button>
     <div class="wc-top-links">
-      <a href="our-county.html">Our County</a>
-      <a href="budget-overview.html" aria-current="page">Budget Overview</a>
+      <a href="our-county.html" aria-current="page">Our County</a>
+      <a href="budget-overview.html">Budget Overview</a>
       <a href="departments.html">Departments</a>
       <a href="capital-improvement-plan.html">Capital Projects</a>
       <a href="financials.html">Financials</a>
@@ -340,24 +300,24 @@
     <nav class="wc-breadcrumb" aria-label="Breadcrumb">
       <a href="../index.html">Home</a>
       <span class="wc-breadcrumb-sep">/</span>
-      <span class="wc-breadcrumb-current">Budget Overview</span>
+      <span class="wc-breadcrumb-current">Our County</span>
     </nav>
 
-    <div class="page-eyebrow">Budget Overview</div>
-    <h1 class="page-title">Budget Overview</h1>
-    <p class="page-intro">Explore the FY 2027 proposed budget, county priorities, organizational structure, financial policies, and the process that guides Walton County's annual budget.</p>
+    <div class="page-eyebrow">Our County</div>
+    <h1 class="page-title">Our County</h1>
+    <p class="page-intro">Explore Walton County's community profile, demographics, governance structure, and organization before diving into the FY 2027 budget.</p>
 
-    <section aria-label="Budget overview directory">
+    <section aria-label="Our County directory">
       <div class="wc-hub-tools">
         <label class="wc-hub-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
           </svg>
-          <input id="hubSearch" type="search" placeholder="Search Budget Overview..." autocomplete="off" aria-label="Search budget overview">
+          <input id="hubSearch" type="search" placeholder="Search Our County..." autocomplete="off" aria-label="Search Our County">
         </label>
-        <div class="wc-result-count" id="hubResultCount">Loading overview pages</div>
+        <div class="wc-result-count" id="hubResultCount">Loading county pages</div>
       </div>
-      <div class="wc-empty-state" id="hubEmpty">No overview pages match that search.</div>
+      <div class="wc-empty-state" id="hubEmpty">No county pages match that search.</div>
       <div class="wc-hub-grid" id="hubGrid"></div>
     </section>
   </main>
@@ -373,40 +333,34 @@
   (function(){
     var pages = [
       {
-        title:"GFOA Distinguished Budget Presentation Award",
-        href:"gfoa-distinguished-budget-presentation-award.html",
-        label:"Recognition",
-        description:"Review the award standards and presentation recognition for Walton County's budget document."
+        title:"Overview of Walton County",
+        href:"overview-of-walton-county.html",
+        label:"County Profile",
+        description:"Explore community context, demographics, economic indicators, geography, and the story behind Walton County."
       },
       {
-        title:"Transmittal Letter",
-        href:"transmittal-letter.html",
-        label:"Executive Message",
-        description:"Read the budget message introducing major priorities, financial conditions, and recommendations."
+        title:"Organizational Structure",
+        href:"organizational-structure.html",
+        label:"Governance",
+        description:"See how County government is organized and how departments, offices, and elected leadership connect."
       },
       {
-        title:"Budget Process & Calendar",
-        href:"budget-process-and-calendar.html",
-        label:"Process",
-        description:"Follow the annual budget development timeline, hearings, adoption milestones, and key dates."
+        title:"Statistical & Supplemental Information",
+        href:"statistical-and-supplemental-information.html",
+        label:"Supplemental",
+        description:"Explore demographic, economic, statistical, and supplemental information that provides context for Walton County."
       },
       {
-        title:"Fund Descriptions and Structure",
-        href:"fund-descriptions-and-structure.html",
-        label:"Fund Structure",
-        description:"Understand the County's fund accounting structure and how resources are organized."
+        title:"Glossary, Acronyms, and Frequently Asked Questions",
+        href:"glossary-acronyms-and-frequently-asked-questions.html",
+        label:"Reference",
+        description:"Find definitions, acronyms, and answers to common questions about Walton County's budget and public finance terms."
       },
       {
-        title:"Department to Fund Relationship",
-        href:"department-to-fund-relationship.html",
-        label:"Funding Map",
-        description:"See which funds support departments, offices, programs, and recurring services."
-      },
-      {
-        title:"Financial Policies",
-        href:"financial-policies.html",
-        label:"Fiscal Policy",
-        description:"Review policies for budgeting, reserves, fund balance, debt, investment, and fiscal stewardship."
+        title:"Strategic Initiatives",
+        href:"strategic-initiatives.html",
+        label:"Priorities",
+        description:"Review the goals and initiatives that guide County decisions, public investment, and service priorities."
       }
     ];
 

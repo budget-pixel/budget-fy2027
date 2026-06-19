@@ -7,13 +7,13 @@ window.wcProjectSearchBaseUrl = window.location.pathname.indexOf("/pages/") !== 
   : "pages/search.html?q=";
 
 window.wcBudgetPages = window.wcBudgetPages || [
-  { title:"Home", section:"Introduction and Overview", href:"home.html" },
   { title:"GFOA Distinguished Budget Presentation Award", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd25815ed4e2fe49b4" },
   { title:"Transmittal Letter", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdc3a5aa570050fba9" },
   { title:"Budget-in-Brief", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=69e8ae83a93da8d66dc5e248" },
-  { title:"Overview of Walton County", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd2e29b2249e0a5b99" },
-  { title:"Organizational Structure", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1af21806371d68e7" },
-  { title:"Strategic Initiatives", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbda2feb1e35a5b122d" },
+  { title:"Our County", section:"Our County", href:"our-county.html" },
+  { title:"Overview of Walton County", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd2e29b2249e0a5b99" },
+  { title:"Organizational Structure", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1af21806371d68e7" },
+  { title:"Strategic Initiatives", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbda2feb1e35a5b122d" },
   { title:"Budget Overview", section:"Budget Overview", href:"budget-overview.html" },
   { title:"Departments", section:"Departments", href:"departments.html" },
   { title:"Budget Process & Calendar", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdeb3f9f1b409e86d5" },
@@ -77,8 +77,8 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Capital Improvement Plan", section:"Capital Improvement Plan", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd4a9d93e5ac05a153" },
   { title:"Debt Overview", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd7fa91d193bd3f319" },
   { title:"Financial Forecast", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd986e584c322f6216" },
-  { title:"Glossary, Acronyms, and Frequently Asked Questions", section:"Glossary, Statistical, and Supplemental Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd48feef483c784fe0" },
-  { title:"Statistical & Supplemental Information", section:"Glossary, Statistical, and Supplemental Information", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1da6285c17aaf19a" }
+  { title:"Glossary, Acronyms, and Frequently Asked Questions", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd48feef483c784fe0" },
+  { title:"Statistical & Supplemental Information", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1da6285c17aaf19a" }
 ];
 
 (function(){
@@ -97,6 +97,10 @@ window.wcBudgetPages = window.wcBudgetPages || [
 
     "Budget-in-Brief": [
       "budget brief", "summary", "quick summary", "highlights", "overview", "taxes", "millage", "property taxes", "ad valorem taxes", "ad valoram taxes", "revenues", "expenses", "public safety", "capital projects", "total budget"
+    ],
+
+    "Our County": [
+      "our county", "county overview", "county profile", "overview of walton county", "organizational structure", "governance", "demographics", "community profile", "statistical", "supplemental", "glossary", "faq", "frequently asked questions", "acronyms", "strategic initiatives", "priorities", "goals"
     ],
 
     "Overview of Walton County": [
@@ -373,9 +377,9 @@ window.wcBudgetPages = window.wcBudgetPages || [
   };
 
   const localHrefMap = {
-    "Home": "home.html",
     "GFOA Distinguished Budget Presentation Award": "gfoa-distinguished-budget-presentation-award.html",
     "Transmittal Letter": "transmittal-letter.html",
+    "Our County": "our-county.html",
     "Overview of Walton County": "overview-of-walton-county.html",
     "Organizational Structure": "organizational-structure.html",
     "Strategic Initiatives": "strategic-initiatives.html",

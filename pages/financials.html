@@ -29,7 +29,10 @@
   a{color:inherit}
   .wc-hub-shell{
     width:min(1320px, calc(100% - 32px));
-    margin:14px auto 34px;
+    margin:0 auto 34px;
+  }
+  .wc-hub-shell > main{
+    padding-top:40px;
   }
   .wc-story-nav{
     position:sticky;
@@ -120,7 +123,7 @@
     gap:8px;
     align-items:center;
     flex-wrap:wrap;
-    margin:44px 0 24px;
+    margin:0 0 24px;
     color:var(--wc-muted);
     font-size:13px;
     font-weight:800;
@@ -129,58 +132,33 @@
     color:var(--wc-green);
     text-decoration:none;
   }
-  .wc-breadcrumb span[aria-hidden="true"]{
+  .wc-breadcrumb-sep{
     color:rgba(96,113,132,.52);
   }
-  .wc-page-hero{
-    display:grid;
-    grid-template-columns:minmax(0, 1fr) minmax(280px, 420px);
-    gap:28px;
-    align-items:end;
-    margin-bottom:34px;
-    padding:42px;
-    border:1px solid rgba(255,255,255,.72);
-    border-radius:32px;
-    background:
-      linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.72)),
-      radial-gradient(circle at top right, rgba(209,190,120,.20), transparent 26rem);
-    box-shadow:var(--wc-shadow);
-  }
-  .wc-page-hero h1{
-    margin:0;
-    color:var(--wc-ink);
-    font-family:Georgia, "Times New Roman", serif;
-    font-size:clamp(48px, 6vw, 88px);
-    line-height:.98;
-    font-weight:500;
-    letter-spacing:0;
-  }
-  .wc-page-hero p{
-    max-width:760px;
-    margin:20px 0 0;
+  .wc-breadcrumb-current{
     color:var(--wc-muted);
-    font-size:20px;
-    line-height:1.65;
   }
-  .wc-hero-stat{
-    padding:24px;
-    border-radius:24px;
-    background:linear-gradient(135deg, var(--wc-green), var(--wc-green-2));
-    color:#ffffff;
-  }
-  .wc-hero-stat strong{
-    display:block;
-    font-size:48px;
-    line-height:1;
-  }
-  .wc-hero-stat span{
-    display:block;
-    margin-top:10px;
-    color:rgba(255,255,255,.78);
-    font-size:13px;
-    font-weight:900;
-    letter-spacing:.1em;
+  .page-eyebrow{
+    margin:4px 0 14px;
+    color:var(--wc-green);
+    font-size:.78rem;
+    font-weight:800;
+    letter-spacing:.12em;
     text-transform:uppercase;
+  }
+  .page-title{
+    margin:0 0 16px;
+    color:#24344d;
+    font-size:clamp(2rem, 4vw, 2.75rem);
+    font-weight:800;
+    line-height:1.12;
+  }
+  .page-intro{
+    max-width:760px;
+    margin:0 0 40px;
+    color:var(--wc-muted);
+    font-size:1.05rem;
+    line-height:1.65;
   }
   .wc-hub-tools{
     display:flex;
@@ -321,7 +299,6 @@
       padding-top:8px;
     }
     .wc-story-nav.is-menu-open .wc-top-links{display:flex}
-    .wc-page-hero{grid-template-columns:1fr}
     .wc-hub-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
   }
   @media(max-width:720px){
@@ -337,11 +314,6 @@
       border-radius:14px;
       background:rgba(255,255,255,.12);
     }
-    .wc-page-hero{
-      padding:28px;
-      border-radius:24px;
-    }
-    .wc-page-hero p{font-size:17px}
     .wc-hub-tools{display:block}
     .wc-result-count{display:block;margin:14px 0 0}
     .wc-hub-grid{grid-template-columns:1fr}
@@ -356,7 +328,7 @@
       <span></span><span></span><span></span>
     </button>
     <div class="wc-top-links">
-      <a href="../index.html#county">Our County</a>
+      <a href="our-county.html">Our County</a>
       <a href="budget-overview.html">Budget Overview</a>
       <a href="departments.html">Departments</a>
       <a href="capital-improvement-plan.html">Capital Projects</a>
@@ -367,20 +339,13 @@
   <main>
     <nav class="wc-breadcrumb" aria-label="Breadcrumb">
       <a href="../index.html">Home</a>
-      <span aria-hidden="true">/</span>
-      <span>Financials</span>
+      <span class="wc-breadcrumb-sep">/</span>
+      <span class="wc-breadcrumb-current">Financials</span>
     </nav>
 
-    <section class="wc-page-hero">
-      <div>
-        <h1>Financials</h1>
-        <p>Browse revenue, expense, personnel, fund, capital equipment, debt, forecast, and supplemental financial information for Walton County's FY 2027 proposed budget.</p>
-      </div>
-      <div class="wc-hero-stat">
-        <strong id="hubTotal">0</strong>
-        <span>Financial Pages</span>
-      </div>
-    </section>
+    <div class="page-eyebrow">Financials</div>
+    <h1 class="page-title">Financials</h1>
+    <p class="page-intro">Browse revenue, expense, personnel, fund, capital equipment, debt, forecast, and supplemental financial information for Walton County's FY 2027 proposed budget.</p>
 
     <section aria-label="Financial directory">
       <div class="wc-hub-tools">
@@ -460,18 +425,6 @@
         href:"financial-forecast.html",
         label:"Forecast",
         description:"Review long-range financial assumptions, revenue outlook, expense projections, and planning considerations."
-      },
-      {
-        title:"Glossary, Acronyms, and Frequently Asked Questions",
-        href:"glossary-acronyms-and-frequently-asked-questions.html",
-        label:"Reference",
-        description:"Find definitions, acronyms, and answers to common budget and financial questions."
-      },
-      {
-        title:"Statistical & Supplemental Information",
-        href:"statistical-and-supplemental-information.html",
-        label:"Supplemental",
-        description:"Explore demographic, economic, statistical, and supplemental information supporting the budget."
       }
     ];
 
@@ -500,7 +453,8 @@
       var matches = pages.filter(function(page){
         return !query || normalize(page.title + " " + page.label + " " + page.description).indexOf(query) !== -1;
       });
-      $("#hubTotal").textContent = String(pages.length);
+      var total = $("#hubTotal");
+      if(total) total.textContent = String(pages.length);
       $("#hubResultCount").textContent = matches.length + " of " + pages.length + " pages";
       $("#hubEmpty").classList.toggle("is-visible", matches.length === 0);
       $("#hubGrid").innerHTML = matches.map(function(page){
