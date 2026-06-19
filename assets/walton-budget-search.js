@@ -18,6 +18,9 @@
         "home.html",
         "Go to Home"
       );
+      if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.equalizeAll === "function"){
+        window.WaltonSplitLogo.equalizeAll(logoContainer);
+      }
     }
 
     var sidebar = document.getElementById("sidebar");

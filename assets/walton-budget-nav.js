@@ -1253,14 +1253,10 @@
     }
     var brandHtml = `
       <div class="wc-split-brand" aria-label="Walton County Board of County Commissioners">
-        <div class="wc-split-brand-left">
-          <div class="wc-split-brand-top">Walton</div>
-          <div class="wc-split-brand-bottom">Board of County</div>
-        </div>
         <span class="wc-split-brand-seal wc-seal-mark" aria-hidden="true"></span>
-        <div class="wc-split-brand-right">
-          <div class="wc-split-brand-top">County</div>
-          <div class="wc-split-brand-bottom">Commissioners</div>
+        <div class="wc-split-brand-text">
+          <div class="wc-split-brand-top">Walton County</div>
+          <div class="wc-split-brand-bottom">Board of County Commissioners</div>
         </div>
       </div>
     `;
@@ -1293,6 +1289,9 @@
         "home.html",
         "Go to Home"
       );
+      if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.equalizeAll === "function"){
+        window.WaltonSplitLogo.equalizeAll(logoContainer);
+      }
     }
     var sidebar = document.getElementById("sidebar");
     var searchHost = sidebar || nav;
