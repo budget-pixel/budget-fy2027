@@ -20,7 +20,9 @@
       );
     }
 
-    var existingSearchSlot = nav.querySelector(".wc-nav-search-slot");
+    var sidebar = document.getElementById("sidebar");
+    var searchHost = sidebar || nav;
+    var existingSearchSlot = searchHost.querySelector(".wc-nav-search-slot");
 
     if(existingSearchSlot){
       if(existingSearchSlot.classList.contains("wc-nav-search-slot-fallback")){
@@ -53,7 +55,19 @@
       <div class="wc-nav-search-results" role="listbox" aria-label="Search results"></div>
     `;
 
-    nav.appendChild(slot);
+    if(sidebar){
+      slot.classList.add("wc-sidebar-search-slot");
+      var sidebarHeader = sidebar.querySelector(".wc-sidebar-header");
+      if(sidebarHeader && sidebarHeader.nextSibling){
+        sidebar.insertBefore(slot, sidebarHeader.nextSibling);
+      }else if(sidebarHeader){
+        sidebar.appendChild(slot);
+      }else{
+        sidebar.insertBefore(slot, sidebar.firstChild);
+      }
+    }else{
+      nav.appendChild(slot);
+    }
 
     var results = slot.querySelector(".wc-nav-search-results");
     var input = slot.querySelector("#wcTocSearch");

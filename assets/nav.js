@@ -164,13 +164,25 @@
       if(btn.getAttribute('data-sidebar-bound') === 'true') return;
       btn.setAttribute('data-sidebar-bound', 'true');
       btn.addEventListener('click', function(){
-        btn.closest('.nav-section').classList.toggle('open');
+        var section = btn.closest('.nav-section');
+        var shouldOpen = section && !section.classList.contains('open');
+        document.querySelectorAll('.nav-section.open').forEach(function(openSection){
+          if(openSection !== section){
+            openSection.classList.remove('open');
+          }
+        });
+        if(section){
+          section.classList.toggle('open', shouldOpen);
+        }
       });
     });
   }
 
   function openActiveSection(){
     var active = document.querySelector('.nav-section-links a.active');
+    document.querySelectorAll('.nav-section.open').forEach(function(section){
+      section.classList.remove('open');
+    });
     if(active){
       active.closest('.nav-section').classList.add('open');
       setTimeout(function(){ active.scrollIntoView({block:'nearest'}); }, 100);
