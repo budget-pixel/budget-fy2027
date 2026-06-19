@@ -85,7 +85,22 @@ function getProjectValue(project, keys, fallback = "Not specified"){
 }
 
 function buildBackHref(){
+  const params = new URLSearchParams(window.location.search);
+  const returnHref = params.get("return");
+
+  if(returnHref && /^[a-z0-9-]+\.html(?:#[a-z0-9_-]+)?$/i.test(returnHref)){
+    return returnHref;
+  }
+
   return "search.html";
+}
+
+function buildBackLabel(backHref){
+  if(/^cip-/.test(String(backHref || ""))){
+    return "Back to Schedule";
+  }
+
+  return "Back to Project Search";
 }
 
 function renderListItem(label, value){
@@ -337,6 +352,7 @@ function renderProjectPage(){
   const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
   const project = projects.find(p => p.slug === slug);
   const backHref = buildBackHref();
+  const backLabel = buildBackLabel(backHref);
 
   if(!project){
 
@@ -344,7 +360,7 @@ function renderProjectPage(){
       <div class="wc-project-not-found">
         <h1>Project Not Found</h1>
         <p>The requested project could not be located.</p>
-        <p><a class="wc-project-back" href="${backHref}">&larr; Back to Project Index</a></p>
+        <p><a class="wc-project-back" href="${backHref}">&larr; ${backLabel}</a></p>
       </div>
     `;
 
@@ -369,7 +385,7 @@ function renderProjectPage(){
     <main class="wc-project-page">
 
       <div class="wc-project-actions">
-        <a class="wc-project-back" href="${backHref}">&larr; Back to Project Search</a>
+        <a class="wc-project-back" href="${backHref}">&larr; ${backLabel}</a>
       </div>
 
       <section class="wc-project-hero">

@@ -41,17 +41,26 @@ function displayYear(year){
   return String(year || "").replace(/^FY(\d{4})$/, "FY $1");
 }
 
-function buildProjectUrl(project){
+function getHashYear(years){
+  const hashYear = decodeURIComponent(String(window.location.hash || "").replace(/^#/, "")).toUpperCase();
+
+  return years.includes(hashYear) ? hashYear : "";
+}
+
+function buildProjectUrl(project, year){
   if(!project || !project.slug){
     return "";
   }
 
-  return `cip-project.html?project=${encodeURIComponent(project.slug)}`;
+  const returnPath = window.location.pathname.split("/").pop() || "capital-projects.html";
+  const returnTarget = year ? `${returnPath}#${encodeURIComponent(year)}` : returnPath;
+
+  return `cip-project.html?project=${encodeURIComponent(project.slug)}&return=${encodeURIComponent(returnTarget)}`;
 }
 
-function renderProjectTitle(project){
+function renderProjectTitle(project, year){
   const title = escapeHtml(project && project.title ? project.title : "Capital Project");
-  const url = buildProjectUrl(project);
+  const url = buildProjectUrl(project, year);
 
   if(!url){
     return title;
@@ -83,7 +92,7 @@ function renderYearScheduleTable(year, label, projects, totalLabel){
           <tbody>
             ${projects.map(project => `
               <tr>
-                <td>${renderProjectTitle(project)}</td>
+                <td>${renderProjectTitle(project, year)}</td>
                 <td class="wc-num">${money(project.year_amount_value)}</td>
               </tr>
             `).join("")}
@@ -328,8 +337,9 @@ function renderFundSchedule(config){
       return;
     }
 
-    let activeYear = availableYears.includes(config.defaultYear || "FY2027")
-      ? (config.defaultYear || "FY2027")
+    const requestedYear = config.defaultYear || getHashYear(years) || "FY2027";
+    let activeYear = availableYears.includes(requestedYear)
+      ? requestedYear
       : availableYears[0];
 
     function renderActiveYear(){
@@ -384,6 +394,9 @@ function renderFundSchedule(config){
       mount.querySelectorAll("[data-cip-year]").forEach(button => {
         button.addEventListener("click", () => {
           activeYear = button.getAttribute("data-cip-year") || "FY2027";
+          if(window.history && window.history.replaceState){
+            window.history.replaceState(null, "", `#${activeYear}`);
+          }
           renderActiveYear();
         });
       });

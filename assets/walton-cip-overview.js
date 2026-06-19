@@ -242,11 +242,6 @@ function renderProjectCard(project){
         </div>
 
         <div class="wc-project-metric">
-          <span>District</span>
-          <strong>${escapeHtml(project.district)}</strong>
-        </div>
-
-        <div class="wc-project-metric">
           <span>Target Year</span>
           <strong>${escapeHtml(project.target)}</strong>
         </div>
@@ -270,6 +265,8 @@ function renderProjectCard(project){
         ` : ""}
 
       </div>
+
+      <div class="wc-project-card-action">View Project</div>
 
     </article>
   `;
@@ -1241,69 +1238,105 @@ function renderProjects(){
 
       .wc-project-index-header{
         margin-bottom:22px;
+        padding:28px;
+        border:1px solid rgba(0,63,40,.12);
+        border-radius:28px;
+        background:#f7fbf7;
+      }
+
+      .wc-project-index-header .page-intro{
+        max-width:760px;
+      }
+
+      .wc-project-search-stats{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:1px;
+        margin-top:24px;
+        overflow:hidden;
+        border:1px solid rgba(0,63,40,.12);
+        border-radius:20px;
+        background:rgba(0,63,40,.12);
+      }
+
+      .wc-project-search-stat{
+        padding:18px;
+        background:#ffffff;
+      }
+
+      .wc-project-search-stat strong{
+        display:block;
+        color:#003f28;
+        font-size:28px;
+        line-height:1;
+      }
+
+      .wc-project-search-stat span{
+        display:block;
+        margin-top:8px;
+        color:#607184;
+        font-size:11px;
+        font-weight:900;
+        letter-spacing:.08em;
+        text-transform:uppercase;
       }
 
       .wc-project-full-search-row{
         display:flex;
-        justify-content:center;
-        margin:24px 0 26px 0;
+        justify-content:flex-start;
+        margin:18px 0 26px 0;
       }
 
       .wc-project-full-search-link{
         display:inline-flex;
         align-items:center;
         justify-content:center;
-        min-height:50px;
-        padding:0 24px;
+        min-height:42px;
+        padding:0 18px;
         border-radius:999px;
-        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
-        color:#ffffff;
+        border:1px solid rgba(0,63,40,.18);
+        background:#ffffff;
+        color:#003f28;
         font-family:Arial, Helvetica, sans-serif;
-        font-size:14px;
+        font-size:12px;
         font-weight:800;
         letter-spacing:.08em;
         text-transform:uppercase;
         text-decoration:none;
-        box-shadow:0 10px 24px rgba(0,98,49,0.16);
+        box-shadow:none;
         transition:transform .22s ease, box-shadow .22s ease;
       }
 
       .wc-project-full-search-link:hover{
         transform:translateY(-2px);
-        box-shadow:0 14px 28px rgba(0,98,49,0.20);
+        box-shadow:0 10px 20px rgba(23,32,51,.08);
       }
 
       .wc-project-toolbar{
-        display:flex;
-        flex-wrap:wrap;
-        gap:12px;
-        align-items:center;
-        justify-content:space-between;
-        margin-bottom:16px;
-        padding:14px;
+        display:grid;
+        gap:16px;
+        margin-bottom:18px;
+        padding:18px;
         background:#ffffff;
-        border-radius:14px;
-        border:1px solid rgba(209,190,120,0.34);
-        box-shadow:
-          0 8px 20px rgba(0,98,49,0.07),
-          0 3px 8px rgba(36,52,77,0.05);
+        border-radius:24px;
+        border:1px solid rgba(23,32,51,.10);
+        box-shadow:0 14px 34px rgba(23,32,51,.06);
       }
 
       .wc-project-search-wrap{
         position:relative;
-        flex:1 1 420px;
-        min-width:280px;
+        width:100%;
       }
 
       .wc-project-search{
         width:100% !important;
-        height:44px !important;
-        padding:0 14px 0 48px !important;
+        height:58px !important;
+        padding:0 18px 0 54px !important;
         text-indent:0 !important;
-        border-radius:10px;
-        border:1px solid rgba(0,98,49,0.16);
-        background:#f4f7f5;
-        font-size:13px;
+        border-radius:18px;
+        border:1px solid rgba(0,63,40,.13);
+        background:#f7fbf7;
+        font-size:16px;
         color:#172033;
         outline:none;
         box-sizing:border-box;
@@ -1326,29 +1359,31 @@ function renderProjects(){
 
       .wc-project-search-icon{
         position:absolute !important;
-        left:17px !important;
+        left:20px !important;
         top:50% !important;
         transform:translateY(-50%) !important;
-        width:16px !important;
-        height:16px !important;
+        width:18px !important;
+        height:18px !important;
         opacity:.55 !important;
         pointer-events:none !important;
         z-index:2 !important;
       }
 
       .wc-project-filter-group{
-        display:flex;
-        flex-wrap:wrap;
-        gap:9px;
+        display:grid;
+        grid-template-columns:1fr;
+        gap:12px;
         width:100%;
       }
 
       .wc-project-filter-set{
         display:flex;
         flex-wrap:wrap;
-        gap:7px;
+        gap:8px;
         align-items:center;
         width:100%;
+        padding-top:12px;
+        border-top:1px solid rgba(23,32,51,.08);
       }
 
       .wc-project-filter-label{
@@ -1361,14 +1396,14 @@ function renderProjects(){
       }
 
       .wc-project-filter{
-        height:34px;
-        padding:0 11px;
+        min-height:36px;
+        padding:0 13px;
         border-radius:999px;
         border:1px solid rgba(0,98,49,0.14);
         background:#ffffff;
         color:#172033;
         font-size:12px;
-        font-weight:600;
+        font-weight:800;
         cursor:pointer;
         transition:
           background .22s ease,
@@ -1382,9 +1417,9 @@ function renderProjects(){
       }
 
       .wc-project-filter.active{
-        background:linear-gradient(135deg,#006231 0%,#0b7741 100%);
+        background:#003f28;
         color:#ffffff;
-        border-color:#006231;
+        border-color:#003f28;
       }
 
       .wc-project-results-row{
@@ -1392,7 +1427,7 @@ function renderProjects(){
         align-items:center;
         justify-content:space-between;
         gap:12px;
-        margin:0 0 10px 0;
+        margin:0 0 14px 0;
         color:#5a6e7f;
         font-size:12px;
         font-weight:700;
@@ -1433,14 +1468,12 @@ function renderProjects(){
         display:flex;
         flex-direction:column;
         align-self:stretch !important;
-        gap:11px;
-        padding:16px;
+        gap:13px;
+        padding:18px;
         background:#ffffff;
-        border-radius:14px;
-        border:1px solid rgba(209,190,120,0.34);
-        box-shadow:
-          0 8px 20px rgba(0,98,49,0.07),
-          0 3px 8px rgba(36,52,77,0.05);
+        border-radius:20px;
+        border:1px solid rgba(23,32,51,.11);
+        box-shadow:0 14px 34px rgba(23,32,51,.06);
         transition:
           transform .24s ease,
           box-shadow .24s ease,
@@ -1449,10 +1482,8 @@ function renderProjects(){
 
       .wc-project-card:hover{
         transform:translateY(-2px);
-        border-color:rgba(0,98,49,0.28);
-        box-shadow:
-          0 14px 28px rgba(0,98,49,0.10),
-          0 5px 12px rgba(36,52,77,0.07);
+        border-color:rgba(0,63,40,.22);
+        box-shadow:0 18px 42px rgba(23,32,51,.09);
       }
 
       .wc-project-card-top{
@@ -1465,7 +1496,7 @@ function renderProjects(){
       .wc-project-card h3{
         margin:0;
         color:#172033;
-        font-size:17px;
+        font-size:19px;
         line-height:1.24;
         font-weight:700;
       }
@@ -1476,8 +1507,8 @@ function renderProjects(){
         justify-content:center;
         padding:5px 8px;
         border-radius:999px;
-        background:rgba(0,98,49,0.08);
-        color:#006231;
+        background:#f7fbf7;
+        color:#003f28;
         font-size:9px;
         font-weight:700;
         letter-spacing:.08em;
@@ -1487,8 +1518,8 @@ function renderProjects(){
 
       .wc-project-description{
         color:#5a6e7f;
-        font-size:12px;
-        line-height:1.5;
+        font-size:13px;
+        line-height:1.6;
         position:relative;
       }
 
@@ -1542,18 +1573,19 @@ function renderProjects(){
 
       .wc-project-metrics{
         display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-columns:1fr;
         gap:8px;
         margin-top:auto;
         align-items:stretch;
       }
 
       .wc-project-metric{
-        min-height:64px;
-        padding:9px 10px;
-        border-radius:10px;
-        background:#f4f7f5;
-        border:1px solid rgba(0,98,49,0.08);
+        min-height:auto;
+        padding:10px 0;
+        border-radius:0;
+        background:transparent;
+        border:0;
+        border-top:1px solid rgba(23,32,51,.08);
         display:flex;
         flex-direction:column;
         justify-content:flex-start;
@@ -1582,6 +1614,31 @@ function renderProjects(){
 
       .wc-project-metric:first-child strong{
         white-space:nowrap;
+      }
+
+      .wc-project-card-action{
+        display:inline-flex;
+        align-items:center;
+        justify-content:flex-start;
+        margin-top:2px;
+        color:#003f28;
+        font-size:12px;
+        font-weight:900;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+      }
+
+      .wc-project-card-action::after{
+        content:"";
+        width:28px;
+        height:1px;
+        margin-left:10px;
+        background:#003f28;
+        transition:width .22s ease;
+      }
+
+      .wc-project-card:hover .wc-project-card-action::after{
+        width:44px;
       }
 
       .wc-project-status{
@@ -1814,7 +1871,13 @@ function renderProjects(){
 
         .wc-project-index-header{
           margin-bottom:18px;
-          padding:0 4px;
+          padding:22px;
+          border-radius:22px;
+        }
+
+        .wc-project-search-stats{
+          grid-template-columns:1fr;
+          margin-top:18px;
         }
 
         .wc-project-full-search-row{
@@ -1829,8 +1892,8 @@ function renderProjects(){
         }
 
         .wc-project-toolbar{
-          padding:12px !important;
-          border-radius:13px;
+          padding:14px !important;
+          border-radius:20px;
           gap:10px;
         }
 
@@ -1841,10 +1904,10 @@ function renderProjects(){
         }
 
         .wc-project-search{
-          height:42px !important;
-          padding-left:46px !important;
-          font-size:13px !important;
-          border-radius:10px;
+          height:52px !important;
+          padding-left:48px !important;
+          font-size:14px !important;
+          border-radius:16px;
         }
 
         .wc-project-search-icon{
@@ -1941,7 +2004,7 @@ function renderProjects(){
 
         .wc-project-metric{
           min-height:auto;
-          padding:9px 10px;
+          padding:10px 0;
         }
 
         .wc-project-metric strong{
@@ -2199,6 +2262,20 @@ function renderProjects(){
           <div class="page-eyebrow">Capital Projects</div>
           <h1 class="page-title">Project Search</h1>
           <p class="page-intro">Browse, search, and filter Walton County capital improvement projects by department, year, and funding source. This project index is populated from the CIP export and is designed to help residents quickly locate projects relevant to their community.</p>
+          <div class="wc-project-search-stats" aria-label="Capital project search summary">
+            <div class="wc-project-search-stat">
+              <strong>${escapeHtml(allProjects.length)}</strong>
+              <span>Projects in Index</span>
+            </div>
+            <div class="wc-project-search-stat">
+              <strong>${escapeHtml(formatMoneyShort(overviewStats.totalBudget))}</strong>
+              <span>Planned Budget</span>
+            </div>
+            <div class="wc-project-search-stat">
+              <strong>${escapeHtml(fundOptions.length)}</strong>
+              <span>Funding Sources</span>
+            </div>
+          </div>
         </div>
 
         ${!isFullView ? `
