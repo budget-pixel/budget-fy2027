@@ -1688,6 +1688,106 @@
     padding-top:10px !important;
     padding-bottom:24px !important;
   }
+  footer[role="contentinfo"].wc-search-footer{
+    min-height:0 !important;
+    margin:64px 0 0 !important;
+    padding:0 !important;
+    background:#f6f8f5 !important;
+    border-top:1px solid rgba(36,52,77,0.10) !important;
+    overflow:visible !important;
+  }
+  footer[role="contentinfo"].wc-search-footer .footer-container{
+    max-width:1120px !important;
+    min-height:0 !important;
+    margin:0 auto !important;
+    padding:42px clamp(22px, 4vw, 44px) 36px !important;
+    background:transparent !important;
+    overflow:visible !important;
+  }
+  .wc-search-footer .wc-budget-footer-inner{
+    display:grid !important;
+    grid-template-columns:minmax(0, 1fr) auto !important;
+    align-items:end !important;
+    gap:24px !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:transparent !important;
+  }
+  .wc-footer-search-copy{
+    max-width:680px !important;
+  }
+  .wc-footer-search-copy h2{
+    margin:0 !important;
+    color:#172033 !important;
+    font-family:Georgia, "Times New Roman", serif !important;
+    font-size:clamp(28px, 3.2vw, 42px) !important;
+    line-height:1.05 !important;
+    font-weight:500 !important;
+    letter-spacing:0 !important;
+  }
+  .wc-footer-search-copy p{
+    max-width:560px !important;
+    margin:10px 0 0 !important;
+    color:rgba(36,52,77,.72) !important;
+    font-size:15px !important;
+    line-height:1.55 !important;
+    font-weight:500 !important;
+  }
+  .wc-footer-search-button{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+    min-height:42px !important;
+    padding:0 18px !important;
+    border:1px solid rgba(0,98,49,.16) !important;
+    border-radius:999px !important;
+    background:#006231 !important;
+    color:#ffffff !important;
+    font:800 12px/1 Arial, Helvetica, sans-serif !important;
+    letter-spacing:.04em !important;
+    text-transform:none !important;
+    cursor:pointer !important;
+    box-shadow:0 10px 24px rgba(0,98,49,.14) !important;
+    transition:transform .2s ease, background .2s ease, box-shadow .2s ease !important;
+    white-space:nowrap !important;
+  }
+  .wc-footer-search-button:hover{
+    transform:translateY(-1px) !important;
+    background:#004f28 !important;
+    box-shadow:0 12px 28px rgba(0,98,49,.18) !important;
+  }
+  .wc-footer-search-button svg{
+    width:15px !important;
+    height:15px !important;
+  }
+  .wc-search-footer .wc-budget-footer-links{
+    display:flex !important;
+    justify-content:flex-start !important;
+    gap:20px !important;
+    margin-top:28px !important;
+    padding-top:18px !important;
+    border-top:1px solid rgba(36,52,77,.10) !important;
+  }
+  .wc-search-footer .wc-budget-footer-links a{
+    min-height:auto !important;
+    padding:0 !important;
+    border-radius:0 !important;
+    color:rgba(36,52,77,.62) !important;
+    background:transparent !important;
+    font-size:11px !important;
+    font-weight:700 !important;
+    letter-spacing:.02em !important;
+    text-transform:none !important;
+  }
+  .wc-search-footer .wc-budget-footer-links a:hover{
+    color:#006231 !important;
+    background:transparent !important;
+  }
+  .wc-search-footer .wc-budget-footer-bottom,
+  .wc-search-footer .wc-budget-footer-brand{
+    display:none !important;
+  }
   
   /* STANDALONE WALTON HEADER */
   .wc-standalone-budget-nav{
@@ -2135,33 +2235,44 @@
       footerContainer.id = 'footer';
       footer.insertBefore(footerContainer, footer.firstChild);
     }
-    var hasOpenGovNav = !!document.querySelector('nav#nav-menu.nav-menu');
-    var budgetPagePrefix = /\/pages\//.test(window.location.pathname) ? "" : "pages/";
+    footer.classList.add("wc-search-footer");
     var desiredFooterHtml = `
       <div class="wc-budget-footer-inner">
-        <div class="wc-budget-footer-brand" aria-label="Walton County">
-          ${getWaltonSplitBrandHtml("../index.html", "Go to Home")}
+        <div class="wc-footer-search-copy">
+          <h2>Still looking for something?</h2>
+          <p>Search departments, budgets, personnel, funds, publications, and county information.</p>
         </div>
-        ${hasOpenGovNav ? `
-        <nav class="wc-budget-footer-links" aria-label="Budget footer links">
-          <a href="../index.html">Home</a>
-          <a href="${budgetPagePrefix}capital-projects.html">Capital Projects</a>
-          <a href="${budgetPagePrefix}search.html">Project Search</a>
-          <a href="${budgetPagePrefix}glossary-acronyms-and-frequently-asked-questions.html">Glossary & FAQ</a>
-        </nav>
-        ` : ``}
+        <button class="wc-footer-search-button" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+          </svg>
+          Search the Budget
+        </button>
       </div>
+      <nav class="wc-budget-footer-links" aria-label="Footer utility links">
+        <a href="mailto:budget@mywaltonfl.gov">Contact Budget Office</a>
+        <a href="https://www.co.walton.fl.us/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a>
+        <a href="https://www.co.walton.fl.us/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+      </nav>
     `;
     if(footerContainer.getAttribute("data-wc-rendered") !== "true" || footerContainer.innerHTML.trim() !== desiredFooterHtml.trim()){
       footerContainer.innerHTML = desiredFooterHtml;
       footerContainer.setAttribute("data-wc-rendered", "true");
     }
-    if(!footer.querySelector('.wc-budget-footer-bottom')){
-      var footerBottom = document.createElement('div');
-      footerBottom.className = 'wc-budget-footer-bottom';
-      footerBottom.textContent = 'Prepared by the Walton County Office of Management and Budget.';
-      footer.appendChild(footerBottom);
-    }
+    footer.querySelectorAll('.wc-budget-footer-bottom').forEach(function(footerBottom){
+      footerBottom.remove();
+    });
+    footer.querySelectorAll('.wc-footer-search-button').forEach(function(button){
+      if(button.getAttribute("data-wc-search-bound") === "true"){
+        return;
+      }
+      button.setAttribute("data-wc-search-bound", "true");
+      button.addEventListener("click", function(){
+        if(window.WaltonBudgetGlobalSearch && typeof window.WaltonBudgetGlobalSearch.open === "function"){
+          window.WaltonBudgetGlobalSearch.open();
+        }
+      });
+    });
   }
   function startWcBudgetNav(){
     ensureWaltonSplitLogoStyles();

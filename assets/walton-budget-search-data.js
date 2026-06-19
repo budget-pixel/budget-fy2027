@@ -6,7 +6,7 @@ window.wcProjectSearchBaseUrl = window.location.pathname.indexOf("/pages/") !== 
   ? "search.html?q="
   : "pages/search.html?q=";
 
-window.wcBudgetPages = window.wcBudgetPages || [
+var wcCoreBudgetPages = [
   { title:"GFOA Distinguished Budget Presentation Award", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd25815ed4e2fe49b4" },
   { title:"Transmittal Letter", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdc3a5aa570050fba9" },
   { title:"Budget-in-Brief", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=69e8ae83a93da8d66dc5e248" },
@@ -17,7 +17,8 @@ window.wcBudgetPages = window.wcBudgetPages || [
   { title:"Budget Overview", section:"Budget Overview", href:"budget-overview.html" },
   { title:"Constitutional Officers & Other Agencies", section:"Constitutional Officers", href:"constitutional-officers.html" },
   { title:"Departments", section:"Departments", href:"departments.html" },
-  { title:"Budget Process & Calendar", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdeb3f9f1b409e86d5" },
+  { title:"Budget Process", section:"Financial Structure, Policies, and Process", href:"budget-process-and-calendar.html" },
+  { title:"Budget Calendar", section:"Financial Structure, Policies, and Process", href:"budget-calendar.html" },
   { title:"Fund Descriptions and Structure", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd623edf6822e6e54d" },
   { title:"Department to Fund Relationship", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdcf5e99561d6ee920" },
   { title:"Financial Policies", section:"Financial Structure, Policies, and Process", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd42737a8f8389d90a" },
@@ -131,8 +132,12 @@ window.wcBudgetPages = window.wcBudgetPages || [
       "departments", "department directory", "services", "office directory", "county services", "browse departments", "department budgets", "department staffing", "performance measures"
     ],
 
-    "Budget Process & Calendar": [
-      "budget process", "calendar", "budget calendar", "timeline", "budget adoption", "hearings", "public hearing", "tentative budget", "final budget", "truth in millage", "trim", "millage dates", "budget cycle"
+    "Budget Process": [
+      "budget process", "budget development", "budget cycle", "budget preparation", "budget review", "workshops", "budget adoption", "public hearing", "tentative budget", "final budget", "omb", "department requests", "basis of budgeting", "gaap", "modified accrual", "encumbrance", "grant revenue", "budget amendment", "amendment process", "budget implementation", "budgetary control", "gfoa"
+    ],
+
+    "Budget Calendar": [
+      "calendar", "budget calendar", "timeline", "key dates", "budget dates", "hearings", "public hearing", "truth in millage", "trim", "millage dates", "budget workshops", "adoption dates", "public involvement", "public participation", "community feedback", "meeting notifications", "news flash", "gfoa"
     ],
 
     "Fund Descriptions and Structure": [
@@ -422,7 +427,8 @@ window.wcBudgetPages = window.wcBudgetPages || [
     "Budget Overview": "budget-overview.html",
     "Constitutional Officers & Other Agencies": "constitutional-officers.html",
     "Departments": "departments.html",
-    "Budget Process & Calendar": "budget-process-and-calendar.html",
+    "Budget Process": "budget-process-and-calendar.html",
+    "Budget Calendar": "budget-calendar.html",
     "Fund Descriptions and Structure": "fund-descriptions-and-structure.html",
     "Department to Fund Relationship": "department-to-fund-relationship.html",
     "Financial Policies": "financial-policies.html",
@@ -503,6 +509,19 @@ window.wcBudgetPages = window.wcBudgetPages || [
     const isPagesPath = /\/pages\//.test(window.location.pathname);
     return isPagesPath ? localHref : "pages/" + localHref;
   }
+
+  var existingPages = Array.isArray(window.wcBudgetPages) ? window.wcBudgetPages : [];
+  var mergedPagesByTitle = {};
+  existingPages.concat(wcCoreBudgetPages).forEach(function(page){
+    if(page && page.title){
+      var normalizedTitle = page.title === "Budget Process & Calendar" ? "Budget Process" : page.title;
+      var normalizedPage = Object.assign({}, page, { title:normalizedTitle });
+      mergedPagesByTitle[normalizedTitle] = Object.assign({}, mergedPagesByTitle[normalizedTitle] || {}, normalizedPage);
+    }
+  });
+  window.wcBudgetPages = Object.keys(mergedPagesByTitle).map(function(title){
+    return mergedPagesByTitle[title];
+  });
 
   window.wcBudgetPages.forEach(function(page){
     page.href = normalizeBudgetPageHref(page);

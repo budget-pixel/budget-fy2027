@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Budget Calendar — Walton County FY 2027 Budget</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wc-calendar-intro{
+    margin:34px 0;
+    padding:32px;
+    border-radius:24px;
+    background:#f5f9f7;
+    border:1px solid rgba(0,98,49,.14);
+  }
+  .wc-calendar-intro p{
+    max-width:880px;
+    margin:0;
+    color:#5d7085;
+    font-size:17px;
+    line-height:1.75;
+  }
+  .wc-calendar-intro a{
+    display:inline-flex;
+    margin-top:20px;
+    color:#006231;
+    font-size:13px;
+    font-weight:900;
+    text-decoration:none;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .wc-timeline-strip{
+    display:grid;
+    grid-template-columns:repeat(7, minmax(0, 1fr));
+    gap:10px;
+    margin:34px 0;
+  }
+  .wc-timeline-month{
+    min-height:110px;
+    padding:16px;
+    border:1px solid rgba(36,52,77,.10);
+    border-radius:18px;
+    background:#ffffff;
+  }
+  .wc-timeline-month.featured{
+    border-color:rgba(0,98,49,.18);
+    background:#f5f9f7;
+  }
+  .wc-timeline-month strong{
+    display:block;
+    margin-bottom:8px;
+    color:#006231;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.10em;
+  }
+  .wc-timeline-month span{
+    color:#172033;
+    font-size:14px;
+    font-weight:800;
+    line-height:1.35;
+  }
+  .wc-calendar-table{
+    margin-top:28px;
+    border:1px solid rgba(36,52,77,.12);
+    border-radius:22px;
+    overflow:hidden;
+    background:#ffffff;
+  }
+  .wc-calendar-row{
+    display:grid;
+    grid-template-columns:180px minmax(0, 1fr);
+    border-bottom:1px solid rgba(36,52,77,.10);
+  }
+  .wc-calendar-row:last-child{
+    border-bottom:0;
+  }
+  .wc-calendar-date{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px 18px;
+    background:#eaf4ee;
+    color:#172033;
+    font-weight:900;
+    text-align:center;
+  }
+  .wc-calendar-row.featured .wc-calendar-date{
+    background:#dfeee6;
+  }
+  .wc-calendar-event{
+    padding:16px 20px;
+    color:#5d7085;
+    font-size:15px;
+    line-height:1.65;
+  }
+  .wc-calendar-row.featured .wc-calendar-event{
+    background:#f5f9f7;
+    color:#344054;
+  }
+  .wc-calendar-note{
+    max-width:880px;
+    margin:22px auto 0;
+    color:#6b7d90;
+    font-size:13px;
+    line-height:1.55;
+    text-align:center;
+  }
+  .wc-public-involvement{
+    margin:34px 0;
+  }
+  .wc-public-involvement h2{
+    margin:0 0 18px;
+    color:#172033;
+    font-size:clamp(28px, 4vw, 42px);
+    line-height:1.1;
+  }
+  .wc-public-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:18px;
+  }
+  .wc-public-card{
+    padding:22px;
+    border:1px solid rgba(36,52,77,.12);
+    border-radius:18px;
+    background:#ffffff;
+  }
+  .wc-public-card h3{
+    margin:0 0 10px;
+    color:#172033;
+    font-size:20px;
+  }
+  .wc-public-card p{
+    margin:0;
+    color:#5d7085;
+    font-size:15px;
+    line-height:1.65;
+  }
+  .wc-public-card a{
+    display:inline-flex;
+    margin-top:14px;
+    color:#006231;
+    font-size:13px;
+    font-weight:900;
+    text-decoration:none;
+  }
+  @media(max-width:980px){
+    .wc-timeline-strip,
+    .wc-public-grid{
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media(max-width:680px){
+    .wc-calendar-intro{
+      padding:22px;
+    }
+    .wc-timeline-strip,
+    .wc-calendar-row,
+    .wc-public-grid{
+      grid-template-columns:1fr;
+    }
+    .wc-timeline-month{
+      min-height:auto;
+    }
+    .wc-calendar-date{
+      justify-content:flex-start;
+      text-align:left;
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav-menu" class="nav-menu">
+  <div class="logo-container"></div>
+</nav>
+
+<div id="layout">
+<main id="content">
+
+<div class="page-eyebrow">Financial Structure, Policies, and Process</div>
+<h1 class="page-title">Budget Calendar</h1>
+<p class="page-intro">Key FY 2027 budget development dates, public workshops, notices, hearings, and adoption milestones.</p>
+
+<section class="wc-calendar-intro" aria-label="Budget calendar summary">
+  <p>The budget calendar identifies the anticipated timeline for the annual budget process, including departmental submissions, constitutional officer budget deadlines, taxable value certifications, public workshops, TRIM notices, public hearings, and final adoption.</p>
+  <a href="https://floridarevenue.com/property/Documents/trimregwb.pdf" target="_blank" rel="noopener noreferrer">View TRIM Compliance Workbook</a>
+</section>
+
+<section class="wc-public-involvement" aria-label="Public involvement in the budget process">
+  <h2>Public Involvement</h2>
+  <div class="wc-public-grid">
+    <article class="wc-public-card">
+      <h3>Public budget workshops</h3>
+      <p>Residents can review the tentative budget, proposed service levels, funding priorities, and allocation of resources during public budget workshops.</p>
+    </article>
+    <article class="wc-public-card">
+      <h3>Community feedback</h3>
+      <p>Citizens are encouraged to ask questions, express concerns, provide recommendations, and offer feedback as the budget is refined.</p>
+    </article>
+    <article class="wc-public-card">
+      <h3>Meeting notifications</h3>
+      <p>Walton County provides meeting and public notice information so residents can follow workshops, hearings, and Board meetings.</p>
+      <a href="https://www.mywaltonfl.gov/list.aspx" target="_blank" rel="noopener noreferrer">Subscribe to News Flash</a>
+    </article>
+  </div>
+</section>
+
+<section class="wc-timeline-strip" aria-label="Budget calendar monthly milestones">
+  <div class="wc-timeline-month"><strong>March</strong><span>Budget requests distributed</span></div>
+  <div class="wc-timeline-month"><strong>April</strong><span>Department submissions due</span></div>
+  <div class="wc-timeline-month"><strong>May</strong><span>Revenue estimates prepared</span></div>
+  <div class="wc-timeline-month"><strong>June</strong><span>Taxable values and officer budgets</span></div>
+  <div class="wc-timeline-month featured"><strong>July</strong><span>Budget workshops and reduction exercise</span></div>
+  <div class="wc-timeline-month"><strong>August</strong><span>TRIM notices and hearing certification</span></div>
+  <div class="wc-timeline-month featured"><strong>September</strong><span>Public hearings and final adoption</span></div>
+</section>
+
+<section aria-label="Budget calendar detailed schedule">
+  <div class="wc-calendar-table">
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">March 12</div>
+      <div class="wc-calendar-event">The Office of Management and Budget distributes operating and capital improvement budget requests for department entry.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">April 6</div>
+      <div class="wc-calendar-event">Operating and capital improvement budget requests are due from county departments.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">May 1</div>
+      <div class="wc-calendar-event">The Office of Management and Budget prepares preliminary revenue and fund balance estimates.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">June 1</div>
+      <div class="wc-calendar-event">The Property Appraiser delivers preliminary taxable value to the Board of County Commissioners.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">June 1</div>
+      <div class="wc-calendar-event">Tentative budget submissions from Constitutional Officers are due to the Board of County Commissioners.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">June 10-11</div>
+      <div class="wc-calendar-event">The Office of Management and Budget holds staff budget workshops with Administration.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">July 1</div>
+      <div class="wc-calendar-event">The Property Appraiser sends certification of taxable values, Form DR-420.</div>
+    </div>
+    <div class="wc-calendar-row featured">
+      <div class="wc-calendar-date">July 7</div>
+      <div class="wc-calendar-event">The first public budget workshop reviews the tentative budget, funding requests, and proposed millage rate.</div>
+    </div>
+    <div class="wc-calendar-row featured">
+      <div class="wc-calendar-date">July 14, 21, 28</div>
+      <div class="wc-calendar-event">Public budget workshops continue, including Board review of the tentative budget and required budget reduction exercise.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">August 1</div>
+      <div class="wc-calendar-event">The Tax Collector budget submission is due to the Department of Revenue and Board of County Commissioners.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">August 4</div>
+      <div class="wc-calendar-event">The Office of Management and Budget certifies the completed DR-420 form, including millage rates and hearing information.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">August 24</div>
+      <div class="wc-calendar-event">The Property Appraiser mails TRIM notices to taxpayers.</div>
+    </div>
+    <div class="wc-calendar-row featured">
+      <div class="wc-calendar-date">September 14</div>
+      <div class="wc-calendar-event">The tentative budget and proposed millage rate hearing is held.</div>
+    </div>
+    <div class="wc-calendar-row">
+      <div class="wc-calendar-date">September 23</div>
+      <div class="wc-calendar-event">The Notice of Proposed Tax Increase and Budget Summary Advertisement is advertised.</div>
+    </div>
+    <div class="wc-calendar-row featured">
+      <div class="wc-calendar-date">September 28</div>
+      <div class="wc-calendar-event">The final budget hearing is held to adopt the final millage rate and final budget.</div>
+    </div>
+  </div>
+  <p class="wc-calendar-note"><strong>Budget Coordinator:</strong> Office of Management and Budget. All dates shown are estimates for planning purposes and may be adjusted as necessary during the budget development process.</p>
+</section>
+
+</main>
+</div>
+
+<script src="../assets/walton-budget-search-data.js"></script>
+<script src="../assets/budget-data.js"></script>
+<script src="../assets/walton-budget-nav.js"></script>
+<script src="../assets/walton-budget-pdf.js"></script>
+</body>
+</html>

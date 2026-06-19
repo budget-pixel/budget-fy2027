@@ -901,15 +901,82 @@
   }
 
   .wc-home-footer{
-    margin:88px 0 24px;
-    padding:28px;
-    border-radius:24px;
-    background:var(--wc-green-3);
-    color:#ffffff;
+    margin:64px 0 0;
+    padding:42px clamp(22px, 4vw, 44px) 36px;
+    border-top:1px solid rgba(36,52,77,.10);
+    background:#f6f8f5;
+    color:var(--wc-ink);
   }
-  .wc-home-footer p{
-    margin:8px 0 0;
-    color:rgba(255,255,255,.72);
+  .wc-home-footer-inner{
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) auto;
+    align-items:end;
+    gap:24px;
+  }
+  .wc-footer-search-copy{
+    max-width:680px;
+  }
+  .wc-footer-search-copy h2{
+    margin:0;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(28px, 3.2vw, 42px);
+    line-height:1.05;
+    font-weight:500;
+    letter-spacing:0;
+    color:#172033;
+  }
+  .wc-footer-search-copy p{
+    max-width:560px;
+    margin:10px 0 0;
+    color:rgba(36,52,77,.72);
+    font-size:15px;
+    line-height:1.55;
+    font-weight:500;
+  }
+  .wc-footer-search-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:42px;
+    padding:0 18px;
+    border:1px solid rgba(0,98,49,.16);
+    border-radius:999px;
+    background:var(--wc-green);
+    color:#ffffff;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.04em;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(0,98,49,.14);
+    transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+    white-space:nowrap;
+  }
+  .wc-footer-search-button:hover{
+    transform:translateY(-1px);
+    background:#004f28;
+    box-shadow:0 12px 28px rgba(0,98,49,.18);
+  }
+  .wc-footer-search-button svg{
+    width:15px;
+    height:15px;
+  }
+  .wc-footer-links{
+    display:flex;
+    gap:20px;
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid rgba(36,52,77,.10);
+  }
+  .wc-footer-links a{
+    color:rgba(36,52,77,.62);
+    font-size:11px;
+    font-weight:700;
+    text-decoration:none;
+    transition:color .2s ease;
+  }
+  .wc-footer-links a:hover{
+    color:var(--wc-green);
   }
 
   .wc-reveal{
@@ -943,11 +1010,45 @@
   @media(max-width:860px){
     .wc-home-shell{width:min(100% - 20px, 760px)}
     .wc-story-nav{
-      padding:14px 18px 0;
+      padding:12px 16px;
       flex-wrap:wrap;
+      gap:10px;
+      background:linear-gradient(180deg, rgba(0,62,40,.98), rgba(0,62,40,.92));
     }
-    .logo-container{min-width:0}
-    .wc-story-nav .wc-split-brand-text{display:none !important}
+    .logo-container{
+      min-width:0;
+      max-width:calc(100% - 54px);
+    }
+    .wc-story-nav .wc-split-brand{
+      height:44px !important;
+      gap:5px !important;
+    }
+    .wc-story-nav .wc-split-brand-top{
+      font-size:18px !important;
+      color:#ffffff !important;
+    }
+    .wc-story-nav .wc-split-brand-bottom{
+      font-size:7px !important;
+      line-height:7px !important;
+      color:rgba(255,255,255,.78) !important;
+    }
+    .wc-story-nav .wc-split-brand-seal,
+    .wc-story-nav .wc-seal-mark{
+      width:36px !important;
+      height:36px !important;
+      flex:0 0 36px !important;
+      background-size:32px 32px !important;
+    }
+    .wc-menu-toggle{
+      width:38px;
+      height:38px;
+      color:#ffffff;
+      border-color:rgba(255,255,255,.38);
+      background:rgba(255,255,255,.13);
+    }
+    .wc-menu-toggle span{
+      background:#ffffff;
+    }
     .wc-search-wrap{
       left:0;
       padding:0 20px;
@@ -1009,6 +1110,23 @@
     .wc-budget-grid,
     .wc-projects-grid{
       grid-template-columns:1fr;
+    }
+    .wc-home-footer{
+      margin-top:48px;
+      padding:38px 20px 34px;
+    }
+    .wc-home-footer-inner{
+      grid-template-columns:1fr;
+      align-items:start;
+      gap:18px;
+    }
+    .wc-footer-search-button{
+      width:100%;
+      max-width:320px;
+    }
+    .wc-footer-links{
+      flex-direction:column;
+      gap:12px;
     }
   }
 
@@ -1087,9 +1205,24 @@
 
   </main>
 
-  <footer class="wc-home-footer">
-    <strong>Walton County FY 2027 Proposed Budget</strong>
-    <p>Prepared by the Walton County Office of Management and Budget.</p>
+  <footer class="wc-home-footer" role="contentinfo">
+    <div class="wc-home-footer-inner">
+      <div class="wc-footer-search-copy">
+        <h2>Still looking for something?</h2>
+        <p>Search departments, budgets, personnel, funds, publications, and county information.</p>
+      </div>
+      <button class="wc-footer-search-button" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+        </svg>
+        Search the Budget
+      </button>
+    </div>
+    <nav class="wc-footer-links" aria-label="Footer utility links">
+      <a href="mailto:budget@mywaltonfl.gov">Contact Budget Office</a>
+      <a href="https://www.co.walton.fl.us/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a>
+      <a href="https://www.co.walton.fl.us/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+    </nav>
   </footer>
 </div>
 
@@ -1203,6 +1336,9 @@
           }
         });
       }
+      document.querySelectorAll(".wc-footer-search-button").forEach(function(button){
+        button.addEventListener("click", openSearch);
+      });
       window.addEventListener("resize", function(){
         if(nav.classList.contains("is-search-open")) syncHeaderMetrics();
       });
@@ -1212,7 +1348,7 @@
           closeSearch();
           return;
         }
-        if(!nav.contains(e.target)){
+        if(!nav.contains(e.target) && !e.target.closest(".wc-home-footer")){
           closeSearch();
         }
       });
