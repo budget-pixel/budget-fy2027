@@ -15,7 +15,7 @@
       typeof getWaltonSplitBrandHtml === "function"
     ){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
-        "home.html",
+        "../index.html",
         "Go to Home"
       );
       if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.equalizeAll === "function"){

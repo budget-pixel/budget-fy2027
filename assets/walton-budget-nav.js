@@ -1481,7 +1481,7 @@
     var logoContainer = nav.querySelector(".logo-container");
     if(logoContainer && !logoContainer.querySelector(".wc-split-brand")){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
-        "home.html",
+        "../index.html",
         "Go to Home"
       );
       if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.equalizeAll === "function"){
@@ -1653,11 +1653,11 @@
     var desiredFooterHtml = `
       <div class="wc-budget-footer-inner">
         <div class="wc-budget-footer-brand" aria-label="Walton County">
-          ${getWaltonSplitBrandHtml("", "")}
+          ${getWaltonSplitBrandHtml("../index.html", "Go to Home")}
         </div>
         ${hasOpenGovNav ? `
         <nav class="wc-budget-footer-links" aria-label="Budget footer links">
-          <a href="${budgetPagePrefix}home.html">Home</a>
+          <a href="../index.html">Home</a>
           <a href="${budgetPagePrefix}capital-improvement-plan.html">Capital Improvement Plan</a>
           <a href="${budgetPagePrefix}search.html">Project Search</a>
           <a href="${budgetPagePrefix}glossary-acronyms-and-frequently-asked-questions.html">Glossary & FAQ</a>
