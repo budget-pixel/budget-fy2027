@@ -500,9 +500,9 @@
     grid-template-columns:auto 1fr auto !important;
     align-items:center !important;
     column-gap:24px !important;
-    min-height:74px !important;
+    min-height:88px !important;
     margin-top:0 !important;
-    padding:22px clamp(28px, 6vw, 86px) !important;
+    padding:22px clamp(40px, 7vw, 104px) 14px !important;
     box-sizing:border-box !important;
     background:linear-gradient(180deg, rgba(0,62,40,.96), rgba(0,62,40,.88)) !important;
     border-top:0 !important;
@@ -573,6 +573,11 @@
   }
   nav#nav-menu .wc-split-brand{
     height:52px !important;
+  }
+  nav#nav-menu.nav-menu .logo-container{
+    min-width:284px !important;
+    height:52px !important;
+    min-height:52px !important;
   }
   nav#nav-menu .wc-split-brand-top{
     color:#ffffff !important;
@@ -1798,8 +1803,8 @@
     align-items:center !important;
     justify-content:space-between !important;
     gap:24px !important;
-    min-height:74px !important;
-    padding:22px clamp(28px, 6vw, 86px) !important;
+    min-height:88px !important;
+    padding:22px clamp(40px, 7vw, 104px) 14px !important;
     box-sizing:border-box !important;
     background:linear-gradient(180deg, rgba(0,62,40,.96), rgba(0,62,40,.88)) !important;
     border-bottom:0 !important;
