@@ -20,17 +20,26 @@
 <h1 class="page-title">Departments</h1>
 <p class="page-intro">Explore Walton County departments, budgets, staffing, performance measures, and services.</p>
 
+<section aria-label="Related directories">
+  <ul class="wc-directory-list">
+    <li><a class="wc-directory-item" href="constitutional-officers.html">
+      <div class="wc-directory-item-main">
+        <span class="wc-directory-item-title">Constitutional Officers</span>
+        <span class="wc-directory-item-desc">Independently elected officers including the Sheriff, Tax Collector, Property Appraiser, and Supervisor of Elections.</span>
+      </div>
+      <span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>
+    </a></li>
+    <li><a class="wc-directory-item" href="autonomous-entities.html">
+      <div class="wc-directory-item-main">
+        <span class="wc-directory-item-title">Autonomous Entities</span>
+        <span class="wc-directory-item-desc">Courts, the State Attorney and Public Defender, and other statutorily funded agencies.</span>
+      </div>
+      <span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>
+    </a></li>
+  </ul>
+</section>
+
 <section aria-label="Department directory">
-  <div class="wc-directory-tools">
-    <label class="wc-directory-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
-      </svg>
-      <input id="departmentSearch" type="search" placeholder="Search Departments..." autocomplete="off" aria-label="Search departments">
-    </label>
-    <div class="wc-directory-count" id="departmentResultCount">Loading departments</div>
-  </div>
-  <div class="wc-directory-empty" id="departmentEmpty">No departments match that search.</div>
   <ul class="wc-directory-list" id="departmentList"></ul>
 </section>
 
@@ -193,18 +202,8 @@
 
     function renderDepartments(){
       var list = $("#departmentList");
-      var empty = $("#departmentEmpty");
-      var input = $("#departmentSearch");
-      var count = $("#departmentResultCount");
-      var query = normalize(input && input.value);
-      var matches = departments.filter(function(dept){
-        return !query || normalize(dept.name + " " + dept.description).indexOf(query) !== -1;
-      });
 
-      count.textContent = matches.length + " of " + departments.length + " departments";
-      empty.classList.toggle("is-visible", matches.length === 0);
-
-      list.innerHTML = matches.map(function(dept){
+      list.innerHTML = departments.map(function(dept){
         return '<li><a class="wc-directory-item" href="' + escapeHtml(dept.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(dept.name) + '</span>' +
@@ -248,10 +247,7 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function(){
-      initDirectory();
-      $("#departmentSearch").addEventListener("input", renderDepartments);
-    });
+    document.addEventListener("DOMContentLoaded", initDirectory);
   })();
 </script>
 </body>

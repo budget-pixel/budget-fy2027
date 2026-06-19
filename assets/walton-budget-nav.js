@@ -1656,6 +1656,10 @@
       sectionCrumb = '<a href="our-county.html">Our County</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Departments"){
       sectionCrumb = '<a href="departments.html">Departments</a><span class="wc-breadcrumb-sep">/</span>';
+    }else if(eyebrowText === "Constitutional Officers"){
+      sectionCrumb = '<a href="constitutional-officers.html">Constitutional Officers</a><span class="wc-breadcrumb-sep">/</span>';
+    }else if(eyebrowText === "Autonomous Entities"){
+      sectionCrumb = '<a href="autonomous-entities.html">Autonomous Entities</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Introduction and Overview" || eyebrowText === "Financial Structure, Policies, and Process"){
       sectionCrumb = '<a href="budget-overview.html">Budget Overview</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Financial Summaries" || eyebrowText === "Debt and Financial Forecast" || eyebrowText === "Glossary, Statistical, and Supplemental Information"){

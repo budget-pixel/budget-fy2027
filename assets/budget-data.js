@@ -2698,78 +2698,6 @@
     });
   }
 
-  // Builds the "Budget / Personnel / Change From Prior Year / Performance
-  // Measures" card strip from data already fetched for the existing
-  // expense/staffing/performance tables. Cards are only included when the
-  // underlying number is actually computable, rather than showing a
-  // placeholder for departments where a figure doesn't apply.
-  function renderMetricsStripHtml(deptName, deptCode) {
-    const expenseRows = getDepartmentExpenses(deptName, deptCode);
-    const currentTotal = expenseRows.reduce((s, r) => s + (r.FY2027_Proposed || 0), 0);
-    const priorTotal = expenseRows.reduce((s, r) => s + (r.FY2026_Budget || 0), 0);
-
-    const staffingRows = getDepartmentStaffing(deptName, deptCode);
-    const fteTotal = staffingRows.reduce((s, r) => s + (r["2027"] || 0), 0);
-
-    const performanceRows = getDepartmentPerformanceMeasures(deptName, deptCode);
-
-    const cards = [];
-    if (currentTotal > 0) {
-      cards.push({ label: "FY 2027 Budget", value: formatCurrency(currentTotal) });
-    }
-    if (fteTotal > 0) {
-      cards.push({ label: "Personnel (FTE)", value: formatNumber(fteTotal) });
-    }
-    if (currentTotal > 0 && priorTotal > 0) {
-      const pct = ((currentTotal - priorTotal) / priorTotal) * 100;
-      const sign = pct > 0 ? "+" : "";
-      const cls = pct > 0 ? "is-positive" : (pct < 0 ? "is-negative" : "");
-      cards.push({
-        label: "Change From Prior Year",
-        value: sign + formatNumber(pct, 1) + "%",
-        cls
-      });
-    }
-    if (performanceRows.length) {
-      cards.push({ label: "Performance Measures", value: formatNumber(performanceRows.length) });
-    }
-
-    if (!cards.length) return "";
-
-    return (
-      '<div class="wc-metrics-strip">' +
-      cards
-        .map(
-          (c) =>
-            '<div class="wc-metric-card"><div class="wc-metric-label">' +
-            c.label +
-            '</div><div class="wc-metric-value' +
-            (c.cls ? " " + c.cls : "") +
-            '">' +
-            c.value +
-            "</div></div>"
-        )
-        .join("") +
-      "</div>"
-    );
-  }
-
-  function mountMetricsStrip(anchorEl, deptName, deptCode) {
-    if (!anchorEl || !anchorEl.parentNode) return;
-    const html = renderMetricsStripHtml(deptName, deptCode);
-    let strip = document.getElementById("wc-metrics-strip-auto");
-    if (!html) {
-      if (strip) strip.remove();
-      return;
-    }
-    if (!strip) {
-      strip = document.createElement("div");
-      strip.id = "wc-metrics-strip-auto";
-      anchorEl.parentNode.insertBefore(strip, anchorEl);
-    }
-    strip.innerHTML = html;
-  }
-
   function initDepartmentPage() {
     const ids = [
       "department-narrative",
@@ -2852,7 +2780,6 @@
         }
 
         renderDepartmentNarrative(narrativeEl, deptName, deptCode);
-        mountMetricsStrip(narrativeEl, deptName, deptCode);
 
         // Statutory & Other Agency Funding is scattered across many
         // unrelated Dept_Names (Economic Development Alliance, Human
@@ -3300,8 +3227,6 @@
     getDepartmentNarrative,
     renderTable,
     renderDepartmentNarrative,
-    renderMetricsStripHtml,
-    mountMetricsStrip,
     renderFinancialSummary,
     renderFilterControls,
     renderConsolidatedRevenueBudgetTable,
