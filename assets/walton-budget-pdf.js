@@ -4,6 +4,9 @@
   var BRAND_LOGO_URL = "https://stories.opengov.com/countyofwaltonfl/uploads/c432578eae78-Walton_County_Logo_no_background.png";
 
 var PRINT_CSS = `
+.wc-print-brand-pill{
+  display:none;
+}
 @media print{
   @page{
     size:letter landscape;
