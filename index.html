@@ -98,6 +98,27 @@
     background:rgba(255,255,255,.14);
     color:var(--wc-gold-2);
   }
+  .wc-search-focus{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:38px;
+    height:38px;
+    flex:0 0 auto;
+    margin-left:4px;
+    border:1px solid rgba(255,255,255,.5);
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    color:#ffffff;
+    cursor:pointer;
+  }
+  .wc-search-focus:hover{
+    background:rgba(255,255,255,.24);
+  }
+  .wc-search-focus svg{
+    width:17px;
+    height:17px;
+  }
   .wc-menu-toggle{
     display:none;
     width:42px;
@@ -620,6 +641,11 @@
       <a href="pages/departments.html">Departments</a>
       <a href="pages/capital-improvement-plan.html">Capital Projects</a>
       <a href="pages/financials.html">Financials</a>
+      <button class="wc-search-focus" type="button" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+        </svg>
+      </button>
     </div>
   </nav>
   <div class="wc-hero-inner">
@@ -725,6 +751,8 @@
 </div>
 
 <script src="assets/walton-split-logo.js"></script>
+<script src="assets/walton-budget-search-data.js"></script>
+<script src="assets/walton-budget-search.js"></script>
 <script src="assets/budget-data.js"></script>
 <script src="assets/walton-cip-projects.js"></script>
 <script>
@@ -765,9 +793,16 @@
       }
     }
 
+    function initSearch(){
+      if(typeof window.initWaltonBudgetSearch === "function"){
+        window.initWaltonBudgetSearch({ nav: $("#nav-menu") });
+      }
+    }
+
     function initMenu(){
       var nav = $("#nav-menu");
       var toggle = $(".wc-menu-toggle");
+      var searchToggle = $(".wc-search-focus");
       if(!nav || !toggle) return;
       toggle.addEventListener("click", function(){
         var open = !nav.classList.contains("is-menu-open");
@@ -780,6 +815,18 @@
           toggle.setAttribute("aria-expanded", "false");
         });
       });
+      if(searchToggle){
+        searchToggle.addEventListener("click", function(){
+          var open = !nav.classList.contains("is-search-open");
+          nav.classList.toggle("is-search-open", open);
+          if(open){
+            setTimeout(function(){
+              var input = $("#wcTocSearch");
+              if(input) input.focus();
+            }, 40);
+          }
+        });
+      }
       document.addEventListener("click", function(e){
         if(!nav.contains(e.target)){
           nav.classList.remove("is-search-open");
@@ -884,6 +931,7 @@
 
     document.addEventListener("DOMContentLoaded", function(){
       initLogo();
+      initSearch();
       initMenu();
       updateRevenueCards();
       initProjects();

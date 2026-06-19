@@ -1650,7 +1650,9 @@
     var eyebrowText = eyebrow.textContent.trim();
     var titleText = title.textContent.trim();
     var sectionCrumb = "";
-    if(titleText === "Overview of Walton County" || titleText === "Organizational Structure" || titleText === "Statistical & Supplemental Information" || titleText === "Glossary, Acronyms, and Frequently Asked Questions" || titleText === "Strategic Initiatives"){
+    if(eyebrowText === titleText){
+      sectionCrumb = "";
+    }else if(titleText === "Overview of Walton County" || titleText === "Organizational Structure" || titleText === "Statistical & Supplemental Information" || titleText === "Glossary, Acronyms, and Frequently Asked Questions" || titleText === "Strategic Initiatives"){
       sectionCrumb = '<a href="our-county.html">Our County</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Departments"){
       sectionCrumb = '<a href="departments.html">Departments</a><span class="wc-breadcrumb-sep">/</span>';

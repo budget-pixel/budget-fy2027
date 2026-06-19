@@ -115,6 +115,59 @@ body {
 .wc-metric-card .wc-metric-value.is-positive { color: var(--green); }
 .wc-metric-card .wc-metric-value.is-negative { color: #9c3b3b; }
 
+/* ── directory list (our-county / departments / budget-overview / financials) ── */
+.wc-directory-tools {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin: 0 0 16px;
+}
+.wc-directory-search { position: relative; flex: 1 1 280px; }
+.wc-directory-search svg {
+  position: absolute; left: 16px; top: 50%; width: 18px; height: 18px;
+  transform: translateY(-50%); color: var(--green); pointer-events: none;
+}
+.wc-directory-search input {
+  width: 100%; min-height: 48px; box-sizing: border-box;
+  padding: 0 16px 0 44px; border: 1px solid var(--border); border-radius: 999px;
+  background: #fff; color: var(--text); font: 700 14px Arial, Helvetica, sans-serif;
+  outline: 0;
+}
+.wc-directory-search input:focus { border-color: rgba(0,98,49,.35); }
+.wc-directory-count {
+  flex: 0 0 auto; color: var(--muted); font-size: .72rem; font-weight: 800;
+  letter-spacing: .07em; text-transform: uppercase;
+}
+.wc-directory-empty {
+  display: none; padding: 26px; border: 1px dashed rgba(90,110,127,.35);
+  border-radius: 14px; background: #fff; color: var(--muted); font-weight: 700;
+}
+.wc-directory-empty.is-visible { display: block; }
+.wc-directory-list { list-style: none; margin: 0; padding: 0; }
+.wc-directory-list li {
+  border: 1px solid var(--border); border-radius: 14px; background: #fff;
+  margin-bottom: 10px;
+}
+.wc-directory-item {
+  display: flex; align-items: center; gap: 20px; padding: 18px 22px;
+  text-decoration: none; color: inherit;
+}
+.wc-directory-item:hover { background: var(--light); }
+.wc-directory-item-main { flex: 1 1 auto; min-width: 0; }
+.wc-directory-item-title { display: block; color: var(--navy); font-size: 1rem; font-weight: 800; }
+.wc-directory-item-desc { display: block; margin-top: 4px; color: var(--muted); font-size: .85rem; line-height: 1.55; }
+.wc-directory-item-meta { display: flex; gap: 18px; flex: 0 0 auto; }
+.wc-directory-item-stat { text-align: right; min-width: 84px; }
+.wc-directory-item-stat strong { display: block; color: var(--green); font-size: .95rem; font-weight: 800; }
+.wc-directory-item-stat span {
+  display: block; margin-top: 2px; color: var(--muted); font-size: .65rem;
+  font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.wc-directory-item-arrow { flex: 0 0 auto; color: var(--green); font-size: 18px; font-weight: 700; }
+@media (max-width: 640px) {
+  .wc-directory-item { flex-wrap: wrap; }
+  .wc-directory-item-meta { width: 100%; justify-content: flex-start; }
+  .wc-directory-item-stat { text-align: left; }
+}
+
 /* ── table label (above walton-styled table) ── */
 .wc-table-wrap { margin: 28px 0; }
 .wc-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
