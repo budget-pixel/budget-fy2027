@@ -785,24 +785,36 @@
     color:var(--wc-muted);
     font-size:16px;
   }
+  .wc-investment-heading{
+    margin-top:54px;
+  }
 
   .wc-budget-grid{
     display:grid;
     grid-template-columns:repeat(5, minmax(0,1fr));
     gap:14px;
   }
+  .wc-investment-grid{
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0,1fr));
+    gap:14px;
+    margin-top:22px;
+  }
   .wc-budget-card,
+  .wc-investment-card,
   .wc-project-card{
     border:1px solid var(--wc-line);
     background:rgba(255,255,255,.86);
     box-shadow:0 14px 34px rgba(23,32,51,.08);
   }
-  .wc-budget-card{
+  .wc-budget-card,
+  .wc-investment-card{
     min-height:180px;
     padding:22px;
     border-radius:24px;
   }
-  .wc-budget-card small{
+  .wc-budget-card small,
+  .wc-investment-card small{
     display:block;
     min-height:44px;
     color:var(--wc-muted);
@@ -812,12 +824,19 @@
     line-height:1.35;
     text-transform:uppercase;
   }
-  .wc-budget-card strong{
+  .wc-budget-card strong,
+  .wc-investment-card strong{
     display:block;
     margin-top:22px;
     color:var(--wc-green);
     font-size:clamp(28px, 3vw, 42px);
     line-height:1;
+  }
+  .wc-investment-card p{
+    margin:16px 0 0;
+    color:var(--wc-muted);
+    font-size:14px;
+    line-height:1.55;
   }
   .wc-project-card:hover{
     transform:translateY(-4px);
@@ -1110,6 +1129,7 @@
     }
     .wc-section-heading p{margin-top:12px}
     .wc-budget-grid,
+    .wc-investment-grid,
     .wc-projects-grid{
       grid-template-columns:1fr;
     }
@@ -1137,7 +1157,8 @@
     .wc-hero-subtitle{font-size:22px}
     .wc-hero-copy{font-size:16px}
     .wc-button{width:100%}
-    .wc-budget-grid{grid-template-columns:1fr}
+    .wc-budget-grid,
+    .wc-investment-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -1190,6 +1211,19 @@
         <div class="wc-budget-card" data-revenue-card="surtax"><small>Local Discretionary Sales Surtax</small><strong>$40.0M</strong></div>
         <div class="wc-budget-card" data-revenue-card="halfcent"><small>Local Government Half-Cent Sales Tax</small><strong>$17.9M</strong></div>
         <div class="wc-budget-card" data-revenue-card="other"><small>All Other Revenues</small><strong>$57.9M</strong></div>
+      </div>
+      <div class="wc-section-heading wc-investment-heading">
+        <div>
+          <span>Major Expense Areas</span>
+          <h2>Where those resources are invested.</h2>
+        </div>
+      </div>
+      <div class="wc-investment-grid">
+        <div class="wc-investment-card" data-expense-card="sheriff"><small>Sheriff Fund</small><strong>...</strong><p>Public safety operations and law enforcement services.</p></div>
+        <div class="wc-investment-card" data-expense-card="tourism"><small>Tourist Development Fund</small><strong>...</strong><p>Tourism operations, beach services, destination support, and visitor impacts.</p></div>
+        <div class="wc-investment-card" data-expense-card="transportation"><small>Transportation Fund</small><strong>...</strong><p>Road maintenance, construction, and transportation priorities.</p></div>
+        <div class="wc-investment-card" data-expense-card="capital"><small>Capital Projects Fund</small><strong>...</strong><p>Roads, facilities, public infrastructure, and major improvements.</p></div>
+        <div class="wc-investment-card" data-expense-card="general"><small>General Fund</small><strong>...</strong><p>Funding for constitutional offices, county departments, and programs not covered in a special revenue fund.</p></div>
       </div>
     </section>
 
@@ -1398,6 +1432,42 @@
       }).catch(function(){});
     }
 
+    function updateExpenseCards(){
+      if(!window.WCBudgetData || typeof window.WCBudgetData.loadBudgetData !== "function") return;
+      window.WCBudgetData.loadBudgetData().then(function(data){
+        var rows = Array.isArray(data.expenditures) ? data.expenditures.filter(function(row){
+          return String(row.Dept_Code || "").trim().slice(0, 3) !== "503";
+        }) : [];
+        if(!rows.length) return;
+
+        function fundCode(row){
+          return String(row.Dept_Code || "").trim().slice(0, 3);
+        }
+
+        function sumWhere(predicate){
+          return rows.reduce(function(total, row){
+            return predicate(row) ? total + parseMoney(row.FY2027_Proposed) : total;
+          }, 0);
+        }
+
+        var values = {
+          sheriff: sumWhere(function(row){ return fundCode(row) === "107"; }),
+          capital: sumWhere(function(row){ return fundCode(row) === "300"; }),
+          transportation: sumWhere(function(row){ return fundCode(row) === "101"; }),
+          tourism: sumWhere(function(row){ return fundCode(row) === "111"; }),
+          general: sumWhere(function(row){
+            return fundCode(row) === "001" && String(row.Object_Code || "").trim() !== "591000";
+          })
+        };
+
+        Object.keys(values).forEach(function(key){
+          if(values[key] <= 0) return;
+          var card = $('[data-expense-card="' + key + '"] strong');
+          if(card) card.textContent = formatCurrencyShort(values[key]);
+        });
+      }).catch(function(){});
+    }
+
     function projectNarrative(project){
       var text = project.description || project.pertinent_information || project.funding_source || "";
       text = String(text).replace(/\s+/g, " ").trim();
@@ -1461,6 +1531,7 @@
       initSearch();
       initMenu();
       updateRevenueCards();
+      updateExpenseCards();
       initProjects();
       initReveal();
     });

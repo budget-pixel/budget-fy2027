@@ -48,6 +48,74 @@ function getSearchableProjects(){
   return projects.filter(project => !project.is_legacy_in_house_engineering_row);
 }
 
+function formatMoneyShort(value){
+  const amount = Number(value) || 0;
+  const abs = Math.abs(amount);
+
+  if(abs >= 1000000){
+    return "$" + (amount / 1000000).toLocaleString("en-US", {
+      maximumFractionDigits: 1,
+      minimumFractionDigits: abs < 10000000 ? 1 : 0
+    }) + "M";
+  }
+
+  return "$" + Math.round(amount).toLocaleString("en-US");
+}
+
+function projectBudgetValue(project){
+  return Number(project && project.budget_value ? project.budget_value : 0) || 0;
+}
+
+function getCipOverviewStats(projects){
+  const currentProjects = (projects || []).filter(project => projectBudgetValue(project) > 0);
+  const totalBudget = currentProjects.reduce((sum, project) => sum + projectBudgetValue(project), 0);
+  function fundTotal(matches){
+    return currentProjects.reduce((sum, project) => {
+      const funding = String(project.funding || "").toLowerCase();
+      return matches.some(match => funding.includes(match)) ? sum + projectBudgetValue(project) : sum;
+    }, 0);
+  }
+
+  const fundCards = [
+    {
+      label: "Capital Projects Fund",
+      value: fundTotal(["capital projects fund", "capital project"]),
+      text: "County facilities, public infrastructure, and major improvements.",
+      href: "cip-capital-projects.html"
+    },
+    {
+      label: "Grant Funded",
+      value: fundTotal(["grant"]),
+      text: "Projects supported by federal, state, or regional grant funding.",
+      href: "cip-grants.html"
+    },
+    {
+      label: "Sheriff Fund",
+      value: fundTotal(["sheriff", "fine", "forfeiture"]),
+      text: "Public safety facilities, equipment, and law enforcement capital needs.",
+      href: "cip-sheriff.html"
+    },
+    {
+      label: "Tourist Development Fund",
+      value: fundTotal(["tourist", "tourism"]),
+      text: "Beach operations, visitor infrastructure, and destination improvements.",
+      href: "cip-tourist-development.html"
+    },
+    {
+      label: "Transportation Fund",
+      value: fundTotal(["transportation"]),
+      text: "Road, bridge, drainage, and mobility infrastructure.",
+      href: "cip-transportation.html"
+    }
+  ];
+
+  return {
+    totalBudget,
+    projectCount: currentProjects.length,
+    fundCards
+  };
+}
+
 function getFilterOptions(projects, key, preferredOrder){
   const seen = {};
   const options = [];
@@ -232,6 +300,7 @@ function renderProjects(){
   }
 
   const allProjects = getSearchableProjects();
+  const overviewStats = getCipOverviewStats(allProjects);
   const filtered = getFilteredProjects();
   const visibleProjects = filtered.slice(0, visibleLimit);
   const departmentOptions = getFilterOptions(allProjects, "dept", [
@@ -269,7 +338,8 @@ function renderProjects(){
       }
 
       body.wc-cip-overview-page #content{
-        padding-bottom:28px;
+        max-width:1240px;
+        padding:44px 32px 70px;
       }
 
       body.wc-cip-overview-page .page-nav{
@@ -496,8 +566,13 @@ function renderProjects(){
       }
 
       .wc-cip-page-header{
-        margin:0 0 8px;
+        margin:0 0 28px;
         font-family:Arial, Helvetica, sans-serif;
+      }
+
+      .wc-cip-page-header .page-intro{
+        max-width:820px;
+        text-align:left;
       }
 
       .wc-budget-strip-section{
@@ -694,6 +769,455 @@ function renderProjects(){
 
       .wc-cip-list strong{
         color:#172033;
+      }
+
+      .wc-cip-story-hero{
+        position:relative;
+        min-height:520px;
+        margin:0 0 24px;
+        overflow:hidden;
+        border-radius:30px;
+        background:#10251d;
+      }
+
+      .wc-cip-story-hero img{
+        width:100%;
+        height:100%;
+        min-height:520px;
+        object-fit:cover;
+        filter:saturate(.94) contrast(1.03);
+      }
+
+      .wc-cip-story-hero::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:linear-gradient(90deg, rgba(0,31,20,.86) 0%, rgba(0,31,20,.54) 44%, rgba(0,31,20,.1) 100%);
+      }
+
+      .wc-cip-story-panel{
+        position:absolute;
+        left:clamp(24px, 5vw, 58px);
+        bottom:clamp(24px, 5vw, 54px);
+        z-index:1;
+        width:min(640px, calc(100% - 48px));
+        padding:30px;
+        border:1px solid rgba(255,255,255,.24);
+        border-radius:26px;
+        background:rgba(255,255,255,.14);
+        color:#ffffff;
+        backdrop-filter:blur(14px);
+      }
+
+      .wc-cip-kicker{
+        display:block;
+        margin:0 0 10px;
+        color:#003f28;
+        font-size:12px;
+        font-weight:900;
+        letter-spacing:.16em;
+        text-transform:uppercase;
+      }
+
+      .wc-cip-story-panel .wc-cip-kicker{
+        color:#f1dc94;
+      }
+
+      .wc-cip-story-panel h1{
+        margin:0 0 16px;
+        color:#ffffff;
+        font-family:Georgia, "Times New Roman", serif;
+        font-size:clamp(42px, 6vw, 76px);
+        line-height:.96;
+        font-weight:500;
+        letter-spacing:0;
+      }
+
+      .wc-cip-story-panel p{
+        max-width:560px;
+        margin:0;
+        color:rgba(255,255,255,.88);
+        font-size:17px;
+        line-height:1.65;
+      }
+
+      .wc-cip-overview-metrics{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:1px;
+        margin:0 0 72px;
+        overflow:hidden;
+        border:1px solid rgba(0,63,40,.12);
+        border-radius:24px;
+        background:rgba(0,63,40,.12);
+      }
+
+      .wc-cip-overview-metrics-two{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+      }
+
+      .wc-cip-overview-metric{
+        padding:24px;
+        background:#f7fbf7;
+      }
+
+      .wc-cip-overview-metric strong{
+        display:block;
+        color:#003f28;
+        font-size:clamp(30px, 4vw, 46px);
+        line-height:1;
+      }
+
+      .wc-cip-overview-metric span{
+        display:block;
+        margin-top:10px;
+        color:#607184;
+        font-size:12px;
+        font-weight:900;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+      }
+
+      .wc-cip-story-section{
+        margin:0 0 76px;
+      }
+
+      .wc-cip-story-header{
+        max-width:820px;
+        margin:0 0 28px;
+      }
+
+      .wc-cip-story-header h2,
+      .wc-cip-story-copy h2{
+        margin:0 0 14px;
+        color:#172033;
+        font-family:Georgia, "Times New Roman", serif;
+        font-size:clamp(34px, 4vw, 58px);
+        line-height:1.05;
+        font-weight:500;
+      }
+
+      .wc-cip-story-header p,
+      .wc-cip-story-copy p{
+        margin:0 0 14px;
+        color:#607184;
+        font-size:16px;
+        line-height:1.75;
+      }
+
+      .wc-cip-gfoa-section{
+        display:grid;
+        grid-template-columns:minmax(280px,.42fr) minmax(0,.58fr);
+        gap:30px;
+        align-items:start;
+      }
+
+      .wc-cip-gfoa-media{
+        display:grid;
+        gap:14px;
+      }
+
+      .wc-cip-gfoa-copy{
+        padding-top:4px;
+      }
+
+      .wc-cip-gfoa-copy h3{
+        margin:0 0 16px;
+        color:#172033;
+        font-family:Georgia, "Times New Roman", serif;
+        font-size:clamp(28px, 3vw, 42px);
+        line-height:1.08;
+        font-weight:500;
+      }
+
+      .wc-cip-gfoa-copy > p{
+        max-width:720px;
+        margin:0 0 26px;
+        color:#607184;
+        font-size:16px;
+        line-height:1.75;
+      }
+
+      .wc-cip-element-grid{
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:14px;
+        margin:0 0 30px;
+      }
+
+      .wc-cip-element-card{
+        min-height:178px;
+        padding:20px;
+        border:1px solid rgba(0,63,40,.12);
+        border-radius:18px;
+        background:#f7fbf7;
+      }
+
+      .wc-cip-element-card strong{
+        display:block;
+        margin:0 0 10px;
+        color:#003f28;
+        font-size:18px;
+        line-height:1.2;
+      }
+
+      .wc-cip-element-card p{
+        margin:0;
+        color:#526577;
+        font-size:14px;
+        line-height:1.65;
+      }
+
+      .wc-cip-gfoa-video{
+        position:relative;
+        min-height:190px;
+        overflow:hidden;
+        border:1px solid rgba(0,63,40,.12);
+        border-radius:18px;
+        background:#07140f;
+      }
+
+      .wc-cip-gfoa-video iframe{
+        display:block;
+        width:100%;
+        height:220px;
+        border:0;
+      }
+
+      .wc-cip-finance-list{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:14px;
+        margin:0;
+        padding:0;
+        list-style:none;
+      }
+
+      .wc-cip-finance-list li{
+        padding:18px;
+        border:1px solid rgba(0,63,40,.12);
+        border-radius:18px;
+        background:#ffffff;
+        color:#526577;
+        font-size:14px;
+        line-height:1.6;
+      }
+
+      .wc-cip-finance-list strong{
+        display:block;
+        margin-bottom:4px;
+        color:#003f28;
+        font-size:13px;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+      }
+
+      .wc-cip-fund-grid{
+        display:grid;
+        grid-template-columns:repeat(5, minmax(0,1fr));
+        gap:14px;
+      }
+
+      .wc-cip-fund-card,
+      .wc-cip-process-card,
+      .wc-cip-link-card{
+        border:1px solid rgba(23,32,51,.11);
+        border-radius:24px;
+        background:rgba(255,255,255,.9);
+        box-shadow:0 14px 34px rgba(23,32,51,.08);
+      }
+
+      .wc-cip-fund-card{
+        display:flex;
+        flex-direction:column;
+        min-height:230px;
+        padding:22px;
+        color:inherit;
+        text-decoration:none;
+      }
+
+      .wc-cip-fund-card small{
+        display:block;
+        min-height:46px;
+        color:#607184;
+        font-size:12px;
+        font-weight:900;
+        letter-spacing:.08em;
+        line-height:1.35;
+        text-transform:uppercase;
+      }
+
+      .wc-cip-fund-card strong{
+        display:block;
+        margin-top:18px;
+        color:#003f28;
+        font-size:clamp(28px, 3vw, 42px);
+        line-height:1;
+      }
+
+      .wc-cip-fund-card p{
+        margin:16px 0 0;
+        color:#607184;
+        font-size:14px;
+        line-height:1.55;
+      }
+
+      .wc-cip-fund-card span{
+        margin-top:auto;
+        padding-top:18px;
+        color:#003f28;
+        font-size:13px;
+        font-weight:900;
+      }
+
+      .wc-cip-story-grid{
+        display:grid;
+        grid-template-columns:minmax(0, .95fr) minmax(0, 1.05fr);
+        gap:28px;
+        align-items:start;
+      }
+
+      .wc-cip-story-image{
+        overflow:hidden;
+        border-radius:26px;
+      }
+
+      .wc-cip-story-image img{
+        width:100%;
+        min-height:420px;
+        object-fit:cover;
+      }
+
+      .wc-cip-process-grid{
+        display:grid;
+        grid-template-columns:repeat(4, minmax(0,1fr));
+        gap:14px;
+        margin-top:24px;
+      }
+
+      .wc-cip-process-card{
+        padding:22px;
+      }
+
+      .wc-cip-process-card strong{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:34px;
+        height:34px;
+        margin-bottom:18px;
+        border-radius:999px;
+        background:#003f28;
+        color:#ffffff;
+        font-size:14px;
+      }
+
+      .wc-cip-process-card h3{
+        margin:0 0 10px;
+        color:#172033;
+        font-size:18px;
+        line-height:1.2;
+      }
+
+      .wc-cip-process-card p{
+        margin:0;
+        color:#607184;
+        font-size:14px;
+        line-height:1.6;
+      }
+
+      .wc-cip-link-grid{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:14px;
+      }
+
+      .wc-cip-link-card{
+        display:flex;
+        flex-direction:column;
+        min-height:170px;
+        padding:24px;
+        color:inherit;
+        text-decoration:none;
+      }
+
+      .wc-cip-link-card h3{
+        margin:0 0 10px;
+        color:#172033;
+        font-size:20px;
+      }
+
+      .wc-cip-link-card p{
+        margin:0;
+        color:#607184;
+        font-size:14px;
+        line-height:1.6;
+      }
+
+      .wc-cip-link-card span{
+        margin-top:auto;
+        padding-top:18px;
+        color:#003f28;
+        font-size:13px;
+        font-weight:900;
+      }
+
+      @media(max-width:1050px){
+        .wc-cip-overview-metrics,
+        .wc-cip-fund-grid,
+        .wc-cip-process-grid,
+        .wc-cip-link-grid{
+          grid-template-columns:repeat(2, minmax(0,1fr));
+        }
+
+        .wc-cip-gfoa-section{
+          grid-template-columns:1fr;
+        }
+
+        .wc-cip-gfoa-media{
+          grid-template-columns:repeat(2, minmax(0,1fr));
+        }
+
+        .wc-cip-story-grid{
+          grid-template-columns:1fr;
+        }
+      }
+
+      @media(max-width:680px){
+        .wc-cip-story-hero,
+        .wc-cip-story-hero img{
+          min-height:540px;
+        }
+
+        .wc-cip-story-panel{
+          left:16px;
+          bottom:16px;
+          width:calc(100% - 32px);
+          padding:22px;
+          border-radius:22px;
+        }
+
+        .wc-cip-overview-metrics,
+        .wc-cip-fund-grid,
+        .wc-cip-process-grid,
+        .wc-cip-link-grid,
+        .wc-cip-element-grid,
+        .wc-cip-finance-list,
+        .wc-cip-gfoa-media{
+          grid-template-columns:1fr;
+        }
+
+        .wc-cip-story-section{
+          margin-bottom:54px;
+        }
+
+        .wc-cip-story-image img{
+          min-height:280px;
+        }
+
+        .wc-cip-gfoa-video iframe{
+          height:210px;
+        }
       }
 
       .wc-project-index-section{
@@ -1504,122 +2028,163 @@ function renderProjects(){
     <div class="wc-cip-page-header">
       <div class="page-eyebrow">Capital Projects</div>
       <h1 class="page-title">Capital Improvement Plan</h1>
-      <p class="page-intro">This online document provides an overview of Walton County&rsquo;s Capital Improvement Plan (CIP) for a five-year period beginning October 1, 2027, and ending September 30, 2031. The CIP serves as the County&rsquo;s long-range financial planning document for proposed capital projects, outlining anticipated project costs, funding strategies, and implementation timelines over the next five fiscal years. The plan is designed to support strategic, efficient, and sustainable infrastructure development throughout Walton County.</p>
-      <p class="page-intro">Capital improvement projects are essential to maintaining and enhancing the quality of life for residents and visitors. Walton County&rsquo;s CIP aligns projected revenues with identified capital priorities and anticipated expenditures necessary to maintain, improve, and expand public infrastructure and facilities. The CIP is updated annually and presented to the Board of County Commissioners for review and approval in order to reflect changing community needs, service demands, economic conditions, and funding availability. As priorities evolve, projects may be accelerated, delayed, modified, or removed based on operational needs, emergencies, available resources, or policy direction from the County Commission. Inclusion in the CIP does not guarantee future funding authorization.</p>
-      <p class="page-intro">Capital projects generally progress through multiple phases, including land acquisition, planning, design, permitting, engineering, procurement, and construction. While some smaller-scale projects may be completed within one to two years, larger and more complex projects often extend across multiple fiscal years and may experience delays associated with permitting requirements, legal considerations, market conditions, or construction timelines. The CIP provides a framework for allocating funding annually throughout each project phase while identifying long-term financial obligations associated with future implementation.</p>
-      <p class="page-intro">Although only projects appropriated within the current fiscal year are formally adopted as part of the annual budget, the five-year CIP remains a critical planning tool for establishing long-term funding priorities and coordinating infrastructure investments across County departments and agencies. Through comprehensive capital planning, Walton County seeks to ensure that infrastructure development remains aligned with community priorities, operational needs, growth trends, and the County&rsquo;s long-term financial sustainability.</p>
+      <p class="page-intro">Walton County&rsquo;s Capital Improvement Plan connects long-range infrastructure needs with the funding, timing, and project delivery decisions required to support a growing county.</p>
     </div>
     ` : ""}
 
     <section class="wc-cip-main-section">
       <div class="wc-cip-main-inner">
         ${!isStandaloneSearchPage ? `
-        <section class="wc-budget-strip-section" id="wc-cip-at-glance">
-          <div class="wc-intro-inner">
-          <h2>Fiscal Year 2027 CIP at a Glance</h2>
-          <div class="wc-metrics-strip">
-            <div class="wc-metric-card">
-              <div class="wc-metric-label">Transportation Fund CIP</div>
-              <div class="wc-metric-value">$5.2M</div>
-            </div>
-
-            <div class="wc-metric-card">
-              <div class="wc-metric-label">Capital Fund CIP</div>
-              <div class="wc-metric-value">$17.9M</div>
-            </div>
-
-            <div class="wc-metric-card">
-              <div class="wc-metric-label">Sheriff&rsquo;s Office CIP</div>
-              <div class="wc-metric-value">$10M</div>
-            </div>
-
-            <div class="wc-metric-card">
-              <div class="wc-metric-label">Tourist Development Fund CIP</div>
-              <div class="wc-metric-value">$9.8M</div>
-            </div>
-
-            <div class="wc-metric-card">
-              <div class="wc-metric-label">Grant Funded CIP</div>
-              <div class="wc-metric-value">$14.2M</div>
-            </div>
-          </div>
+        <section class="wc-cip-story-hero" id="wc-cip-overview" aria-label="Capital Improvement Plan overview">
+          <img src="https://stories.opengov.com/countyofwaltonfl/uploads/a2f6c84a8bdd-254725dbdfca-d2d5e281eaa6-bridge_construction.JPG?v=2026-04-25T00:49:59.957Z" alt="Bridge construction project in Walton County">
+          <div class="wc-cip-story-panel">
+            <span class="wc-cip-kicker">FY 2027 Capital Improvement Plan</span>
+            <h1>Investing in the infrastructure behind everyday life.</h1>
+            <p>The CIP identifies major projects that maintain, improve, and expand public infrastructure across roads, public safety, tourism, facilities, drainage, parks, and other county assets.</p>
           </div>
         </section>
 
-        <section class="wc-cip-feature-section">
-          <div class="wc-cip-feature-grid">
-            <article class="wc-cip-feature-card">
-              <div class="wc-cip-feature-image">
-                <img src="https://stories.opengov.com/countyofwaltonfl/uploads/0bb46b56839a-3dcc0cc1c7ae-930602781477-20240621_154908.jpg?v=2026-04-25T00:49:46.254Z" alt="Definition of CIP Projects">
-              </div>
+        <section class="wc-cip-overview-metrics wc-cip-overview-metrics-two" id="wc-cip-at-glance" aria-label="CIP at a glance">
+          <div class="wc-cip-overview-metric">
+            <strong>${escapeHtml(formatMoneyShort(overviewStats.totalBudget))}</strong>
+            <span>Planned Project Budget</span>
+          </div>
+          <div class="wc-cip-overview-metric">
+            <strong>${escapeHtml(overviewStats.projectCount)}</strong>
+            <span>Projects in the Plan</span>
+          </div>
+        </section>
 
-              <div class="wc-cip-feature-content">
-                <span>Capital Project Criteria</span>
-                <h2>Definition of CIP Projects</h2>
-                <p>
-                  Walton County defines a CIP project as a significant, non-recurring capital expenditure for the construction, expansion, purchase, or major repair or replacement of buildings, utility systems, streets, or other physical structures or properties. Typically, a CIP project has an expected useful life of more than one year and an estimated total expenditure exceeding $50,000.
-                </p>
+        <section class="wc-cip-story-section">
+          <div class="wc-cip-story-header">
+            <span class="wc-cip-kicker">Capital Funding</span>
+            <h2>Capital investments by funding source.</h2>
+            <p>Capital projects are organized by fund so residents can see how restricted revenues, grants, and county resources are directed toward long-term improvements.</p>
+          </div>
+          <div class="wc-cip-fund-grid">
+            ${overviewStats.fundCards.map(card => `
+              <a class="wc-cip-fund-card" href="${escapeHtml(card.href)}">
+                <small>${escapeHtml(card.label)}</small>
+                <strong>${escapeHtml(formatMoneyShort(card.value))}</strong>
+                <p>${escapeHtml(card.text)}</p>
+                <span>View Schedule</span>
+              </a>
+            `).join("")}
+          </div>
+        </section>
+
+        <section class="wc-cip-story-section">
+          <div class="wc-cip-story-grid">
+            <div class="wc-cip-story-image">
+              <img src="https://stories.opengov.com/countyofwaltonfl/uploads/0bb46b56839a-3dcc0cc1c7ae-930602781477-20240621_154908.jpg?v=2026-04-25T00:49:46.254Z" alt="Walton County capital project site">
+            </div>
+            <div class="wc-cip-story-copy">
+              <span class="wc-cip-kicker">What Counts as Capital</span>
+              <h2>Projects with long-term public value.</h2>
+              <p>Walton County defines a CIP project as a significant, non-recurring capital expenditure for the construction, expansion, purchase, major repair, or replacement of buildings, utility systems, streets, infrastructure, or public property.</p>
+              <p>Projects generally move through land acquisition, planning, design, permitting, engineering, procurement, construction, inspection, and closeout. Larger efforts often span multiple fiscal years as funding, permitting, and construction schedules evolve.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="wc-cip-story-section" aria-label="Capital project elements and financing">
+          <div class="wc-cip-story-header">
+            <span class="wc-cip-kicker">Capital Plan Elements</span>
+            <h2>What goes into a capital project.</h2>
+            <p>Capital Improvement Plan projects are composed of multiple project elements that collectively support planning, development, construction, and long-term delivery of public infrastructure and facilities throughout Walton County.</p>
+          </div>
+          <div class="wc-cip-gfoa-section">
+            <div class="wc-cip-gfoa-media">
+              <div class="wc-cip-gfoa-video">
+                <iframe src="https://www.youtube-nocookie.com/embed/2ha4PCBgw2Y?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Capital Improvement Plan Elements" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
               </div>
+              <div class="wc-cip-gfoa-video">
+                <iframe src="https://www.youtube.com/embed/UI4QSqOn7o0?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Sources of Financing" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+              </div>
+            </div>
+
+            <div class="wc-cip-gfoa-copy">
+              <span class="wc-cip-kicker">Elements of a Capital Improvement Plan</span>
+              <h3>Project elements and funding sources.</h3>
+              <p>Capital projects combine physical improvements, professional services, inspections, and financing decisions so each project can move from need identification to long-term public use.</p>
+              <div class="wc-cip-element-grid">
+                <article class="wc-cip-element-card">
+                  <strong>Land</strong>
+                  <p>Purchase of necessary property for capital projects, including building acquisitions, rights-of-way, easements, and property needed to support future infrastructure expansion and public facilities.</p>
+                </article>
+                <article class="wc-cip-element-card">
+                  <strong>Construction / Improvements</strong>
+                  <p>Expansions, renovations, major replacements, and mechanical or electrical system installations, including site preparation and infrastructure such as sidewalks, streets, parking areas, drainage systems, and utility connections.</p>
+                </article>
+                <article class="wc-cip-element-card">
+                  <strong>Design / Professional Services</strong>
+                  <p>Development of plans, specifications, programming, surveying, engineering services, development costs, permitting support, and environmental impact studies necessary for approved capital projects.</p>
+                </article>
+                <article class="wc-cip-element-card">
+                  <strong>Construction Engineering and Inspection</strong>
+                  <p>CEI activities and resources include reviewing, monitoring, and inspecting construction projects through plan reviews, material testing, supervision, quality assurance, and compliance oversight.</p>
+                </article>
+              </div>
+              <span class="wc-cip-kicker">Sources of Financing</span>
+              <ul class="wc-cip-finance-list">
+                <li><strong>Current Revenues</strong>The County primarily funds capital projects on a cash basis using available revenue streams, including resources that may be legally restricted for specific purposes.</li>
+                <li><strong>Grants</strong>Capital grants from federal, state, and regional agencies may support eligible projects and can include local match, compliance, and reporting requirements.</li>
+                <li><strong>Debt</strong>When appropriate, the County may issue debt to finance major capital projects using fixed or variable, long-term or short-term structures designed to manage cost and risk.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="wc-cip-story-section">
+          <div class="wc-cip-story-header">
+            <span class="wc-cip-kicker">Planning Process</span>
+            <h2>How projects move into the capital plan.</h2>
+          </div>
+          <div class="wc-cip-process-grid">
+            <article class="wc-cip-process-card">
+              <strong>1</strong>
+              <h3>Identify Need</h3>
+              <p>Departments identify infrastructure, facility, equipment, mobility, and public service needs.</p>
             </article>
-
-            <article class="wc-cip-feature-card">
-              <div class="wc-cip-feature-image">
-                <img src="https://stories.opengov.com/countyofwaltonfl/uploads/a2f6c84a8bdd-254725dbdfca-d2d5e281eaa6-bridge_construction.JPG?v=2026-04-25T00:49:59.957Z" alt="CIP Budget Process">
-              </div>
-
-              <div class="wc-cip-feature-content">
-                <span>Planning and Funding</span>
-                <h2>CIP Budget Process</h2>
-                <p>
-                  County departments submit their CIP proposals annually to the Office of Management and Budget (OMB). OMB evaluates these requests against available funding and provides recommendations to the Commission and County administrators. This process culminates in the development of the five-year Capital Improvement Plan, which is included in the County&rsquo;s annual budget as approved by the Board of County Commissioners.
-                </p>
-              </div>
+            <article class="wc-cip-process-card">
+              <strong>2</strong>
+              <h3>Evaluate Funding</h3>
+              <p>OMB reviews available revenues, restrictions, grants, timing, and long-term financial impact.</p>
+            </article>
+            <article class="wc-cip-process-card">
+              <strong>3</strong>
+              <h3>Prioritize Projects</h3>
+              <p>Projects are reviewed against community needs, operational priorities, readiness, and policy direction.</p>
+            </article>
+            <article class="wc-cip-process-card">
+              <strong>4</strong>
+              <h3>Adopt Budget</h3>
+              <p>Appropriated projects become part of the annual budget, while the five-year CIP remains a planning guide.</p>
             </article>
           </div>
         </section>
 
-        <section class="wc-cip-info-section">
-          <div class="wc-cip-info-grid">
-            <article class="wc-cip-panel">
-              <div class="wc-cip-video">
-                <iframe src="https://www.youtube-nocookie.com/embed/2ha4PCBgw2Y?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=2ha4PCBgw2Y" title="Capital Improvement Plan Elements" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-              </div>
-
-              <div class="wc-cip-content">
-                <span class="wc-cip-label">Project Components</span>
-                <h2>Elements of a Capital Improvement Plan</h2>
-                <p>
-                  Capital Improvement Plan projects are composed of multiple project elements that collectively support the planning, development, construction, and long-term delivery of public infrastructure and facilities throughout Walton County.
-                </p>
-
-                <ul class="wc-cip-list">
-                  <li><strong>Land:</strong> Purchase of necessary property for capital projects, including building acquisitions, rights-of-way, easements, and property needed to support future infrastructure expansion and public facilities.</li>
-                  <li><strong>Construction / Improvements:</strong> Expansions, renovations, major replacements, and mechanical or electrical system installations. This also includes site preparation and the construction of infrastructure such as sidewalks, streets, parking areas, drainage systems, and utility connections.</li>
-                  <li><strong>Design / Professional Services:</strong> Development of plans, specifications, programming, surveying, engineering services, development costs, permitting support, and environmental impact studies necessary for approved capital projects.</li>
-                  <li><strong>Construction Engineering and Inspection (CEI):</strong> Activities and resources associated with reviewing, monitoring, and inspecting construction projects, including plan reviews, material testing, supervision, quality assurance, and compliance oversight.</li>
-                </ul>
-              </div>
-            </article>
-
-            <article class="wc-cip-panel">
-              <div class="wc-cip-video">
-                <iframe src="https://www.youtube.com/embed/UI4QSqOn7o0?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=UI4QSqOn7o0" title="Sources of Financing" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-              </div>
-
-              <div class="wc-cip-content">
-                <span class="wc-cip-label">Funding Strategy</span>
-                <h2>Sources of Financing</h2>
-                <p>
-                  Walton County utilizes a variety of funding mechanisms to support capital improvement projects and long-term infrastructure investment. Funding sources are evaluated annually to ensure projects remain financially sustainable while maintaining operational flexibility and long-range planning objectives.
-                </p>
-
-                <ul class="wc-cip-list">
-                  <li><strong>Current Revenues (Cash Basis):</strong> The County primarily funds its capital improvement program on a cash basis using a variety of revenue streams, some of which are legally restricted for specific purposes or infrastructure categories.</li>
-                  <li><strong>Grants:</strong> Walton County receives capital grants from federal, state, and regional agencies. These grants are typically awarded for specific project purposes and may require local matching funds or compliance with program requirements.</li>
-                  <li><strong>Debt:</strong> The County may issue debt to finance major capital projects, utilizing a strategic mix of fixed-rate and variable-rate obligations as well as long-term and short-term financing structures to minimize costs and manage financial risk.</li>
-                </ul>
-              </div>
-            </article>
+        <section class="wc-cip-story-section">
+          <div class="wc-cip-story-header">
+            <span class="wc-cip-kicker">Explore Capital</span>
+            <h2>Move from overview to project detail.</h2>
+          </div>
+          <div class="wc-cip-link-grid">
+            <a class="wc-cip-link-card" href="capital-projects.html">
+              <h3>Capital Directory</h3>
+              <p>Browse the overview, fund schedules, and project search from one capital landing page.</p>
+              <span>Open Directory</span>
+            </a>
+            <a class="wc-cip-link-card" href="search.html">
+              <h3>Project Search</h3>
+              <p>Search and filter projects by department, fund, year, district, and project status.</p>
+              <span>Search Projects</span>
+            </a>
+            <a class="wc-cip-link-card" href="cip-capital-projects.html">
+              <h3>Fund Schedules</h3>
+              <p>Review capital schedules by fund, including transportation, tourism, sheriff, grants, and capital projects.</p>
+              <span>View Schedules</span>
+            </a>
           </div>
         </section>
         ` : ""}
