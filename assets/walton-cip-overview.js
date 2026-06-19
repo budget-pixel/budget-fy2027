@@ -496,10 +496,7 @@ function renderProjects(){
       }
 
       .wc-cip-page-header{
-        max-width:980px;
-        margin:0 auto;
-        padding:32px 18px 8px;
-        box-sizing:border-box;
+        margin:0 0 8px;
         font-family:Arial, Helvetica, sans-serif;
       }
 
@@ -1503,40 +1500,20 @@ function renderProjects(){
 
     </style>
 
+    ${!isStandaloneSearchPage ? `
+    <div class="wc-cip-page-header">
+      <div class="page-eyebrow">Capital Projects</div>
+      <h1 class="page-title">Capital Improvement Plan</h1>
+      <p class="page-intro">This online document provides an overview of Walton County&rsquo;s Capital Improvement Plan (CIP) for a five-year period beginning October 1, 2027, and ending September 30, 2031. The CIP serves as the County&rsquo;s long-range financial planning document for proposed capital projects, outlining anticipated project costs, funding strategies, and implementation timelines over the next five fiscal years. The plan is designed to support strategic, efficient, and sustainable infrastructure development throughout Walton County.</p>
+      <p class="page-intro">Capital improvement projects are essential to maintaining and enhancing the quality of life for residents and visitors. Walton County&rsquo;s CIP aligns projected revenues with identified capital priorities and anticipated expenditures necessary to maintain, improve, and expand public infrastructure and facilities. The CIP is updated annually and presented to the Board of County Commissioners for review and approval in order to reflect changing community needs, service demands, economic conditions, and funding availability. As priorities evolve, projects may be accelerated, delayed, modified, or removed based on operational needs, emergencies, available resources, or policy direction from the County Commission. Inclusion in the CIP does not guarantee future funding authorization.</p>
+      <p class="page-intro">Capital projects generally progress through multiple phases, including land acquisition, planning, design, permitting, engineering, procurement, and construction. While some smaller-scale projects may be completed within one to two years, larger and more complex projects often extend across multiple fiscal years and may experience delays associated with permitting requirements, legal considerations, market conditions, or construction timelines. The CIP provides a framework for allocating funding annually throughout each project phase while identifying long-term financial obligations associated with future implementation.</p>
+      <p class="page-intro">Although only projects appropriated within the current fiscal year are formally adopted as part of the annual budget, the five-year CIP remains a critical planning tool for establishing long-term funding priorities and coordinating infrastructure investments across County departments and agencies. Through comprehensive capital planning, Walton County seeks to ensure that infrastructure development remains aligned with community priorities, operational needs, growth trends, and the County&rsquo;s long-term financial sustainability.</p>
+    </div>
+    ` : ""}
+
     <section class="wc-cip-main-section">
       <div class="wc-cip-main-inner">
         ${!isStandaloneSearchPage ? `
-        <div class="wc-cip-page-header">
-          <div class="page-eyebrow">Capital Projects</div>
-          <h1 class="page-title">Capital Improvement Plan</h1>
-          <p class="page-intro">Walton County&rsquo;s five-year capital improvement plan for fiscal years 2027 through 2031, outlining infrastructure investments, funding strategies, and project timelines.</p>
-        </div>
-
-        <section class="wc-intro-section" id="wc-cip-overview">
-          <div class="wc-intro-inner">
-            <span>Capital Improvement Plan</span>
-            <h2>Introduction</h2>
-
-            <p>
-              This online document provides an overview of Walton County&rsquo;s Capital Improvement Plan (CIP) for a five-year period beginning October 1, 2027, and ending September 30, 2031. The CIP serves as the County&rsquo;s long-range financial planning document for proposed capital projects, outlining anticipated project costs, funding strategies, and implementation timelines over the next five fiscal years. The plan is designed to support strategic, efficient, and sustainable infrastructure development throughout Walton County.
-            </p>
-
-            <p>
-              Capital improvement projects are essential to maintaining and enhancing the quality of life for residents and visitors. Walton County&rsquo;s CIP aligns projected revenues with identified capital priorities and anticipated expenditures necessary to maintain, improve, and expand public infrastructure and facilities. The CIP is updated annually and presented to the Board of County Commissioners for review and approval in order to reflect changing community needs, service demands, economic conditions, and funding availability. As priorities evolve, projects may be accelerated, delayed, modified, or removed based on operational needs, emergencies, available resources, or policy direction from the County Commission. Inclusion in the CIP does not guarantee future funding authorization.
-            </p>
-
-            <p>
-              Capital projects generally progress through multiple phases, including land acquisition, planning, design, permitting, engineering, procurement, and construction. While some smaller-scale projects may be completed within one to two years, larger and more complex projects often extend across multiple fiscal years and may experience delays associated with permitting requirements, legal considerations, market conditions, or construction timelines. The CIP provides a framework for allocating funding annually throughout each project phase while identifying long-term financial obligations associated with future implementation.
-            </p>
-
-            <p>
-              Although only projects appropriated within the current fiscal year are formally adopted as part of the annual budget, the five-year CIP remains a critical planning tool for establishing long-term funding priorities and coordinating infrastructure investments across County departments and agencies. Through comprehensive capital planning, Walton County seeks to ensure that infrastructure development remains aligned with community priorities, operational needs, growth trends, and the County&rsquo;s long-term financial sustainability.
-            </p>
-          </div>
-
-          <div class="wc-intro-divider"></div>
-        </section>
-
         <section class="wc-budget-strip-section" id="wc-cip-at-glance">
           <div class="wc-intro-inner">
           <h2>Fiscal Year 2027 CIP at a Glance</h2>
@@ -1656,9 +1633,7 @@ function renderProjects(){
         <div class="wc-project-index-header" id="wc-project-search">
           <div class="page-eyebrow">Capital Projects</div>
           <h1 class="page-title">Project Search</h1>
-          <p class="page-intro">
-            Browse, search, and filter Walton County capital improvement projects by department, year, and funding source. This project index is populated from the CIP export and is designed to help residents quickly locate projects relevant to their community.
-          </p>
+          <p class="page-intro">Browse, search, and filter Walton County capital improvement projects by department, year, and funding source. This project index is populated from the CIP export and is designed to help residents quickly locate projects relevant to their community.</p>
         </div>
 
         ${!isFullView ? `
