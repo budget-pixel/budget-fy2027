@@ -797,7 +797,7 @@
           "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
           (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
           "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
-          "<td>" + escapeHtml(r[descField] || "") + "</td>" +
+          '<td class="wc-itemized-description-column">' + escapeHtml(r[descField] || "") + "</td>" +
           BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
             '<td class="wc-num wc-prior-year">' + formatCurrency(r[c.field] || 0) + "</td>"
           ).join("") +
@@ -809,8 +809,13 @@
     totalFields.forEach((field) => {
       totals[field] = mergedRows.reduce((sum, row) => sum + (row[field] || 0), 0);
     });
+    const totalLabelCells =
+      "<td>Total</td>" +
+      (isExpense ? "<td></td>" : "") +
+      "<td></td>" +
+      '<td class="wc-itemized-description-column"></td>';
     bodyRows.push(
-      '<tr class="wc-table-total-row"><td colspan="' + (isExpense ? 4 : 3) + '">Total</td>' +
+      '<tr class="wc-table-total-row">' + totalLabelCells +
         BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
           '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
         ).join("") +
@@ -820,7 +825,10 @@
     const detailTable = renderTable({
       columns: [{ label: "Category" }]
         .concat(isExpense ? [{ label: "Object Code" }] : [])
-        .concat([{ label: isExpense ? "Object Name" : "Revenue Name" }, { label: "Itemized Description" }])
+        .concat([
+          { label: isExpense ? "Object Name" : "Revenue Name" },
+          { label: "Itemized Description", classes: ["wc-itemized-description-column"] }
+        ])
         .concat(
           BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
           [{ label: "FY 2027 Proposed", num: true }]

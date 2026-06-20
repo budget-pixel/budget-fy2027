@@ -1,7 +1,10 @@
 /* Walton County FY 2027 Budget — Supabase actuals data layer.
    Google Sheets remains the source for budget/publication rows, labels,
    descriptions, FY 2026 budget, FY 2027 proposed, and page narrative content.
-   Supabase is used only for historical actuals and optional transaction detail.
+   Supabase public views provide FY 2020-FY 2025 historical actuals.
+   Cache tables stay internal in Supabase and are not queried by browser code.
+   Raw transaction data must not load on page startup; transaction drilldown
+   should be lazy-loaded only for a specific year/org/object/project request.
    Use a Supabase publishable/anon key only; never place a service-role key in
    this public static website. */
 (function () {
@@ -12,6 +15,7 @@
 
   let supabaseClient = null;
   let warnedAboutConfig = false;
+  const SUPABASE_PAGE_SIZE = 1000;
 
   function hasSupabaseConfig() {
     return (
@@ -49,24 +53,40 @@
     const client = getClient();
     if (!client) return [];
 
-    const { data, error } = await client
-      .from(viewName)
-      .select("year, org, object, project, amount");
+    const rows = [];
+    let from = 0;
 
-    if (error) {
-      console.error("WCSupabaseData: failed to load " + viewName, error);
-      return [];
+    while (true) {
+      const to = from + SUPABASE_PAGE_SIZE - 1;
+      const { data, error } = await client
+        .from(viewName)
+        .select("year, org, object, project, amount")
+        .order("year", { ascending: true })
+        .order("org", { ascending: true })
+        .order("object", { ascending: true })
+        .order("project", { ascending: true })
+        .range(from, to);
+
+      if (error) {
+        console.error("Failed to load " + viewName + " actuals from Supabase:", error);
+        return rows;
+      }
+
+      const page = Array.isArray(data) ? data : [];
+      rows.push(...page);
+      if (page.length < SUPABASE_PAGE_SIZE) break;
+      from += SUPABASE_PAGE_SIZE;
     }
 
-    return Array.isArray(data) ? data : [];
+    return rows;
   }
 
   function loadExpenseActuals() {
-    return loadSummaryRows("expense_actuals_summary");
+    return loadSummaryRows("expense_actuals_public");
   }
 
   function loadRevenueActuals() {
-    return loadSummaryRows("revenue_actuals_summary");
+    return loadSummaryRows("revenue_actuals_public");
   }
 
   function cleanCode(value) {
@@ -92,7 +112,7 @@
     const lookup = new Map();
     (Array.isArray(rows) ? rows : []).forEach((row) => {
       const key = buildLookupKey(row.org, row.object, row.project, row.year);
-      lookup.set(key, (lookup.get(key) || 0) + amountToNumber(row.amount));
+      lookup.set(key, amountToNumber(row.amount));
     });
     return lookup;
   }
@@ -128,14 +148,15 @@
   }
 
   function getActualAmount(lookup, row, year) {
-    if (!lookup || typeof lookup.get !== "function") return 0;
+    if (!lookup || typeof lookup.get !== "function") return undefined;
     const key = buildLookupKey(rowOrg(row), rowObject(row), rowProject(row), year);
-    return amountToNumber(lookup.get(key));
+    return lookup.get(key);
   }
 
   function actualOrFallback(lookup, row, year, fallbackValue) {
-    const actual = getActualAmount(lookup, row, year);
-    if (actual !== 0) return actual;
+    if (!lookup || typeof lookup.has !== "function") return amountToNumber(fallbackValue);
+    const key = buildLookupKey(rowOrg(row), rowObject(row), rowProject(row), year);
+    if (lookup.has(key)) return amountToNumber(lookup.get(key));
     return amountToNumber(fallbackValue);
   }
 
