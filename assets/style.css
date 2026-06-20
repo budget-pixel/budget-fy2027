@@ -1142,6 +1142,106 @@ body {
 #department-expense-table { margin-top: 32px; }
 .court-innovations-supplemental-tables { margin-top: 32px; }
 
+.wc-finance-card {
+  margin: 28px 0;
+  padding: 26px;
+  background: #ffffff;
+  border: 1px solid rgba(23,32,51,.10);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(23,32,51,.055);
+}
+.wc-finance-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.wc-finance-card-kicker {
+  margin: 0 0 10px;
+  color: #003f28;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.wc-finance-card-total {
+  display: block;
+  color: #172033;
+  font-size: clamp(2.35rem, 5vw, 4.4rem);
+  line-height: .92;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+.wc-finance-card-subtitle {
+  display: block;
+  margin-top: 10px;
+  color: #607184;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.wc-finance-card-breakdown {
+  display: grid;
+  gap: 17px;
+}
+.wc-finance-card-row.is-zero {
+  display: none;
+}
+.wc-finance-card-row-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.wc-finance-card-row-head strong {
+  color: #172033;
+  font-size: .96rem;
+  line-height: 1.25;
+}
+.wc-finance-card-row-head span {
+  color: #003f28;
+  font-size: .82rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.wc-finance-card-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(0,63,40,.10);
+}
+.wc-finance-card-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #003f28;
+}
+.wc-finance-card-amount {
+  margin-top: 7px;
+  color: #526577;
+  font-size: .86rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.wc-finance-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(23,32,51,.08);
+}
+.wc-finance-card-footer .wc-data-updated-note {
+  margin: 0;
+}
+.wc-finance-card .wc-budget-lines-detail {
+  margin-top: 18px;
+}
+
 .wc-data-table-wrap { margin: 24px 0; }
 .wc-data-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
 .wc-data-table-scroll { width: 100%; overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 12px; }
@@ -1358,6 +1458,14 @@ body {
   .wc-filter-bar { flex-direction: column; align-items: stretch; }
   .wc-filter-field { min-width: 0; }
   .wc-data-table th, .wc-data-table td { padding: 7px 8px; font-size: .8rem; }
+  .wc-finance-card {
+    padding: 20px;
+    border-radius: 20px;
+  }
+  .wc-finance-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 /* ── ported from walton-performance-measures ── */

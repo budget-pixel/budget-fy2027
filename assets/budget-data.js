@@ -272,6 +272,16 @@
     return (n < 0 ? "-$" : "$") + formatted;
   }
 
+  function formatCompactCurrency(value) {
+    const n = typeof value === "number" ? value : toNumber(value);
+    const abs = Math.abs(n);
+    const sign = n < 0 ? "-" : "";
+    if (abs >= 1000000000) return sign + "$" + (abs / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+    if (abs >= 1000000) return sign + "$" + (abs / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (abs >= 1000) return sign + "$" + (abs / 1000).toFixed(0) + "K";
+    return sign + "$" + abs.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  }
+
   function formatNumber(value, decimals) {
     const n = typeof value === "number" ? value : toNumber(value);
     const d = typeof decimals === "number" ? decimals : (n % 1 !== 0 ? 1 : 0);
@@ -721,7 +731,7 @@
     const toggleHeader = priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
 
     return {
-      button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" aria-expanded="false">View Budget Lines</button>',
+      button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
       detail: '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
         toggleHeader + detailTable + "</div>"
     };
@@ -737,7 +747,9 @@
     const isHidden = detail.hasAttribute("hidden");
     detail.toggleAttribute("hidden", !isHidden);
     toggle.setAttribute("aria-expanded", String(isHidden));
-    toggle.textContent = isHidden ? "Hide Budget Lines" : "View Budget Lines";
+    toggle.textContent = isHidden
+      ? (toggle.dataset.openLabel || "Hide Budget Lines")
+      : (toggle.dataset.closedLabel || "View Budget Lines");
   });
 
   function lastUpdatedNoteHtml() {
@@ -851,6 +863,59 @@
     });
   }
 
+  function renderFinancialDashboardCard(options) {
+    const rows = options.rows || [];
+    const caption = options.caption || "Financial Summary";
+    const kind = options.kind || "expense";
+    const total = options.total || 0;
+    const showPrior = !!options.showPrior;
+    const detail = options.detail || { button: "", detail: "" };
+    const updated = lastUpdatedNoteHtml();
+    const zeroClass = total === 0 ? " is-zero" : "";
+    const currentLabel = kind === "revenue" ? "FY 2027 Proposed Revenue" : "FY 2027 Proposed Budget";
+    const sortedRows = rows
+      .slice()
+      .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
+
+    const itemHtml = sortedRows.map((row) => {
+      const amount = row.amount || 0;
+      const percent = total ? Math.abs(amount) / Math.abs(total) * 100 : 0;
+      const width = total ? Math.max(percent, amount ? 2 : 0) : 0;
+      const isZero = amount === 0;
+      return (
+        '<div class="wc-finance-card-row' + (isZero ? " is-zero" : "") + '">' +
+          '<div class="wc-finance-card-row-head">' +
+            '<strong>' + escapeHtml(row.label || "Other") + '</strong>' +
+            '<span>' + escapeHtml(percent.toFixed(percent >= 10 ? 0 : 1)) + '%</span>' +
+          '</div>' +
+          '<div class="wc-finance-card-track" aria-hidden="true">' +
+            '<span style="width:' + width.toFixed(2) + '%"></span>' +
+          '</div>' +
+          '<div class="wc-finance-card-amount">' + escapeHtml(formatCurrency(amount)) + '</div>' +
+        '</div>'
+      );
+    }).join("");
+
+    return (
+      '<section class="wc-finance-card wc-budget-lines-card' + zeroClass + (showPrior ? " show-prior-years" : "") + '">' +
+        '<div class="wc-finance-card-head">' +
+          '<div>' +
+            '<p class="wc-finance-card-kicker">' + escapeHtml(caption) + '</p>' +
+            '<strong class="wc-finance-card-total">' + escapeHtml(formatCompactCurrency(total)) + '</strong>' +
+            '<span class="wc-finance-card-subtitle">' + escapeHtml(currentLabel) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="wc-finance-card-breakdown">' + itemHtml + '</div>' +
+        '<div class="wc-finance-card-footer">' +
+          updated +
+          detail.button +
+        '</div>' +
+        detail.detail +
+        renderNotesHtml("Expenditure Notes:", options.notes) +
+      '</section>'
+    );
+  }
+
   // Department-page expense/revenue tables: rolled up to category level
   // (Personnel Services, Operating Expenditures, Capital Outlay, etc.)
   // rather than individual object/revenue codes.
@@ -874,41 +939,28 @@
       totalsByType.set(type, totals);
     });
 
-    const bodyRows = Array.from(totalsByType.entries())
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([type, totals]) =>
-        "<tr" + (totals.FY2027_Proposed === 0 ? ' class="wc-budget-line-zero-current"' : "") + ">" +
-        categoryCellHtml(type, isExpense) +
-        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
-          '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
-        ).join("") +
-        '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
-      );
-
-    bodyRows.push(
-      '<tr class="wc-table-total-row"><td>Total</td>' +
-      BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
-        '<td class="wc-num wc-prior-year">' + formatCurrency(grandTotals[c.field]) + "</td>"
-      ).join("") +
-      '<td class="wc-num">' + formatCurrency(grandTotals.FY2027_Proposed) + "</td></tr>"
-    );
-
     const showPrior = getShowPriorYears();
-    const table = renderTable({
-      caption: caption,
-      columns: [{ label: typeLabel }]
-        .concat(BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })))
-        .concat([{ label: "FY 2027 Proposed", num: true }]),
-      bodyRows: bodyRows,
-      toggleHtml: isExpense ? priorYearsToggleHtml(showPrior) : ""
-    });
-    if (!table) return "";
+    const detail = renderBudgetLinesToggle(rows, descriptionField, kind);
+    if (detail.button && !isExpense) {
+      detail.button = detail.button
+        .replace('data-closed-label="View Budget Lines"', 'data-closed-label="View Revenue Lines"')
+        .replace('data-open-label="Hide Budget Lines"', 'data-open-label="Hide Revenue Lines"')
+        .replace("View Budget Lines", "View Revenue Lines");
+    }
+    const cardRows = Array.from(totalsByType.entries()).map(([type, totals]) => ({
+      label: type,
+      amount: totals.FY2027_Proposed || 0
+    }));
 
-    return (
-      '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
-      table + renderTableFooterRow(isExpense ? rows : null, descriptionField) + renderNotesHtml("Expenditure Notes:", notes) +
-      "</div>"
-    );
+    return renderFinancialDashboardCard({
+      caption,
+      kind,
+      rows: cardRows,
+      total: grandTotals.FY2027_Proposed || 0,
+      showPrior,
+      detail,
+      notes: isExpense ? notes : null
+    });
   }
 
   // A single row right under a table: the "Last Updated" stamp on the
@@ -2059,11 +2111,15 @@
     const years = [2024, 2025, 2026, 2027];
     const priorYears = years.filter((y) => y < 2027);
     const totals = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
-    const bodyRows = rows
+    const sortedRows = rows
       .slice()
-      .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""))
-      .map((r) => {
-        years.forEach((y) => { totals[y] += r[y] || 0; });
+      .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""));
+
+    sortedRows.forEach((r) => {
+      years.forEach((y) => { totals[y] += r[y] || 0; });
+    });
+
+    const bodyRows = sortedRows.map((r) => {
         const rowClass = (r[2027] || 0) === 0 ? ' class="wc-staffing-zero-current"' : "";
         return (
           "<tr" + rowClass + "><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
@@ -2088,31 +2144,54 @@
         notes.map((n) => "<p>" + n + "</p>").join("") +
         "</div>"
       : "";
+    const detailId = "wc-staffing-lines-" + (++budgetLinesDetailCounter);
+    const maxFte = Math.max.apply(null, sortedRows.map((r) => r[2027] || 0).concat([0]));
+    const positionRows = sortedRows
+      .filter((r) => (r[2027] || 0) !== 0)
+      .sort((a, b) => (b[2027] || 0) - (a[2027] || 0))
+      .map((r) => {
+        const current = r[2027] || 0;
+        const percent = totals[2027] ? current / totals[2027] * 100 : 0;
+        const width = maxFte ? Math.max(2, current / maxFte * 100) : 0;
+        return (
+          '<div class="wc-finance-card-row">' +
+            '<div class="wc-finance-card-row-head">' +
+              '<strong>' + escapeHtml(r.Position_Name || "Position") + '</strong>' +
+              '<span>' + escapeHtml(percent.toFixed(percent >= 10 ? 0 : 1)) + '%</span>' +
+            '</div>' +
+            '<div class="wc-finance-card-track" aria-hidden="true"><span style="width:' + width.toFixed(2) + '%"></span></div>' +
+            '<div class="wc-finance-card-amount">' + escapeHtml(formatNumber(current)) + ' FTE</div>' +
+          '</div>'
+        );
+      }).join("");
     return (
-      '<section class="wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '">' +
-      '<div class="wc-data-table-wrap">' +
-      '<div class="wc-table-label-row">' +
-      '<p class="wc-table-label">' + escapeHtml(label) + "</p>" +
-      '<div class="wc-fy-column-toggle-wrap">' +
-      '<label class="wc-fy-column-toggle-label">' +
-      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" aria-label="View Prior Years" ' +
-      (showPrior ? "checked" : "") + " />" +
-      '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
-      "</label>" +
-      "</div>" +
-      "</div>" +
-      '<div class="wc-data-table-scroll">' +
-      '<table class="wc-data-table wc-staffing-table">' +
-      "<thead><tr>" +
-      "<th>Position Name</th>" +
-      priorYears.map((y) => '<th class="wc-num wc-prior-year">FY ' + y + "</th>").join("") +
-      '<th class="wc-num">FY 2027</th>' +
-      "</tr></thead>" +
-      "<tbody>" + bodyRows.join("") + "</tbody>" +
-      "</table>" +
-      "</div>" +
-      notesHtml +
-      "</div>" +
+      '<section class="wc-finance-card wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '">' +
+        '<div class="wc-finance-card-head">' +
+          '<div>' +
+            '<p class="wc-finance-card-kicker">' + escapeHtml(label) + '</p>' +
+            '<strong class="wc-finance-card-total">' + escapeHtml(formatNumber(totals[2027])) + '</strong>' +
+            '<span class="wc-finance-card-subtitle">FY 2027 Full-Time Equivalent Positions</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="wc-finance-card-breakdown">' + positionRows + '</div>' +
+        '<div class="wc-finance-card-footer">' +
+          lastUpdatedNoteHtml() +
+          '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Position Detail" data-open-label="Hide Position Detail" aria-expanded="false">View Position Detail</button>' +
+        '</div>' +
+        notesHtml +
+        '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+          priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header") +
+          '<div class="wc-data-table-scroll">' +
+          '<table class="wc-data-table wc-staffing-table">' +
+          "<thead><tr>" +
+          "<th>Position Name</th>" +
+          priorYears.map((y) => '<th class="wc-num wc-prior-year">FY ' + y + "</th>").join("") +
+          '<th class="wc-num">FY 2027</th>' +
+          "</tr></thead>" +
+          "<tbody>" + bodyRows.join("") + "</tbody>" +
+          "</table>" +
+          "</div>" +
+        "</div>" +
       "</section>"
     );
   }
