@@ -6,7 +6,7 @@
 <title>GFOA Distinguished Budget Presentation Award — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
-<body>
+<body class="gfoa-award-page">
 
 <!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
 <nav id="nav-menu" class="nav-menu">
@@ -16,203 +16,366 @@
 <div id="layout">
 <main id="content">
 
-<div class="page-eyebrow">Introduction and Overview</div>
-<h1 class="page-title">GFOA Distinguished Budget Presentation Award</h1>
-
-<section class="page-text wc-gfoa-narrative">
-  <p>
-    The Government Finance Officers Association of the United States and Canada (GFOA) presented a Distinguished Budget Presentation Award to Walton County, Florida for its Annual Budget for the fiscal year beginning October 1, 2025. In order to receive this award, a government unit must publish a budget document that meets program criteria as a policy document, as a financial plan, as an operations guide, and as a communications device.
-  </p>
-
-  <p>
-    This award is valid for a period of one year only. We believe our current budget continues to conform to program requirements, and we are submitting it to GFOA to determine its eligibility for another award.
-  </p>
-
-  <p class="wc-gfoa-link">
-    <a href="https://www.gfoa.org/budget-award-winners" target="_blank" rel="noopener">GFOA Budget Award Winners</a>
-  </p>
-</section>
-
 <style>
-  .wc-gfoa-narrative p{
-    text-align:justify;
+  body.gfoa-award-page #content{
+    max-width:1240px;
+    padding:44px 32px 78px;
   }
 
-  .wc-gfoa-narrative .wc-gfoa-link{
-    margin-top:26px;
-    text-align:left;
+  .wc-gfoa-page{
+    font-family:Arial, Helvetica, sans-serif;
+  }
+
+  .wc-gfoa-breadcrumb-source{
+    position:absolute !important;
+    width:1px !important;
+    height:1px !important;
+    padding:0 !important;
+    margin:-1px !important;
+    overflow:hidden !important;
+    clip:rect(0, 0, 0, 0) !important;
+    white-space:nowrap !important;
+    border:0 !important;
+  }
+
+  .wc-gfoa-hero{
+    display:grid;
+    grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);
+    gap:28px;
+    align-items:stretch;
+    margin:0 0 34px;
+  }
+
+  .wc-gfoa-hero-copy{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-height:520px;
+    padding:46px;
+    border-radius:30px;
+    background:#003f28;
+    color:#ffffff;
+  }
+
+  .wc-gfoa-kicker{
+    display:block;
+    margin:0 0 12px;
+    color:#d1be78;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+
+  .wc-gfoa-hero-copy h1{
+    margin:0 0 18px;
+    color:#ffffff;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(44px, 6vw, 76px);
+    line-height:.96;
+    font-weight:500;
+    letter-spacing:0;
+  }
+
+  .wc-gfoa-hero-copy p{
+    max-width:680px;
+    margin:0;
+    color:rgba(255,255,255,.86);
+    font-size:17px;
+    line-height:1.7;
+  }
+
+  .wc-gfoa-hero-media{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:520px;
+    padding:24px;
+    border:1px solid rgba(0,63,40,.12);
+    border-radius:30px;
+    background:#f7fbf7;
+  }
+
+  .wc-gfoa-hero-media img{
+    width:100%;
+    max-width:560px;
+    height:auto;
+    display:block;
+    border:6px solid #d1be78;
+    border-radius:24px;
+    background:#ffffff;
+    box-shadow:0 18px 42px rgba(23,32,51,.12);
+  }
+
+  .wc-gfoa-intro-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(280px,.38fr);
+    gap:22px;
+    margin:0 0 34px;
+  }
+
+  .wc-gfoa-panel{
+    padding:28px;
+    border:1px solid rgba(23,32,51,.11);
+    border-radius:24px;
+    background:#ffffff;
+    box-shadow:0 14px 34px rgba(23,32,51,.06);
+  }
+
+  .wc-gfoa-panel h2{
+    margin:0 0 14px;
+    color:#172033;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(30px, 3vw, 44px);
+    line-height:1.08;
+    font-weight:500;
+  }
+
+  .wc-gfoa-panel p{
+    margin:0 0 14px;
+    color:#607184;
+    font-size:16px;
+    line-height:1.75;
+  }
+
+  .wc-gfoa-panel p:last-child{
+    margin-bottom:0;
+  }
+
+  .wc-gfoa-status{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:20px;
+    background:#f7fbf7;
+  }
+
+  .wc-gfoa-status strong{
+    display:block;
+    color:#003f28;
+    font-size:42px;
+    line-height:1;
+  }
+
+  .wc-gfoa-status span{
+    display:block;
+    margin-top:8px;
+    color:#607184;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.10em;
+    text-transform:uppercase;
+  }
+
+  .wc-gfoa-link-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:42px;
+    padding:0 18px;
+    border:1px solid rgba(0,63,40,.18);
+    border-radius:999px;
+    background:#003f28;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.06em;
+    text-decoration:none;
+    text-transform:uppercase;
+    transition:transform .2s ease, background .2s ease;
+  }
+
+  .wc-gfoa-link-button:hover{
+    transform:translateY(-1px);
+    background:#002f1f;
+  }
+
+  .wc-gfoa-criteria{
+    margin:0 0 34px;
+  }
+
+  .wc-gfoa-section-header{
+    max-width:780px;
+    margin:0 0 20px;
+  }
+
+  .wc-gfoa-section-header h2{
+    margin:0 0 10px;
+    color:#172033;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(32px, 4vw, 56px);
+    line-height:1.05;
+    font-weight:500;
+  }
+
+  .wc-gfoa-section-header p{
+    margin:0;
+    color:#607184;
+    font-size:16px;
+    line-height:1.7;
+  }
+
+  .wc-gfoa-criteria-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:14px;
+  }
+
+  .wc-gfoa-criterion{
+    min-height:190px;
+    padding:22px;
+    border:1px solid rgba(0,63,40,.12);
+    border-radius:20px;
+    background:#f7fbf7;
+  }
+
+  .wc-gfoa-criterion strong{
+    display:block;
+    margin:0 0 10px;
+    color:#003f28;
+    font-size:17px;
+    line-height:1.2;
+  }
+
+  .wc-gfoa-criterion p{
+    margin:0;
+    color:#526577;
+    font-size:14px;
+    line-height:1.65;
+  }
+
+  .wc-gfoa-image-showcase{
+    max-width:900px;
+    margin:0 auto;
+  }
+
+  .wc-gfoa-image-card{
+    padding:20px;
+    border:1px solid rgba(23,32,51,.11);
+    border-radius:24px;
+    background:#ffffff;
+    box-shadow:0 14px 34px rgba(23,32,51,.06);
+  }
+
+  .wc-gfoa-image-card img{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:18px;
+  }
+
+  .wc-gfoa-image-card small{
+    display:block;
+    margin-top:14px;
+    color:#607184;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  @media(max-width:960px){
+    body.gfoa-award-page #content{
+      padding:34px 22px 64px;
+    }
+
+    .wc-gfoa-hero,
+    .wc-gfoa-intro-grid{
+      grid-template-columns:1fr;
+    }
+
+    .wc-gfoa-criteria-grid{
+      grid-template-columns:repeat(2, minmax(0,1fr));
+    }
+  }
+
+  @media(max-width:640px){
+    body.gfoa-award-page #content{
+      padding:28px 16px 54px;
+    }
+
+    .wc-gfoa-hero-copy,
+    .wc-gfoa-hero-media,
+    .wc-gfoa-panel{
+      padding:22px;
+      border-radius:22px;
+      min-height:auto;
+    }
+
+    .wc-gfoa-criteria-grid{
+      grid-template-columns:1fr;
+    }
   }
 </style>
 
-<script src="https://budget-pixel.github.io/walton-budget-nav.js/walton-header-slide.js"></script>
-
-<div style="
-  width:100%;
-  display:flex;
-  justify-content:center;
-  padding:40px 20px;
-  background:#ffffff;
-  box-sizing:border-box;
-">
-
-  <div style="
-    background:#ffffff;
-    border-radius:28px;
-    padding:24px;
-    box-shadow:
-      0 10px 30px rgba(36,52,77,0.12),
-      0 4px 12px rgba(36,52,77,0.08);
-    max-width:700px;
-    width:100%;
-    box-sizing:border-box;
-  ">
-
-    <img alt="Walton County Graphic" src="https://stories.opengov.com/countyofwaltonfl/uploads/01505b16c250-Untitled.png?v=2026-05-13T12:24:08.130Z" style="
-        width:100%;
-        height:auto;
-        display:block;
-        border-radius:20px;
-        border:4px solid #d1be78;
-      ">
-
-  </div>
-
+<div class="wc-gfoa-breadcrumb-source">
+  <div class="page-eyebrow">Introduction and Overview</div>
+  <h1 class="page-title">GFOA Distinguished Budget Presentation Award</h1>
 </div>
 
-<div style="
-  width:100%;
-  display:flex;
-  justify-content:center;
-  padding:40px 20px;
-  background:#ffffff;
-  box-sizing:border-box;
-">
-
-  <div style="
-    background:#ffffff;
-    border-radius:28px;
-    padding:28px;
-    box-shadow:
-      0 10px 30px rgba(36,52,77,0.12),
-      0 4px 12px rgba(36,52,77,0.08);
-    max-width:1150px;
-    width:100%;
-    box-sizing:border-box;
-  ">
-
-    <img alt="Walton County Graphic" src="https://stories.opengov.com/countyofwaltonfl/uploads/254c1ac3f06a-15654.png?v=2026-05-13T12:27:42.104Z" style="
-        width:100%;
-        height:auto;
-        display:block;
-        border-radius:20px;
-      ">
-
+<section class="wc-gfoa-page">
+  <div class="wc-gfoa-hero">
+    <div class="wc-gfoa-hero-copy">
+      <span class="wc-gfoa-kicker">Introduction and Overview</span>
+      <h1>Distinguished Budget Presentation Award</h1>
+      <p>The Government Finance Officers Association award recognizes budget documents that clearly communicate priorities, financial plans, operations, and policy direction to the public.</p>
+    </div>
+    <div class="wc-gfoa-hero-media">
+      <img alt="GFOA Distinguished Budget Presentation Award certificate for Walton County" src="https://stories.opengov.com/countyofwaltonfl/uploads/01505b16c250-Untitled.png?v=2026-05-13T12:24:08.130Z">
+    </div>
   </div>
 
-</div>
+  <div class="wc-gfoa-intro-grid">
+    <section class="wc-gfoa-panel">
+      <h2>Recognition for clear public budgeting.</h2>
+      <p>The Government Finance Officers Association of the United States and Canada presented a Distinguished Budget Presentation Award to Walton County, Florida for its Annual Budget for the fiscal year beginning October 1, 2025.</p>
+      <p>To receive this award, a government must publish a budget document that meets program criteria as a policy document, a financial plan, an operations guide, and a communications device.</p>
+      <p>This award is valid for one year. Walton County believes the current budget continues to conform to program requirements and is submitting it to GFOA to determine eligibility for another award.</p>
+    </section>
 
-<style>
-  .wc-award-confetti-bottom{
-    position:fixed;
-    left:0;
-    bottom:0;
-    width:100%;
-    height:420px;
-    pointer-events:none;
-    z-index:99999;
-    overflow:visible;
-  }
+    <aside class="wc-gfoa-panel wc-gfoa-status">
+      <div>
+        <strong>2nd Year</strong>
+        <span>Received</span>
+      </div>
+      <a class="wc-gfoa-link-button" href="https://www.gfoa.org/budget-award-winners" target="_blank" rel="noopener">View GFOA Winners</a>
+    </aside>
+  </div>
 
-  .wc-award-confetti-bottom span{
-    position:absolute;
-    bottom:-30px;
-    display:block;
-    width:9px;
-    height:18px;
-    border-radius:2px;
-    opacity:0;
-    animation:wcConfettiBlast 2s ease-out forwards;
-  }
+  <section class="wc-gfoa-criteria">
+    <div class="wc-gfoa-section-header">
+      <span class="wc-gfoa-kicker">Award Criteria</span>
+      <h2>Four roles of an effective budget document.</h2>
+      <p>GFOA evaluates whether a budget document helps residents, policymakers, and staff understand the government&rsquo;s priorities, resources, services, and financial direction.</p>
+    </div>
 
-  .wc-award-confetti-bottom span:nth-child(3n){
-    background:#006231;
-  }
+    <div class="wc-gfoa-criteria-grid">
+      <article class="wc-gfoa-criterion">
+        <strong>Policy Document</strong>
+        <p>Explains goals, priorities, and major decisions that guide how public resources are allocated.</p>
+      </article>
+      <article class="wc-gfoa-criterion">
+        <strong>Financial Plan</strong>
+        <p>Shows revenue, expenditures, fund structure, and the financial resources needed to deliver services.</p>
+      </article>
+      <article class="wc-gfoa-criterion">
+        <strong>Operations Guide</strong>
+        <p>Connects departments, staffing, capital projects, and service delivery to the adopted financial plan.</p>
+      </article>
+      <article class="wc-gfoa-criterion">
+        <strong>Communications Device</strong>
+        <p>Presents budget information in a format that is understandable, transparent, and useful to the public.</p>
+      </article>
+    </div>
+  </section>
 
-  .wc-award-confetti-bottom span:nth-child(3n+1){
-    background:#d1be78;
-  }
-
-  .wc-award-confetti-bottom span:nth-child(3n+2){
-    background:#ffffff;
-    border:1px solid #d1be78;
-  }
-
-  .wc-award-confetti-bottom span:nth-child(5n){
-    width:7px;
-    height:7px;
-    border-radius:999px;
-  }
-
-  @keyframes wcConfettiBlast{
-    0%{
-      opacity:0;
-      transform:translateX(0) translateY(0) rotate(0deg) scale(.7);
-    }
-
-    10%{
-      opacity:1;
-    }
-
-    100%{
-      opacity:0;
-      transform:
-        translateX(var(--x))
-        translateY(var(--y))
-        rotate(var(--r))
-        scale(1.1);
-    }
-  }
-</style><div id="wcAwardConfettiBottom" class="wc-award-confetti-bottom"></div><script>
-(function(){
-
-  var container = document.getElementById("wcAwardConfettiBottom");
-
-  for(var i = 0; i < 120; i++){
-
-    var piece = document.createElement("span");
-
-    piece.style.left = Math.random() * 100 + "%";
-
-    piece.style.setProperty(
-      "--x",
-      ((Math.random() * 320) - 160) + "px"
-    );
-
-    piece.style.setProperty(
-      "--y",
-      (-(Math.random() * 520 + 120)) + "px"
-    );
-
-    piece.style.setProperty(
-      "--r",
-      ((Math.random() * 720) - 360) + "deg"
-    );
-
-    piece.style.animationDelay =
-      (Math.random() * 0.25) + "s";
-
-    piece.style.animationDuration =
-      (1.6 + Math.random() * 0.8) + "s";
-
-    container.appendChild(piece);
-  }
-
-  setTimeout(function(){
-    container.remove();
-  }, 2600);
-
-})();
-</script>
+  <section class="wc-gfoa-image-showcase" aria-label="GFOA award materials">
+    <div class="wc-gfoa-image-card">
+      <img alt="Walton County award recognition graphic" src="https://stories.opengov.com/countyofwaltonfl/uploads/254c1ac3f06a-15654.png?v=2026-05-13T12:27:42.104Z">
+      <small>Walton County recognition</small>
+    </div>
+  </section>
+</section>
 </main>
 </div>
 

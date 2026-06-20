@@ -6,7 +6,7 @@
 <title>Transmittal Letter — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css">
 </head>
-<body>
+<body class="transmittal-page">
 
 <!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
 <nav id="nav-menu" class="nav-menu">
@@ -19,27 +19,479 @@
 <div class="page-eyebrow">Introduction and Overview</div>
 <h1 class="page-title">Transmittal Letter</h1>
 
-<div class="wc-table-wrap">
-  <p class="wc-table-label">Charts</p>
-  <div class="chart-notice">
-    <p>This page contains interactive charts. View them in the
-       <a href="transmittal-letter.html">current publication page</a>.</p>
-    <ul><li>Total (FY2027)</li>
-<li>Total FY 2026-27 (Department) (FY2027)</li>
-<li>Graph 3: FTE Count by Fund: Graph 3: FTE Count by Fund, Building Fund, General Fund, Housing &amp; Urban Development Fund</li>
-<li>Total (FY2027)</li>
-<li>Total FY 2026-27 (Department) (FY2027)</li>
-<li>Total (FY2027)</li>
-<li>Total FY 2026-27 (Department) (FY2027)</li>
-<li>Total (FY2027)</li>
-<li>Total FY 2026-27 (Department) (FY2027)</li>
-<li>Total (FY2027)</li>
-<li>Total FY 2026-27 (Department) (FY2027)</li>
-<li>Total (FY2027)</li>
-<li>Total FY 2026-27 (Department) (FY2027)</li>
-</ul>
+<style>
+  body.transmittal-page #content{
+    max-width:1240px;
+    padding:44px 32px 78px;
+  }
+
+  .wc-transmittal{
+    font-family:Arial, Helvetica, sans-serif;
+  }
+
+  .wc-transmittal-hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(280px,.42fr);
+    gap:22px;
+    margin:0 0 34px;
+  }
+
+  .wc-transmittal-hero-copy{
+    padding:42px;
+    border-radius:30px;
+    background:#003f28;
+    color:#ffffff;
+  }
+
+  .wc-transmittal-kicker{
+    display:block;
+    margin:0 0 12px;
+    color:#d1be78;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+
+  .wc-transmittal-hero-copy h2{
+    margin:0 0 16px;
+    color:#ffffff;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(42px, 6vw, 72px);
+    line-height:.98;
+    font-weight:500;
+  }
+
+  .wc-transmittal-hero-copy p{
+    max-width:760px;
+    margin:0;
+    color:rgba(255,255,255,.86);
+    font-size:17px;
+    line-height:1.7;
+  }
+
+  .wc-transmittal-date-card{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:22px;
+    padding:28px;
+    border:1px solid rgba(0,63,40,.12);
+    border-radius:30px;
+    background:#f7fbf7;
+  }
+
+  .wc-transmittal-date-card strong{
+    display:block;
+    color:#003f28;
+    font-size:42px;
+    line-height:1;
+  }
+
+  .wc-transmittal-date-card span{
+    display:block;
+    margin-top:8px;
+    color:#607184;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.10em;
+    text-transform:uppercase;
+  }
+
+  .wc-transmittal-letter-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 300px;
+    gap:28px;
+    align-items:start;
+    margin:0 0 34px;
+  }
+
+  .wc-transmittal-letter{
+    padding:34px;
+    border:1px solid rgba(23,32,51,.11);
+    border-radius:26px;
+    background:#ffffff;
+    box-shadow:0 14px 34px rgba(23,32,51,.06);
+  }
+
+  .wc-transmittal-letter p{
+    margin:0 0 18px;
+    color:#526577;
+    font-size:16px;
+    line-height:1.82;
+  }
+
+  .wc-transmittal-letter h3{
+    margin:34px 0 12px;
+    color:#003f28;
+    font-size:22px;
+    line-height:1.2;
+  }
+
+  .wc-transmittal-letter ul{
+    display:grid;
+    gap:9px;
+    margin:0 0 22px;
+    padding-left:22px;
+    color:#526577;
+    font-size:16px;
+    line-height:1.65;
+  }
+
+  .wc-transmittal-letter p:last-child{
+    margin-bottom:0;
+  }
+
+  .wc-transmittal-salutation,
+  .wc-transmittal-signature{
+    color:#172033 !important;
+    font-weight:800;
+  }
+
+  .wc-transmittal-aside{
+    display:grid;
+    gap:14px;
+  }
+
+  .wc-transmittal-stat{
+    padding:20px;
+    border:1px solid rgba(0,63,40,.12);
+    border-radius:20px;
+    background:#f7fbf7;
+  }
+
+  .wc-transmittal-stat strong{
+    display:block;
+    color:#003f28;
+    font-size:24px;
+    line-height:1.1;
+  }
+
+  .wc-transmittal-stat span{
+    display:block;
+    margin-top:8px;
+    color:#607184;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .wc-transmittal-section{
+    margin:0 0 34px;
+  }
+
+  .wc-transmittal-section-header{
+    max-width:780px;
+    margin:0 0 20px;
+  }
+
+  .wc-transmittal-section-header h2{
+    margin:0 0 10px;
+    color:#172033;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(32px, 4vw, 54px);
+    line-height:1.05;
+    font-weight:500;
+  }
+
+  .wc-transmittal-section-header p{
+    margin:0;
+    color:#607184;
+    font-size:16px;
+    line-height:1.7;
+  }
+
+  .wc-transmittal-priority-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:14px;
+  }
+
+  .wc-transmittal-priority{
+    min-height:205px;
+    padding:22px;
+    border:1px solid rgba(0,63,40,.12);
+    border-radius:20px;
+    background:#f7fbf7;
+  }
+
+  .wc-transmittal-priority strong{
+    display:block;
+    margin:0 0 10px;
+    color:#003f28;
+    font-size:17px;
+    line-height:1.2;
+  }
+
+  .wc-transmittal-priority p{
+    margin:0;
+    color:#526577;
+    font-size:14px;
+    line-height:1.65;
+  }
+
+  .wc-transmittal-links{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:14px;
+  }
+
+  .wc-transmittal-link-card{
+    display:flex;
+    flex-direction:column;
+    min-height:172px;
+    padding:22px;
+    border:1px solid rgba(23,32,51,.11);
+    border-radius:20px;
+    background:#ffffff;
+    color:inherit;
+    text-decoration:none;
+    box-shadow:0 14px 34px rgba(23,32,51,.06);
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .wc-transmittal-link-card:hover{
+    transform:translateY(-2px);
+    border-color:rgba(0,63,40,.22);
+    box-shadow:0 18px 42px rgba(23,32,51,.09);
+  }
+
+  .wc-transmittal-link-card h3{
+    margin:0 0 8px;
+    color:#172033;
+    font-size:18px;
+    line-height:1.2;
+  }
+
+  .wc-transmittal-link-card p{
+    margin:0 0 18px;
+    color:#607184;
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .wc-transmittal-link-card span{
+    margin-top:auto;
+    color:#003f28;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  @media(max-width:960px){
+    body.transmittal-page #content{
+      padding:34px 22px 64px;
+    }
+
+    .wc-transmittal-hero,
+    .wc-transmittal-letter-grid{
+      grid-template-columns:1fr;
+    }
+
+    .wc-transmittal-priority-grid,
+    .wc-transmittal-links{
+      grid-template-columns:repeat(2, minmax(0,1fr));
+    }
+  }
+
+  @media(max-width:640px){
+    body.transmittal-page #content{
+      padding:28px 16px 54px;
+    }
+
+    .wc-transmittal-hero-copy,
+    .wc-transmittal-date-card,
+    .wc-transmittal-letter{
+      padding:22px;
+      border-radius:22px;
+    }
+
+    .wc-transmittal-priority-grid,
+    .wc-transmittal-links{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+
+<section class="wc-transmittal">
+  <div class="wc-transmittal-hero">
+    <div class="wc-transmittal-hero-copy">
+      <span class="wc-transmittal-kicker">Transmittal Letter</span>
+      <h2>A budget message for Walton County.</h2>
+      <p>The transmittal letter introduces the annual budget, explains the financial conditions shaping the plan, and connects the County&rsquo;s priorities to the services, infrastructure, and stewardship residents depend on.</p>
+    </div>
+
+    <aside class="wc-transmittal-date-card">
+      <div>
+        <strong>Annual</strong>
+        <span>Budget Message</span>
+      </div>
+      <div>
+        <strong>Oct. 1</strong>
+        <span>Fiscal Year Begins</span>
+      </div>
+    </aside>
   </div>
-</div>
+
+  <div class="wc-transmittal-letter-grid">
+    <article class="wc-transmittal-letter">
+      <p class="wc-transmittal-salutation">To the Honorable Walton County Board of County Commissioners:</p>
+
+      <p>In accordance with Florida Statute Chapter 129.03(3), I am transmitting with this message the final budget for Fiscal Year 2025-2026 (FY 26). This budget is balanced and provides a general operating framework for providing all County services for the forthcoming year. This budget focuses on public safety, infrastructure needs, and providing services for a continually growing county in the most efficient and effective manner possible.</p>
+
+      <p>The proposed budget has been developed with the following objectives:</p>
+      <ul>
+        <li>Maintaining the existing service levels for residents.</li>
+        <li>Consideration of the Board of County Commissioners' directives.</li>
+        <li>Funding the Sheriff, other Constitutional Officers, and other statutory requirements.</li>
+        <li>Addressing the needs required for an aging infrastructure and the maintenance of county facilities.</li>
+        <li>Investing in our employees.</li>
+        <li>Maintaining a sound self-insurance fund for health insurance.</li>
+        <li>Maintaining reserves.</li>
+      </ul>
+
+      <h3>Summary of Changes</h3>
+      <p>The Fiscal Year 2026 Final Budget is $2,935,920 higher than the Proposed Budget. This includes $1,700,000 in excess EMS revenue requested to be budgeted by the Sheriff&rsquo;s Office and a net increase of $1,235,920 in other appropriations. In the General Fund, interfund transfers-in increased, reflecting a $400,000 Clerk FTE request for IT staff and $72,913 in cost-of-living and related adjustments, as recommended by the BCC at the proposed workshop. In the Transportation Fund, $201,472 was added for cost-of-living adjustments, offset by higher projected fuel tax revenues. The Mosquito Control State Aid Fund increased by $6,186, offset by increased state aid contributions. The Debt Service Fund now includes $55,000, representing the remaining cash balance from the voter-approved sales tax referendum dedicated to the construction of the Highway 331 bridge. The largest change occurred in the Fine &amp; Forfeiture Fund, which increased by $4.7 million: $1.7 million from excess EMS revenues and $3 million redirected to the Bruce Fire Station project. This increase was offset by a $2.5 million decrease in the Capital Projects Fund as the Bruce Fire Station allocation was shifted into the Fine &amp; Forfeiture Fund, along with a $500,000 increase in interest revenue.</p>
+
+      <p>In comparing the FY 26 Final Budget to the FY 25 Final Budget, the total budget across all funds has increased from $310,408,506 to $327,945,088. This difference is due to a combination of several factors. Staff's primary focus has been on meeting infrastructure needs while maintaining current levels of service for our citizens. With this goal, an additional $10 million has been budgeted within the Capital Projects Fund for various infrastructure projects. Within the General Fund, Managed Vendor Program revenues of $1.53 million have been budgeted toward infrastructure to be utilized at the Board's discretion. Within the Road &amp; Bridge Fund, $891,000 has also been allocated to Mossy Head Wastewater Treatment Plant infrastructure for modification and expansion of the effluent system, as well as a grit removal system.</p>
+
+      <p>Requests for personnel have also focused on maintenance of the county's current infrastructure and services. In the Road and Bridge Fund, a Stabilization Crew is requested for maintenance to improve the structural integrity of existing roads within the County. Additional staffing for the Facilities Maintenance, Parks Maintenance, and Custodial departments is also requested to keep up with the current workload in maintaining the current aging parks and County structures.</p>
+
+      <h3>Budget Summary</h3>
+      <p>The final budget has been crafted with a reduced millage rate of 3.519 from 3.600 for the County Operating millage and maintaining 0.441 for the North Walton Mosquito Control District.</p>
+
+      <p>Public Safety remains the largest expenditure category for our County, with an allocation of $126 million, staying relatively flat when compared to the prior year. The Sheriff&rsquo;s Office allocation of $114 million reflects a slight increase from the prior year. Of the total public safety expenditure, 89% is allocated to the Walton County Sheriff&rsquo;s Office, while the remaining 11% funds other services such as the Building Department, Code Enforcement, and the Medical Examiner.</p>
+
+      <p>General Government expenditures are allocated at $58 million, a 4% increase from the previous year, ensuring support for essential government functions, including the remaining constitutional offices. The Economic Environment category is budgeted at $55 million, reflecting a 6.5% decrease from the prior year due to a decrease in Tourist Development Tax collections seen during Fiscal Year 2025. Additionally, the Transportation budget is set at $45 million, a 19% increase from the previous year, ensuring continued investment in infrastructure.</p>
+
+      <p>The budget for the Physical Environment activity category has been increased to $23 million, reflecting an increase of 12% in overall expenses related to solid waste collection and disposal. Culture and Recreation funding has been increased $1.8 million, or 23%, to reflect an increase in anticipated Recreation Plat Fee expenditures for capital recreation projects, and an increase in Parks Maintenance staffing and expenditures related to maintenance of county park facilities. The Human Services activity category has increased 12%, driven by increased funding for the DeFuniak Community Redevelopment Agency, and an additional funding request from the Walton County Health Department to maintain current primary care services within Walton County.</p>
+
+      <p>General Government Taxes remain the county's largest revenue source, accounting for 77% of budgeted revenues and projected at $254 million, with Ad Valorem taxes making up 66% or $167 million of the total. The projection for Ad Valorem taxes is supported by an increase in the County-Wide Certified Taxable Value, rising from $42.5 billion in fiscal year 2025 to $46.6 billion in fiscal year 2026, a 9.6% increase. The Discretionary Sales Surtax now contributes 15.5% or $39.7 million to be utilized primarily for solid waste collection and disposal, as well as funding road and bridge construction and maintenance.</p>
+
+      <p>Intergovernmental Revenues, expected to rise slightly to $29 million, include all revenues received from federal and state government sources. These revenues come in the form of grants, shared revenues, and payments in lieu of taxes. This category encompasses the half-cent sales tax as well as other state revenue-sharing streams, making it a critical component of the county&rsquo;s budget.</p>
+
+      <p>Miscellaneous Revenues are anticipated to increase 37% to $14.8 million, primarily from increased budgeted interest earnings and an increase in expected Recreation Plat Fee collections. Charges for Services are projected to generate $14 million, reflecting a 5% increase from the prior year&rsquo;s budget, in line with the sustained demand for county services. Permits, Fees, and Special Assessments are budgeted at $3.2 million, a decline from the prior year.</p>
+
+      <h3>Opportunities and Challenges in Budget Development</h3>
+      <p>As we move through the budget process and into the upcoming fiscal year, we are aware that there are several factors to consider that could potentially impact government operations over the next year. There is a possible impact on revenues due to legislative changes related to sales and property taxes. Another long-term concern is the uncertainty of future economic conditions. While tourist development taxes are collected and used within that fund for expenditures allowed under Florida Statute related to tourism, sales taxes recognized in Solid Waste and General Funds are impacted by tourism levels within the County. The budget development process presents both challenges and opportunities that will strengthen our financial planning and resource allocation for the future. As we move through the remainder of FY 25 and into the next fiscal year, it will be imperative to closely monitor those and other revenue sources that the County relies on to balance the budget.</p>
+
+      <p>The county&rsquo;s reliance on sales tax revenue is particularly significant, given that a large portion of ad valorem taxes are allocated to the budgets of constitutional officers. This reliance makes it even more critical to manage our resources effectively. The half-cent and one-cent surtaxes, though projected to remain moderately flat this year, offer us a unique opportunity to be more strategic and efficient with our existing resources. By focusing on optimizing our financial management practices, we can continue to support essential services and infrastructure projects without compromising the quality of life for our residents. Similarly, although tourist development taxes are expected to experience a decline from recent years, this is a natural rebalancing as global travel has normalized post-pandemic. The dip offers us the chance to refine our tourism strategies and focus on attracting visitors who will contribute positively to the local economy.</p>
+
+      <p>Overall, while there are challenges ahead, they also offer opportunities for growth, innovation, and improved financial management. By tackling these challenges with a proactive and strategic approach, we can ensure that our community remains resilient and well-prepared for the future.</p>
+
+      <h3>Full-Time Positions</h3>
+      <p>The final budget includes an additional 19.5 FTE's under the Board of County Commissioners, 6 for the Clerk of Courts, and 0.5 for the Supervisor of Elections. These requests focus on the need to maintain existing county facilities and levels of service. A detailed personnel summary is provided on each departmental budget page in this document, and an overall summary is provided as a separate page within the budget document.</p>
+
+      <p>During the budget process, each department identifies the positions that are necessary to either provide an enhanced level of service or maintain an existing one. Not all requests for new positions were included in the FY 26 Proposed Budget. Every new position request was reviewed and discussed, with some requests not being recommended. Positions that were not recommended were those that added new services or were considered an expansion of existing services. Only the BCC has the ability to add positions; additional positions approved or denied by the BCC during the budget workshops will be added or removed accordingly and reflected in the staffing totals.</p>
+
+      <p>New positions approved for FY 26 are as follows:</p>
+      <ul>
+        <li>Facilities Maintenance: 4 FTE's for a construction crew; anticipated to be a neutral budget item, smaller projects previously contracted will be done in-house.</li>
+        <li>Custodial: 3 FTE's for increased facilities and workload, with one FTE dedicated to the Building Department facility and the cost recouped through the cost allocation study.</li>
+        <li>Parks Maintenance: 4 FTE's for increased workload with park expansions and aging park facilities.</li>
+        <li>Public Works: 1 FTE for a Utility Inspector and 5 FTE's for a Stabilization Crew.</li>
+        <li>Office of Management &amp; Budget: 1 FTE for an experienced Budget Analyst for succession planning.</li>
+        <li>Procurement: 1 FTE for additional duties related to contracts awarded for solicitation.</li>
+        <li>Mossy Head Wastewater Treatment Facility: 0.5 FTE to bring the Sewer Technician to a full FTE.</li>
+      </ul>
+
+      <p>These positions will be partially offset by reductions in Engineering, Eagle Springs Grill, Building Department, and Section 8 Housing. The Clerk of Courts &amp; Comptroller has requested 5 FTE for IT Network and 1 FTE for a Payroll Specialist. The Supervisor of Elections has requested 0.5 FTE for a part-time employee for the South Walton Office.</p>
+
+      <p>These staffing changes reflect the county's ongoing commitment to aligning resources with our operational needs and strategic objectives. By making these adjustments, we are ensuring that the county remains well-equipped to meet the challenges of the upcoming fiscal year while continuing to provide the high level of service our residents expect.</p>
+
+      <h3>Major Fund Highlights</h3>
+      <p>As we transition into Fiscal Year 2026, the General Fund budget has been proposed at $204,494,466, a notable $16 million increase from the $189,306,344 allocated in Fiscal Year 2025. The largest increase in revenue is attributed to a 9.7% increase in taxable property values over the prior year, resulting in a corresponding increase in proposed ad valorem tax revenues of $13.7 million. The transfer of these ad valorem tax revenues from the General Fund to the Capital Projects and Fine &amp; Forfeiture Funds is proposed to increase $13.8 million to budget for critical infrastructure projects throughout the county. The other main driver of the increase in the General Fund budget is the addition of the Managed Vendor Program revenues and expenditures of $1.53 million.</p>
+
+      <p>The Transportation Fund for Fiscal Year 2026 is budgeted at $26.6 million, reflecting a modest increase from the $26.2 million allocated in FY 2025. This increase supports the county&rsquo;s commitment to maintaining and improving its transportation infrastructure, which is crucial for both residents and the local economy. Projected costs have remained relatively flat for FY 26 due to a lower anticipated cost of capital projects to be completed in the coming fiscal year.</p>
+
+      <p>The Fine &amp; Forfeiture Fund budget for Fiscal Year 2026 is proposed at $114,116,228, an increase over last year's fund budget of $107,849,843. The Fiscal Year 2026 Budget includes $1,700,000 in excess EMS revenue requested to be budgeted by the Sheriff&rsquo;s Office and $3,000,000 redirected to the Bruce Fire Station project, contributing to the overall increase in this fund.</p>
+
+      <p>The Tourist Development Fund for Fiscal Year 2026 is proposed at $51,500,000, reflecting a decrease from the $55,331,554 budgeted in FY 2025. This reduction is due to lower Tourist Development Tax revenues received to date in FY 25 when compared to the prior year. This budget has been approved and recommended by the Tourist Development Council, which focused on conservative budgeting principles and an increased effort for marketing for FY 26.</p>
+
+      <p>The Solid Waste Fund for Fiscal Year 2026 is set at $41,000,000, reflecting an increase of $3,850,000 over FY 25. Increases in the Solid Waste Fund budget focus on regular operations and maintenance of the county&rsquo;s solid waste management system, as well as an increase in transfers out to the Transportation Fund for road and bridge projects.</p>
+
+      <p>The Capital Project Fund for Fiscal Year 2026 is proposed at $20.3 million, marking a substantial increase from the $12.7 million allocated in FY 2025. This increase of over $7.6 million reflects the county's commitment to advancing critical infrastructure projects that are essential for supporting the community's growth and development.</p>
+
+      <p>In summary, the Fiscal Year 2025-2026 budget reflects a balanced and forward-thinking approach, carefully designed to meet the immediate needs of our community while positioning Walton County for sustained growth and resilience. This budget underscores our commitment to fiscal responsibility, strategic investment in critical infrastructure, and the continued delivery of high-quality services to our residents. I want to express my gratitude to the Board of County Commissioners for their guidance and to the entire county staff for their dedication and hard work in developing this comprehensive financial plan. Together, we are ensuring that Walton County remains a vibrant and prosperous place to live, work, and visit.</p>
+
+      <p class="wc-transmittal-signature">Melissa Thomason,<br>Chief Financial Officer</p>
+    </article>
+
+    <aside class="wc-transmittal-aside" aria-label="Transmittal letter highlights">
+      <div class="wc-transmittal-stat">
+        <strong>Balanced Plan</strong>
+        <span>Recurring Revenues and Costs</span>
+      </div>
+      <div class="wc-transmittal-stat">
+        <strong>Core Services</strong>
+        <span>Operations and Public Needs</span>
+      </div>
+      <div class="wc-transmittal-stat">
+        <strong>Capital Focus</strong>
+        <span>Infrastructure and Facilities</span>
+      </div>
+      <div class="wc-transmittal-stat">
+        <strong>Transparency</strong>
+        <span>Searchable Budget Detail</span>
+      </div>
+    </aside>
+  </div>
+
+  <section class="wc-transmittal-section">
+    <div class="wc-transmittal-section-header">
+      <span class="wc-transmittal-kicker">Budget Priorities</span>
+      <h2>What the proposed budget is built to support.</h2>
+      <p>The annual plan connects resources to countywide responsibilities, service delivery, and long-term investments.</p>
+    </div>
+
+    <div class="wc-transmittal-priority-grid">
+      <article class="wc-transmittal-priority">
+        <strong>Public Safety</strong>
+        <p>Supports law enforcement, emergency response, corrections, courts, fire-related partnerships, and the facilities and equipment needed to protect residents and visitors.</p>
+      </article>
+      <article class="wc-transmittal-priority">
+        <strong>Infrastructure</strong>
+        <p>Invests in transportation, drainage, buildings, technology, equipment, and capital projects that maintain and expand public assets.</p>
+      </article>
+      <article class="wc-transmittal-priority">
+        <strong>Quality of Life</strong>
+        <p>Maintains parks, libraries, recreation, community services, planning, code compliance, and other programs that shape everyday life in Walton County.</p>
+      </article>
+      <article class="wc-transmittal-priority">
+        <strong>Fiscal Stewardship</strong>
+        <p>Preserves reserves, evaluates future operating impacts, monitors revenue trends, and uses fund accounting to keep restricted resources aligned with their intended purpose.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wc-transmittal-section">
+    <div class="wc-transmittal-section-header">
+      <span class="wc-transmittal-kicker">Explore the Supporting Detail</span>
+      <h2>Move from the message to the numbers.</h2>
+      <p>The pages below provide the financial schedules, department detail, and capital planning information that support the transmittal letter.</p>
+    </div>
+
+    <div class="wc-transmittal-links">
+      <a class="wc-transmittal-link-card" href="budget-overview.html">
+        <h3>Budget Overview</h3>
+        <p>Review the budget hub, process, policies, fund structure, and major financial context.</p>
+        <span>Open Overview</span>
+      </a>
+      <a class="wc-transmittal-link-card" href="financials.html">
+        <h3>Financials</h3>
+        <p>Explore revenues, expenses, fund schedules, transfers, personnel, equipment, debt, and forecast information.</p>
+        <span>View Financials</span>
+      </a>
+      <a class="wc-transmittal-link-card" href="capital-projects.html">
+        <h3>Capital Projects</h3>
+        <p>Browse the capital overview, fund schedules, and searchable project index for planned investments.</p>
+        <span>View Capital Plan</span>
+      </a>
+    </div>
+  </section>
+</section>
 </main>
 </div>
 
