@@ -18,6 +18,12 @@
 
   const LOADING_MESSAGE = "Loading budget data...";
   const ERROR_MESSAGE = "Budget data could not be loaded. Please try again later.";
+  const HISTORICAL_ACTUAL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+  const SUPABASE_CLIENT_SCRIPT = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+  const currentScriptSrc = document.currentScript && document.currentScript.src;
+  const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
+  const supabaseDataScript = assetBaseUrl + "supabase-data.js";
 
   // The published sheets use department names that differ slightly between
   // tabs (and from this site's page titles). These aliases map a page's
@@ -128,6 +134,81 @@
     errors: {}
   };
   let loadPromise = null;
+
+  function loadScriptOnce(id, src) {
+    return new Promise((resolve, reject) => {
+      const existing = document.getElementById(id);
+      if (existing) {
+        if (existing.dataset.loaded === "true") {
+          resolve();
+          return;
+        }
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", () => reject(new Error("Failed to load " + src)), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.id = id;
+      script.src = src;
+      script.async = true;
+      script.addEventListener(
+        "load",
+        () => {
+          script.dataset.loaded = "true";
+          resolve();
+        },
+        { once: true }
+      );
+      script.addEventListener("error", () => reject(new Error("Failed to load " + src)), { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureSupabaseDataLayer() {
+    if (window.WCSupabaseData) return Promise.resolve(window.WCSupabaseData);
+
+    return loadScriptOnce("wc-supabase-js", SUPABASE_CLIENT_SCRIPT)
+      .then(() => loadScriptOnce("wc-supabase-data", supabaseDataScript))
+      .then(() => window.WCSupabaseData || null)
+      .catch((err) => {
+        console.error("WCBudgetData: Supabase actuals layer could not be loaded; using Google Sheets fallbacks.", err);
+        return null;
+      });
+  }
+
+  function loadSupabaseActualLookups() {
+    return ensureSupabaseDataLayer().then((supabaseData) => {
+      if (!supabaseData) return null;
+
+      return Promise.all([
+        supabaseData.loadExpenseActuals(),
+        supabaseData.loadRevenueActuals()
+      ]).then(([expenseRows, revenueRows]) => ({
+        supabaseData,
+        expenseLookup: supabaseData.buildActualsLookup(expenseRows),
+        revenueLookup: supabaseData.buildActualsLookup(revenueRows)
+      }));
+    }).catch((err) => {
+      console.error("WCBudgetData: Supabase actuals could not be loaded; using Google Sheets fallbacks.", err);
+      return null;
+    });
+  }
+
+  function applyActualsToRows(rows, lookup, supabaseData) {
+    if (!lookup || !supabaseData || typeof supabaseData.actualOrFallback !== "function") {
+      return rows;
+    }
+
+    return (rows || []).map((row) => {
+      const next = { ...row };
+      HISTORICAL_ACTUAL_YEARS.forEach((year) => {
+        const field = "FY" + year + "_Actual";
+        next[field] = supabaseData.actualOrFallback(lookup, row, year, row[field]);
+      });
+      return next;
+    });
+  }
 
   function escapeHtml(value) {
     return String(value === undefined || value === null ? "" : value)
@@ -605,9 +686,10 @@
 
     cache.datasetCount = specs.length;
 
-    loadPromise = Promise.allSettled(
-      specs.map((spec) => fetchCSV(spec[1]).then((rows) => rows.map(spec[2])))
-    ).then((results) => {
+    loadPromise = Promise.all([
+      Promise.allSettled(specs.map((spec) => fetchCSV(spec[1]).then((rows) => rows.map(spec[2])))),
+      loadSupabaseActualLookups()
+    ]).then(([results, actuals]) => {
       results.forEach((result, i) => {
         const key = specs[i][0];
         if (result.status === "fulfilled") {
@@ -618,6 +700,12 @@
           console.error("WCBudgetData: failed to load " + key, result.reason);
         }
       });
+
+      if (actuals) {
+        cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseLookup, actuals.supabaseData);
+        cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueLookup, actuals.supabaseData);
+      }
+
       return cache;
     });
 
