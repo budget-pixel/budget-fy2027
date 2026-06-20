@@ -1191,6 +1191,9 @@ body {
 .wc-department-financial-grid .wc-finance-card {
   margin: 0;
 }
+.wc-department-financial-grid .wc-finance-card + .wc-finance-card {
+  margin-top: 18px;
+}
 .wc-department-financial-grid #department-staffing-table {
   grid-column: 1 / -1;
 }

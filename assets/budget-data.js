@@ -716,6 +716,18 @@
           '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
         );
       });
+    const totalFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    const totals = {};
+    totalFields.forEach((field) => {
+      totals[field] = mergedRows.reduce((sum, row) => sum + (row[field] || 0), 0);
+    });
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td colspan="' + (isExpense ? 4 : 3) + '">Total</td>' +
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+          '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
+    );
 
     const detailTable = renderTable({
       columns: [{ label: "Category" }]
@@ -1747,6 +1759,17 @@
         '<td class="wc-num">' + formatCurrency(d.FY2027_Proposed || 0) + "</td></tr>"
       );
     });
+    const totals = {};
+    sumFields.forEach((field) => {
+      totals[field] = deptRows.reduce((sum, row) => sum + (row[field] || 0), 0);
+    });
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td colspan="2">Total</td>' +
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+          '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
+    );
 
     const detailTable = renderTable({
       columns: [{ label: "Category" }, { label: "Department" }].concat(
