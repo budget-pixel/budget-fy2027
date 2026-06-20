@@ -7,8 +7,8 @@
 (function () {
   "use strict";
 
-  const SUPABASE_URL = "REPLACE_WITH_SUPABASE_PROJECT_URL";
-  const SUPABASE_PUBLISHABLE_KEY = "REPLACE_WITH_SUPABASE_PUBLISHABLE_KEY";
+  const SUPABASE_URL = "https://gxsfkvzexfpctaiozqrb.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_94LmtSpqQZCvjeyQa9BYVQ__b-Rgj8L";
 
   let supabaseClient = null;
   let warnedAboutConfig = false;
