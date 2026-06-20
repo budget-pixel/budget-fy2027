@@ -737,19 +737,84 @@
     };
   }
 
-  // Single delegated listener handles every "View Budget Lines" button on
-  // the page, regardless of which function rendered the table it belongs to.
+  let activeBudgetDetailToggle = null;
+
+  function ensureBudgetDetailModal() {
+    let modal = document.querySelector(".wc-budget-detail-modal");
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.className = "wc-budget-detail-modal";
+    modal.hidden = true;
+    modal.innerHTML =
+      '<div class="wc-budget-detail-backdrop" data-budget-detail-close></div>' +
+      '<section class="wc-budget-detail-card" role="dialog" aria-modal="true" aria-labelledby="wc-budget-detail-title">' +
+        '<div class="wc-budget-detail-header">' +
+          '<div>' +
+            '<p class="wc-budget-detail-kicker">Budget Detail</p>' +
+            '<h2 id="wc-budget-detail-title">Budget Lines</h2>' +
+          '</div>' +
+          '<button type="button" class="wc-budget-detail-close" data-budget-detail-close aria-label="Close budget detail">&times;</button>' +
+        '</div>' +
+        '<div class="wc-budget-detail-body"></div>' +
+      '</section>';
+    document.body.appendChild(modal);
+    modal.addEventListener("click", (event) => {
+      if (event.target.closest("[data-budget-detail-close]")) {
+        closeBudgetDetailModal();
+      }
+    });
+    return modal;
+  }
+
+  function closeBudgetDetailModal() {
+    const modal = document.querySelector(".wc-budget-detail-modal");
+    if (!modal) return;
+    modal.hidden = true;
+    modal.classList.remove("is-open");
+    document.body.classList.remove("wc-budget-detail-open");
+    const body = modal.querySelector(".wc-budget-detail-body");
+    if (body) body.innerHTML = "";
+    if (activeBudgetDetailToggle) {
+      activeBudgetDetailToggle.setAttribute("aria-expanded", "false");
+      if (document.contains(activeBudgetDetailToggle)) {
+        activeBudgetDetailToggle.focus({ preventScroll: true });
+      }
+      activeBudgetDetailToggle = null;
+    }
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeBudgetDetailModal();
+  });
+
+  function openBudgetDetailModal(toggle, detail) {
+    const modal = ensureBudgetDetailModal();
+    const title = modal.querySelector("#wc-budget-detail-title");
+    const body = modal.querySelector(".wc-budget-detail-body");
+    const label = toggle.dataset.closedLabel || toggle.textContent || "Budget Lines";
+    if (title) title.textContent = label.replace(/^View\s+/i, "");
+    if (body) {
+      body.innerHTML = detail.innerHTML;
+      bindPriorYearsToggle(body);
+      applyPriorYearsState(false, body);
+    }
+    activeBudgetDetailToggle = toggle;
+    toggle.setAttribute("aria-expanded", "true");
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.classList.add("is-open"));
+    document.body.classList.add("wc-budget-detail-open");
+    const closeButton = modal.querySelector(".wc-budget-detail-close");
+    if (closeButton) closeButton.focus({ preventScroll: true });
+  }
+
+  // Single delegated listener handles every detail button on the page,
+  // regardless of which function rendered the card or table it belongs to.
   document.addEventListener("click", (event) => {
     const toggle = event.target.closest(".wc-view-budget-lines-toggle");
     if (!toggle) return;
     const detail = document.getElementById(toggle.dataset.target);
     if (!detail) return;
-    const isHidden = detail.hasAttribute("hidden");
-    detail.toggleAttribute("hidden", !isHidden);
-    toggle.setAttribute("aria-expanded", String(isHidden));
-    toggle.textContent = isHidden
-      ? (toggle.dataset.openLabel || "Hide Budget Lines")
-      : (toggle.dataset.closedLabel || "View Budget Lines");
+    openBudgetDetailModal(toggle, detail);
   });
 
   function lastUpdatedNoteHtml() {
@@ -876,8 +941,9 @@
     const sortedRows = rows
       .slice()
       .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
-
-    const itemHtml = sortedRows.map((row) => {
+    const nonZeroRows = sortedRows.filter((row) => (row.amount || 0) !== 0);
+    const visibleRows = nonZeroRows.slice(0, 3);
+    const itemHtml = visibleRows.map((row) => {
       const amount = row.amount || 0;
       const percent = total ? Math.abs(amount) / Math.abs(total) * 100 : 0;
       const width = total ? Math.max(percent, amount ? 2 : 0) : 0;
@@ -2145,22 +2211,28 @@
         "</div>"
       : "";
     const detailId = "wc-staffing-lines-" + (++budgetLinesDetailCounter);
-    const maxFte = Math.max.apply(null, sortedRows.map((r) => r[2027] || 0).concat([0]));
-    const positionRows = sortedRows
+    const activeStaffingRows = sortedRows
       .filter((r) => (r[2027] || 0) !== 0)
-      .sort((a, b) => (b[2027] || 0) - (a[2027] || 0))
+      .sort((a, b) => (b[2027] || 0) - (a[2027] || 0));
+    const visibleStaffingRows = activeStaffingRows.slice(0, 5);
+    const otherStaffingFte = activeStaffingRows
+      .slice(5)
+      .reduce((sum, row) => sum + (row[2027] || 0), 0);
+    if (otherStaffingFte !== 0) {
+      visibleStaffingRows.push({ Position_Name: "All Other", 2027: otherStaffingFte });
+    }
+    const visibleMaxFte = Math.max.apply(null, visibleStaffingRows.map((r) => r[2027] || 0).concat([0]));
+    const positionRows = visibleStaffingRows
       .map((r) => {
         const current = r[2027] || 0;
-        const percent = totals[2027] ? current / totals[2027] * 100 : 0;
-        const width = maxFte ? Math.max(2, current / maxFte * 100) : 0;
+        const width = visibleMaxFte ? Math.max(2, current / visibleMaxFte * 100) : 0;
         return (
           '<div class="wc-finance-card-row">' +
             '<div class="wc-finance-card-row-head">' +
               '<strong>' + escapeHtml(r.Position_Name || "Position") + '</strong>' +
-              '<span>' + escapeHtml(percent.toFixed(percent >= 10 ? 0 : 1)) + '%</span>' +
+              '<span>' + escapeHtml(formatNumber(current)) + ' FTE</span>' +
             '</div>' +
             '<div class="wc-finance-card-track" aria-hidden="true"><span style="width:' + width.toFixed(2) + '%"></span></div>' +
-            '<div class="wc-finance-card-amount">' + escapeHtml(formatNumber(current)) + ' FTE</div>' +
           '</div>'
         );
       }).join("");
@@ -2661,11 +2733,12 @@
     );
   }
 
-  function applyPriorYearsState(checked) {
-    document.querySelectorAll(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card").forEach((card) => {
+  function applyPriorYearsState(checked, container) {
+    const root = container || document;
+    root.querySelectorAll(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card").forEach((card) => {
       card.classList.toggle("show-prior-years", checked);
     });
-    document.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((cb) => {
+    root.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((cb) => {
       cb.checked = checked;
     });
   }
@@ -2798,6 +2871,20 @@
     });
   }
 
+  function arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl) {
+    const cards = [expenseEl, revenueEl, staffingEl].filter((el) =>
+      el && !el.hidden && el.innerHTML.trim()
+    );
+    if (!cards.length) return;
+    let grid = document.querySelector(".wc-department-financial-grid");
+    if (!grid) {
+      grid = document.createElement("section");
+      grid.className = "wc-department-financial-grid";
+      cards[0].parentNode.insertBefore(grid, cards[0]);
+    }
+    cards.forEach((card) => grid.appendChild(card));
+  }
+
   function initDepartmentPage() {
     const ids = [
       "department-narrative",
@@ -2814,6 +2901,7 @@
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
+    document.body.classList.add("wc-department-financial-dashboard");
 
     const deptName = getDepartmentNameFromPage();
     const deptCode = getDeptCodeFromPage();
@@ -2956,6 +3044,8 @@
         );
         bindTooltipAnchors(courtInnovationsEl);
         bindPriorYearsToggle(courtInnovationsEl);
+
+        arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
