@@ -1803,6 +1803,39 @@ body {
   border-color: var(--border) !important;
 }
 
+:root[data-theme="dark"] .wc-cip-schedule-controls,
+:root[data-theme="dark"] .wc-cip-year-stat,
+:root[data-theme="dark"] .wc-cip-year-button {
+  background: rgba(14,28,22,.92) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .wc-cip-year-summary {
+  background: var(--border) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .wc-cip-schedule-control-top h2 {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .wc-cip-schedule-control-top p,
+:root[data-theme="dark"] .wc-cip-active-total span,
+:root[data-theme="dark"] .wc-cip-year-stat span {
+  color: var(--muted) !important;
+}
+:root[data-theme="dark"] .wc-cip-active-total strong,
+:root[data-theme="dark"] .wc-cip-year-stat strong,
+:root[data-theme="dark"] .wc-cip-project-link {
+  color: var(--green) !important;
+}
+:root[data-theme="dark"] .wc-cip-year-button {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .wc-cip-year-button:hover,
+:root[data-theme="dark"] .wc-cip-year-button.is-active {
+  background: var(--green2) !important;
+  border-color: var(--green2) !important;
+  color: #07110d !important;
+}
+
 :root[data-theme="dark"] .wc-data-table thead th,
 :root[data-theme="dark"] .wc-performance-table thead th {
   background: linear-gradient(135deg, #0c4a32 0%, #143f32 100%) !important;

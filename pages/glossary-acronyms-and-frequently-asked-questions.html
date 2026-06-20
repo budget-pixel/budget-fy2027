@@ -324,6 +324,39 @@
       grid-template-columns:1fr !important;
     }
   }
+
+  :root[data-theme="dark"] .wc-help-faq-section{
+    background:#0c1712 !important;
+  }
+
+  :root[data-theme="dark"] .wc-budget-contact-card,
+  :root[data-theme="dark"] .wc-faq-card{
+    background:rgba(14,28,22,0.92) !important;
+    border-color:var(--border) !important;
+  }
+
+  :root[data-theme="dark"] .wc-budget-contact-content h2,
+  :root[data-theme="dark"] .wc-faq-card summary{
+    color:var(--text) !important;
+  }
+
+  :root[data-theme="dark"] .wc-budget-contact-content p,
+  :root[data-theme="dark"] .wc-faq-card p{
+    color:var(--muted) !important;
+  }
+
+  :root[data-theme="dark"] .wc-budget-contact-details a{
+    color:var(--green) !important;
+  }
+
+  :root[data-theme="dark"] .wc-faq-card summary::after{
+    background:rgba(123,211,159,0.14) !important;
+    color:var(--green) !important;
+  }
+
+  :root[data-theme="dark"] .wc-faq-card[open] summary{
+    color:var(--green) !important;
+  }
   </style>
   <div class="wc-help-faq-shell">
     <aside class="wc-budget-contact-card">
@@ -679,6 +712,41 @@
       #searchResults p{
         padding:18px 16px !important;
       }
+    }
+
+    :root[data-theme="dark"] .wc-glossary-section{
+      background:#0c1712 !important;
+    }
+
+    :root[data-theme="dark"] .wc-glossary-search-panel,
+    :root[data-theme="dark"] #searchResults p,
+    :root[data-theme="dark"] .wc-glossary-empty{
+      background:rgba(14,28,22,0.92) !important;
+      border-color:var(--border) !important;
+    }
+
+    :root[data-theme="dark"] #searchResults p:hover{
+      background:rgba(123,211,159,0.08) !important;
+    }
+
+    :root[data-theme="dark"] #searchBar{
+      background:rgba(7,17,13,0.6) !important;
+      border-color:var(--border) !important;
+      color:var(--text) !important;
+    }
+
+    :root[data-theme="dark"] #searchBar:focus{
+      background:rgba(7,17,13,0.8) !important;
+      border-color:var(--green) !important;
+    }
+
+    :root[data-theme="dark"] #searchResults strong{
+      color:var(--green) !important;
+    }
+
+    :root[data-theme="dark"] #searchResults span,
+    :root[data-theme="dark"] .wc-glossary-empty{
+      color:var(--muted) !important;
     }
   </style>
 

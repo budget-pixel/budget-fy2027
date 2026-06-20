@@ -479,7 +479,24 @@
 
       var matches = links.filter(function(item){
         return item.searchText.indexOf(normalizedQuery) !== -1;
-      }).slice(0, 3);
+      }).map(function(item, index){
+        var titleNormalized = item.title.toLowerCase();
+        var rank;
+        if(titleNormalized === normalizedQuery){
+          rank = 0;
+        }else if(titleNormalized.indexOf(normalizedQuery) === 0){
+          rank = 1;
+        }else if(titleNormalized.indexOf(normalizedQuery) !== -1){
+          rank = 2;
+        }else{
+          rank = 3;
+        }
+        return { item:item, rank:rank, index:index };
+      }).sort(function(a, b){
+        return a.rank - b.rank || a.index - b.index;
+      }).slice(0, 8).map(function(entry){
+        return entry.item;
+      });
 
       if(!matches.length){
         resultsInner.innerHTML = '<div class="wc-nav-search-empty">No matching sections found.</div>';
