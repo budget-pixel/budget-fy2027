@@ -618,9 +618,13 @@
     height:52px !important;
   }
   nav#nav-menu.nav-menu .logo-container{
-    min-width:284px !important;
     height:52px !important;
     min-height:52px !important;
+  }
+  @media(min-width:861px){
+    nav#nav-menu.nav-menu .logo-container{
+      min-width:284px !important;
+    }
   }
   nav#nav-menu .wc-split-brand-top{
     color:#ffffff !important;
@@ -934,6 +938,9 @@
     background:rgba(255,255,255,.14) !important;
     color:#d1be78 !important;
   }
+  nav#nav-menu .wc-nav-links-search{
+    display:none !important;
+  }
   nav#nav-menu .wc-nav-actions{
     grid-column:3 !important;
     display:flex !important;
@@ -1018,8 +1025,35 @@
       border-radius:12px !important;
       background:rgba(255,255,255,.12) !important;
     }
+    nav#nav-menu .wc-nav-links-search{
+      order:-1 !important;
+      display:inline-flex !important;
+      align-items:center !important;
+      gap:8px !important;
+      justify-content:flex-start !important;
+      min-height:38px !important;
+      padding:0 12px !important;
+      margin-bottom:6px !important;
+      border:0 !important;
+      border-radius:12px !important;
+      background:rgba(255,255,255,.12) !important;
+      color:rgba(255,255,255,.92) !important;
+      font-size:14px !important;
+      font-weight:700 !important;
+      cursor:pointer !important;
+    }
+    nav#nav-menu .wc-nav-links-search svg{
+      width:18px !important;
+      height:18px !important;
+      stroke:currentColor !important;
+      fill:none !important;
+      flex:0 0 auto !important;
+    }
     nav#nav-menu .wc-nav-menu-toggle{
       display:inline-flex !important;
+    }
+    nav#nav-menu .wc-nav-search-toggle{
+      display:none !important;
     }
   }
   .wc-breadcrumb{
@@ -1777,9 +1811,16 @@
     if(!nav.querySelector(".wc-nav-links")){
       var linksWrap = document.createElement("div");
       linksWrap.className = "wc-nav-links";
-      linksWrap.innerHTML = WC_NAV_LINKS.map(function(link){
-        return '<a href="' + link.href + '">' + link.label + '</a>';
-      }).join("");
+      linksWrap.innerHTML =
+        '<button type="button" class="wc-nav-links-search" aria-label="Search">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+            '<path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>' +
+          '</svg>' +
+          '<span>Search</span>' +
+        '</button>' +
+        WC_NAV_LINKS.map(function(link){
+          return '<a href="' + link.href + '">' + link.label + '</a>';
+        }).join("");
       nav.appendChild(linksWrap);
     }
     if(!nav.querySelector(".wc-nav-actions")){
@@ -1853,6 +1894,14 @@
           openNavSearch();
         }
       });
+      var linksSearchToggle = nav.querySelector(".wc-nav-links-search");
+      if(linksSearchToggle){
+        linksSearchToggle.addEventListener("click", function(){
+          nav.classList.remove("is-menu-open");
+          menuToggle.setAttribute("aria-expanded", "false");
+          openNavSearch();
+        });
+      }
       menuToggle.addEventListener("click", function(){
         var open = !nav.classList.contains("is-menu-open");
         nav.classList.toggle("is-menu-open", open);

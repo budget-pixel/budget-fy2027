@@ -637,8 +637,10 @@
     });
 
     if(closeButton){
-      closeButton.addEventListener("click", function(){
+      closeButton.addEventListener("click", function(e){
+        e.stopPropagation();
         closeSearchMode();
+        closeMobileSearch();
       });
     }
 

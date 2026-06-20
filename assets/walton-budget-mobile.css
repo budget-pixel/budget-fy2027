@@ -240,23 +240,20 @@
   nav#nav-menu.nav-menu .wc-split-brand-top{
     color:#ffffff !important;
     font-size:18px !important;
-    line-height:.9 !important;
-    letter-spacing:.045em !important;
   }
 
   nav#nav-menu.nav-menu .wc-split-brand-bottom{
     color:rgba(255,255,255,.78) !important;
-    font-size:8px !important;
-    line-height:8px !important;
-    letter-spacing:.08em !important;
+    font-size:7px !important;
+    line-height:7px !important;
   }
 
   nav#nav-menu.nav-menu .wc-split-brand-seal,
   nav#nav-menu.nav-menu .logo-container .wc-seal-mark{
-    width:40px !important;
-    height:40px !important;
-    flex:0 0 40px !important;
-    background-size:36px 36px !important;
+    width:36px !important;
+    height:36px !important;
+    flex:0 0 36px !important;
+    background-size:32px 32px !important;
   }
 
   nav#nav-menu .wc-nav-links{
@@ -287,6 +284,34 @@
     font-size:14px !important;
     font-weight:700 !important;
     text-decoration:none !important;
+  }
+
+  nav#nav-menu .wc-nav-search-toggle{
+    display:none !important;
+  }
+
+  nav#nav-menu .wc-nav-links-search{
+    order:-1 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:8px !important;
+    min-height:40px !important;
+    padding:0 12px !important;
+    border:0 !important;
+    border-radius:12px !important;
+    background:rgba(255,255,255,.10) !important;
+    color:#ffffff !important;
+    font-size:14px !important;
+    font-weight:700 !important;
+  }
+
+  nav#nav-menu .wc-nav-links-search svg{
+    width:17px !important;
+    height:17px !important;
+    stroke:currentColor !important;
+    fill:none !important;
+    flex:0 0 auto !important;
   }
 
   nav#nav-menu .wc-nav-search-slot{
@@ -491,31 +516,7 @@
   }
 
   nav#nav-menu .logo-container{
-    max-width:100% !important;
     min-height:42px !important;
-  }
-
-  .wc-split-brand-top{
-    font-size:16px !important;
-    letter-spacing:.055em !important;
-  }
-
-  .wc-split-brand-bottom{
-    font-size:6.8px !important;
-    line-height:7px !important;
-    letter-spacing:.07em !important;
-  }
-
-  .wc-split-brand-right .wc-split-brand-bottom{
-    letter-spacing:.09em !important;
-  }
-
-  .wc-split-brand-seal,
-  nav#nav-menu .logo-container .wc-seal-mark{
-    width:32px !important;
-    height:32px !important;
-    flex:0 0 32px !important;
-    background-size:28px 28px !important;
   }
   [data-report-table-container-id]{
     border-radius:14px !important;
@@ -549,28 +550,6 @@
     word-break:normal !important;
     background:#ffffff !important;
     background-clip:padding-box !important;
-  }
-}
-
-@media(max-width:360px){
-
-  .wc-split-brand-top{
-    font-size:15px !important;
-    letter-spacing:.045em !important;
-  }
-
-  .wc-split-brand-bottom{
-    font-size:6px !important;
-    line-height:6.5px !important;
-    letter-spacing:.04em !important;
-  }
-
-  .wc-split-brand-seal,
-  nav#nav-menu .logo-container .wc-seal-mark{
-    width:30px !important;
-    height:30px !important;
-    flex-basis:30px !important;
-    background-size:26px 26px !important;
   }
 }
 
