@@ -55,8 +55,6 @@
                 autocomplete="off"
               >
 
-              <span class="wc-search-esc" aria-hidden="true">Esc</span>
-
               <button type="button" class="wc-search-close" aria-label="Close search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6 6 18"></path>

@@ -1673,7 +1673,7 @@ body {
 .wc-performance-card{ width:100%; border:0; border-radius:0; background:#fff; box-shadow:none; position:relative; padding-top:60px; }
 .wc-performance-card::before{
   content:"Departmental Goal, Objective, and Performance Measures"; position:absolute; top:18px; left:50%; transform:translateX(-50%);
-  color:#172033; font-size:1rem; line-height:1.25; font-weight:600; text-align:center; white-space:nowrap;
+  width:min(100% - 180px, 760px); color:#172033; font-size:1rem; line-height:1.25; font-weight:600; text-align:center; white-space:normal;
 }
 .wc-performance-card-header{ display:none; }
 .wc-performance-goal-block{ margin:0; padding:0; }
@@ -1702,12 +1702,15 @@ body {
 @media(max-width:900px){
   .wc-performance-page{ padding:24px 12px 36px; } .wc-performance-page.is-embedded{ padding:0; }
   .wc-performance-header h1{ font-size:1.25rem; } .wc-performance-header p{ font-size:13px; }
-  .wc-performance-card::before{ font-size:1rem; margin-bottom:10px; top:12px; }
-  .wc-performance-card{ padding-top:44px; }
+  .wc-performance-card::before{ width:100%; max-width:26rem; font-size:1rem; margin-bottom:0; top:0; padding:0 12px; box-sizing:border-box; }
+  .wc-performance-card{ padding-top:86px; }
   .wc-performance-table-wrap{ border-radius:18px; } .wc-performance-table th, .wc-performance-table td{ padding:7px 6px; }
   .wc-performance-table thead th{ font-size:12px; } .wc-performance-table td{ font-size:12px; line-height:1.35; }
   .wc-performance-note{ padding-top:10px; font-size:11px; }
-  .wc-fy-column-toggle-wrap{ position:static !important; width:98px !important; height:18px !important; margin:6px auto 12px auto !important; }
+  .wc-performance-card > .wc-fy-column-toggle-wrap{ position:absolute !important; top:48px !important; right:50% !important; transform:translateX(50%) !important; width:auto !important; min-width:132px !important; height:24px !important; margin:0 !important; padding:0 10px !important; }
+  .wc-fy-column-toggle-wrap{ position:static !important; width:auto !important; height:22px !important; margin:6px auto 12px auto !important; padding:0 9px !important; }
+  .wc-performance-card > .wc-fy-column-toggle-wrap .wc-fy-column-toggle-label{ font-size:11px !important; }
+  .wc-performance-card > .wc-fy-column-toggle-wrap .wc-fy-column-toggle-text{ font-size:11px !important; white-space:nowrap !important; }
 }
 
 /* ── site-wide dark mode ── */
