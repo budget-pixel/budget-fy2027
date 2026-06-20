@@ -502,7 +502,7 @@
     column-gap:24px !important;
     min-height:88px !important;
     margin-top:0 !important;
-    padding:22px clamp(40px, 7vw, 104px) 14px !important;
+    padding:22px clamp(22px, 4vw, 64px) 14px !important;
     box-sizing:border-box !important;
     background:linear-gradient(180deg, rgba(0,62,40,.96), rgba(0,62,40,.88)) !important;
     border-top:0 !important;
@@ -1804,7 +1804,7 @@
     justify-content:space-between !important;
     gap:24px !important;
     min-height:88px !important;
-    padding:22px clamp(40px, 7vw, 104px) 14px !important;
+    padding:22px clamp(22px, 4vw, 64px) 14px !important;
     box-sizing:border-box !important;
     background:linear-gradient(180deg, rgba(0,62,40,.96), rgba(0,62,40,.88)) !important;
     border-bottom:0 !important;
