@@ -1168,7 +1168,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
-  align-items: stretch;
+  align-items: start;
   margin: 28px 0;
 }
 .wc-department-financial-grid #department-expense-table,
@@ -1189,7 +1189,6 @@ body {
   display: contents;
 }
 .wc-department-financial-grid .wc-finance-card {
-  height: 100%;
   margin: 0;
 }
 .wc-department-financial-grid #department-staffing-table {
@@ -1244,7 +1243,6 @@ body {
 .wc-finance-card-breakdown {
   display: grid;
   gap: 17px;
-  flex: 1;
   align-content: start;
 }
 .wc-department-financial-grid #department-staffing-table .wc-finance-card-breakdown {
