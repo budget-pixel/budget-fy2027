@@ -799,6 +799,9 @@
     if (body) {
       body.className = "wc-budget-detail-body wc-budget-lines-card";
       body.innerHTML = detail.innerHTML;
+      body.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((checkbox) => {
+        checkbox.removeAttribute("data-wc-prior-years-bound");
+      });
       bindPriorYearsToggle(body);
       applyPriorYearsState(false, body);
       body.classList.remove("show-prior-years");
@@ -2388,7 +2391,7 @@
       expenseNames: ["Tourism Administration"],
       revenueNames: ["Tourist Development Taxes"],
       staffingNames: ["Tourism Administration"],
-      machineryNames: ["Tourism Administration"]
+      machineryNames: []
     },
     {
       label: "Sales and Visitor Center",
@@ -2457,14 +2460,11 @@
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
       const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
-      const machineryRows = rowsForExactNames(cache.machinery, spec.machineryNames);
-
       const body = [
         narrativeHtml,
         renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
         renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
-        renderStaffingTable(staffingRows),
-        renderMachineryTable(machineryRows)
+        renderStaffingTable(staffingRows)
       ].filter(Boolean).join("");
 
       if (!body) return "";
@@ -2490,7 +2490,7 @@
       expenseNames: ["Beach Operations"],
       revenueNames: [],
       staffingNames: ["Beach Operations"],
-      machineryNames: ["Beach Operations"],
+      machineryNames: [],
       performanceNames: ["Tourism Beach Operations"]
     },
     {
@@ -2507,7 +2507,7 @@
       expenseNames: ["Beach Tram"],
       revenueNames: [],
       staffingNames: ["Beach Tram"],
-      machineryNames: ["Beach Tram"]
+      machineryNames: []
     }
   ];
 
@@ -2522,7 +2522,6 @@
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
       const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
-      const machineryRows = rowsForExactNames(cache.machinery, spec.machineryNames);
       const performanceRows = rowsForExactNames(cache.performanceMeasures, spec.performanceNames || []);
 
       const body = [
@@ -2530,8 +2529,7 @@
         renderPerformanceTable(performanceRows),
         renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
         renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
-        renderStaffingTable(staffingRows),
-        renderMachineryTable(machineryRows)
+        renderStaffingTable(staffingRows)
       ].filter(Boolean).join("");
 
       if (!body) return "";
@@ -2596,14 +2594,11 @@
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
       const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
-      const machineryRows = rowsForExactNames(cache.machinery, spec.machineryNames);
-
       const body = [
         narrativeHtml,
         renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
         renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
-        renderStaffingTable(staffingRows),
-        renderMachineryTable(machineryRows)
+        renderStaffingTable(staffingRows)
       ].filter(Boolean).join("");
 
       if (!body) return "";
@@ -3013,7 +3008,7 @@
 
         mountOrHide(staffingEl, renderStaffingTable(getDepartmentStaffing(deptName, deptCode)));
         bindPriorYearsToggle(staffingEl);
-        mountOrHide(machineryEl, renderMachineryTable(getDepartmentMachinery(deptName, deptCode)));
+        mountOrHide(machineryEl, "");
         mountOrHide(
           stateAidEl,
           normalizeDeptName(deptName) === "mosquito control" ? renderMosquitoStateAidTables() : ""

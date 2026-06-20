@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Walton County FY 2027 Proposed Budget</title>
+<script>
+  (function(){
+    try{
+      if(window.localStorage.getItem("waltonBudgetTheme") === "dark"){
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    }catch(e){}
+  })();
+</script>
 <style>
   :root{
     --wc-green:#006231;
@@ -115,6 +124,33 @@
     color:#ffffff;
     cursor:pointer;
   }
+  .wc-theme-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:38px;
+    height:38px;
+    flex:0 0 auto;
+    margin-left:4px;
+    border:1px solid rgba(255,255,255,.5);
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    color:#ffffff;
+    cursor:pointer;
+  }
+  .wc-theme-toggle:hover{
+    background:rgba(255,255,255,.24);
+  }
+  .wc-theme-toggle svg{
+    width:17px;
+    height:17px;
+    stroke:currentColor;
+    fill:none;
+  }
+  .wc-theme-toggle .wc-theme-sun{display:none}
+  html[data-theme="dark"] .wc-theme-toggle .wc-theme-moon{display:none}
+  html[data-theme="dark"] .wc-theme-toggle .wc-theme-sun{display:block}
+  .wc-theme-toggle-mobile{display:none}
   .wc-search-focus:hover{
     background:rgba(255,255,255,.24);
   }
@@ -1000,6 +1036,63 @@
     color:var(--wc-green);
   }
 
+  html[data-theme="dark"]{
+    --wc-green:#7bd39f;
+    --wc-green-2:#48b778;
+    --wc-green-3:#0f3f2d;
+    --wc-gold:#d8c77e;
+    --wc-gold-2:#f1dc94;
+    --wc-ink:#edf3ef;
+    --wc-muted:#a9b9b0;
+    --wc-line:rgba(226,235,229,.16);
+    --wc-soft:#101d17;
+    --wc-white:#0f1b16;
+    --wc-shadow:0 24px 70px rgba(0,0,0,.38);
+    color-scheme:dark;
+  }
+  html[data-theme="dark"] body{
+    background:
+      radial-gradient(circle at top left, rgba(123,211,159,.13), transparent 34rem),
+      linear-gradient(180deg,#07110d 0%,#0c1712 45%,#09120e 100%);
+  }
+  html[data-theme="dark"] .wc-story-nav{
+    background:linear-gradient(180deg, rgba(5,20,14,.18), transparent);
+  }
+  html[data-theme="dark"] .wc-home-shell{
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-section-heading h2,
+  html[data-theme="dark"] .wc-budget-card strong,
+  html[data-theme="dark"] .wc-investment-card strong,
+  html[data-theme="dark"] .wc-project-card h3,
+  html[data-theme="dark"] .wc-footer-search-copy h2{
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-budget-card,
+  html[data-theme="dark"] .wc-investment-card,
+  html[data-theme="dark"] .wc-project-card,
+  html[data-theme="dark"] .wc-home-footer{
+    background:rgba(14,28,22,.92);
+    border-color:var(--wc-line);
+    box-shadow:0 18px 46px rgba(0,0,0,.28);
+  }
+  html[data-theme="dark"] .wc-budget-card small,
+  html[data-theme="dark"] .wc-investment-card small,
+  html[data-theme="dark"] .wc-investment-card p,
+  html[data-theme="dark"] .wc-project-card p,
+  html[data-theme="dark"] .wc-footer-search-copy p,
+  html[data-theme="dark"] .wc-footer-links a{
+    color:var(--wc-muted);
+  }
+  html[data-theme="dark"] .wc-footer-search-button{
+    background:rgba(123,211,159,.13);
+    border-color:rgba(123,211,159,.38);
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-footer-search-button:hover{
+    background:rgba(123,211,159,.2);
+  }
+
   .wc-reveal{
     opacity:0;
     transform:translateY(18px);
@@ -1024,7 +1117,9 @@
       justify-content:flex-start;
       padding-top:8px;
     }
-    .wc-menu-toggle{display:inline-flex;margin-left:auto}
+    .wc-story-nav.is-menu-open .wc-top-links .wc-theme-toggle{display:none}
+    .wc-theme-toggle-mobile{display:inline-flex;margin-left:auto}
+    .wc-menu-toggle{display:inline-flex;margin-left:0}
     .wc-budget-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
   }
 
@@ -1166,6 +1261,15 @@
 <section class="wc-hero" id="top" aria-label="Walton County FY 2027 Proposed Budget">
   <nav id="nav-menu" class="wc-story-nav nav-menu" aria-label="Primary navigation">
     <div class="logo-container"></div>
+    <button class="wc-theme-toggle wc-theme-toggle-mobile" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+      <svg class="wc-theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 14.2A8.2 8.2 0 0 1 9.8 3a7 7 0 1 0 11.2 11.2Z"></path>
+      </svg>
+      <svg class="wc-theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+    </button>
     <button class="wc-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -1179,6 +1283,15 @@
       <button class="wc-search-focus" type="button" aria-label="Search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
+        </svg>
+      </button>
+      <button class="wc-theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+        <svg class="wc-theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 14.2A8.2 8.2 0 0 1 9.8 3a7 7 0 1 0 11.2 11.2Z"></path>
+        </svg>
+        <svg class="wc-theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
         </svg>
       </button>
     </div>
@@ -1296,6 +1409,42 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    function getTheme(){
+      try{
+        return window.localStorage.getItem("waltonBudgetTheme") === "dark" ? "dark" : "light";
+      }catch(e){
+        return "light";
+      }
+    }
+
+    function applyTheme(theme){
+      var nextTheme = theme === "dark" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      document.querySelectorAll(".wc-theme-toggle").forEach(function(button){
+        var isDark = nextTheme === "dark";
+        button.setAttribute("aria-pressed", String(isDark));
+        button.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+        button.title = isDark ? "Light mode" : "Dark mode";
+      });
+    }
+
+    function setTheme(theme){
+      var nextTheme = theme === "dark" ? "dark" : "light";
+      try{
+        window.localStorage.setItem("waltonBudgetTheme", nextTheme);
+      }catch(e){}
+      applyTheme(nextTheme);
+    }
+
+    function initTheme(){
+      applyTheme(getTheme());
+      document.querySelectorAll(".wc-theme-toggle").forEach(function(button){
+        button.addEventListener("click", function(){
+          setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+        });
+      });
     }
 
     function initLogo(){
@@ -1527,6 +1676,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function(){
+      initTheme();
       initLogo();
       initSearch();
       initMenu();

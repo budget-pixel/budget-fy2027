@@ -177,6 +177,7 @@
   }
 
   nav#nav-menu .wc-nav-search-toggle,
+  nav#nav-menu .wc-theme-toggle,
   nav#nav-menu .wc-nav-menu-toggle{
     display:inline-flex !important;
     align-items:center !important;
@@ -190,7 +191,8 @@
     color:#ffffff !important;
   }
 
-  nav#nav-menu .wc-nav-search-toggle svg{
+  nav#nav-menu .wc-nav-search-toggle svg,
+  nav#nav-menu .wc-theme-toggle svg{
     width:17px !important;
     height:17px !important;
   }

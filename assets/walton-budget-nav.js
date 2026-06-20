@@ -28,6 +28,46 @@
   var mobileStylesheetId = "wc-budget-mobile-styles";
   var splitLogoScriptId = "wc-split-logo-script";
   var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "walton-split-logo.js?v=1";
+  var wcThemeStorageKey = "waltonBudgetTheme";
+  function getStoredWaltonTheme(){
+    try{
+      return window.localStorage.getItem(wcThemeStorageKey) === "dark" ? "dark" : "light";
+    }catch(e){
+      return "light";
+    }
+  }
+  function applyWaltonTheme(theme){
+    var nextTheme = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    if(document.body){
+      document.body.classList.toggle("wc-dark-mode", nextTheme === "dark");
+    }
+    document.querySelectorAll(".wc-theme-toggle").forEach(function(button){
+      var isDark = nextTheme === "dark";
+      button.setAttribute("aria-pressed", String(isDark));
+      button.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+      button.title = isDark ? "Light mode" : "Dark mode";
+    });
+  }
+  function setWaltonTheme(theme){
+    var nextTheme = theme === "dark" ? "dark" : "light";
+    try{
+      window.localStorage.setItem(wcThemeStorageKey, nextTheme);
+    }catch(e){
+      /* Theme still applies for this page view. */
+    }
+    applyWaltonTheme(nextTheme);
+  }
+  function toggleWaltonTheme(){
+    setWaltonTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  }
+  applyWaltonTheme(getStoredWaltonTheme());
+  window.WaltonBudgetTheme = {
+    apply:applyWaltonTheme,
+    set:setWaltonTheme,
+    toggle:toggleWaltonTheme,
+    get:getStoredWaltonTheme
+  };
   function loadWaltonMobileStylesheet(){
     var mobileStylesheet = document.getElementById(mobileStylesheetId);
     if(!mobileStylesheet){
@@ -510,6 +550,9 @@
     box-shadow:none !important;
     transition:box-shadow .2s ease !important;
     font-family:Arial, Helvetica, sans-serif !important;
+  }
+  html[data-theme="dark"] nav#nav-menu.nav-menu{
+    background:linear-gradient(180deg, rgba(5,20,14,.98), rgba(5,20,14,.92)) !important;
   }
   nav#nav-menu.nav-menu.is-scrolled{
     box-shadow:none !important;
@@ -1102,6 +1145,7 @@
     position:relative !important;
   }
   nav#nav-menu .wc-nav-search-toggle,
+  nav#nav-menu .wc-theme-toggle,
   nav#nav-menu .wc-nav-menu-toggle{
     display:inline-flex !important;
     align-items:center !important;
@@ -1117,14 +1161,25 @@
     position:relative !important;
   }
   nav#nav-menu .wc-nav-search-toggle:hover,
+  nav#nav-menu .wc-theme-toggle:hover,
   nav#nav-menu .wc-nav-menu-toggle:hover{
     background:rgba(255,255,255,.2) !important;
   }
-  nav#nav-menu .wc-nav-search-toggle svg{
+  nav#nav-menu .wc-nav-search-toggle svg,
+  nav#nav-menu .wc-theme-toggle svg{
     width:18px !important;
     height:18px !important;
     stroke:currentColor !important;
     fill:none !important;
+  }
+  nav#nav-menu .wc-theme-toggle .wc-theme-sun{
+    display:none !important;
+  }
+  html[data-theme="dark"] nav#nav-menu .wc-theme-toggle .wc-theme-moon{
+    display:none !important;
+  }
+  html[data-theme="dark"] nav#nav-menu .wc-theme-toggle .wc-theme-sun{
+    display:block !important;
   }
   nav#nav-menu .wc-nav-menu-toggle{
     display:none !important;
@@ -1793,6 +1848,31 @@
   .wc-search-footer .wc-budget-footer-brand{
     display:none !important;
   }
+  html[data-theme="dark"] footer[role="contentinfo"].wc-search-footer{
+    background:transparent !important;
+  }
+  html[data-theme="dark"] footer[role="contentinfo"].wc-search-footer .footer-container{
+    background:rgba(14,28,22,.92) !important;
+    border-color:rgba(226,235,229,.16) !important;
+    box-shadow:0 18px 46px rgba(0,0,0,.28) !important;
+  }
+  html[data-theme="dark"] .wc-footer-search-copy h2{
+    color:#edf3ef !important;
+  }
+  html[data-theme="dark"] .wc-footer-search-copy p,
+  html[data-theme="dark"] .wc-search-footer .wc-budget-footer-links a{
+    color:#a9b9b0 !important;
+  }
+  html[data-theme="dark"] .wc-footer-search-button{
+    background:rgba(123,211,159,.13) !important;
+    border-color:rgba(123,211,159,.38) !important;
+    color:#edf3ef !important;
+    box-shadow:none !important;
+  }
+  html[data-theme="dark"] .wc-footer-search-button:hover{
+    background:rgba(123,211,159,.2) !important;
+    color:#edf3ef !important;
+  }
   
   /* STANDALONE WALTON HEADER */
   .wc-standalone-budget-nav{
@@ -1810,6 +1890,9 @@
     border-bottom:0 !important;
     box-shadow:none !important;
     font-family:Arial, Helvetica, sans-serif !important;
+  }
+  html[data-theme="dark"] .wc-standalone-budget-nav{
+    background:linear-gradient(180deg, rgba(5,20,14,.98), rgba(5,20,14,.92)) !important;
   }
   .wc-standalone-brand{
     display:flex !important;
@@ -1910,13 +1993,27 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
           </svg>
         </button>
+        <button type="button" class="wc-theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
+          <svg class="wc-theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 14.2A8.2 8.2 0 0 1 9.8 3a7 7 0 1 0 11.2 11.2Z"></path>
+          </svg>
+          <svg class="wc-theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+        </button>
         <button type="button" class="wc-nav-menu-toggle" aria-label="Open navigation menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       `;
       nav.appendChild(actions);
       var searchToggle = actions.querySelector(".wc-nav-search-toggle");
+      var themeToggle = actions.querySelector(".wc-theme-toggle");
       var menuToggle = actions.querySelector(".wc-nav-menu-toggle");
+      applyWaltonTheme(getStoredWaltonTheme());
+      if(themeToggle){
+        themeToggle.addEventListener("click", toggleWaltonTheme);
+      }
       function syncNavSearchTop(){
         var navRect = nav.getBoundingClientRect();
         document.documentElement.style.setProperty("--wc-nav-search-top", navRect.height + "px");
