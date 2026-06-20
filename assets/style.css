@@ -1151,9 +1151,20 @@ body {
 }
 .wc-department-financial-grid #department-expense-table,
 .wc-department-financial-grid #department-revenue-table,
-.wc-department-financial-grid #department-staffing-table {
+.wc-department-financial-grid #department-staffing-table,
+.wc-department-financial-grid #department-solid-waste-tables,
+.wc-department-financial-grid #department-building-construction-tables,
+.wc-department-financial-grid #department-bcc-tables {
   min-width: 0;
   margin: 0;
+}
+.wc-department-financial-grid #department-solid-waste-tables,
+.wc-department-financial-grid #department-building-construction-tables,
+.wc-department-financial-grid #department-bcc-tables,
+.wc-department-financial-grid .solid-waste-supplemental-tables,
+.wc-department-financial-grid .building-construction-supplemental-tables,
+.wc-department-financial-grid .bcc-supplemental-tables {
+  display: contents;
 }
 .wc-department-financial-grid .wc-finance-card {
   height: 100%;

@@ -773,7 +773,10 @@
     modal.classList.remove("is-open");
     document.body.classList.remove("wc-budget-detail-open");
     const body = modal.querySelector(".wc-budget-detail-body");
-    if (body) body.innerHTML = "";
+    if (body) {
+      body.innerHTML = "";
+      body.className = "wc-budget-detail-body";
+    }
     if (activeBudgetDetailToggle) {
       activeBudgetDetailToggle.setAttribute("aria-expanded", "false");
       if (document.contains(activeBudgetDetailToggle)) {
@@ -794,9 +797,11 @@
     const label = toggle.dataset.closedLabel || toggle.textContent || "Budget Lines";
     if (title) title.textContent = label.replace(/^View\s+/i, "");
     if (body) {
+      body.className = "wc-budget-detail-body wc-budget-lines-card";
       body.innerHTML = detail.innerHTML;
       bindPriorYearsToggle(body);
       applyPriorYearsState(false, body);
+      body.classList.remove("show-prior-years");
     }
     activeBudgetDetailToggle = toggle;
     toggle.setAttribute("aria-expanded", "true");
@@ -2735,6 +2740,9 @@
 
   function applyPriorYearsState(checked, container) {
     const root = container || document;
+    if (root.classList && root.matches(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card")) {
+      root.classList.toggle("show-prior-years", checked);
+    }
     root.querySelectorAll(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card").forEach((card) => {
       card.classList.toggle("show-prior-years", checked);
     });
@@ -2871,8 +2879,9 @@
     });
   }
 
-  function arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl) {
-    const cards = [expenseEl, revenueEl, staffingEl].filter((el) =>
+  function arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl, supplementalExpenseEls) {
+    const supplementalEls = supplementalExpenseEls || [];
+    const cards = [expenseEl].concat(supplementalEls, [revenueEl, staffingEl]).filter((el) =>
       el && !el.hidden && el.innerHTML.trim()
     );
     if (!cards.length) return;
@@ -3045,7 +3054,11 @@
         bindTooltipAnchors(courtInnovationsEl);
         bindPriorYearsToggle(courtInnovationsEl);
 
-        arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl);
+        arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl, [
+          solidWasteEl,
+          buildingConstructionEl,
+          bccEl
+        ]);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
