@@ -1168,7 +1168,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
-  align-items: start;
+  align-items: stretch;
   margin: 28px 0;
 }
 .wc-department-financial-grid #department-expense-table,
@@ -1189,6 +1189,7 @@ body {
   display: contents;
 }
 .wc-department-financial-grid .wc-finance-card {
+  height: 100%;
   margin: 0;
 }
 .wc-department-financial-grid .wc-finance-card + .wc-finance-card {
@@ -1302,7 +1303,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-top: 22px;
+  margin-top: auto;
   padding-top: 16px;
   border-top: 1px solid rgba(23,32,51,.08);
 }
@@ -1635,6 +1636,7 @@ body {
   }
   .wc-data-table th, .wc-data-table td { padding: 7px 8px; font-size: .8rem; }
   .wc-finance-card {
+    height: auto;
     padding: 20px;
     border-radius: 20px;
   }
