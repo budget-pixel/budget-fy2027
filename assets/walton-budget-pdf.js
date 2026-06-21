@@ -1,7 +1,11 @@
 (function () {
   "use strict";
 
-  var BRAND_LOGO_URL = "https://stories.opengov.com/countyofwaltonfl/uploads/c432578eae78-Walton_County_Logo_no_background.png";
+  function assetPath(path) {
+    return (window.location.pathname.indexOf("/pages/") !== -1 ? "../" : "") + path;
+  }
+
+  var BRAND_LOGO_URL = assetPath("assets/images/Page Images/walton-county-logo-no-background.png");
 
 var PRINT_CSS = `
 .wc-print-brand-pill{

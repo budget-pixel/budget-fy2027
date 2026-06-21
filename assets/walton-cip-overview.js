@@ -2099,7 +2099,7 @@ function renderProjects(){
       <div class="wc-cip-main-inner">
         ${!isStandaloneSearchPage ? `
         <section class="wc-cip-story-hero" id="wc-cip-overview" aria-label="Capital Improvement Plan overview">
-          <img src="https://stories.opengov.com/countyofwaltonfl/uploads/a2f6c84a8bdd-254725dbdfca-d2d5e281eaa6-bridge_construction.JPG?v=2026-04-25T00:49:59.957Z" alt="Bridge construction project in Walton County">
+          <img src="../assets/images/Page Images/cip-bridge-construction.jpg" alt="Bridge construction project in Walton County">
           <div class="wc-cip-story-panel">
             <span class="wc-cip-kicker">FY 2027 Capital Improvement Plan</span>
             <h1>Investing in the infrastructure behind everyday life.</h1>
@@ -2139,7 +2139,7 @@ function renderProjects(){
         <section class="wc-cip-story-section">
           <div class="wc-cip-story-grid">
             <div class="wc-cip-story-image">
-              <img src="https://stories.opengov.com/countyofwaltonfl/uploads/0bb46b56839a-3dcc0cc1c7ae-930602781477-20240621_154908.jpg?v=2026-04-25T00:49:46.254Z" alt="Walton County capital project site">
+              <img src="../assets/images/Page Images/cip-project-site.jpg" alt="Walton County capital project site">
             </div>
             <div class="wc-cip-story-copy">
               <span class="wc-cip-kicker">What Counts as Capital</span>

@@ -1,11 +1,16 @@
 (function(){
   var STYLE_ID = "wc-split-logo-styles";
 
+  function assetPath(path){
+    return (window.location.pathname.indexOf("/pages/") !== -1 ? "../" : "") + path;
+  }
+
   function injectStyles(){
     if(document.getElementById(STYLE_ID)){
       return;
     }
 
+    var logoUrl = assetPath("assets/images/Page Images/walton-county-logo-no-background.png");
     var style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `
@@ -71,7 +76,7 @@
         height:50px !important;
         flex:0 0 50px !important;
         border-radius:999px !important;
-        background:#ffffff url("https://stories.opengov.com/countyofwaltonfl/uploads/c432578eae78-Walton_County_Logo_no_background.png") center center / 46px 46px no-repeat !important;
+        background:#ffffff url("${logoUrl}") center center / 46px 46px no-repeat !important;
         border:3px solid #d1be78 !important;
         box-sizing:border-box !important;
         transform:none !important;
