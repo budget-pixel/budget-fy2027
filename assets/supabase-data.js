@@ -168,6 +168,7 @@
     let query = client
       .from("public_transactions")
       .select("*")
+      .eq("is_public", true)
       .order("transaction_date", { ascending: true });
 
     if (options.year !== undefined && options.year !== null && String(options.year).trim() !== "") {

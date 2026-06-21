@@ -1,6 +1,10 @@
 (function () {
   "use strict";
 
+  // TODO: Transaction CSV export is not currently implemented. If added later,
+  // it must export only public_transactions public-facing fields and must not
+  // include raw source fields from transactions_raw.
+
   function $(selector) {
     return document.querySelector(selector);
   }
