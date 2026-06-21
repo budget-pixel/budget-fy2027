@@ -1340,7 +1340,7 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 96px 22px 32px;
+  padding: 72px 18px 24px;
 }
 .wc-budget-detail-backdrop {
   position: absolute;
@@ -1351,8 +1351,8 @@ body {
 .wc-budget-detail-card {
   position: relative;
   z-index: 1;
-  width: min(980px, 100%);
-  max-height: min(78vh, 860px);
+  width: min(1720px, calc(100vw - 36px));
+  max-height: min(86vh, 960px);
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.18);
   border-radius: 28px;
@@ -1410,9 +1410,9 @@ body {
   cursor: pointer;
 }
 .wc-budget-detail-body {
-  max-height: calc(min(78vh, 860px) - 92px);
+  max-height: calc(min(86vh, 960px) - 92px);
   overflow: auto;
-  padding: 20px 24px 24px;
+  padding: 18px 20px 22px;
 }
 .wc-budget-detail-body .wc-budget-lines-detail {
   margin-top: 0;
@@ -1420,8 +1420,20 @@ body {
   border-top: 0;
 }
 .wc-budget-detail-body .wc-data-table-scroll {
-  max-height: 58vh;
+  max-height: 66vh;
   overflow: auto;
+}
+.wc-budget-detail-body .wc-budget-lines-detail .wc-data-table {
+  font-size: .64rem;
+  min-width: 0;
+}
+.wc-budget-detail-body .wc-budget-lines-detail .wc-data-table th,
+.wc-budget-detail-body .wc-budget-lines-detail .wc-data-table td {
+  padding: 6px 7px;
+}
+.wc-budget-detail-body .wc-budget-lines-detail.show-prior-years .wc-data-table th,
+.wc-budget-detail-body .wc-budget-lines-detail.show-prior-years .wc-data-table td {
+  white-space: nowrap;
 }
 
 .wc-data-table-wrap { margin: 24px 0; }
@@ -1476,6 +1488,16 @@ body {
   height: 20px !important;
   margin: 0 0 8px auto !important;
 }
+.wc-budget-lines-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.wc-budget-lines-tools .wc-fy-column-toggle-wrap.wc-budget-lines-detail-header {
+  margin: 0 !important;
+}
 .wc-staffing-notes {
   margin-top: 10px;
   padding: 10px 14px;
@@ -1526,6 +1548,7 @@ body {
 .wc-budget-lines-detail .wc-data-table th, .wc-budget-lines-detail .wc-data-table td { padding: 6px 8px; }
 .wc-budget-lines-card:not(.show-prior-years) .wc-data-table .wc-prior-year { display: none; }
 .wc-budget-lines-card:not(.show-prior-years) .wc-data-table tr.wc-budget-line-zero-current { display: none; }
+.wc-budget-lines-card:not(.show-prior-years) .wc-transaction-drilldown-helper { display: none; }
 .wc-budget-lines-card.show-prior-years .wc-data-table .wc-itemized-description-column { display: none; }
 .wc-revenue-actuals-note {
   max-width: 980px;
@@ -1540,11 +1563,12 @@ body {
   font-style: italic;
 }
 .wc-transaction-drilldown-helper {
-  margin: 0 0 12px;
+  margin: 0;
   color: #526577;
-  font-size: .82rem;
+  font-size: .72rem;
   line-height: 1.4;
   font-style: italic;
+  text-align: right;
 }
 .wc-actual-drilldown-link {
   color: #003f28;
@@ -1749,6 +1773,7 @@ body {
     padding: 72px 12px 18px;
   }
   .wc-budget-detail-card {
+    width: min(100%, calc(100vw - 24px));
     border-radius: 22px;
     max-height: 82vh;
   }
@@ -1758,6 +1783,13 @@ body {
   .wc-budget-detail-body {
     max-height: calc(82vh - 82px);
     padding: 16px 18px 18px;
+  }
+  .wc-budget-detail-body .wc-budget-lines-detail .wc-data-table {
+    font-size: .68rem;
+  }
+  .wc-budget-detail-body .wc-budget-lines-detail .wc-data-table th,
+  .wc-budget-detail-body .wc-budget-lines-detail .wc-data-table td {
+    padding: 6px 8px;
   }
   .wc-finance-card-footer {
     align-items: flex-start;

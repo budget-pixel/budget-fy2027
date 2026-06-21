@@ -889,8 +889,9 @@
     const toggleHeader = priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
     const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
     const transactionHelper = hasTransactionDrilldown
-      ? '<p class="wc-transaction-drilldown-helper">Click an actual amount to view the transactions included in that total.</p>'
+      ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
+    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + toggleHeader + transactionHelper + "</div>";
     const revenueContextNote = isExpense
       ? ""
       : '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>';
@@ -898,7 +899,7 @@
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
       detail: '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
-        toggleHeader + revenueContextNote + transactionHelper + detailTable + "</div>"
+        budgetLinesTools + revenueContextNote + detailTable + "</div>"
     };
   }
 
