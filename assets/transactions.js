@@ -88,15 +88,15 @@
       return;
     }
 
-    const hasProgram = rows.some((row) => firstValue(row, ["project", "project_string"]) || context.program);
+    const hasProgram = rows.some((row) => firstValue(row, ["program_name", "program_code"]) || context.program);
     const bodyRows = rows.map((row) => {
-      const vendor = firstValue(row, ["vdr_name_item_desc", "vendor", "payee"]) || "Not available";
-      const description = firstValue(row, ["comments", "description", "reference"]) || "No description provided";
-      const project = firstValue(row, ["project", "project_string"]) || context.program || "";
+      const vendor = firstValue(row, ["vendor_payee_public"]) || "Not available";
+      const description = firstValue(row, ["description_public"]) || "No description provided";
+      const project = firstValue(row, ["program_name", "program_code"]) || context.program || "";
       const amount = displayAmount(row.amount, context);
       return (
         "<tr>" +
-        "<td>" + escapeHtml(formatDate(row.eff_date || row.post_date) || "Not available") + "</td>" +
+        "<td>" + escapeHtml(formatDate(row.transaction_date) || "Not available") + "</td>" +
         "<td>" + escapeHtml(vendor) + "</td>" +
         "<td>" + escapeHtml(description) + "</td>" +
         '<td class="wc-num">' + escapeHtml(formatCurrency(amount)) + "</td>" +

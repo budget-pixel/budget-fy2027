@@ -3,8 +3,8 @@
    descriptions, FY 2026 budget, FY 2027 proposed, and page narrative content.
    Supabase public views provide FY 2020-FY 2025 historical actuals.
    Cache tables stay internal in Supabase and are not queried by browser code.
-   Raw transaction data must not load on page startup; transaction drilldown
-   should be lazy-loaded only for a specific year/org/object/project request.
+   Raw transaction data must not load in browser code; transaction drilldown
+   uses cleaned public_transactions rows for a specific year/org/object/project.
    Use a Supabase publishable/anon key only; never place a service-role key in
    this public static website. */
 (function () {
@@ -166,25 +166,22 @@
 
     const options = filters || {};
     let query = client
-      .from("transactions_raw")
+      .from("public_transactions")
       .select("*")
-      .order("eff_date", { ascending: true });
+      .order("transaction_date", { ascending: true });
 
     if (options.year !== undefined && options.year !== null && String(options.year).trim() !== "") {
-      query = query.eq("year", options.year);
+      query = query.eq("fiscal_year", options.year);
     }
     if (options.org !== undefined && options.org !== null && String(options.org).trim() !== "") {
-      query = query.eq("org", options.org);
+      query = query.eq("department_code", options.org);
     }
     if (options.object !== undefined && options.object !== null && String(options.object).trim() !== "") {
-      query = query.eq("object", options.object);
+      query = query.eq("object_code", options.object);
     }
     if (Object.prototype.hasOwnProperty.call(options, "project")) {
       const project = options.project === undefined || options.project === null ? "" : String(options.project).trim();
-      query = project ? query.eq("project", project) : query.or("project.is.null,project.eq.");
-    }
-    if (options.type !== undefined && options.type !== null && String(options.type).trim() !== "") {
-      query = query.eq("t", options.type);
+      query = project ? query.eq("program_code", project) : query.or("program_code.is.null,program_code.eq.");
     }
 
     const { data, error } = await query;
