@@ -1539,6 +1539,84 @@ body {
   line-height: 1.45;
   font-style: italic;
 }
+.wc-transaction-drilldown-helper {
+  margin: 0 0 12px;
+  color: #526577;
+  font-size: .82rem;
+  line-height: 1.4;
+  font-style: italic;
+}
+.wc-actual-drilldown-link {
+  color: #003f28;
+  font-weight: 900;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.wc-actual-drilldown-link:hover,
+.wc-actual-drilldown-link:focus {
+  text-decoration: underline;
+}
+.wc-transaction-page {
+  max-width: 1320px;
+}
+.wc-transaction-panel {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid rgba(23,32,51,.10);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(23,32,51,.055);
+}
+.wc-transaction-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 18px;
+  color: #003f28;
+  font-size: .9rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+.wc-transaction-back-link:hover,
+.wc-transaction-back-link:focus {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.wc-transaction-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.wc-transaction-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(0,63,40,.14);
+  border-radius: 999px;
+  background: rgba(0,63,40,.06);
+  color: #003f28;
+  font-size: .78rem;
+  font-weight: 800;
+}
+.wc-transaction-status {
+  margin: 0 0 16px;
+  color: #526577;
+  font-size: .92rem;
+  font-weight: 700;
+}
+.wc-transaction-summary-note {
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+  font-style: italic;
+}
+.wc-transaction-table-scroll {
+  max-height: 68vh;
+}
+.wc-transaction-table {
+  min-width: 760px;
+}
 
 .wc-filter-bar {
   display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
@@ -1776,6 +1854,8 @@ body {
 :root[data-theme="dark"] .wc-performance-header p,
 :root[data-theme="dark"] .wc-performance-note,
 :root[data-theme="dark"] .wc-revenue-actuals-note,
+:root[data-theme="dark"] .wc-transaction-drilldown-helper,
+:root[data-theme="dark"] .wc-transaction-status,
 :root[data-theme="dark"] .wc-table-label {
   color: var(--muted) !important;
 }
@@ -1923,6 +2003,25 @@ body {
 :root[data-theme="dark"] .wc-revenue-actuals-note {
   background: rgba(216,199,126,.10) !important;
   border-color: rgba(216,199,126,.34) !important;
+}
+
+:root[data-theme="dark"] .wc-transaction-panel {
+  background: rgba(10,20,16,.92) !important;
+  border-color: rgba(237,243,239,.12) !important;
+}
+
+:root[data-theme="dark"] .wc-transaction-chip {
+  background: rgba(123,211,159,.10) !important;
+  border-color: rgba(123,211,159,.22) !important;
+  color: var(--green) !important;
+}
+
+:root[data-theme="dark"] .wc-actual-drilldown-link {
+  color: var(--green) !important;
+}
+
+:root[data-theme="dark"] .wc-transaction-back-link {
+  color: var(--green) !important;
 }
 
 :root[data-theme="dark"] .wc-view-budget-lines-toggle:hover,

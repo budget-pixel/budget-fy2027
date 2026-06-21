@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transaction Detail — Walton County FY 2027 Budget</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav id="nav-menu" class="nav-menu">
+  <div class="logo-container"></div>
+</nav>
+
+<div id="layout">
+<main id="content" class="wc-transaction-page">
+  <nav class="wc-breadcrumb" aria-label="Breadcrumb">
+    <a href="../index.html">Home</a>
+    <span>/</span>
+    <a href="departments.html">Departments</a>
+    <span>/</span>
+    <span>Transaction Detail</span>
+  </nav>
+
+  <div class="page-eyebrow">Budget Detail</div>
+  <a class="wc-transaction-back-link" href="office-of-management-and-budget.html" data-transaction-back>← Back to Budget Lines</a>
+  <h1 class="page-title" id="transaction-title">Transaction Detail</h1>
+  <p class="page-intro" id="transaction-intro">Loading transaction detail...</p>
+
+  <section class="wc-transaction-panel" aria-live="polite">
+    <div class="wc-transaction-chip-row" id="transaction-filter-chips"></div>
+    <div id="transaction-status" class="wc-transaction-status">Loading transactions...</div>
+    <div id="transaction-table"></div>
+  </section>
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/supabase-data.js"></script>
+<script src="../assets/transactions.js"></script>
+<script src="../assets/walton-budget-nav.js"></script>
+<script src="../assets/walton-budget-pdf.js"></script>
+</body>
+</html>

@@ -179,8 +179,9 @@
     if (options.object !== undefined && options.object !== null && String(options.object).trim() !== "") {
       query = query.eq("object", options.object);
     }
-    if (options.project !== undefined && options.project !== null && String(options.project).trim() !== "") {
-      query = query.eq("project", options.project);
+    if (Object.prototype.hasOwnProperty.call(options, "project")) {
+      const project = options.project === undefined || options.project === null ? "" : String(options.project).trim();
+      query = project ? query.eq("project", project) : query.or("project.is.null,project.eq.");
     }
     if (options.type !== undefined && options.type !== null && String(options.type).trim() !== "") {
       query = query.eq("t", options.type);

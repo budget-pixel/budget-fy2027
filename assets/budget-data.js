@@ -741,14 +741,57 @@
   // table: every individual object-code line behind that table's rolled-up
   // totals, including any itemized sub-account (Project_Name) and Note.
   const BUDGET_LINE_PRIOR_YEAR_COLUMNS = [
-    { field: "FY2020_Actual", label: "FY 2020 Actual" },
-    { field: "FY2021_Actual", label: "FY 2021 Actual" },
-    { field: "FY2022_Actual", label: "FY 2022 Actual" },
-    { field: "FY2023_Actual", label: "FY 2023 Actual" },
-    { field: "FY2024_Actual", label: "FY 2024 Actual" },
-    { field: "FY2025_Actual", label: "FY 2025 Actual" },
+    { field: "FY2020_Actual", label: "FY 2020 Actual", year: 2020, actual: true },
+    { field: "FY2021_Actual", label: "FY 2021 Actual", year: 2021, actual: true },
+    { field: "FY2022_Actual", label: "FY 2022 Actual", year: 2022, actual: true },
+    { field: "FY2023_Actual", label: "FY 2023 Actual", year: 2023, actual: true },
+    { field: "FY2024_Actual", label: "FY 2024 Actual", year: 2024, actual: true },
+    { field: "FY2025_Actual", label: "FY 2025 Actual", year: 2025, actual: true },
     { field: "FY2026_Budget", label: "FY 2026 Budget" }
   ];
+
+  function slugParam(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function transactionDrilldownEnabledForRow(row) {
+    return normalizeDeptName(row && row.Dept_Name) === "office of management and budget";
+  }
+
+  function transactionHrefForBudgetLine(row, column, fields) {
+    if (!column.actual || !transactionDrilldownEnabledForRow(row)) return "";
+    const amount = row[column.field] || 0;
+    if (!amount) return "";
+
+    const params = new URLSearchParams();
+    const category = row[fields.categoryField] || "";
+    const objectCode = row[fields.codeField] || "";
+    const objectName = row[fields.nameField] || "";
+    const projectCode = row.Project_Code || "";
+    const projectName = row.Project_Name || "";
+    const deptCode = row.Dept_Code || "";
+    const transactionPage = window.location.pathname.indexOf("/pages/") !== -1 ? "transactions.html" : "pages/transactions.html";
+
+    params.set("fy", String(column.year));
+    params.set("category", slugParam(category));
+    params.set("categoryLabel", category);
+    params.set("kind", fields.kind || "expense");
+    params.set("selectedActual", String((fields.kind || "expense") === "revenue" ? Math.abs(amount) : amount));
+    params.set("objectCode", objectCode);
+    params.set("objectName", objectName);
+    params.set("org", deptCode);
+    params.set("departmentCode", deptCode);
+    params.set("departmentName", row.Dept_Name || "");
+    params.set("fundCode", fundCodeForRow(row));
+    if (projectCode) params.set("projectCode", projectCode);
+    if (projectName) params.set("program", projectName);
+
+    return transactionPage + "?" + params.toString();
+  }
 
   function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName) {
     if (!rows || !rows.length) return { button: "", detail: "" };
@@ -794,15 +837,20 @@
       .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")))
       .map((r) => {
         const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
+        const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue" };
         return (
           "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
           "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
           (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
           "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
           '<td class="wc-itemized-description-column">' + escapeHtml(r[descField] || "") + "</td>" +
-          BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
-            '<td class="wc-num wc-prior-year">' + formatCurrency(r[c.field] || 0) + "</td>"
-          ).join("") +
+          BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => {
+            const href = transactionHrefForBudgetLine(r, c, drilldownFields);
+            const value = formatCurrency(r[c.field] || 0);
+            return '<td class="wc-num wc-prior-year">' +
+              (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '">' + value + "</a>" : value) +
+              "</td>";
+          }).join("") +
           '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
         );
       });
@@ -839,6 +887,10 @@
     });
 
     const toggleHeader = priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+    const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
+    const transactionHelper = hasTransactionDrilldown
+      ? '<p class="wc-transaction-drilldown-helper">Click an actual amount to view the transactions included in that total.</p>'
+      : "";
     const revenueContextNote = isExpense
       ? ""
       : '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>';
@@ -846,7 +898,7 @@
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
       detail: '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
-        toggleHeader + revenueContextNote + detailTable + "</div>"
+        toggleHeader + revenueContextNote + transactionHelper + detailTable + "</div>"
     };
   }
 
