@@ -1518,6 +1518,18 @@ body {
 .wc-budget-lines-card:not(.show-prior-years) .wc-data-table .wc-prior-year { display: none; }
 .wc-budget-lines-card:not(.show-prior-years) .wc-data-table tr.wc-budget-line-zero-current { display: none; }
 .wc-budget-lines-card.show-prior-years .wc-data-table .wc-itemized-description-column { display: none; }
+.wc-revenue-actuals-note {
+  max-width: 980px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(209,190,120,.38);
+  border-radius: 14px;
+  background: rgba(209,190,120,.10);
+  color: #526577;
+  font-size: .82rem;
+  line-height: 1.45;
+  font-style: italic;
+}
 
 .wc-filter-bar {
   display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
@@ -1754,6 +1766,7 @@ body {
 :root[data-theme="dark"] .wc-finance-card-amount,
 :root[data-theme="dark"] .wc-performance-header p,
 :root[data-theme="dark"] .wc-performance-note,
+:root[data-theme="dark"] .wc-revenue-actuals-note,
 :root[data-theme="dark"] .wc-table-label {
   color: var(--muted) !important;
 }
@@ -1896,6 +1909,11 @@ body {
 :root[data-theme="dark"] .wc-performance-note {
   background: transparent !important;
   color: var(--muted) !important;
+}
+
+:root[data-theme="dark"] .wc-revenue-actuals-note {
+  background: rgba(216,199,126,.10) !important;
+  border-color: rgba(216,199,126,.34) !important;
 }
 
 :root[data-theme="dark"] .wc-view-budget-lines-toggle:hover,
