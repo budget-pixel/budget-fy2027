@@ -30,9 +30,6 @@
   }
 
   .wc-transmittal-hero{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(280px,.42fr);
-    gap:22px;
     margin:0 0 34px;
   }
 
@@ -70,39 +67,7 @@
     line-height:1.7;
   }
 
-  .wc-transmittal-date-card{
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    gap:22px;
-    padding:28px;
-    border:1px solid rgba(0,63,40,.12);
-    border-radius:30px;
-    background:#f7fbf7;
-  }
-
-  .wc-transmittal-date-card strong{
-    display:block;
-    color:#003f28;
-    font-size:42px;
-    line-height:1;
-  }
-
-  .wc-transmittal-date-card span{
-    display:block;
-    margin-top:8px;
-    color:#607184;
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:.10em;
-    text-transform:uppercase;
-  }
-
   .wc-transmittal-letter-grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 300px;
-    gap:28px;
-    align-items:start;
     margin:0 0 34px;
   }
 
@@ -148,35 +113,6 @@
     font-weight:800;
   }
 
-  .wc-transmittal-aside{
-    display:grid;
-    gap:14px;
-  }
-
-  .wc-transmittal-stat{
-    padding:20px;
-    border:1px solid rgba(0,63,40,.12);
-    border-radius:20px;
-    background:#f7fbf7;
-  }
-
-  .wc-transmittal-stat strong{
-    display:block;
-    color:#003f28;
-    font-size:24px;
-    line-height:1.1;
-  }
-
-  .wc-transmittal-stat span{
-    display:block;
-    margin-top:8px;
-    color:#607184;
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-  }
-
   .wc-transmittal-section{
     margin:0 0 34px;
   }
@@ -200,35 +136,6 @@
     color:#607184;
     font-size:16px;
     line-height:1.7;
-  }
-
-  .wc-transmittal-priority-grid{
-    display:grid;
-    grid-template-columns:repeat(4, minmax(0,1fr));
-    gap:14px;
-  }
-
-  .wc-transmittal-priority{
-    min-height:205px;
-    padding:22px;
-    border:1px solid rgba(0,63,40,.12);
-    border-radius:20px;
-    background:#f7fbf7;
-  }
-
-  .wc-transmittal-priority strong{
-    display:block;
-    margin:0 0 10px;
-    color:#003f28;
-    font-size:17px;
-    line-height:1.2;
-  }
-
-  .wc-transmittal-priority p{
-    margin:0;
-    color:#526577;
-    font-size:14px;
-    line-height:1.65;
   }
 
   .wc-transmittal-links{
@@ -285,12 +192,6 @@
       padding:34px 22px 64px;
     }
 
-    .wc-transmittal-hero,
-    .wc-transmittal-letter-grid{
-      grid-template-columns:1fr;
-    }
-
-    .wc-transmittal-priority-grid,
     .wc-transmittal-links{
       grid-template-columns:repeat(2, minmax(0,1fr));
     }
@@ -302,13 +203,11 @@
     }
 
     .wc-transmittal-hero-copy,
-    .wc-transmittal-date-card,
     .wc-transmittal-letter{
       padding:22px;
       border-radius:22px;
     }
 
-    .wc-transmittal-priority-grid,
     .wc-transmittal-links{
       grid-template-columns:1fr;
     }
@@ -323,16 +222,6 @@
       <p>The transmittal letter introduces the annual budget, explains the financial conditions shaping the plan, and connects the County&rsquo;s priorities to the services, infrastructure, and stewardship residents depend on.</p>
     </div>
 
-    <aside class="wc-transmittal-date-card">
-      <div>
-        <strong>Annual</strong>
-        <span>Budget Message</span>
-      </div>
-      <div>
-        <strong>Oct. 1</strong>
-        <span>Fiscal Year Begins</span>
-      </div>
-    </aside>
   </div>
 
   <div class="wc-transmittal-letter-grid">
@@ -419,52 +308,7 @@
       <p class="wc-transmittal-signature">Melissa Thomason,<br>Chief Financial Officer</p>
     </article>
 
-    <aside class="wc-transmittal-aside" aria-label="Transmittal letter highlights">
-      <div class="wc-transmittal-stat">
-        <strong>Balanced Plan</strong>
-        <span>Recurring Revenues and Costs</span>
-      </div>
-      <div class="wc-transmittal-stat">
-        <strong>Core Services</strong>
-        <span>Operations and Public Needs</span>
-      </div>
-      <div class="wc-transmittal-stat">
-        <strong>Capital Focus</strong>
-        <span>Infrastructure and Facilities</span>
-      </div>
-      <div class="wc-transmittal-stat">
-        <strong>Transparency</strong>
-        <span>Searchable Budget Detail</span>
-      </div>
-    </aside>
   </div>
-
-  <section class="wc-transmittal-section">
-    <div class="wc-transmittal-section-header">
-      <span class="wc-transmittal-kicker">Budget Priorities</span>
-      <h2>What the proposed budget is built to support.</h2>
-      <p>The annual plan connects resources to countywide responsibilities, service delivery, and long-term investments.</p>
-    </div>
-
-    <div class="wc-transmittal-priority-grid">
-      <article class="wc-transmittal-priority">
-        <strong>Public Safety</strong>
-        <p>Supports law enforcement, emergency response, corrections, courts, fire-related partnerships, and the facilities and equipment needed to protect residents and visitors.</p>
-      </article>
-      <article class="wc-transmittal-priority">
-        <strong>Infrastructure</strong>
-        <p>Invests in transportation, drainage, buildings, technology, equipment, and capital projects that maintain and expand public assets.</p>
-      </article>
-      <article class="wc-transmittal-priority">
-        <strong>Quality of Life</strong>
-        <p>Maintains parks, libraries, recreation, community services, planning, code compliance, and other programs that shape everyday life in Walton County.</p>
-      </article>
-      <article class="wc-transmittal-priority">
-        <strong>Fiscal Stewardship</strong>
-        <p>Preserves reserves, evaluates future operating impacts, monitors revenue trends, and uses fund accounting to keep restricted resources aligned with their intended purpose.</p>
-      </article>
-    </div>
-  </section>
 
   <section class="wc-transmittal-section">
     <div class="wc-transmittal-section-header">

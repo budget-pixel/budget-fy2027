@@ -1519,10 +1519,26 @@
 
     const isExcludedFund = (r) => CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r));
     const inFund = (r) => fundCodes.includes(fundCodeForRow(r)) && !isExcludedFund(r);
+    const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
+
+    function revenueActualKey(row) {
+      return [
+        fundCodeForRow(row),
+        String((row && row.Dept_Code) || "").trim(),
+        String((row && row.Revenue_Code) || "").trim(),
+        String((row && row.Project_Code) || "").trim()
+      ].join("|");
+    }
 
     function sumFor(rows, predicate, field) {
+      const seenRevenueActuals = rows === revenueRows && revenueActualFields.has(field) ? new Set() : null;
       return rows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
+        if (seenRevenueActuals) {
+          const key = revenueActualKey(r);
+          if (seenRevenueActuals.has(key)) return sum;
+          seenRevenueActuals.add(key);
+        }
         return sum + (r[field] || 0);
       }, 0);
     }
@@ -1725,6 +1741,25 @@
     const lastIndex = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.length - 1;
     const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
     const allMatchingRows = [];
+    const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
+
+    function dedupedRevenueSum(rowsToSum, field) {
+      const seen = revenueActualFields.has(field) ? new Set() : null;
+      return rowsToSum.reduce((sum, r) => {
+        if (seen) {
+          const key = [
+            fundCodeForRow(r),
+            String((r && r.Dept_Code) || "").trim(),
+            String((r && r.Revenue_Code) || "").trim(),
+            String((r && r.Project_Code) || "").trim()
+          ].join("|");
+          if (seen.has(key)) return sum;
+          seen.add(key);
+        }
+        return sum + (r[field] || 0);
+      }, 0);
+    }
+
     const bodyRows = CONSOLIDATED_REVENUE_SUMMARY_ROWS.map((spec) => {
       // Revenue_Code 381000 (Interfund Group Transfer In) is reported on
       // the Summary of Interfund Transfers page instead, and the
@@ -1739,7 +1774,7 @@
       return (
         "<tr><td>" + escapeHtml(spec.label) + "</td>" +
         CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
-          const sum = matching.reduce((s, r) => s + (r[col.field] || 0), 0);
+          const sum = dedupedRevenueSum(matching, col.field);
           totals[i] += sum;
           return '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(sum) + "</td>";
         }).join("") +
@@ -2190,6 +2225,29 @@
     return (Math.round(n * 10) / 10).toString();
   }
 
+  const REVENUE_ACTUAL_FIELD_NAMES = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
+
+  function revenueAccountingKey(row) {
+    return [
+      fundCodeForRow(row),
+      String((row && row.Dept_Code) || "").trim(),
+      String((row && row.Revenue_Code) || "").trim(),
+      String((row && row.Project_Code) || "").trim()
+    ].join("|");
+  }
+
+  function sumRevenueRowsForField(rows, field) {
+    const seen = REVENUE_ACTUAL_FIELD_NAMES.has(field) ? new Set() : null;
+    return rows.reduce((sum, row) => {
+      if (seen) {
+        const key = revenueAccountingKey(row);
+        if (seen.has(key)) return sum;
+        seen.add(key);
+      }
+      return sum + (row[field] || 0);
+    }, 0);
+  }
+
   function renderRevenueTopicCards(container, topics, idPrefix) {
     if (!container) return;
     const revenueRows = cache.revenues || [];
@@ -2239,7 +2297,7 @@
 
       const datasets = Array.from(byName.entries()).map(([name, rowsForName], i) => ({
         label: name,
-        data: REVENUE_TOPIC_CHART_YEARS.map((y) => rowsForName.reduce((s, r) => s + (r[y.field] || 0), 0)),
+        data: REVENUE_TOPIC_CHART_YEARS.map((y) => sumRevenueRowsForField(rowsForName, y.field)),
         backgroundColor: REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length],
         borderRadius: 6,
         borderSkipped: false
