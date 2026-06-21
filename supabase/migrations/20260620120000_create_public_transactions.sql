@@ -132,8 +132,14 @@ comment on function public.is_reference_like_text(text) is
 
 drop function if exists public.refresh_public_transactions();
 drop function if exists public.refresh_public_transactions(boolean);
+drop function if exists public.refresh_public_transactions(boolean, integer);
 
-create or replace function public.refresh_public_transactions(_dry_run boolean default false, _limit integer default null)
+create or replace function public.refresh_public_transactions(
+  _dry_run boolean default false,
+  _limit integer default null,
+  _batch_size integer default null,
+  _after_raw_transaction_id text default null
+)
 returns table(
   dry_run boolean,
   source_table text,
@@ -141,7 +147,8 @@ returns table(
   rows_inserted integer,
   rows_updated integer,
   rows_skipped integer,
-  duplicate_raw_transaction_id_count integer
+  duplicate_raw_transaction_id_count integer,
+  next_after_raw_transaction_id text
 )
 language plpgsql
 security definer
@@ -151,6 +158,8 @@ declare
   source_reg regclass;
   source_name text;
   source_expr text;
+  batch_where text;
+  batch_order_limit text;
   cleaned_cte text;
 begin
   -- transactions_raw is the canonical raw source. raw_transactions is checked
@@ -165,6 +174,18 @@ begin
     raise exception '_limit must be a positive integer when provided.';
   end if;
 
+  if _batch_size is not null and _batch_size <= 0 then
+    raise exception '_batch_size must be a positive integer when provided.';
+  end if;
+
+  if _after_raw_transaction_id is not null and _batch_size is null then
+    raise exception '_after_raw_transaction_id requires _batch_size to be set.';
+  end if;
+
+  if _limit is not null and _batch_size is not null then
+    raise exception '_limit and _batch_size are mutually exclusive. Use _limit for a one-off smoke test, or _batch_size/_after_raw_transaction_id for a full keyset-batched refresh.';
+  end if;
+
   source_name := source_reg::text;
 
   -- When _limit is set, process only the most recent N raw rows so a refresh
@@ -176,6 +197,23 @@ begin
     );
   else
     source_expr := source_name;
+  end if;
+
+  -- Keyset batching: raw_transaction_id is a derived hash, not a stored/indexed
+  -- column on the raw source, so each batch still scans the source table to
+  -- compute it. The benefit over OFFSET is correctness under concurrent inserts
+  -- (no skipped/duplicated rows as the table changes between batches) and
+  -- avoiding repeated row-skipping cost as later batches run.
+  if _batch_size is not null then
+    batch_where := case
+      when _after_raw_transaction_id is not null
+        then format('where raw_transaction_id > %L', _after_raw_transaction_id)
+      else ''
+    end;
+    batch_order_limit := format('order by raw_transaction_id limit %s', _batch_size);
+  else
+    batch_where := '';
+    batch_order_limit := '';
   end if;
 
   cleaned_cte := format($sql$
@@ -205,14 +243,21 @@ begin
         nullif(object::text, '') as object_code_clean
       from %s
     ),
+    windowed as (
+      -- Keyset page over raw_normalized when _batch_size is set; a no-op
+      -- passthrough otherwise. raw_transaction_id is computed above, so this
+      -- filter/order/limit always runs against the full raw_normalized result.
+      select *
+      from raw_normalized
+      %s
+      %s
+    ),
     described as (
-      -- (raw_normalized may be reading from a row-limited subquery above when
-      -- _limit is set; column shape is identical either way.)
       select
         *,
         (comments_clean is not null and not public.is_reference_like_text(comments_clean)) as comments_meaningful,
         (reference_clean is not null and not public.is_reference_like_text(reference_clean)) as reference_meaningful
-      from raw_normalized
+      from windowed
     ),
     cleaned_all as (
       select
@@ -304,17 +349,22 @@ begin
           )
         )::integer as invalid_count
       from cleaned_all
+    ),
+    cursor_counts as (
+      select max(raw_transaction_id) as max_raw_transaction_id
+      from windowed
     )
-  $sql$, source_expr);
+  $sql$, source_expr, batch_where, batch_order_limit);
 
   execute cleaned_cte || $sql$
     select
       processed_count,
       invalid_count + duplicate_extra_count,
-      duplicate_extra_count
-    from source_counts, duplicate_counts;
+      duplicate_extra_count,
+      max_raw_transaction_id
+    from source_counts, duplicate_counts, cursor_counts;
   $sql$
-  into rows_processed, rows_skipped, duplicate_raw_transaction_id_count;
+  into rows_processed, rows_skipped, duplicate_raw_transaction_id_count, next_after_raw_transaction_id;
 
   if _dry_run then
     execute cleaned_cte || $sql$
@@ -409,11 +459,11 @@ begin
 end;
 $$;
 
-revoke all on function public.refresh_public_transactions(boolean, integer) from public;
-grant execute on function public.refresh_public_transactions(boolean, integer) to service_role;
+revoke all on function public.refresh_public_transactions(boolean, integer, integer, text) from public;
+grant execute on function public.refresh_public_transactions(boolean, integer, integer, text) to service_role;
 
-comment on function public.refresh_public_transactions(boolean, integer) is
-  'Idempotently refreshes public_transactions from transactions_raw using a stable raw-field hash and upserts on raw_transaction_id. Sets is_public based on cleanup_status/confidence/description quality. Pass _dry_run=true for dry-run counts without writes. Pass _limit to cap how many of the most recent raw rows are processed, for smoke-testing before a full-table run.';
+comment on function public.refresh_public_transactions(boolean, integer, integer, text) is
+  'Idempotently refreshes public_transactions from transactions_raw using a stable raw-field hash and upserts on raw_transaction_id. Sets is_public based on cleanup_status/confidence/description quality. Pass _dry_run=true for dry-run counts without writes. Pass _limit to cap how many of the most recent raw rows are processed, for a one-off smoke test. Pass _batch_size (optionally with _after_raw_transaction_id from a prior call''s next_after_raw_transaction_id) for keyset-paginated full-table refreshes; continue until rows_processed = 0. _limit and _batch_size are mutually exclusive.';
 
 comment on table public.public_transactions is
   'Cleaned, resident-friendly public transaction rows for budget actual drill-through. Raw finance-system fields stay internal. Only is_public = true rows are visible to anon/authenticated readers via RLS.';
