@@ -125,6 +125,8 @@
   const cache = {
     expenditures: [],
     revenues: [],
+    expenseActualRows: [],
+    revenueActualRows: [],
     staffing: [],
     performanceMeasures: [],
     machinery: [],
@@ -187,6 +189,8 @@
         supabaseData.loadRevenueActuals()
       ]).then(([expenseRows, revenueRows]) => ({
         supabaseData,
+        expenseRows,
+        revenueRows,
         expenseLookup: supabaseData.buildActualsLookup(expenseRows),
         revenueLookup: supabaseData.buildActualsLookup(revenueRows)
       }));
@@ -703,6 +707,8 @@
       });
 
       if (actuals) {
+        cache.expenseActualRows = actuals.expenseRows || [];
+        cache.revenueActualRows = actuals.revenueRows || [];
         cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseLookup, actuals.supabaseData);
         cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueLookup, actuals.supabaseData);
       }
@@ -2227,23 +2233,19 @@
 
   const REVENUE_ACTUAL_FIELD_NAMES = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
-  function revenueAccountingKey(row) {
-    return [
-      fundCodeForRow(row),
-      String((row && row.Dept_Code) || "").trim(),
-      String((row && row.Revenue_Code) || "").trim(),
-      String((row && row.Project_Code) || "").trim()
-    ].join("|");
-  }
-
   function sumRevenueRowsForField(rows, field) {
-    const seen = REVENUE_ACTUAL_FIELD_NAMES.has(field) ? new Set() : null;
+    if (REVENUE_ACTUAL_FIELD_NAMES.has(field) && (cache.revenueActualRows || []).length) {
+      const year = Number(field.slice(2, 6));
+      const codes = new Set(rows.map((row) => String((row && row.Revenue_Code) || "").trim()).filter(Boolean));
+      return (cache.revenueActualRows || []).reduce((sum, row) => {
+        if (Number(row.year) !== year) return sum;
+        if (!codes.has(String(row.object || "").trim())) return sum;
+        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(String(row.org || "").trim().slice(0, 3))) return sum;
+        return sum + (Number(row.amount) || 0);
+      }, 0);
+    }
+
     return rows.reduce((sum, row) => {
-      if (seen) {
-        const key = revenueAccountingKey(row);
-        if (seen.has(key)) return sum;
-        seen.add(key);
-      }
       return sum + (row[field] || 0);
     }, 0);
   }
