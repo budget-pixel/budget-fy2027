@@ -160,14 +160,36 @@
     return amountToNumber(fallbackValue);
   }
 
+  const PUBLIC_TRANSACTION_FIELDS = [
+    "fiscal_year",
+    "transaction_date",
+    "fund_code",
+    "fund_name",
+    "department_code",
+    "department_name",
+    "program_code",
+    "program_name",
+    "category",
+    "object_code",
+    "object_name",
+    "vendor_payee_public",
+    "description_public",
+    "document_number_public",
+    "amount",
+    "is_public"
+  ].join(", ");
+
   async function loadTransactions(filters) {
     const client = getClient();
     if (!client) return [];
 
+    // TODO (temporary, dev-only): remove before final production cleanup.
+    console.log("Transaction detail source: public_transactions");
+
     const options = filters || {};
     let query = client
       .from("public_transactions")
-      .select("*")
+      .select(PUBLIC_TRANSACTION_FIELDS)
       .eq("is_public", true)
       .order("transaction_date", { ascending: true });
 
@@ -179,6 +201,9 @@
     }
     if (options.object !== undefined && options.object !== null && String(options.object).trim() !== "") {
       query = query.eq("object_code", options.object);
+    }
+    if (options.fund !== undefined && options.fund !== null && String(options.fund).trim() !== "") {
+      query = query.eq("fund_code", options.fund);
     }
     if (Object.prototype.hasOwnProperty.call(options, "project")) {
       const project = options.project === undefined || options.project === null ? "" : String(options.project).trim();

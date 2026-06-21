@@ -23,7 +23,7 @@
 
   const currentScriptSrc = document.currentScript && document.currentScript.src;
   const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
-  const supabaseDataScript = assetBaseUrl + "supabase-data.js";
+  const supabaseDataScript = assetBaseUrl + "supabase-data.js?v=20260620-2";
 
   // The published sheets use department names that differ slightly between
   // tabs (and from this site's page titles). These aliases map a page's

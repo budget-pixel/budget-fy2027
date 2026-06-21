@@ -5,6 +5,20 @@
   // it must export only public_transactions public-facing fields and must not
   // include raw source fields from transactions_raw.
 
+  // Floating-point summation noise only; not a tolerance for real discrepancies.
+  const RECONCILIATION_TOLERANCE = 0.01;
+
+  function isDebugMode() {
+    try {
+      return (
+        /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ||
+        new URLSearchParams(window.location.search).has("debug")
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
   function $(selector) {
     return document.querySelector(selector);
   }
@@ -168,24 +182,56 @@
       return;
     }
 
-    const rows = await window.WCSupabaseData.loadTransactions({
+    const queryFilters = {
       year: context.fy,
       org: context.org,
       object: context.objectCode,
+      fund: context.fundCode || "",
       project: context.projectCode || ""
-    });
+    };
+
+    const rows = await window.WCSupabaseData.loadTransactions(queryFilters);
+
+    const transactionTotal = rows.reduce((sum, row) => sum + displayAmount(row.amount, context), 0);
+    const hasSelectedActual = context.selectedActual !== null;
+    const difference = hasSelectedActual ? transactionTotal - context.selectedActual : null;
+    const withinTolerance = !hasSelectedActual || Math.abs(difference) <= RECONCILIATION_TOLERANCE;
 
     if (status) {
-      const transactionTotal = rows.reduce((sum, row) => sum + displayAmount(row.amount, context), 0);
-      const countText = rows.length.toLocaleString("en-US") + " transaction" + (rows.length === 1 ? "" : "s") + " found.";
-      const summary = rows.length
-        ? countText + " Transaction total: " + formatCurrency(transactionTotal) + "."
-        : "No matching transactions were found for this exact filter.";
-      const mismatch = context.selectedActual !== null && Math.round(transactionTotal) !== Math.round(context.selectedActual)
-        ? '<span class="wc-transaction-summary-note">Transaction total may differ from the displayed actual due to rounding, timing, adjustments, or centrally recorded activity.</span>'
-        : "";
-      status.innerHTML = escapeHtml(summary) + mismatch;
+      if (!rows.length) {
+        status.innerHTML = escapeHtml("No matching transactions were found for this exact filter.");
+      } else {
+        const lines = [
+          rows.length.toLocaleString("en-US") + " transaction" + (rows.length === 1 ? "" : "s") + " found."
+        ];
+        if (hasSelectedActual) lines.push("Selected actual amount: " + formatCurrency(context.selectedActual));
+        lines.push("Transaction total: " + formatCurrency(transactionTotal));
+        if (hasSelectedActual) lines.push("Difference: " + formatCurrency(difference));
+
+        const warning = hasSelectedActual && !withinTolerance
+          ? '<p class="wc-transaction-summary-note">The transaction total does not match the selected actual amount. ' +
+            "This may happen if some activity is filtered out for public display, recorded centrally, " +
+            "summarized differently in the actuals view, or unavailable at the transaction level.</p>"
+          : "";
+        status.innerHTML = lines.map((line) => "<p>" + escapeHtml(line) + "</p>").join("") + warning;
+      }
     }
+
+    if (isDebugMode()) {
+      console.log("Transaction detail reconciliation", {
+        fiscalYear: context.fy,
+        objectCode: context.objectCode,
+        departmentCode: context.org,
+        fundCode: context.fundCode || null,
+        programCode: context.projectCode || null,
+        selectedActualAmount: context.selectedActual,
+        queryFilters: queryFilters,
+        rowCount: rows.length,
+        transactionTotal: transactionTotal,
+        difference: difference
+      });
+    }
+
     renderTable(rows, context);
   }
 
