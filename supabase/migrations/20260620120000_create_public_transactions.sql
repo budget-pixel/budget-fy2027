@@ -36,7 +36,7 @@ comment on column public.public_transactions.raw_transaction_id is
   'Stable deterministic hash from raw source fields only: org, object, project, year, eff_date, post_date, journal, ref1, reference, and amount. Cleaned public fields are intentionally excluded so future cleanup-rule changes do not change row identity.';
 
 comment on column public.public_transactions.is_public is
-  'Gates default public visibility independent of table-level grants. False for needs_review rows, low-confidence rows, and rows where no real vendor/description text survived cleanup (object-name fallback only). The public RLS select policy filters on this column.';
+  'Marks rows that are safe for public display after cleanup. Valid cleaned rows are public so transaction detail totals reconcile to budget-line actuals; invalid needs_review rows remain non-public.';
 
 create unique index if not exists public_transactions_raw_transaction_id_uidx
   on public.public_transactions (raw_transaction_id);
@@ -404,13 +404,12 @@ begin
           when vendor_clean is not null then 0.65
           else 0.40
         end::numeric(4, 2) as cleanup_confidence,
-        -- Public by default only when real transaction-specific text (comments or
-        -- a non-reference-like reference) survived cleanup and the row did not
-        -- need review. Rows that only have the object/account name or a synthetic
-        -- "Object <code>" fallback stay private until an editor confirms them.
+        -- Public by default for valid cleaned rows so drill-through transaction
+        -- totals reconcile to the budget-line actuals. Rows with weak text still
+        -- receive safe public placeholders/fallbacks above, so raw finance-system
+        -- wording is not exposed. Only structurally invalid rows stay private.
         case
           when year is null or object is null or amount is null then false
-          when not (comments_meaningful or reference_meaningful) then false
           else true
         end as is_public
       from described
@@ -557,10 +556,10 @@ revoke all on function public.refresh_public_transactions(boolean, integer, inte
 grant execute on function public.refresh_public_transactions(boolean, integer, integer, text) to service_role;
 
 comment on function public.refresh_public_transactions(boolean, integer, integer, text) is
-  'Idempotently refreshes public_transactions from transactions_raw using a stable raw-field hash and upserts on raw_transaction_id. Sets is_public based on cleanup_status/confidence/description quality. Pass _dry_run=true for dry-run counts without writes. Pass _limit to cap how many of the most recent raw rows are processed, for a one-off smoke test. Pass _batch_size (optionally with _after_raw_transaction_id from a prior call''s next_after_raw_transaction_id) for keyset-paginated full-table refreshes; continue until rows_processed = 0. _limit and _batch_size are mutually exclusive.';
+  'Idempotently refreshes public_transactions from transactions_raw using a stable raw-field hash and upserts on raw_transaction_id. Sets valid cleaned rows as public so transaction totals reconcile to budget-line actuals. Pass _dry_run=true for dry-run counts without writes. Pass _limit to cap how many of the most recent raw rows are processed, for a one-off smoke test. Pass _batch_size (optionally with _after_raw_transaction_id from a prior call''s next_after_raw_transaction_id) for keyset-paginated full-table refreshes; continue until rows_processed = 0. _limit and _batch_size are mutually exclusive.';
 
 comment on table public.public_transactions is
-  'Cleaned, resident-friendly public transaction rows for budget actual drill-through. Raw finance-system fields stay internal. Only is_public = true rows are visible to anon/authenticated readers via RLS.';
+  'Cleaned, resident-friendly public transaction rows for budget actual drill-through. Raw finance-system fields stay internal. Valid cleaned rows are visible to anon/authenticated readers via RLS.';
 
 /*
 Quick duplicate verification after a refresh:

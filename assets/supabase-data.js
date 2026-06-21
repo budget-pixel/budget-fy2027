@@ -183,9 +183,6 @@
     const client = getClient();
     if (!client) return [];
 
-    // TODO (temporary, dev-only): remove before final production cleanup.
-    console.log("Transaction detail source: public_transactions");
-
     const options = filters || {};
     let query = client
       .from("public_transactions")

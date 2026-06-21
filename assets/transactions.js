@@ -204,7 +204,6 @@
         const lines = [
           rows.length.toLocaleString("en-US") + " transaction" + (rows.length === 1 ? "" : "s") + " found."
         ];
-        if (hasSelectedActual) lines.push("Selected actual amount: " + formatCurrency(context.selectedActual));
         lines.push("Transaction total: " + formatCurrency(transactionTotal));
         if (hasSelectedActual) lines.push("Difference: " + formatCurrency(difference));
 
