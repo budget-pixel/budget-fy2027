@@ -2261,7 +2261,7 @@ function renderProjects(){
         <div class="wc-project-index-header" id="wc-project-search">
           <div class="page-eyebrow">Capital Projects</div>
           <h1 class="page-title">Project Search</h1>
-          <p class="page-intro">Browse, search, and filter Walton County capital improvement projects by department, year, and funding source. This project index is populated from the CIP export and is designed to help residents quickly locate projects relevant to their community.</p>
+          <p class="page-intro">Browse, search, and filter Walton County capital improvement projects by department, year, and funding source. This project indexed is designed to help residents quickly locate projects relevant to their community.</p>
           <div class="wc-project-search-stats" aria-label="Capital project search summary">
             <div class="wc-project-search-stat">
               <strong>${escapeHtml(allProjects.length)}</strong>
