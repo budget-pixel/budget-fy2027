@@ -120,6 +120,7 @@
   };
 
   const PRIOR_YEARS_KEY = "wc_show_prior_years";
+  const PERFORMANCE_PRIOR_YEARS_KEY = "wc_show_performance_prior_years";
 
   const cache = {
     expenditures: [],
@@ -714,10 +715,11 @@
 
   // ---- rendering primitives ----
 
-  function priorYearsToggleHtml(showPrior, extraWrapClass) {
+  function priorYearsToggleHtml(showPrior, extraWrapClass, scope) {
+    const priorScope = scope || "budget";
     const label =
       '<label class="wc-fy-column-toggle-label">' +
-      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" aria-label="View Prior Years" ' +
+      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" data-wc-prior-years-scope="' + escapeHtml(priorScope) + '" aria-label="View Prior Years" ' +
       (showPrior ? "checked" : "") + " />" +
       '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
       "</label>";
@@ -1062,6 +1064,7 @@
       .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
     const nonZeroRows = sortedRows.filter((row) => (row.amount || 0) !== 0);
     const visibleRows = nonZeroRows.slice(0, 3);
+    const rowCountClass = " wc-finance-card-rows-" + Math.max(visibleRows.length, 0);
     const itemHtml = visibleRows.map((row) => {
       const amount = row.amount || 0;
       const percent = total ? Math.abs(amount) / Math.abs(total) * 100 : 0;
@@ -1082,7 +1085,7 @@
     }).join("");
 
     return (
-      '<section class="wc-finance-card wc-budget-lines-card' + zeroClass + (showPrior ? " show-prior-years" : "") + '">' +
+      '<section class="wc-finance-card wc-budget-lines-card' + rowCountClass + zeroClass + (showPrior ? " show-prior-years" : "") + '">' +
         '<div class="wc-finance-card-head">' +
           '<div>' +
             '<p class="wc-finance-card-kicker">' + escapeHtml(caption) + '</p>' +
@@ -2761,17 +2764,21 @@
     return '<section class="mosquito-state-aid-tables">' + pieces.join("") + "</section>";
   }
 
-  function getShowPriorYears() {
+  function priorYearsStorageKey(scope) {
+    return scope === "performance" ? PERFORMANCE_PRIOR_YEARS_KEY : PRIOR_YEARS_KEY;
+  }
+
+  function getShowPriorYears(scope) {
     try {
-      return localStorage.getItem(PRIOR_YEARS_KEY) === "1";
+      return localStorage.getItem(priorYearsStorageKey(scope)) === "1";
     } catch (e) {
       return false;
     }
   }
 
-  function setShowPriorYears(value) {
+  function setShowPriorYears(value, scope) {
     try {
-      localStorage.setItem(PRIOR_YEARS_KEY, value ? "1" : "0");
+      localStorage.setItem(priorYearsStorageKey(scope), value ? "1" : "0");
     } catch (e) {
       /* localStorage unavailable; in-memory state still applies */
     }
@@ -2792,7 +2799,7 @@
   // cells, a Code Link column, and a "View Prior Years" column toggle.
   function renderPerformanceTable(rows) {
     if (!rows.length) return "";
-    const showPrior = getShowPriorYears();
+    const showPrior = getShowPriorYears("performance");
     const yearCols = [
       { key: "Actual_2022", label: "Actual 2022" },
       { key: "Actual_2023", label: "Actual 2023" },
@@ -2833,7 +2840,7 @@
       '<section class="wc-performance-card' + (showPrior ? " show-prior-years" : "") + '">' +
       '<div class="wc-fy-column-toggle-wrap">' +
       '<label class="wc-fy-column-toggle-label">' +
-      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" aria-label="View Prior Years" ' +
+      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" data-wc-prior-years-scope="performance" aria-label="View Prior Years" ' +
       (showPrior ? "checked" : "") + " />" +
       '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
       "</label>" +
@@ -2855,15 +2862,23 @@
     );
   }
 
-  function applyPriorYearsState(checked, container) {
+  function priorYearsScopeForCheckbox(checkbox) {
+    if (!checkbox) return "budget";
+    return checkbox.getAttribute("data-wc-prior-years-scope") ||
+      (checkbox.closest(".wc-performance-card") ? "performance" : "budget");
+  }
+
+  function applyPriorYearsState(checked, container, scope) {
     const root = container || document;
-    if (root.classList && root.matches(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card")) {
+    const priorScope = scope || "budget";
+    const cardSelector = priorScope === "performance" ? ".wc-performance-card" : ".wc-staffing-card, .wc-budget-lines-card";
+    if (root.classList && root.matches(cardSelector)) {
       root.classList.toggle("show-prior-years", checked);
     }
-    root.querySelectorAll(".wc-performance-card, .wc-staffing-card, .wc-budget-lines-card").forEach((card) => {
+    root.querySelectorAll(cardSelector).forEach((card) => {
       card.classList.toggle("show-prior-years", checked);
     });
-    root.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((cb) => {
+    root.querySelectorAll('.wc-fy-column-toggle-checkbox[data-wc-prior-years-scope="' + priorScope + '"]').forEach((cb) => {
       cb.checked = checked;
     });
   }
@@ -2875,8 +2890,9 @@
       checkbox.setAttribute("data-wc-prior-years-bound", "true");
       checkbox.addEventListener("change", () => {
         const checked = checkbox.checked;
-        setShowPriorYears(checked);
-        applyPriorYearsState(checked);
+        const scope = priorYearsScopeForCheckbox(checkbox);
+        setShowPriorYears(checked, scope);
+        applyPriorYearsState(checked, null, scope);
       });
     });
   }

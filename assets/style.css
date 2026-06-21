@@ -1193,7 +1193,7 @@ body {
   margin: 0;
 }
 .wc-department-financial-grid .wc-finance-card + .wc-finance-card {
-  margin-top: 18px;
+  margin-top: 0;
 }
 .wc-department-financial-grid #department-staffing-table {
   grid-column: 1 / -1;
@@ -1248,6 +1248,15 @@ body {
   display: grid;
   gap: 17px;
   align-content: start;
+}
+.wc-finance-card-rows-1 .wc-finance-card-head {
+  margin-bottom: 28px;
+}
+.wc-finance-card-rows-1 .wc-finance-card-breakdown {
+  margin-bottom: 22px;
+}
+.wc-finance-card-rows-1 .wc-finance-card-footer {
+  margin-top: auto;
 }
 .wc-department-financial-grid #department-staffing-table .wc-finance-card-breakdown {
   grid-template-columns: repeat(2, minmax(0, 1fr));
