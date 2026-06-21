@@ -463,7 +463,7 @@
     <div class="wc-fund-hero-copy">
       <span class="wc-fund-kicker">How the Budget Is Organized</span>
       <h2>Departments are grouped by function, then tied to the fund that pays for the service.</h2>
-      <p>This page replaces the old diagram with a cleaner relationship view. It shows how departments, constitutional officers, activities, transfers, and major operating funds connect inside the County budget.</p>
+      <p>This page shows how departments, constitutional officers, activities, transfers, and major operating funds connect inside the County budget.</p>
     </div>
 
     <aside class="wc-fund-route-card">
@@ -591,20 +591,19 @@
   <section class="wc-fund-section">
     <div class="wc-fund-section-header">
       <span class="wc-fund-kicker">Separate Fund Paths</span>
-      <h2>Some services are shown in dedicated funds.</h2>
-      <p>Special revenue, constitutional officer, and capital project activity may be separated from the General Fund to preserve restrictions, show dedicated funding sources, or isolate major investments.</p>
+      <h2>Dedicated funds follow the same activity structure.</h2>
+      <p>Some services are separated from the General Fund, but they still connect to a public activity, the departments or programs delivering the service, and the fund where the budget is recorded.</p>
     </div>
 
     <div class="wc-relationship-map" aria-label="Dedicated department to fund relationships">
       <div class="wc-relationship-row">
         <div class="wc-relationship-node">
-          <strong>Public Safety Officer</strong>
-          <span>Constitutional Officer</span>
+          <strong>Public Safety</strong>
+          <span>Sheriff Fund Path</span>
         </div>
         <div class="wc-relationship-list">
           <span class="wc-relationship-chip">Sheriff&rsquo;s Office</span>
           <span class="wc-relationship-chip">Sheriff Capital Projects</span>
-          <span class="wc-relationship-chip">Emergency Response Facilities</span>
         </div>
         <div class="wc-relationship-fund is-light">Sheriff Fund</div>
       </div>
@@ -612,11 +611,10 @@
       <div class="wc-relationship-row">
         <div class="wc-relationship-node">
           <strong>Transportation</strong>
-          <span>Restricted Road Revenues</span>
+          <span>Transportation Fund Path</span>
         </div>
         <div class="wc-relationship-list">
           <span class="wc-relationship-chip">Public Works</span>
-          <span class="wc-relationship-chip">Road and Bridge</span>
           <span class="wc-relationship-chip">Transportation Capital Projects</span>
         </div>
         <div class="wc-relationship-fund is-light">Transportation Fund</div>
@@ -624,8 +622,8 @@
 
       <div class="wc-relationship-row">
         <div class="wc-relationship-node">
-          <strong>Tourism</strong>
-          <span>Tourist Development Tax</span>
+          <strong>Economic Activity</strong>
+          <span>Tourist Development Fund Path</span>
         </div>
         <div class="wc-relationship-list">
           <span class="wc-relationship-chip">Tourism Administration</span>
@@ -641,8 +639,8 @@
 
       <div class="wc-relationship-row">
         <div class="wc-relationship-node">
-          <strong>Enterprise and Restricted Programs</strong>
-          <span>Service-Specific Funding</span>
+          <strong>Physical Environment and Community Services</strong>
+          <span>Special Revenue and Enterprise Paths</span>
         </div>
         <div class="wc-relationship-list">
           <span class="wc-relationship-chip">Solid Waste</span>
@@ -653,7 +651,6 @@
           <span class="wc-relationship-chip">Recreation Plat Fee</span>
           <span class="wc-relationship-chip">Preservation</span>
           <span class="wc-relationship-chip">Sidewalk</span>
-          <span class="wc-relationship-chip">Mossy Head Wastewater Treatment Facility</span>
         </div>
         <div class="wc-relationship-fund is-light">Special Revenue and Enterprise Funds</div>
       </div>
@@ -661,36 +658,17 @@
       <div class="wc-relationship-row">
         <div class="wc-relationship-node">
           <strong>Capital and Financing</strong>
-          <span>Major Projects and Debt</span>
+          <span>Capital Project and Debt Paths</span>
         </div>
         <div class="wc-relationship-list">
           <span class="wc-relationship-chip">Capital Projects</span>
           <span class="wc-relationship-chip">Grant-Funded Capital Projects</span>
           <span class="wc-relationship-chip">Debt Service</span>
-          <span class="wc-relationship-chip">Interfund Transfers</span>
         </div>
         <div class="wc-relationship-fund is-light">Capital Projects and Debt Service Funds</div>
       </div>
     </div>
 
-    <div class="wc-fund-detail-grid">
-      <article class="wc-fund-detail-card">
-        <h3>Sheriff Fund</h3>
-        <p>The Sheriff&rsquo;s Office is shown separately because it represents a major public safety appropriation and is accounted for in a dedicated fund path.</p>
-      </article>
-      <article class="wc-fund-detail-card">
-        <h3>Transportation Fund</h3>
-        <p>Transportation activity is supported through restricted transportation revenues and transfers, then used for road, bridge, drainage, and related infrastructure needs.</p>
-      </article>
-      <article class="wc-fund-detail-card">
-        <h3>Capital Projects Fund</h3>
-        <p>Capital project costs are separated from daily operations so major infrastructure and facility investments can be tracked over multiple years.</p>
-      </article>
-      <article class="wc-fund-detail-card">
-        <h3>Interfund Transfers</h3>
-        <p>Transfers move resources between funds when legally allowed and budgeted, connecting revenue sources to the funds where expenditures are recorded.</p>
-      </article>
-    </div>
   </section>
 </section>
 </main>
@@ -812,6 +790,16 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
       .join(" / ");
   }
 
+  function isInterfundTransferOut(row){
+    return String((row && row.Object_Code) || "").trim() === "591000";
+  }
+
+  function isSelfInsuranceFund(fund){
+    const code = String((fund && fund.code) || "").trim();
+    const name = String((fund && fund.name) || "").toLowerCase();
+    return code === "503" || name.indexOf("self-insurance") !== -1 || name.indexOf("self insurance") !== -1;
+  }
+
   function renderFundFlow(data){
     const mount = document.getElementById("wc-fund-flow");
     if (!mount) return;
@@ -823,8 +811,7 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
         code: fund.Fund_Code,
         name: fund.Fund_Name || ("Fund " + fund.Fund_Code),
         type: fundTypeLabel(fund),
-        expense: 0,
-        revenue: 0
+        expense: 0
       });
     });
 
@@ -835,26 +822,21 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
           code: code,
           name: "Fund " + code,
           type: code,
-          expense: 0,
-          revenue: 0
+          expense: 0
         });
       }
       return fundMap.get(code);
     }
 
     (data.expenditures || []).forEach(function(row){
+      if (isInterfundTransferOut(row)) return;
       const fund = ensureFund(fundCodeForRow(row));
       if (fund) fund.expense += Number(row.FY2027_Proposed) || 0;
     });
 
-    (data.revenues || []).forEach(function(row){
-      const fund = ensureFund(fundCodeForRow(row));
-      if (fund) fund.revenue += Number(row.FY2027_Proposed) || 0;
-    });
-
     const funds = Array.from(fundMap.values())
-      .filter(function(fund){ return Math.abs(fund.expense) > 0 || Math.abs(fund.revenue) > 0; })
-      .sort(function(a, b){ return Math.abs(b.expense || b.revenue) - Math.abs(a.expense || a.revenue); });
+      .filter(function(fund){ return !isSelfInsuranceFund(fund) && Math.abs(fund.expense) > 0; })
+      .sort(function(a, b){ return Math.abs(b.expense) - Math.abs(a.expense); });
 
     if (!funds.length){
       mount.innerHTML = '<div class="wc-fund-flow-error">Fund budget amounts are not available right now.</div>';
@@ -862,25 +844,23 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     }
 
     const totalExpense = funds.reduce(function(sum, fund){ return sum + fund.expense; }, 0);
-    const maxAmount = Math.max.apply(null, funds.map(function(fund){ return Math.abs(fund.expense || fund.revenue); }));
+    const maxAmount = Math.max.apply(null, funds.map(function(fund){ return Math.abs(fund.expense); }));
     const currency = (window.WCBudgetData && window.WCBudgetData.formatCurrency) || compactCurrency;
 
     const rows = funds.map(function(fund){
-      const amount = fund.expense || fund.revenue;
+      const amount = fund.expense;
       const share = maxAmount ? Math.max(2, (Math.abs(amount) / maxAmount) * 100) : 0;
-      const revenueText = fund.revenue ? "Revenue " + compactCurrency(fund.revenue) : "Revenue not listed";
       return (
         '<div class="wc-fund-flow-row">' +
           '<div class="wc-fund-flow-name">' +
             '<strong>' + escapeHtml(fund.name) + '</strong>' +
             '<span>' + escapeHtml(fund.type || fund.code) + '</span>' +
           '</div>' +
-          '<div class="wc-fund-flow-track" title="' + escapeHtml(revenueText) + '">' +
+          '<div class="wc-fund-flow-track">' +
             '<div class="wc-fund-flow-bar" style="--fund-share:' + share.toFixed(2) + '%"></div>' +
           '</div>' +
           '<div class="wc-fund-flow-amount" title="' + escapeHtml(currency(fund.expense)) + '">' +
             escapeHtml(compactCurrency(fund.expense)) +
-            '<span>' + escapeHtml(revenueText) + '</span>' +
           '</div>' +
         '</div>'
       );
@@ -889,17 +869,16 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     mount.innerHTML =
       '<div class="wc-fund-flow-head">' +
         '<div>' +
-          '<span class="wc-fund-kicker">FY 2027 Fund Flow</span>' +
+          '<span class="wc-fund-kicker">Fund Flow</span>' +
           '<h2>Budget by fund.</h2>' +
-          '<p>Each row shows the FY 2027 proposed expenditure budget for an active fund. Bar length is scaled to the largest fund so readers can quickly see how much of the budget flows through each fund.</p>' +
+          '<p>Each row shows the expenditure budget for an active fund.</p>' +
         '</div>' +
         '<div class="wc-fund-flow-total">' +
           '<strong>' + escapeHtml(compactCurrency(totalExpense)) + '</strong>' +
-          '<span>Total Expenditures</span>' +
+          '<span>Total Expenditures Less Transfers</span>' +
         '</div>' +
       '</div>' +
-      '<div class="wc-fund-flow-list">' + rows + '</div>' +
-      '<p class="wc-fund-flow-note">Amounts are loaded from the budget Google Sheets feed. Bar length is based on FY 2027 proposed expenditures; revenue totals are shown beneath each expenditure amount.</p>';
+      '<div class="wc-fund-flow-list">' + rows + '</div>';
   }
 
   document.addEventListener("DOMContentLoaded", function(){

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table of Contents — Walton County Budget</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
+<nav id="nav-menu" class="nav-menu">
+  <div class="logo-container"></div>
+</nav>
+
+<div id="layout">
+<main id="content">
+
+<div class="page-eyebrow">Introduction and Overview</div>
+<h1 class="page-title">Table of Contents</h1>
+<p class="page-intro">Use this page as a quick guide to the budget, including county context, budget process information, department pages, capital projects, and financial schedules.</p>
+
+<style>
+  .wc-toc-overview {
+    margin: 0 0 30px;
+  }
+
+  .wc-toc-callout {
+    max-width: 1120px;
+    padding: 30px;
+    border-radius: 28px;
+    background: #003f28;
+    color: #ffffff;
+  }
+
+  .wc-toc-callout h2 {
+    margin: 0 0 12px;
+    color: #ffffff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(32px, 5vw, 54px);
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  .wc-toc-callout p {
+    max-width: 820px;
+    margin: 0;
+    color: rgba(255,255,255,.84);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .wc-toc-sections {
+    counter-reset: toc-page;
+  }
+
+  .wc-toc-section {
+    margin: 0 0 34px;
+  }
+
+  .wc-toc-section h2 {
+    margin: 0 0 12px;
+    color: #003f28;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .wc-toc-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 34px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgba(23,32,51,.10);
+  }
+
+  .wc-toc-list li {
+    counter-increment: toc-page;
+    border-bottom: 1px solid rgba(23,32,51,.10);
+  }
+
+  .wc-toc-list a {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 16px 0;
+    text-decoration: none;
+  }
+
+  .wc-toc-number {
+    color: #d1be78;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .08em;
+  }
+
+  .wc-toc-number::before {
+    content: counter(toc-page, decimal-leading-zero);
+  }
+
+  .wc-toc-title {
+    display: block;
+    color: #172033;
+    font-size: 17px;
+    font-weight: 850;
+  }
+
+  .wc-toc-desc {
+    display: block;
+    margin-top: 4px;
+    color: #607184;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .wc-toc-arrow {
+    color: #003f28;
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .wc-toc-list a:hover .wc-toc-title {
+    color: #006231;
+  }
+
+  @media (max-width: 760px) {
+    .wc-toc-list {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+    }
+
+    .wc-toc-list a {
+      grid-template-columns: 24px minmax(0, 1fr);
+    }
+
+    .wc-toc-arrow {
+      display: none;
+    }
+  }
+
+  :root[data-theme="dark"] .wc-toc-title {
+    color: rgba(255,255,255,.92);
+  }
+
+  :root[data-theme="dark"] .wc-toc-desc {
+    color: rgba(255,255,255,.68);
+  }
+
+  :root[data-theme="dark"] .wc-toc-list,
+  :root[data-theme="dark"] .wc-toc-list li {
+    border-color: rgba(255,255,255,.12);
+  }
+</style>
+
+<section class="wc-toc-overview" aria-label="Table of contents overview">
+  <div class="wc-toc-callout">
+    <h2>Find Your Way Through the Budget</h2>
+    <p>The budget is organized around county context, budget process information, service areas, capital investments, and financial schedules. This table of contents lists the content pages directly without individual project-detail pages.</p>
+  </div>
+</section>
+
+<div class="wc-toc-sections" id="tocSections"></div>
+
+<script>
+  (function(){
+    var sections = [
+      {
+        title:"Introduction and Budget Overview",
+        pages:[
+          { title:"GFOA Distinguished Budget Presentation Award", href:"gfoa-distinguished-budget-presentation-award.html", description:"Budget presentation recognition and award criteria." },
+          { title:"Transmittal Letter", href:"transmittal-letter.html", description:"The executive budget message and major priorities." },
+          { title:"Budget Process", href:"budget-process-and-calendar.html", description:"How the annual budget is developed, reviewed, amended, and adopted." },
+          { title:"Budget Calendar", href:"budget-calendar.html", description:"Key budget dates, public meetings, hearings, and involvement opportunities." },
+          { title:"Fund Descriptions and Structure", href:"fund-descriptions-and-structure.html", description:"How county resources are organized by fund and legal purpose." },
+          { title:"Department to Fund Relationship", href:"department-to-fund-relationship.html", description:"How departments, offices, agencies, and programs are supported by funds." },
+          { title:"Financial Policies", href:"financial-policies.html", description:"Policies for budgeting, reserves, debt, fund balance, and fiscal stewardship." }
+        ]
+      },
+      {
+        title:"Our County",
+        pages:[
+          { title:"Overview of Walton County", href:"overview-of-walton-county.html", description:"History, geography, governance, demographics, and community context." },
+          { title:"Organizational Structure", href:"organizational-structure.html", description:"County organization chart and reporting structure." },
+          { title:"Organizational Chart Full Size", href:"org-chart-full-size.html", description:"Full-size view of the County organizational chart." },
+          { title:"Strategic Initiatives", href:"strategic-initiatives.html", description:"Strategic priorities, mission, vision, and performance alignment." },
+          { title:"Statistical & Supplemental Information", href:"statistical-and-supplemental-information.html", description:"Demographic, economic, statistical, and supplemental budget context." },
+          { title:"Glossary, Acronyms, and Frequently Asked Questions", href:"glossary-acronyms-and-frequently-asked-questions.html", description:"Definitions, acronyms, and answers to common budget questions." }
+        ]
+      },
+      {
+        title:"Constitutional Officers",
+        pages:[
+          { title:"Board of County Commissioners", href:"board-of-county-commissioners.html", description:"Budget, services, staffing, and performance information for the Board." },
+          { title:"Clerk of Courts & County Comptroller", href:"clerk-of-courts-and-county-comptroller.html", description:"Budget and service information for the Clerk and Comptroller." },
+          { title:"Property Appraiser", href:"property-appraiser.html", description:"Budget and service information for the Property Appraiser." },
+          { title:"Sheriff's Office", href:"sheriffs-office.html", description:"Budget and service information for law enforcement, corrections, and public safety." },
+          { title:"Supervisor of Elections", href:"supervisor-of-elections.html", description:"Budget and service information for election administration." },
+          { title:"Tax Collector", href:"tax-collector.html", description:"Budget and service information for tax collection and related services." }
+        ]
+      },
+      {
+        title:"Other Agencies and Court-Related Functions",
+        pages:[
+          { title:"Circuit Court", href:"circuit-court.html", description:"Funding and service information for Circuit Court operations." },
+          { title:"County Court", href:"county-court.html", description:"Funding and service information for County Court operations." },
+          { title:"Court Technology & Innovations", href:"court-technology-and-innovations.html", description:"Technology funding supporting court-related services." },
+          { title:"Guardian Ad Litem", href:"guardian-ad-litem.html", description:"Funding information for Guardian Ad Litem services." },
+          { title:"Medical Examiner", href:"medical-examiner.html", description:"Funding information for Medical Examiner services." },
+          { title:"Non-Profit Funding Program", href:"non-profit-funding-program.html", description:"Funding support for qualifying non-profit and community programs." },
+          { title:"Public Defender", href:"public-defender.html", description:"Funding information for Public Defender services." },
+          { title:"South Walton Fire & State Control", href:"south-walton-fire-and-state-control.html", description:"Funding information for fire and state control services." },
+          { title:"State Attorney", href:"state-attorney.html", description:"Funding information for State Attorney services." },
+          { title:"Statutory & Other Agency Funding", href:"statutory-and-other-agency-funding.html", description:"Funding for statutory obligations and other agency support." },
+          { title:"Walton County Health Department", href:"walton-county-health-department.html", description:"Funding information for public health services." }
+        ]
+      },
+      {
+        title:"Departments",
+        pages:[
+          { title:"Building Construction and Maintenance", href:"building-construction-and-maintenance.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Building Department", href:"building-department.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Code Compliance", href:"code-compliance.html", description:"Budget, staffing, services, and performance information." },
+          { title:"County Administration", href:"county-administration.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Eagle Springs Golf and Recreation Center", href:"eagle-springs-golf-and-recreation-center.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Eagle Springs Grill", href:"eagle-springs-grill.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Emergency Management", href:"emergency-management.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Engineering Department", href:"engineering-department.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Environmental Resources", href:"environmental-resources.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Extension Office", href:"extension-office.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Geographic Info Systems", href:"geographic-info-systems.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Housing & Urban Development", href:"housing-and-urban-development.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Human Resources", href:"human-resources.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Libraries", href:"libraries.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Mosquito Control", href:"mosquito-control.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Mossy Head Wastewater Treatment Facility", href:"mossy-head-wastewater-treatment-facility.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Office of Management and Budget", href:"office-of-management-and-budget.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Office of the County Attorney", href:"office-of-the-county-attorney.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Planning", href:"planning.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Probation", href:"probation.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Public Works", href:"public-works.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Purchasing", href:"purchasing.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Recreation", href:"recreation.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Soil Conservation", href:"soil-conservation.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Solid Waste", href:"solid-waste.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Tourism Administration", href:"tourism-administration.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Tourism Beach Operations", href:"tourism-beach-operations.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Tourism Lifeguard Services and Beach Safety", href:"tourism-lifeguard-services-and-beach-safety.html", description:"Budget, staffing, services, and performance information." },
+          { title:"Veteran Services", href:"veteran-services.html", description:"Budget, staffing, services, and performance information." }
+        ]
+      },
+      {
+        title:"Capital Projects",
+        pages:[
+          { title:"Capital Improvement Plan Overview", href:"capital-improvement-plan.html", description:"How capital projects are planned, evaluated, funded, and presented." },
+          { title:"Capital Project Search", href:"search.html", description:"Search planned capital projects by name, fund, department, district, and project type." },
+          { title:"Capital Projects Fund Schedule", href:"cip-capital-projects.html", description:"Capital projects fund schedule and related project appropriations." },
+          { title:"Grant Funded Schedule", href:"cip-grants.html", description:"Capital projects supported by federal, state, and other grant funding sources." },
+          { title:"Sheriff Fund Schedule", href:"cip-sheriff.html", description:"Capital projects associated with Sheriff and public safety funding." },
+          { title:"Tourist Development Fund Schedule", href:"cip-tourist-development.html", description:"Tourism-related capital investments funded through tourist development resources." },
+          { title:"Transportation Fund Schedule", href:"cip-transportation.html", description:"Transportation capital investments, road work, and infrastructure schedules." }
+        ]
+      },
+      {
+        title:"Financial Schedules and Summaries",
+        pages:[
+          { title:"Consolidated Financial Schedules", href:"consolidated-financial-schedules.html", description:"Countywide revenues, expenditures, transfers, and fund totals." },
+          { title:"Fund Financial Schedules", href:"fund-financial-schedules.html", description:"Financial schedules organized by major and non-major funds." },
+          { title:"Summary of Revenues", href:"summary-of-revenues.html", description:"Major revenue sources including property taxes, sales taxes, tourist development taxes, and other revenues." },
+          { title:"Summary of Expenses", href:"summary-of-expenses.html", description:"Expenditure summaries by function, fund, and budget category." },
+          { title:"Summary of Interfund Transfers", href:"summary-of-interfund-transfers.html", description:"Planned transfers between funds and how resources move to support operations and capital needs." },
+          { title:"Summary of Personnel", href:"summary-of-personnel.html", description:"Staffing summaries and position counts supporting County services and programs." },
+          { title:"Summary of Machinery, Vehicles & Equipment", href:"summary-of-machinery-vehicles-and-equipment.html", description:"Planned machinery, vehicle, and equipment investments." },
+          { title:"Debt Overview", href:"debt-overview.html", description:"Outstanding debt, debt service, borrowing strategy, and long-term obligations." },
+          { title:"Financial Forecast", href:"financial-forecast.html", description:"Long-range assumptions, revenue outlook, expense projections, and planning considerations." }
+        ]
+      }
+    ];
+
+    function escapeHtml(value){
+      return String(value === undefined || value === null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderTableOfContents(){
+      var host = document.getElementById("tocSections");
+      if(!host) return;
+      host.innerHTML = sections.map(function(section, sectionIndex){
+        var headingId = "toc-section-" + sectionIndex;
+        return '<section class="wc-toc-section" aria-labelledby="' + headingId + '">' +
+          '<h2 id="' + headingId + '">' + escapeHtml(section.title) + '</h2>' +
+          '<ul class="wc-toc-list">' +
+            section.pages.map(function(page){
+              return '<li><a href="' + escapeHtml(page.href) + '">' +
+                '<span class="wc-toc-number" aria-hidden="true"></span>' +
+                '<span><span class="wc-toc-title">' + escapeHtml(page.title) + '</span>' +
+                '<span class="wc-toc-desc">' + escapeHtml(page.description) + '</span></span>' +
+                '<span class="wc-toc-arrow" aria-hidden="true">&rarr;</span>' +
+              '</a></li>';
+            }).join("") +
+          '</ul>' +
+        '</section>';
+      }).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", renderTableOfContents);
+  })();
+</script>
+
+<script src="../assets/walton-budget-search-data.js"></script>
+<script src="../assets/budget-data.js?v=20260620"></script>
+<script src="../assets/walton-budget-nav.js"></script>
+<script src="../assets/walton-budget-pdf.js"></script>
+</body>
+</html>
