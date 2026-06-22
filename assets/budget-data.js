@@ -186,13 +186,15 @@
 
       return Promise.all([
         supabaseData.loadExpenseActuals(),
-        supabaseData.loadRevenueActuals()
-      ]).then(([expenseRows, revenueRows]) => ({
+        supabaseData.loadRevenueActuals(),
+        supabaseData.loadOriginalBudget()
+      ]).then(([expenseRows, revenueRows, originalBudgetRows]) => ({
         supabaseData,
         expenseRows,
         revenueRows,
         expenseLookup: supabaseData.buildActualsLookup(expenseRows),
-        revenueLookup: supabaseData.buildActualsLookup(revenueRows)
+        revenueLookup: supabaseData.buildActualsLookup(revenueRows),
+        originalBudgetLookup: supabaseData.buildActualsLookup(originalBudgetRows)
       }));
     }).catch((err) => {
       console.error("WCBudgetData: Supabase actuals could not be loaded; using Google Sheets fallbacks.", err);
@@ -212,6 +214,20 @@
         next[field] = supabaseData.actualOrFallback(lookup, row, year, row[field]);
       });
       return next;
+    });
+  }
+
+  // FY2026 Original Budget has no Google Sheets fallback -- it only exists
+  // in Supabase (expense_original_budget_public), so rows with no matching
+  // org/object/project/year get 0 rather than falling back to another field.
+  function applyOriginalBudgetToRows(rows, lookup, supabaseData) {
+    if (!lookup || !supabaseData || typeof supabaseData.getActualAmount !== "function") {
+      return rows;
+    }
+
+    return (rows || []).map((row) => {
+      const amount = supabaseData.getActualAmount(lookup, row, 2026);
+      return { ...row, FY2026_Original_Budget: amount === undefined ? 0 : amount };
     });
   }
 
@@ -711,6 +727,7 @@
         cache.revenueActualRows = actuals.revenueRows || [];
         cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseLookup, actuals.supabaseData);
         cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueLookup, actuals.supabaseData);
+        cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetLookup, actuals.supabaseData);
       }
 
       return cache;
@@ -753,8 +770,84 @@
     { field: "FY2023_Actual", label: "FY 2023 Actual", year: 2023, actual: true },
     { field: "FY2024_Actual", label: "FY 2024 Actual", year: 2024, actual: true },
     { field: "FY2025_Actual", label: "FY 2025 Actual", year: 2025, actual: true },
-    { field: "FY2026_Budget", label: "FY 2026 Budget" }
+    // Sourced from expense_original_budget_public (Supabase), not the
+    // Google Sheets FY2026_Budget field. Not flagged `actual: true` --
+    // budget amounts never drill through to transaction detail, only
+    // historical actuals do.
+    { field: "FY2026_Original_Budget", label: "FY 2026 Budget" }
   ];
+
+  function budgetLinePriorYearColumns(isExpense) {
+    if (isExpense) return BUDGET_LINE_PRIOR_YEAR_COLUMNS;
+    return BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((column) =>
+      column.field === "FY2026_Original_Budget"
+        ? { field: "FY2026_Budget", label: column.label }
+        : column
+    );
+  }
+
+  function splitBudgetLineCodes(value) {
+    return String(value || "")
+      .split(",")
+      .map((code) => code.trim())
+      .filter(Boolean);
+  }
+
+  function revenueActualAmountForCodes(codes, year) {
+    const codeSet = new Set((codes || []).filter(Boolean));
+    if (!codeSet.size || !(cache.revenueActualRows || []).length) return 0;
+    return (cache.revenueActualRows || []).reduce((sum, row) => {
+      if (Number(row.year) !== Number(year)) return sum;
+      if (!codeSet.has(String(row.object || "").trim())) return sum;
+      if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(String(row.org || "").trim().slice(0, 3))) return sum;
+      return sum + (Number(row.amount) || 0);
+    }, 0);
+  }
+
+  function revenueBudgetAmountForCodes(codes, field) {
+    const codeSet = new Set((codes || []).filter(Boolean));
+    if (!codeSet.size) return 0;
+    return (cache.revenues || []).reduce((sum, row) => {
+      if (!codeSet.has(String(row.Revenue_Code || "").trim())) return sum;
+      if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(row))) return sum;
+      return sum + (row[field] || 0);
+    }, 0);
+  }
+
+  function budgetLineColumnAmount(row, column, isExpense) {
+    if (!isExpense && column.actual) {
+      return revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year);
+    }
+    if (!isExpense && column.field === "FY2026_Budget") {
+      const rowAmount = row[column.field] || 0;
+      return rowAmount || revenueBudgetAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.field);
+    }
+    return row[column.field] || 0;
+  }
+
+  function budgetLineColumnTotal(rows, column, isExpense) {
+    if (!isExpense && column.actual) {
+      const codes = [];
+      (rows || []).forEach((row) => {
+        splitBudgetLineCodes(row.Revenue_Code).forEach((code) => {
+          if (!codes.includes(code)) codes.push(code);
+        });
+      });
+      return revenueActualAmountForCodes(codes, column.year);
+    }
+    if (!isExpense && column.field === "FY2026_Budget") {
+      const fallbackCodes = [];
+      return (rows || []).reduce((sum, row) => {
+        const rowAmount = row[column.field] || 0;
+        if (rowAmount) return sum + rowAmount;
+        splitBudgetLineCodes(row.Revenue_Code).forEach((code) => {
+          if (!fallbackCodes.includes(code)) fallbackCodes.push(code);
+        });
+        return sum;
+      }, 0) + revenueBudgetAmountForCodes(fallbackCodes, column.field);
+    }
+    return (rows || []).reduce((sum, row) => sum + (row[column.field] || 0), 0);
+  }
 
   function slugParam(value) {
     return String(value || "")
@@ -809,6 +902,7 @@
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
     const descField = descriptionField || "Note";
+    const priorYearColumns = budgetLinePriorYearColumns(isExpense);
 
     // On consolidated/county-wide summaries, combine rows that share the
     // same name (e.g. the same revenue source collected under several
@@ -817,7 +911,7 @@
     // happen to share an Object/Revenue Name aren't hidden from each other.
     let mergedRows = rows;
     if (combineByName) {
-      const sumFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+      const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
       rows.forEach((r) => {
         const name = r[nameField] || "";
@@ -850,9 +944,9 @@
           (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
           "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
           '<td class="wc-itemized-description-column">' + escapeHtml(r[descField] || "") + "</td>" +
-          BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => {
+          priorYearColumns.map((c) => {
             const href = transactionHrefForBudgetLine(r, c, drilldownFields);
-            const value = formatCurrency(r[c.field] || 0);
+            const value = formatCurrency(budgetLineColumnAmount(r, c, isExpense));
             return '<td class="wc-num wc-prior-year">' +
               (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '">' + value + "</a>" : value) +
               "</td>";
@@ -860,7 +954,7 @@
           '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
         );
       });
-    const totalFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    const totalFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
     const totals = {};
     totalFields.forEach((field) => {
       totals[field] = mergedRows.reduce((sum, row) => sum + (row[field] || 0), 0);
@@ -872,8 +966,8 @@
       '<td class="wc-itemized-description-column"></td>';
     bodyRows.push(
       '<tr class="wc-table-total-row">' + totalLabelCells +
-        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
-          '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
+        priorYearColumns.map((c) =>
+          '<td class="wc-num wc-prior-year">' + formatCurrency(budgetLineColumnTotal(mergedRows, c, isExpense)) + "</td>"
         ).join("") +
         '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
     );
@@ -886,7 +980,7 @@
           { label: "Itemized Description", classes: ["wc-itemized-description-column"] }
         ])
         .concat(
-          BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
+          priorYearColumns.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
           [{ label: "FY 2027 Proposed", num: true }]
         ),
       bodyRows: bodyRows
@@ -897,15 +991,15 @@
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
-    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + toggleHeader + transactionHelper + "</div>";
     const revenueContextNote = isExpense
       ? ""
       : '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>';
+    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + revenueContextNote + toggleHeader + transactionHelper + "</div>";
 
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
       detail: '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
-        budgetLinesTools + revenueContextNote + detailTable + "</div>"
+        budgetLinesTools + detailTable + "</div>"
     };
   }
 
@@ -1504,9 +1598,17 @@
       .reduce((sum, r) => sum + (r.Fund_Balance || 0), 0);
   }
 
-  const FUND_SCHEDULE_YEAR_COLUMNS = BUDGET_LINE_PRIOR_YEAR_COLUMNS.concat([
-    { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
-  ]);
+  // The fund roll-forward schedule shows the same prior-year-actuals + FY2026
+  // Budget columns as the Budget Lines modal. The Budget Lines modal's
+  // FY2026 column now reads from expense_original_budget_public (Supabase),
+  // but this schedule keeps using the Google Sheets FY2026_Budget field, so
+  // that column is re-added explicitly here rather than inherited.
+  const FUND_SCHEDULE_YEAR_COLUMNS = BUDGET_LINE_PRIOR_YEAR_COLUMNS
+    .filter((c) => c.field !== "FY2026_Original_Budget")
+    .concat([
+      { field: "FY2026_Budget", label: "FY 2026 Budget" },
+      { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
+    ]);
 
   function fiscalYearForField(field) {
     return Number(field.slice(2, 6));
@@ -3138,6 +3240,20 @@
       cards[0].parentNode.insertBefore(grid, cards[0]);
     }
     cards.forEach((card) => grid.appendChild(card));
+
+    // Departments with multiple sub-programs (distinct Dept_Name values,
+    // e.g. Code Compliance / Code Compliance Beach) render one stacked
+    // card per sub-program inside the expense and revenue mounts
+    // independently -- a sub-program with no revenue rows means the two
+    // mounts end up with a different number of stacked cards. CSS Grid
+    // stretches paired cells in the same row to match the taller one,
+    // which otherwise inflates the shorter mount's card with a large
+    // empty gap before its footer. Opt mismatched mounts out of that
+    // stretch so each card just keeps its own natural height.
+    const expenseCardCount = expenseEl ? expenseEl.querySelectorAll(".wc-finance-card").length : 0;
+    const revenueCardCount = revenueEl ? revenueEl.querySelectorAll(".wc-finance-card").length : 0;
+    if (expenseEl) expenseEl.classList.toggle("wc-financial-mount-natural-height", expenseCardCount !== revenueCardCount);
+    if (revenueEl) revenueEl.classList.toggle("wc-financial-mount-natural-height", expenseCardCount !== revenueCardCount);
   }
 
   function initDepartmentPage() {

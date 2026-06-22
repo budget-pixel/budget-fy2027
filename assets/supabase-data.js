@@ -89,6 +89,10 @@
     return loadSummaryRows("revenue_actuals_public");
   }
 
+  function loadOriginalBudget() {
+    return loadSummaryRows("expense_original_budget_public");
+  }
+
   function cleanCode(value) {
     return String(value === undefined || value === null ? "" : value).trim();
   }
@@ -219,6 +223,7 @@
   window.WCSupabaseData = {
     loadExpenseActuals,
     loadRevenueActuals,
+    loadOriginalBudget,
     buildActualsLookup,
     getActualAmount,
     actualOrFallback,

@@ -616,8 +616,18 @@ body {
   margin-bottom: 32px;
 }
 
+.code-compliance-statement-media {
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 28px;
+  overflow: visible;
+}
+
 .eagle-springs-grill-statement-media .wc-video-frame,
-.eagle-springs-statement-media .wc-video-frame {
+.eagle-springs-statement-media .wc-video-frame,
+.code-compliance-statement-media .wc-video-frame {
   position: relative;
   width: 100%;
   max-width: 760px;
@@ -638,7 +648,8 @@ body {
 }
 
 .eagle-springs-grill-statement-media .wc-video-frame iframe,
-.eagle-springs-statement-media .wc-video-frame iframe {
+.eagle-springs-statement-media .wc-video-frame iframe,
+.code-compliance-statement-media .wc-video-frame iframe {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1193,10 +1204,27 @@ body {
   margin: 0;
 }
 .wc-department-financial-grid .wc-finance-card + .wc-finance-card {
-  margin-top: 0;
+  margin-top: 18px;
 }
 .wc-department-financial-grid #department-staffing-table {
   grid-column: 1 / -1;
+  align-self: start;
+}
+.wc-department-financial-grid #department-staffing-table .wc-finance-card {
+  height: auto;
+}
+.wc-department-financial-grid #department-staffing-table .wc-finance-card-footer {
+  margin-top: 16px;
+}
+/* Sub-program departments where the expense/revenue mounts hold a
+   different number of stacked cards (see arrangeDepartmentFinancialDashboard) --
+   opt out of the grid row's height-stretch so a mount's cards aren't
+   inflated to match a taller sibling mount they don't actually pair with. */
+.wc-department-financial-grid .wc-financial-mount-natural-height {
+  align-self: start;
+}
+.wc-department-financial-grid .wc-financial-mount-natural-height .wc-finance-card {
+  height: auto;
 }
 
 .wc-finance-card {
@@ -1413,6 +1441,10 @@ body {
   max-height: calc(min(86vh, 960px) - 92px);
   overflow: auto;
   padding: 18px 20px 22px;
+  scrollbar-width: none;
+}
+.wc-budget-detail-body::-webkit-scrollbar {
+  display: none;
 }
 .wc-budget-detail-body .wc-budget-lines-detail {
   margin-top: 0;
@@ -1422,6 +1454,10 @@ body {
 .wc-budget-detail-body .wc-data-table-scroll {
   max-height: 66vh;
   overflow: auto;
+  scrollbar-width: none;
+}
+.wc-budget-detail-body .wc-data-table-scroll::-webkit-scrollbar {
+  display: none;
 }
 .wc-budget-detail-body .wc-budget-lines-detail .wc-data-table {
   font-size: .64rem;
@@ -1439,6 +1475,13 @@ body {
 .wc-data-table-wrap { margin: 24px 0; }
 .wc-data-table-wrap:has(+ .wc-table-footer-row) { margin-bottom: 8px; }
 .wc-data-table-scroll { width: 100%; overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 12px; }
+.code-compliance-page [data-table-scroll-container="true"],
+.code-compliance-page [data-report-table-container-id],
+.code-compliance-page .wc-data-table-scroll {
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
 .wc-data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .85rem; }
 .wc-data-table th, .wc-data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: normal; }
 .wc-data-table th.wc-num, .wc-data-table td.wc-num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -1490,13 +1533,15 @@ body {
 }
 .wc-budget-lines-tools {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: flex-end;
-  gap: 6px;
-  margin: 0 0 10px;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
 }
 .wc-budget-lines-tools .wc-fy-column-toggle-wrap.wc-budget-lines-detail-header {
-  margin: 0 !important;
+  flex: 0 0 auto !important;
+  margin: 0 0 0 auto !important;
 }
 .wc-staffing-notes {
   margin-top: 10px;
@@ -1551,9 +1596,10 @@ body {
 .wc-budget-lines-card:not(.show-prior-years) .wc-transaction-drilldown-helper { display: none; }
 .wc-budget-lines-card.show-prior-years .wc-data-table .wc-itemized-description-column { display: none; }
 .wc-revenue-actuals-note {
+  flex: 1 1 auto;
   max-width: 980px;
-  margin: 0 0 14px;
-  padding: 10px 12px;
+  margin: 0;
+  padding: 8px 12px;
   border: 1px solid rgba(209,190,120,.38);
   border-radius: 14px;
   background: rgba(209,190,120,.10);
@@ -1563,6 +1609,7 @@ body {
   font-style: italic;
 }
 .wc-transaction-drilldown-helper {
+  flex: 1 1 auto;
   margin: 0;
   color: #526577;
   font-size: .72rem;
@@ -1686,6 +1733,11 @@ body {
   }
 
   .eagle-springs-grill-statement-media {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .code-compliance-statement-media {
     grid-template-columns: 1fr;
     gap: 20px;
   }
