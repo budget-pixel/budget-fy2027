@@ -48,7 +48,7 @@
               </svg>
 
               <input
-                type="search"
+                type="text"
                 id="wcTocSearch"
                 placeholder="Search departments, budgets, publications, personnel..."
                 aria-label="Search the Walton County budget website"

@@ -141,7 +141,7 @@
       function(){
         loadWcScriptOnce(
           "wc-budget-search-script",
-          wcBudgetAssetBaseUrl + "walton-budget-search.js?v=1",
+          wcBudgetAssetBaseUrl + "walton-budget-search.js?v=20260622-search-input-cleanup",
           function(){
             var fallbackSlot = document.querySelector(".wc-nav-search-slot-fallback");
             if(fallbackSlot && fallbackSlot.parentNode){
@@ -748,8 +748,11 @@
   }
   nav#nav-menu #wcTocSearch{
     width:100% !important;
+    min-width:0 !important;
     border:0 !important;
     outline:0 !important;
+    appearance:none !important;
+    -webkit-appearance:none !important;
     background:transparent !important;
     color:rgba(255,255,255,.94) !important;
     font-size:24px !important;
@@ -757,6 +760,13 @@
     font-weight:500 !important;
     letter-spacing:0 !important;
     font-family:Arial, Helvetica, sans-serif !important;
+  }
+  nav#nav-menu #wcTocSearch::-webkit-search-cancel-button,
+  nav#nav-menu #wcTocSearch::-webkit-search-decoration,
+  nav#nav-menu #wcTocSearch::-webkit-search-results-button,
+  nav#nav-menu #wcTocSearch::-webkit-search-results-decoration{
+    display:none !important;
+    -webkit-appearance:none !important;
   }
   nav#nav-menu #wcTocSearch::placeholder{
     color:rgba(255,255,255,.46) !important;
@@ -1996,7 +2006,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
           </svg>
           <input
-            type="search"
+            type="text"
             id="wcTocSearch"
             placeholder="Search is loading..."
             aria-label="Search table of contents"

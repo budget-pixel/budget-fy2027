@@ -1684,6 +1684,13 @@ body {
 }
 .wc-transaction-table-scroll {
   max-height: 68vh;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.wc-transaction-table-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 .wc-transaction-table {
   min-width: 760px;
