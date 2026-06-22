@@ -217,9 +217,10 @@
     });
   }
 
-  // FY2026 Original Budget has no Google Sheets fallback -- it only exists
-  // in Supabase (expense_original_budget_public), so rows with no matching
-  // org/object/project/year get 0 rather than falling back to another field.
+  // FY2026 Original Budget comes from the Supabase BUC cache
+  // (expense_original_budget_public). Despite the legacy view name, the
+  // BUC source can include revenue and expense codes, so this is applied to
+  // both datasets below.
   function applyOriginalBudgetToRows(rows, lookup, supabaseData) {
     if (!lookup || !supabaseData || typeof supabaseData.getActualAmount !== "function") {
       return rows;
@@ -585,6 +586,7 @@
       Dept_Code: (row.Dept_Code || "").trim(),
       Dept_Name: (row.Dept_Name || "").trim(),
       Note: (row.Note || "").trim(),
+      Project_Code: (row.Project_Code || "").trim(),
       Project_Name: (row.Project_Name || "").trim(),
       Revenue_Code: (row.Revenue_Code || "").trim(),
       Revenue_Name: (row.Revenue_Name || "").trim(),
@@ -728,6 +730,7 @@
         cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseLookup, actuals.supabaseData);
         cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueLookup, actuals.supabaseData);
         cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetLookup, actuals.supabaseData);
+        cache.revenues = applyOriginalBudgetToRows(cache.revenues, actuals.originalBudgetLookup, actuals.supabaseData);
       }
 
       return cache;
@@ -778,12 +781,7 @@
   ];
 
   function budgetLinePriorYearColumns(isExpense) {
-    if (isExpense) return BUDGET_LINE_PRIOR_YEAR_COLUMNS;
-    return BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((column) =>
-      column.field === "FY2026_Original_Budget"
-        ? { field: "FY2026_Budget", label: column.label }
-        : column
-    );
+    return BUDGET_LINE_PRIOR_YEAR_COLUMNS;
   }
 
   function splitBudgetLineCodes(value) {
@@ -818,9 +816,12 @@
     if (!isExpense && column.actual) {
       return revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year);
     }
-    if (!isExpense && column.field === "FY2026_Budget") {
-      const rowAmount = row[column.field] || 0;
-      return rowAmount || revenueBudgetAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.field);
+    if (!isExpense && column.field === "FY2026_Original_Budget") {
+      const codes = splitBudgetLineCodes(row.Revenue_Code);
+      const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
+      return rowAmount ||
+        revenueBudgetAmountForCodes(codes, "FY2026_Original_Budget") ||
+        revenueBudgetAmountForCodes(codes, "FY2026_Budget");
     }
     return row[column.field] || 0;
   }
@@ -835,16 +836,20 @@
       });
       return revenueActualAmountForCodes(codes, column.year);
     }
-    if (!isExpense && column.field === "FY2026_Budget") {
+    if (!isExpense && column.field === "FY2026_Original_Budget") {
       const fallbackCodes = [];
-      return (rows || []).reduce((sum, row) => {
-        const rowAmount = row[column.field] || 0;
+      const rowTotal = (rows || []).reduce((sum, row) => {
+        const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
         if (rowAmount) return sum + rowAmount;
         splitBudgetLineCodes(row.Revenue_Code).forEach((code) => {
           if (!fallbackCodes.includes(code)) fallbackCodes.push(code);
         });
         return sum;
-      }, 0) + revenueBudgetAmountForCodes(fallbackCodes, column.field);
+      }, 0);
+      const fallbackTotal =
+        revenueBudgetAmountForCodes(fallbackCodes, "FY2026_Original_Budget") ||
+        revenueBudgetAmountForCodes(fallbackCodes, "FY2026_Budget");
+      return rowTotal + fallbackTotal;
     }
     return (rows || []).reduce((sum, row) => sum + (row[column.field] || 0), 0);
   }
