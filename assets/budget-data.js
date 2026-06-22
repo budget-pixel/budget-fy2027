@@ -812,16 +812,20 @@
     }, 0);
   }
 
+  function revenueDisplayAmount(value) {
+    return Math.abs(Number(value) || 0);
+  }
+
   function budgetLineColumnAmount(row, column, isExpense) {
     if (!isExpense && column.actual) {
-      return revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year);
+      return revenueDisplayAmount(revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year));
     }
     if (!isExpense && column.field === "FY2026_Original_Budget") {
       const codes = splitBudgetLineCodes(row.Revenue_Code);
       const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
-      return rowAmount ||
+      return revenueDisplayAmount(rowAmount ||
         revenueBudgetAmountForCodes(codes, "FY2026_Original_Budget") ||
-        revenueBudgetAmountForCodes(codes, "FY2026_Budget");
+        revenueBudgetAmountForCodes(codes, "FY2026_Budget"));
     }
     return row[column.field] || 0;
   }
@@ -834,7 +838,7 @@
           if (!codes.includes(code)) codes.push(code);
         });
       });
-      return revenueActualAmountForCodes(codes, column.year);
+      return revenueDisplayAmount(revenueActualAmountForCodes(codes, column.year));
     }
     if (!isExpense && column.field === "FY2026_Original_Budget") {
       const fallbackCodes = [];
@@ -849,7 +853,7 @@
       const fallbackTotal =
         revenueBudgetAmountForCodes(fallbackCodes, "FY2026_Original_Budget") ||
         revenueBudgetAmountForCodes(fallbackCodes, "FY2026_Budget");
-      return rowTotal + fallbackTotal;
+      return revenueDisplayAmount(rowTotal + fallbackTotal);
     }
     return (rows || []).reduce((sum, row) => sum + (row[column.field] || 0), 0);
   }
