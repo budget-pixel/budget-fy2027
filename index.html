@@ -723,7 +723,7 @@
     height:210px;
     background:
       linear-gradient(135deg, rgba(0,98,49,.88), rgba(36,52,77,.54)),
-      url("assets/images/Project Images/baldwin-library-learning-center.jpg") center center / cover no-repeat;
+      var(--wc-project-image) center center / cover no-repeat;
   }
   .wc-project-visual::after{
     content:"";
@@ -1425,11 +1425,38 @@
       return text.length > 150 ? text.slice(0, 147).replace(/\s+\S*$/, "") + "..." : text;
     }
 
+    function projectImageSlug(value){
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    var projectImages = {
+      "baldwin-library-learning-center":"assets/images/Project Images/baldwin-library-learning-center.jpg"
+    };
+
+    function projectImageUrl(project){
+      if(project && project.image_url) return project.image_url;
+      var candidates = [
+        project && project.slug,
+        project && project.title,
+        project && project.name,
+        project && project.project_name
+      ].map(projectImageSlug);
+      for(var i = 0; i < candidates.length; i++){
+        if(projectImages[candidates[i]]) return projectImages[candidates[i]];
+      }
+      return "";
+    }
+
     function renderFeaturedProjects(projects){
       var mount = $("#featuredProjects");
       if(!mount) return;
       var featured = (projects || [])
-        .filter(function(project){ return project && !project.is_legacy_in_house_engineering_row && Number(project.budget_value || 0) > 0; })
+        .filter(function(project){ return project && !project.is_legacy_in_house_engineering_row && Number(project.budget_value || 0) > 0 && projectImageUrl(project); })
         .sort(function(a, b){ return Number(b.budget_value || 0) - Number(a.budget_value || 0); })
         .slice(0, 6);
 
@@ -1440,10 +1467,11 @@
 
       mount.innerHTML = featured.map(function(project){
         var href = "pages/cip-project.html?project=" + encodeURIComponent(project.slug || "");
+        var imageUrl = projectImageUrl(project);
         return '<a class="wc-project-card" href="' + href + '">' +
-          '<div class="wc-project-visual"><span class="wc-project-badge">' + escapeHtml(project.department || "Capital Project") + '</span></div>' +
+          '<div class="wc-project-visual" style="--wc-project-image:url(&quot;' + escapeHtml(imageUrl) + '&quot;)"><span class="wc-project-badge">' + escapeHtml(project.department || "Capital Project") + '</span></div>' +
           '<div class="wc-project-body">' +
-            '<div class="wc-project-meta"><span>' + escapeHtml(project.district || "District not specified") + '</span><span class="wc-project-amount">' + escapeHtml(project.budget || "") + '</span></div>' +
+            '<div class="wc-project-meta"><span class="wc-project-amount">' + escapeHtml(project.budget || "") + '</span></div>' +
             '<h3>' + escapeHtml(project.title || "Capital Project") + '</h3>' +
             '<p>' + escapeHtml(projectNarrative(project)) + '</p>' +
             '<span class="wc-card-link">View Project</span>' +
