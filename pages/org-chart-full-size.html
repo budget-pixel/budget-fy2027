@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Walton County Organizational Chart</title>
+  <script>
+    (function(){
+      try{
+        var adminTheme = new URLSearchParams(window.location.search).get("adminTheme");
+        if(adminTheme === "dark" || adminTheme === "light"){
+          /* Hidden local developer preference only; this is not a public feature or navigation setting. */
+          window.localStorage.setItem("waltonBudgetTheme", adminTheme);
+        }
+        document.documentElement.setAttribute(
+          "data-theme",
+          window.localStorage.getItem("waltonBudgetTheme") === "dark" ? "dark" : "light"
+        );
+      }catch(e){}
+    })();
+  </script>
   <link rel="stylesheet" href="../assets/style.css">
   <style>
     body{

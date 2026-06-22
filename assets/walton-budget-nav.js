@@ -29,6 +29,15 @@
   var splitLogoScriptId = "wc-split-logo-script";
   var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "walton-split-logo.js?v=1";
   var wcThemeStorageKey = "waltonBudgetTheme";
+  function applyHiddenAdminThemeParam(){
+    try{
+      var adminTheme = new URLSearchParams(window.location.search).get("adminTheme");
+      if(adminTheme === "dark" || adminTheme === "light"){
+        // Hidden local developer preference only; this is not a public feature or navigation setting.
+        window.localStorage.setItem(wcThemeStorageKey, adminTheme);
+      }
+    }catch(e){}
+  }
   function getStoredWaltonTheme(){
     try{
       return window.localStorage.getItem(wcThemeStorageKey) === "dark" ? "dark" : "light";
@@ -61,6 +70,7 @@
   function toggleWaltonTheme(){
     setWaltonTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
   }
+  applyHiddenAdminThemeParam();
   applyWaltonTheme(getStoredWaltonTheme());
   window.WaltonBudgetTheme = {
     apply:applyWaltonTheme,
@@ -1833,27 +1843,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z"></path>
           </svg>
         </button>
-        <button type="button" class="wc-theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">
-          <svg class="wc-theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 14.2A8.2 8.2 0 0 1 9.8 3a7 7 0 1 0 11.2 11.2Z"></path>
-          </svg>
-          <svg class="wc-theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-          </svg>
-        </button>
         <button type="button" class="wc-nav-menu-toggle" aria-label="Open navigation menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       `;
       nav.appendChild(actions);
       var searchToggle = actions.querySelector(".wc-nav-search-toggle");
-      var themeToggle = actions.querySelector(".wc-theme-toggle");
       var menuToggle = actions.querySelector(".wc-nav-menu-toggle");
       applyWaltonTheme(getStoredWaltonTheme());
-      if(themeToggle){
-        themeToggle.addEventListener("click", toggleWaltonTheme);
-      }
       function syncNavSearchTop(){
         var navRect = nav.getBoundingClientRect();
         document.documentElement.style.setProperty("--wc-nav-search-top", navRect.height + "px");
