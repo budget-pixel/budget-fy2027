@@ -9,7 +9,6 @@
     revenues: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1812049672&single=true&output=csv",
     staffing: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=676680519&single=true&output=csv",
     performanceMeasures: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=95242207&single=true&output=csv",
-    machinery: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=203949583&single=true&output=csv",
     departmentNarratives: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=445845528&single=true&output=csv",
     funds: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=968844446&single=true&output=csv",
     activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv",
@@ -614,13 +613,16 @@
     };
   }
 
-  function normalizeMachineryRow(row) {
-    return {
-      Dept_Code: (row.Dept_Code || "").trim(),
-      Dept_Name: (row.Dept_Name || "").trim(),
-      Item_Description: (row.Item_Description || "").trim(),
-      Amount: toNumber(row.Amount)
-    };
+  function buildMachineryRowsFromExpenditures(rows) {
+    return (rows || [])
+      .filter((row) => String(row.Object_Code || "").trim() === "564000")
+      .map((row) => ({
+        Dept_Code: row.Dept_Code || "",
+        Dept_Name: row.Dept_Name || "",
+        Item_Description: row.Note || row.Project_Name || row.Object_Name || "Machinery & Equipment",
+        Amount: row.FY2027_Proposed || 0
+      }))
+      .filter((row) => row.Amount !== 0);
   }
 
   function normalizePerformanceRow(row) {
@@ -700,7 +702,6 @@
       ["revenues", DATA_SOURCES.revenues, normalizeRevenueRow],
       ["staffing", DATA_SOURCES.staffing, normalizeStaffingRow],
       ["performanceMeasures", DATA_SOURCES.performanceMeasures, normalizePerformanceRow],
-      ["machinery", DATA_SOURCES.machinery, normalizeMachineryRow],
       ["departmentNarratives", DATA_SOURCES.departmentNarratives, normalizeNarrativeRow],
       ["funds", DATA_SOURCES.funds, normalizeFundRow],
       ["activities", DATA_SOURCES.activities, normalizeActivityRow],
@@ -732,6 +733,8 @@
         cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetLookup, actuals.supabaseData);
         cache.revenues = applyOriginalBudgetToRows(cache.revenues, actuals.originalBudgetLookup, actuals.supabaseData);
       }
+
+      cache.machinery = buildMachineryRowsFromExpenditures(cache.expenditures);
 
       return cache;
     });
@@ -858,6 +861,18 @@
     return (rows || []).reduce((sum, row) => sum + (row[column.field] || 0), 0);
   }
 
+  function itemizedDescriptionForBudgetLine(row, descriptionField, isExpense) {
+    if (!descriptionField && isExpense) {
+      if (row.Project_Name && row.Note && row.Project_Name !== row.Note) return row.Project_Name + " — " + row.Note;
+      return row.Project_Name || row.Note || "";
+    }
+    if (!descriptionField) return row.Note || row.Project_Name || "";
+    const primary = row[descriptionField] || "";
+    const fallback = isExpense ? (row.Project_Name || row.Note || "") : (row.Note || row.Project_Name || "");
+    if (primary && fallback && primary !== fallback) return primary + " — " + fallback;
+    return primary || fallback || "";
+  }
+
   function slugParam(value) {
     return String(value || "")
       .toLowerCase()
@@ -925,34 +940,60 @@
       rows.forEach((r) => {
         const name = r[nameField] || "";
         const existing = grouped.get(name);
+        const description = itemizedDescriptionForBudgetLine(r, descriptionField, isExpense);
         if (!existing) {
-          const merged = { codes: [r[codeField] || ""].filter(Boolean), desc: r[descField] || "", category: r[categoryField] || "" };
+          const merged = { codes: [r[codeField] || ""].filter(Boolean), descriptions: description ? [description] : [], category: r[categoryField] || "" };
           sumFields.forEach((f) => { merged[f] = r[f] || 0; });
           grouped.set(name, merged);
           return;
         }
         if (r[codeField] && !existing.codes.includes(r[codeField])) existing.codes.push(r[codeField]);
+        if (description && !existing.descriptions.includes(description)) existing.descriptions.push(description);
         sumFields.forEach((f) => { existing[f] += r[f] || 0; });
       });
       mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
-        const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.desc, [categoryField]: merged.category };
+        const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.descriptions.join("; "), [categoryField]: merged.category };
         sumFields.forEach((f) => { row[f] = merged[f]; });
         return row;
       });
     }
 
-    const bodyRows = mergedRows
+    function groupedPriorYearRows() {
+      if (!isExpense) return mergedRows;
+      const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
+      const grouped = new Map();
+      mergedRows.forEach((r) => {
+        const key = [r[categoryField] || "", r[codeField] || "", r[nameField] || ""].join("||");
+        const existing = grouped.get(key);
+        if (!existing) {
+          const row = {
+            [categoryField]: r[categoryField] || "",
+            [codeField]: r[codeField] || "",
+            [nameField]: r[nameField] || "",
+            [descField]: ""
+          };
+          sumFields.forEach((f) => { row[f] = r[f] || 0; });
+          grouped.set(key, row);
+          return;
+        }
+        sumFields.forEach((f) => { existing[f] += r[f] || 0; });
+      });
+      return Array.from(grouped.values());
+    }
+
+    function budgetLineRowsHtml(rowsToRender, rowClass, suppressDescription) {
+      return rowsToRender
       .slice()
       .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")))
       .map((r) => {
         const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
         const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue" };
         return (
-          "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
+          '<tr class="' + rowClass + (isZeroCurrent ? " wc-budget-line-zero-current" : "") + '">' +
           "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
           (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
           "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
-          '<td class="wc-itemized-description-column">' + escapeHtml(r[descField] || "") + "</td>" +
+          '<td class="wc-itemized-description-column">' + escapeHtml(suppressDescription ? "" : itemizedDescriptionForBudgetLine(r, descriptionField, isExpense)) + "</td>" +
           priorYearColumns.map((c) => {
             const href = transactionHrefForBudgetLine(r, c, drilldownFields);
             const value = formatCurrency(budgetLineColumnAmount(r, c, isExpense));
@@ -963,6 +1004,11 @@
           '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
         );
       });
+    }
+
+    const summaryRows = groupedPriorYearRows();
+    const bodyRows = budgetLineRowsHtml(mergedRows, "wc-budget-line-detail-row", false)
+      .concat(isExpense ? budgetLineRowsHtml(summaryRows, "wc-budget-line-summary-row", true) : []);
     const totalFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
     const totals = {};
     totalFields.forEach((field) => {

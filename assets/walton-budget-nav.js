@@ -12,7 +12,7 @@
     t.src="https://www.clarity.ms/tag/"+i;
     y=l.getElementsByTagName(r)[0];
     y.parentNode.insertBefore(t,y);
-  })(window, document, "clarity", "script", "x1l60xfnei");
+  })(window, document, "clarity", "script", "xb6teb7sh7");
 
   /* Google Analytics 4 */
   window.dataLayer = window.dataLayer || [];
@@ -856,11 +856,26 @@
     grid-template-columns:minmax(0, 1fr) auto !important;
     gap:18px !important;
     align-items:center !important;
+    position:relative !important;
+    overflow:hidden !important;
     padding:13px 0 !important;
     border-radius:0 !important;
     text-decoration:none !important;
     border-bottom:1px solid rgba(255,255,255,.10) !important;
+    list-style:none !important;
+    background-image:none !important;
+    outline:0 !important;
     transition:color .2s ease, border-color .2s ease !important;
+  }
+  nav#nav-menu .wc-nav-search-result::before,
+  nav#nav-menu .wc-nav-search-result::after,
+  nav#nav-menu .wc-nav-search-result strong::before,
+  nav#nav-menu .wc-nav-search-result strong::after{
+    content:none !important;
+    display:none !important;
+  }
+  nav#nav-menu .wc-nav-search-result::marker{
+    content:"" !important;
   }
   nav#nav-menu .wc-nav-search-result:last-child{
     border-bottom:0 !important;

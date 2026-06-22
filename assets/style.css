@@ -1593,7 +1593,9 @@ body {
 .wc-budget-lines-detail .wc-data-table th, .wc-budget-lines-detail .wc-data-table td { padding: 6px 8px; }
 .wc-budget-lines-card:not(.show-prior-years) .wc-data-table .wc-prior-year { display: none; }
 .wc-budget-lines-card:not(.show-prior-years) .wc-data-table tr.wc-budget-line-zero-current { display: none; }
+.wc-budget-lines-card:not(.show-prior-years) .wc-data-table tr.wc-budget-line-summary-row { display: none; }
 .wc-budget-lines-card:not(.show-prior-years) .wc-transaction-drilldown-helper { display: none; }
+.wc-budget-lines-card.show-prior-years .wc-data-table tr.wc-budget-line-detail-row { display: none; }
 .wc-budget-lines-card.show-prior-years .wc-data-table .wc-itemized-description-column { display: none; }
 .wc-revenue-actuals-note {
   flex: 1 1 auto;

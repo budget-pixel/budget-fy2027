@@ -303,12 +303,25 @@
   }
   .wc-nav-search-result{
     display:block;
+    position:relative;
+    overflow:hidden;
     padding:14px 2px;
     border-bottom:1px solid rgba(255,255,255,.12);
     border-radius:0;
     text-decoration:none;
+    list-style:none;
+    background-image:none;
+    outline:0;
     transition:background .2s ease;
   }
+  .wc-nav-search-result::before,
+  .wc-nav-search-result::after,
+  .wc-nav-search-result strong::before,
+  .wc-nav-search-result strong::after{
+    content:none;
+    display:none;
+  }
+  .wc-nav-search-result::marker{content:""}
   .wc-nav-search-result:last-child{border-bottom:0}
   .wc-nav-search-result:hover{background:rgba(255,255,255,.05)}
   .wc-nav-search-result strong{
@@ -456,10 +469,23 @@
     grid-template-columns:minmax(0, 1fr) auto;
     gap:18px;
     align-items:center;
+    position:relative;
+    overflow:hidden;
     padding:13px 0;
     border-bottom:1px solid rgba(255,255,255,.10);
+    list-style:none;
+    background-image:none;
+    outline:0;
     transition:border-color .2s ease;
   }
+  nav#nav-menu .wc-nav-search-result::before,
+  nav#nav-menu .wc-nav-search-result::after,
+  nav#nav-menu .wc-nav-search-result strong::before,
+  nav#nav-menu .wc-nav-search-result strong::after{
+    content:none;
+    display:none;
+  }
+  nav#nav-menu .wc-nav-search-result::marker{content:""}
   nav#nav-menu .wc-nav-search-result:hover{
     background:transparent;
     border-color:rgba(255,255,255,.22);
@@ -1200,7 +1226,7 @@
 <script src="assets/walton-split-logo.js"></script>
 <script src="assets/walton-budget-search-data.js"></script>
 <script src="assets/walton-budget-search.js?v=20260622-search-input-cleanup"></script>
-<script src="assets/budget-data.js?v=20260622-revenue-positive"></script>
+<script src="assets/budget-data.js?v=20260622-machinery-from-expenditures"></script>
 <script src="assets/walton-cip-projects.js?v=20260622-project-images-v3"></script>
 <script>
   (function(){
