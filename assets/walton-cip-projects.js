@@ -5,8 +5,32 @@
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1388930304&single=true&output=csv";
   const FISCAL_YEARS = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
   const PROJECT_IMAGE_FILES = [
+    "abt-martin-dirt-to-pave.jpg",
+    "amaryllis-lane-dirt-to-pave.jpg",
+    "arbour-street-dirt-to-pave.jpg",
     "baldwin-library-learning-center.jpg",
-    "huckaba_road_604114_bridge_replacement.jpg"
+    "bluebottle-court-dirt-to-pave.jpg",
+    "chat-holley-road-resurfacing.png",
+    "clover-lane-dirt-to-pave.jpg",
+    "cook-road-reconstruction.jpg",
+    "cook-road-reconstruction.png",
+    "cowslip-court-dirt-to-pave.jpg",
+    "daisy-lane-dirt-to-pave.jpg",
+    "dalton-drive.png",
+    "hewett-bayou-connector-rd-e-lamb-drive-extension.jpg",
+    "huckaba-road-604114-bridge-replacement.jpg",
+    "huckaba_road_604114_bridge_replacement.jpg",
+    "iris-lane-resurfacing.jpg",
+    "laurel-lane-dirt-to-pave.jpg",
+    "marigold-avenue-dirt-to-pave.jpg",
+    "may-lilly-court-dirt-to-pave.jpg",
+    "nancy-darby-rd-paving-resurfacing.jpg",
+    "north-lake-drive.jpg",
+    "oak-grove-road-phase-2-reconstruction-resurfacing.jpg",
+    "oakwood-lakes-hwy-331-south-turn-lane.png",
+    "passion-flower-street-dirt-to-pave.jpg",
+    "pinetree-lane-dirt-to-pave.png",
+    "rio-ranchero-road-dirt-to-pave.jpg"
   ];
 
   window.wcCipProjects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
