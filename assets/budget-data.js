@@ -819,6 +819,15 @@
     return Math.abs(Number(value) || 0);
   }
 
+  function revenueBudgetUniqueKey(row) {
+    return [
+      fundCodeForRow(row),
+      String((row && row.Dept_Code) || "").trim(),
+      String((row && row.Revenue_Code) || "").trim(),
+      String((row && row.Project_Code) || "").trim()
+    ].join("|");
+  }
+
   function budgetLineColumnAmount(row, column, isExpense) {
     if (!isExpense && column.actual) {
       return revenueDisplayAmount(revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year));
@@ -937,19 +946,42 @@
     if (combineByName) {
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
+      const seenRevenueOriginalBudget = new Map();
       rows.forEach((r) => {
         const name = r[nameField] || "";
         const existing = grouped.get(name);
         const description = itemizedDescriptionForBudgetLine(r, descriptionField, isExpense);
         if (!existing) {
           const merged = { codes: [r[codeField] || ""].filter(Boolean), descriptions: description ? [description] : [], category: r[categoryField] || "" };
-          sumFields.forEach((f) => { merged[f] = r[f] || 0; });
+          sumFields.forEach((f) => {
+            if (!isExpense && f === "FY2026_Original_Budget") {
+              const key = revenueBudgetUniqueKey(r);
+              const seen = seenRevenueOriginalBudget.get(name) || new Set();
+              merged[f] = seen.has(key) ? 0 : revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+              seen.add(key);
+              seenRevenueOriginalBudget.set(name, seen);
+            } else {
+              merged[f] = r[f] || 0;
+            }
+          });
           grouped.set(name, merged);
           return;
         }
         if (r[codeField] && !existing.codes.includes(r[codeField])) existing.codes.push(r[codeField]);
         if (description && !existing.descriptions.includes(description)) existing.descriptions.push(description);
-        sumFields.forEach((f) => { existing[f] += r[f] || 0; });
+        sumFields.forEach((f) => {
+          if (!isExpense && f === "FY2026_Original_Budget") {
+            const key = revenueBudgetUniqueKey(r);
+            const seen = seenRevenueOriginalBudget.get(name) || new Set();
+            if (!seen.has(key)) {
+              existing[f] += revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+              seen.add(key);
+              seenRevenueOriginalBudget.set(name, seen);
+            }
+          } else {
+            existing[f] += r[f] || 0;
+          }
+        });
       });
       mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
         const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.descriptions.join("; "), [categoryField]: merged.category };
@@ -1681,23 +1713,16 @@
     const inFund = (r) => fundCodes.includes(fundCodeForRow(r)) && !isExcludedFund(r);
     const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
-    function revenueActualKey(row) {
-      return [
-        fundCodeForRow(row),
-        String((row && row.Dept_Code) || "").trim(),
-        String((row && row.Revenue_Code) || "").trim(),
-        String((row && row.Project_Code) || "").trim()
-      ].join("|");
-    }
-
     function sumFor(rows, predicate, field) {
-      const seenRevenueActuals = rows === revenueRows && revenueActualFields.has(field) ? new Set() : null;
+      const shouldDedupeRevenue =
+        rows === revenueRows && (revenueActualFields.has(field) || field === "FY2026_Original_Budget");
+      const seenRevenueAmounts = shouldDedupeRevenue ? new Set() : null;
       return rows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
-        if (seenRevenueActuals) {
-          const key = revenueActualKey(r);
-          if (seenRevenueActuals.has(key)) return sum;
-          seenRevenueActuals.add(key);
+        if (seenRevenueAmounts) {
+          const key = revenueBudgetUniqueKey(r);
+          if (seenRevenueAmounts.has(key)) return sum;
+          seenRevenueAmounts.add(key);
         }
         if (field === "FY2026_Original_Budget") {
           const value = r.FY2026_Original_Budget || r.FY2026_Budget || 0;
@@ -1894,7 +1919,7 @@
     { field: "FY2023_Actual", label: "FY 2023 Actuals" },
     { field: "FY2024_Actual", label: "FY 2024 Actuals" },
     { field: "FY2025_Actual", label: "FY 2025 Actuals" },
-    { field: "FY2026_Budget", label: "FY 2026 Budget" },
+    { field: "FY2026_Original_Budget", label: "FY 2026 Budget" },
     { field: "FY2027_Proposed", label: "FY 2027 Budget" }
   ];
 
@@ -1908,17 +1933,16 @@
     const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
     function dedupedRevenueSum(rowsToSum, field) {
-      const seen = revenueActualFields.has(field) ? new Set() : null;
+      const shouldDedupe = revenueActualFields.has(field) || field === "FY2026_Original_Budget";
+      const seen = shouldDedupe ? new Set() : null;
       return rowsToSum.reduce((sum, r) => {
         if (seen) {
-          const key = [
-            fundCodeForRow(r),
-            String((r && r.Dept_Code) || "").trim(),
-            String((r && r.Revenue_Code) || "").trim(),
-            String((r && r.Project_Code) || "").trim()
-          ].join("|");
+          const key = revenueBudgetUniqueKey(r);
           if (seen.has(key)) return sum;
           seen.add(key);
+        }
+        if (field === "FY2026_Original_Budget") {
+          return sum + revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
         }
         return sum + (r[field] || 0);
       }, 0);
