@@ -1183,7 +1183,7 @@
 <script src="assets/walton-budget-search-data.js"></script>
 <script src="assets/walton-budget-search.js"></script>
 <script src="assets/budget-data.js?v=20260622"></script>
-<script src="assets/walton-cip-projects.js"></script>
+<script src="assets/walton-cip-projects.js?v=20260622-project-images-v2"></script>
 <script>
   (function(){
     function $(selector, root){
@@ -1435,13 +1435,29 @@
     }
 
     var projectImages = {
-      "baldwin-library-learning-center":"assets/images/Project Images/baldwin-library-learning-center.jpg",
-      "huckaba-road-604114-bridge-replacement":"assets/images/Project Images/huckaba_road_604114_bridge_replacement.jpg",
-      "huchaba-road-604114-bridge-replacement":"assets/images/Project Images/huckaba_road_604114_bridge_replacement.jpg"
+      "baldwin-library-learning-center":"assets/images/project-images/baldwin-library-learning-center.jpg",
+      "huckaba-road-604114-bridge-replacement":"assets/images/project-images/huckaba_road_604114_bridge_replacement.jpg",
+      "huchaba-road-604114-bridge-replacement":"assets/images/project-images/huckaba_road_604114_bridge_replacement.jpg",
+      "huckaba-rd-604114-bridge-replacement":"assets/images/project-images/huckaba_road_604114_bridge_replacement.jpg",
+      "huchaba-rd-604114-bridge-replacement":"assets/images/project-images/huckaba_road_604114_bridge_replacement.jpg"
     };
 
     function projectImageUrl(project){
       if(project && project.image_url) return project.image_url;
+      var projectText = [
+        project && project.slug,
+        project && project.title,
+        project && project.name,
+        project && project.project_name,
+        project && project.description,
+        project && project.pertinent_information
+      ].join(" ").toLowerCase();
+
+      if((projectText.indexOf("huckaba") !== -1 || projectText.indexOf("huchaba") !== -1) &&
+        (projectText.indexOf("road") !== -1 || projectText.indexOf(" rd") !== -1 || projectText.indexOf("bridge") !== -1)){
+        return projectImages["huckaba-road-604114-bridge-replacement"];
+      }
+
       var candidates = [
         project && project.slug,
         project && project.title,

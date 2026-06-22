@@ -4,6 +4,10 @@
   const CAPITAL_PROJECTS_CSV_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1388930304&single=true&output=csv";
   const FISCAL_YEARS = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
+  const PROJECT_IMAGE_FILES = [
+    "baldwin-library-learning-center.jpg",
+    "huckaba_road_604114_bridge_replacement.jpg"
+  ];
 
   window.wcCipProjects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
 
@@ -94,6 +98,61 @@
       .replace(/&/g, " and ")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || "capital-project";
+  }
+
+  function projectImageKey(value) {
+    return slugify(value)
+      .replace(/(^|-)rd(?=-|$)/g, "$1road")
+      .replace(/huchaba/g, "huckaba");
+  }
+
+  function projectAssetPrefix() {
+    const path = window.location && window.location.pathname ? window.location.pathname : "";
+    return path.indexOf("/pages/") !== -1 ? "../assets/" : "assets/";
+  }
+
+  function projectImagePath(fileName) {
+    return projectAssetPrefix() + "images/project-images/" + fileName;
+  }
+
+  function findProjectImage(row, values) {
+    const imageOptions = PROJECT_IMAGE_FILES.map((fileName) => ({
+      fileName,
+      slug: projectImageKey(fileName.replace(/\.[a-z0-9]+$/i, ""))
+    }));
+    const candidates = values
+      .concat([
+        get(row, "Budget Project Name(s)"),
+        get(row, "Budget Project Code(s)"),
+        get(row, "Location Name"),
+        get(row, "Budget Account Name(s)"),
+        get(row, "Project Narrative"),
+        get(row, "Pertinent Information")
+      ])
+      .map(projectImageKey)
+      .filter(Boolean);
+    const searchableText = candidates.join(" ");
+    const normalizedTitle = projectImageKey(get(row, "Budget Project Name(s)") || values[0]);
+    const match = imageOptions.find((image) => {
+      return candidates.some((candidate) => {
+        return candidate === image.slug ||
+          image.slug.startsWith(candidate + "-") ||
+          candidate.startsWith(image.slug + "-");
+      }) || image.slug.split("-").every((token) => searchableText.includes(token));
+    });
+
+    const imageUrl = match ? projectImagePath(match.fileName) : "";
+
+    if(/hu(?:ck|ch)aba/.test(searchableText)){
+      console.log("[CIP project image debug]", {
+        projectTitle:get(row, "Budget Project Name(s)") || values[0] || "",
+        normalizedKey:normalizedTitle,
+        matchedImageFilename:match ? match.fileName : "",
+        image_url:imageUrl
+      });
+    }
+
+    return imageUrl;
   }
 
   function compactNarrative(value, fallback) {
@@ -191,6 +250,7 @@
         title.toLowerCase().includes("in-house engineering") ||
         accountCode === "534000";
       const hasInHouseEngineering = inHouseEngineeringValue > 0;
+      const imageUrl = findProjectImage(row, [title, slug, code, accountName, accountCode]);
 
       return {
         title,
@@ -217,6 +277,7 @@
         funding_by_year: yearlyFunding,
         funding: fund,
         funding_source: fundingSource,
+        image_url: imageUrl,
         district: get(row, "Commissioner District") || "Not specified",
         target: targetYears.join(", ") || getPrimaryYear(yearlyFunding),
         target_years: targetYears,

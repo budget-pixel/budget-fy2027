@@ -232,11 +232,23 @@ function normalizeProjectImages(project){
     project.slug,
     normalizeProjectSlug(project.title),
     normalizeProjectSlug(project.name),
-    normalizeProjectSlug(project.project_name)
+    normalizeProjectSlug(project.project_name),
+    normalizeProjectSlug(project.proposal_name),
+    normalizeProjectSlug(project.location),
+    normalizeProjectSlug(project.location_name),
+    normalizeProjectSlug(project.description),
+    normalizeProjectSlug(project.pertinent_information)
   ].filter(Boolean);
 
   if(fallbackSlugs.some(slug => slug === "baldwin-library-learning-center")){
     fallbackSlugs.unshift("baldwin-library-learning-center");
+  }
+
+  if(fallbackSlugs.some(slug => /hu(?:ck|ch)aba/.test(slug) && /(?:^|-)r(?:oa)?d(?:-|$)|bridge/.test(slug))){
+    return [{
+      url:"../assets/images/project-images/huckaba_road_604114_bridge_replacement.jpg",
+      caption:"Project image"
+    }];
   }
 
   const uniqueSlugs = Array.from(new Set(fallbackSlugs));
@@ -244,7 +256,7 @@ function normalizeProjectImages(project){
   if(uniqueSlugs.length){
     return uniqueSlugs.flatMap(slug => [
       {
-        url:`../assets/images/Project%20Images/${slug}.jpg`,
+        url:`../assets/images/project-images/${slug}.jpg`,
         caption:"Project image"
       },
       {
