@@ -721,15 +721,22 @@
   .wc-project-visual{
     position:relative;
     height:210px;
-    background:
-      linear-gradient(135deg, rgba(0,98,49,.88), rgba(36,52,77,.54)),
-      var(--wc-project-image) center center / cover no-repeat;
+    background:#e7eee8;
+    overflow:hidden;
+  }
+  .wc-project-visual img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
   }
   .wc-project-visual::after{
     content:"";
     position:absolute;
     inset:0;
-    background:linear-gradient(180deg, transparent 35%, rgba(0,0,0,.46));
+    background:
+      linear-gradient(135deg, rgba(0,98,49,.44), rgba(36,52,77,.24)),
+      linear-gradient(180deg, transparent 35%, rgba(0,0,0,.46));
   }
   .wc-project-badge{
     position:absolute;
@@ -1487,7 +1494,7 @@
         var href = "pages/cip-project.html?project=" + encodeURIComponent(project.slug || "");
         var imageUrl = projectImageUrl(project);
         return '<a class="wc-project-card" href="' + href + '">' +
-          '<div class="wc-project-visual" style="--wc-project-image:url(&quot;' + escapeHtml(imageUrl) + '&quot;)"><span class="wc-project-badge">' + escapeHtml(project.department || "Capital Project") + '</span></div>' +
+          '<div class="wc-project-visual"><img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(project.title || "Capital project image") + '" loading="lazy" decoding="async"><span class="wc-project-badge">' + escapeHtml(project.department || "Capital Project") + '</span></div>' +
           '<div class="wc-project-body">' +
             '<div class="wc-project-meta"><span class="wc-project-amount">' + escapeHtml(project.budget || "") + '</span></div>' +
             '<h3>' + escapeHtml(project.title || "Capital Project") + '</h3>' +
