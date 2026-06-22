@@ -1654,14 +1654,11 @@
   }
 
   // The fund roll-forward schedule shows the same prior-year-actuals + FY2026
-  // Budget columns as the Budget Lines modal. The Budget Lines modal's
-  // FY2026 column now reads from expense_original_budget_public (Supabase),
-  // but this schedule keeps using the Google Sheets FY2026_Budget field, so
-  // that column is re-added explicitly here rather than inherited.
+  // Budget columns as the Budget Lines modal. FY2026 budget is sourced from
+  // the Supabase original budget cache, with the sheet value used only as a
+  // fallback when a row is not present in that cache.
   const FUND_SCHEDULE_YEAR_COLUMNS = BUDGET_LINE_PRIOR_YEAR_COLUMNS
-    .filter((c) => c.field !== "FY2026_Original_Budget")
     .concat([
-      { field: "FY2026_Budget", label: "FY 2026 Budget" },
       { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
     ]);
 
@@ -1701,6 +1698,10 @@
           const key = revenueActualKey(r);
           if (seenRevenueActuals.has(key)) return sum;
           seenRevenueActuals.add(key);
+        }
+        if (field === "FY2026_Original_Budget") {
+          const value = r.FY2026_Original_Budget || r.FY2026_Budget || 0;
+          return sum + (rows === revenueRows ? revenueDisplayAmount(value) : value);
         }
         return sum + (r[field] || 0);
       }, 0);
