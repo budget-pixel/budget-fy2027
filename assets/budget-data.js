@@ -1583,7 +1583,7 @@
       bodyRows.push("<tr><td>" + escapeHtml(tr.label) + "</td>" + tr.cells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") + "</tr>");
     });
     bodyRows.push(
-      '<tr class="wc-table-subtotal-row"><td>' + escapeHtml(config.totalRowLabel) + "</td>" +
+      '<tr class="wc-table-total-row"><td>' + escapeHtml(config.totalRowLabel) + "</td>" +
       categoryTotalValues.map((v) => '<td class="wc-num">' + formatCurrency(v) + "</td>").join("") +
       "</tr>"
     );
@@ -1593,7 +1593,7 @@
       "</tr>"
     );
     bodyRows.push(
-      '<tr class="wc-table-total-row"><td>' + escapeHtml(config.grandTotalLabel) + "</td>" +
+      "<tr><td>" + escapeHtml(config.grandTotalLabel) + "</td>" +
       grandTotalValues.map((v) => '<td class="wc-num">' + formatCurrency(v) + "</td>").join("") +
       "</tr>"
     );
