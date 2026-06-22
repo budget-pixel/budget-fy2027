@@ -3437,8 +3437,15 @@
           // supplemental table below; exclude those codes here to avoid
           // double-counting them in the main Expenditure Summary.
           const excludedObjectCodes = EXPENSE_OBJECT_CODES_BROKEN_OUT[normalizeDeptName(deptName)] || [];
+          // The Court Innovation FTE (Project 1040) is booked under the Board
+          // of County Commissioners' Dept_Name/Dept_Code, but it's shown on
+          // the Court Innovations rollup instead, so it's excluded here to
+          // avoid double-counting it on the BCC page.
+          const isBcc = normalizeDeptName(deptName) === "board of county commissioners";
           const expenseRows = getDepartmentExpenses(deptName, deptCode).filter(
-            (r) => !excludedObjectCodes.includes(String(r.Object_Code || "").trim())
+            (r) =>
+              !excludedObjectCodes.includes(String(r.Object_Code || "").trim()) &&
+              !(isBcc && String(r.Project_Code || "").trim() === "1040")
           );
           expenseHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName);
         }

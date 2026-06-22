@@ -1200,8 +1200,14 @@ body {
   display: contents;
 }
 .wc-department-financial-grid .wc-finance-card {
-  height: 100%;
   margin: 0;
+}
+/* Only stretch a card to match its row's taller sibling when it's the
+   sole card in its mount; when a mount stacks several sub-program cards
+   (see arrangeDepartmentFinancialDashboard), each stacking 100% would
+   overflow the mount and spill into the page content below it. */
+.wc-department-financial-grid .wc-finance-card:only-of-type {
+  height: 100%;
 }
 .wc-department-financial-grid .wc-finance-card + .wc-finance-card {
   margin-top: 18px;
