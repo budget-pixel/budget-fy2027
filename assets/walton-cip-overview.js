@@ -336,7 +336,7 @@ function renderProjects(){
 
       body.wc-cip-overview-page #content{
         max-width:1240px;
-        padding:44px 32px 70px;
+        padding:40px 48px 0;
       }
 
       body.wc-cip-overview-page .page-nav{
@@ -1744,6 +1744,10 @@ function renderProjects(){
       }
 
       @media(max-width:760px){
+        body.wc-cip-overview-page #content{
+          padding:24px 18px 0;
+        }
+
         .wc-cip-main-section{
           width:100% !important;
           max-width:100% !important;

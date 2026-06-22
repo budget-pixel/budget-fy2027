@@ -103,6 +103,79 @@ function buildBackLabel(backHref){
   return "Back to Project Search";
 }
 
+function normalizeProjectSlug(value){
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getRequestedProjectSlug(){
+  const params = new URLSearchParams(window.location.search);
+  const paramSlug = params.get("project") || params.get("slug");
+
+  if(paramSlug){
+    return normalizeProjectSlug(paramSlug);
+  }
+
+  const hashSlug = window.location.hash.replace(/^#\/?/, "");
+
+  if(hashSlug){
+    return normalizeProjectSlug(hashSlug);
+  }
+
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const lastPathPart = pathParts[pathParts.length - 1] || "";
+  const pathSlug = lastPathPart.replace(/\.html$/i, "");
+
+  if(pathSlug && !/^cip-project$/i.test(pathSlug)){
+    return normalizeProjectSlug(pathSlug);
+  }
+
+  return "";
+}
+
+function projectMatchesRequestedSlug(project, requestedSlug){
+  if(!requestedSlug){
+    return false;
+  }
+
+  if(normalizeProjectSlug(project.slug) === requestedSlug){
+    return true;
+  }
+
+  const candidates = [
+    project.title,
+    project.name,
+    project.project_name,
+    project.location,
+    project.project_location,
+    project.location_name,
+    project.project_code,
+    project.code
+  ];
+
+  if(candidates.some(value => normalizeProjectSlug(value) === requestedSlug)){
+    return true;
+  }
+
+  const searchableText = candidates
+    .concat([project.slug, project.description, project.overview, project.summary])
+    .map(value => String(value ?? "").toLowerCase())
+    .join(" ");
+
+  if(requestedSlug === "baldwin-library-learning-center"){
+    return searchableText.includes("baldwin") &&
+      searchableText.includes("library") &&
+      searchableText.includes("learning") &&
+      searchableText.includes("center");
+  }
+
+  return false;
+}
+
 function renderListItem(label, value){
   if(!hasDisplayValue(value)){
     return "";
@@ -155,11 +228,30 @@ function normalizeProjectImages(project){
     }];
   }
 
-  if(project.slug){
-    return [{
-      url:`../assets/images/${project.slug}.jpg`,
-      caption:"Project image"
-    }];
+  const fallbackSlugs = [
+    project.slug,
+    normalizeProjectSlug(project.title),
+    normalizeProjectSlug(project.name),
+    normalizeProjectSlug(project.project_name)
+  ].filter(Boolean);
+
+  if(fallbackSlugs.some(slug => slug === "baldwin-library-learning-center")){
+    fallbackSlugs.unshift("baldwin-library-learning-center");
+  }
+
+  const uniqueSlugs = Array.from(new Set(fallbackSlugs));
+
+  if(uniqueSlugs.length){
+    return uniqueSlugs.flatMap(slug => [
+      {
+        url:`../assets/images/Project%20Images/${slug}.jpg`,
+        caption:"Project image"
+      },
+      {
+        url:`../assets/images/${slug}.jpg`,
+        caption:"Project image"
+      }
+    ]);
   }
 
   return [];
@@ -347,10 +439,9 @@ function renderOverviewBadges(project){
 }
 
 function renderProjectPage(){
-  const params = new URLSearchParams(window.location.search);
-  const slug = params.get("project");
+  const slug = getRequestedProjectSlug();
   const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
-  const project = projects.find(p => p.slug === slug);
+  const project = projects.find(p => projectMatchesRequestedSlug(p, slug));
   const backHref = buildBackHref();
   const backLabel = buildBackLabel(backHref);
 
