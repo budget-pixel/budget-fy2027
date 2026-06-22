@@ -8,7 +8,6 @@
     "abt-martin-dirt-to-pave.jpg",
     "amaryllis-lane-dirt-to-pave.jpg",
     "arbour-street-dirt-to-pave.jpg",
-    "baldwin-library-learning-center.jpg",
     "bluebottle-court-dirt-to-pave.jpg",
     "chat-holley-road-resurfacing.png",
     "clover-lane-dirt-to-pave.jpg",

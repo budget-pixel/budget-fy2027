@@ -240,10 +240,6 @@ function normalizeProjectImages(project){
     normalizeProjectSlug(project.pertinent_information)
   ].filter(Boolean);
 
-  if(fallbackSlugs.some(slug => slug === "baldwin-library-learning-center")){
-    fallbackSlugs.unshift("baldwin-library-learning-center");
-  }
-
   if(fallbackSlugs.some(slug => /hu(?:ck|ch)aba/.test(slug) && /(?:^|-)r(?:oa)?d(?:-|$)|bridge/.test(slug))){
     return [{
       url:"../assets/images/project-images/huckaba_road_604114_bridge_replacement.jpg",
