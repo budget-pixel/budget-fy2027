@@ -3916,9 +3916,25 @@
     applyFilters();
   }
 
+  // A free-text note shown below the Summary of Personnel schedule, sourced
+  // from the Narratives sheet's "Summary of Personnel Note" Dept_Name row
+  // (same sheet/column used for department narratives elsewhere) rather
+  // than hardcoded on the page.
+  function renderPersonnelSummaryNote() {
+    const narrativeRows = cache.departmentNarratives || [];
+    const row = narrativeRows.find((r) => normalizeDeptName(r.Dept_Name) === normalizeDeptName("Summary of Personnel Note"));
+    if (!row || !row.Narrative || !row.Narrative.trim()) return "";
+    return (
+      '<section class="wc-personnel-summary-note content-section">' +
+      splitIntoParagraphs(row.Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
+      "</section>"
+    );
+  }
+
   function initPersonnelSummaryPage() {
     const container = document.getElementById("personnel-summary");
     if (!container) return;
+    const notesContainer = document.getElementById("personnel-summary-notes");
 
     container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
 
@@ -3929,6 +3945,7 @@
           return;
         }
         renderPersonnelSummary(container);
+        mountOrHide(notesContainer, renderPersonnelSummaryNote());
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load personnel summary", err);
