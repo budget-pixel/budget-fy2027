@@ -39,22 +39,23 @@
   }
 
   .wc-gfoa-hero{
-    display:grid;
-    grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);
-    gap:28px;
-    align-items:stretch;
-    margin:0 0 34px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+    padding:52px 40px 104px;
+    border-radius:30px;
+    background:#003f28;
+    color:#ffffff;
+    text-align:center;
+    margin:0 0 -76px;
   }
 
   .wc-gfoa-hero-copy{
     display:flex;
     flex-direction:column;
-    justify-content:center;
-    min-height:520px;
-    padding:46px;
-    border-radius:30px;
-    background:#003f28;
-    color:#ffffff;
+    align-items:center;
+    max-width:720px;
   }
 
   .wc-gfoa-kicker{
@@ -68,103 +69,86 @@
   }
 
   .wc-gfoa-hero-copy h1{
-    margin:0 0 18px;
+    margin:0 0 16px;
     color:#ffffff;
     font-family:Georgia, "Times New Roman", serif;
-    font-size:clamp(44px, 6vw, 76px);
-    line-height:.96;
+    font-size:clamp(40px, 5vw, 64px);
+    line-height:1.04;
     font-weight:500;
     letter-spacing:0;
   }
 
   .wc-gfoa-hero-copy p{
-    max-width:680px;
+    max-width:640px;
     margin:0;
     color:rgba(255,255,255,.86);
     font-size:17px;
     line-height:1.7;
+    text-align:left;
   }
 
-  .wc-gfoa-hero-media{
+  .wc-gfoa-hero-copy p + p{
+    margin-top:14px;
+  }
+
+  .wc-gfoa-hero-badges{
     display:flex;
+    flex-wrap:wrap;
     align-items:center;
     justify-content:center;
-    min-height:520px;
-    padding:24px;
-    border:1px solid rgba(0,63,40,.12);
-    border-radius:30px;
-    background:#f7fbf7;
+    gap:12px;
   }
 
-  .wc-gfoa-hero-media img{
-    width:100%;
-    max-width:560px;
-    height:auto;
-    display:block;
-    border:6px solid #d1be78;
-    border-radius:24px;
-    background:#ffffff;
-    box-shadow:0 18px 42px rgba(23,32,51,.12);
+  .wc-gfoa-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 20px;
+    border:1px solid rgba(209,190,120,.45);
+    border-radius:999px;
+    background:rgba(255,255,255,.07);
+    color:#f3ead0;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
   }
 
-  .wc-gfoa-intro-grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(280px,.38fr);
-    gap:22px;
-    margin:0 0 34px;
+  .wc-gfoa-badge strong{
+    color:#ffffff;
+    font-size:14px;
+    letter-spacing:0;
+    text-transform:none;
   }
 
-  .wc-gfoa-panel{
-    padding:28px;
-    border:1px solid rgba(23,32,51,.11);
-    border-radius:24px;
-    background:#ffffff;
-    box-shadow:0 14px 34px rgba(23,32,51,.06);
-  }
-
-  .wc-gfoa-panel h2{
-    margin:0 0 14px;
-    color:#172033;
-    font-family:Georgia, "Times New Roman", serif;
-    font-size:clamp(30px, 3vw, 44px);
-    line-height:1.08;
-    font-weight:500;
-  }
-
-  .wc-gfoa-panel p{
-    margin:0 0 14px;
-    color:#607184;
-    font-size:16px;
-    line-height:1.75;
-  }
-
-  .wc-gfoa-panel p:last-child{
-    margin-bottom:0;
-  }
-
-  .wc-gfoa-status{
+  .wc-gfoa-certificate-showcase{
+    position:relative;
+    z-index:1;
     display:flex;
     flex-direction:column;
-    justify-content:space-between;
-    gap:20px;
-    background:#f7fbf7;
+    align-items:center;
+    gap:22px;
+    max-width:760px;
+    margin:0 auto 34px;
+    padding:0 20px;
   }
 
-  .wc-gfoa-status strong{
-    display:block;
-    color:#003f28;
-    font-size:42px;
-    line-height:1;
+  .wc-gfoa-certificate-card{
+    padding:20px;
+    border-radius:26px;
+    background:#ffffff;
+    box-shadow:0 28px 56px rgba(15,23,38,.22);
   }
 
-  .wc-gfoa-status span{
+  .wc-gfoa-certificate-card img{
+    width:100%;
+    max-width:320px;
+    height:auto;
     display:block;
-    margin-top:8px;
-    color:#607184;
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:.10em;
-    text-transform:uppercase;
+    margin:0 auto;
+    border:5px solid #1f3a5f;
+    border-radius:16px;
+    background:#ffffff;
   }
 
   .wc-gfoa-link-button{
@@ -279,11 +263,6 @@
       padding:34px 22px 64px;
     }
 
-    .wc-gfoa-hero,
-    .wc-gfoa-intro-grid{
-      grid-template-columns:1fr;
-    }
-
     .wc-gfoa-criteria-grid{
       grid-template-columns:repeat(2, minmax(0,1fr));
     }
@@ -294,12 +273,14 @@
       padding:28px 16px 54px;
     }
 
-    .wc-gfoa-hero-copy,
-    .wc-gfoa-hero-media,
-    .wc-gfoa-panel{
-      padding:22px;
+    .wc-gfoa-hero{
+      padding:34px 22px 80px;
+      margin:0 0 -56px;
       border-radius:22px;
-      min-height:auto;
+    }
+
+    .wc-gfoa-certificate-card{
+      padding:16px;
     }
 
     .wc-gfoa-criteria-grid{
@@ -318,28 +299,22 @@
     <div class="wc-gfoa-hero-copy">
       <span class="wc-gfoa-kicker">Introduction and Overview</span>
       <h1>Distinguished Budget Presentation Award</h1>
-      <p>The Government Finance Officers Association award recognizes budget documents that clearly communicate priorities, financial plans, operations, and policy direction to the public.</p>
-    </div>
-    <div class="wc-gfoa-hero-media">
-      <img alt="GFOA Distinguished Budget Presentation Award certificate for Walton County" src="../assets/images/Page Images/gfoa-budget-award-certificate.png">
-    </div>
-  </div>
-
-  <div class="wc-gfoa-intro-grid">
-    <section class="wc-gfoa-panel">
-      <h2>Recognition for clear public budgeting.</h2>
       <p>The Government Finance Officers Association of the United States and Canada presented a Distinguished Budget Presentation Award to Walton County, Florida for its Annual Budget for the fiscal year beginning October 1, 2025.</p>
       <p>To receive this award, a government must publish a budget document that meets program criteria as a policy document, a financial plan, an operations guide, and a communications device.</p>
       <p>This award is valid for one year. Walton County believes the current budget continues to conform to program requirements and is submitting it to GFOA to determine eligibility for another award.</p>
-    </section>
+    </div>
 
-    <aside class="wc-gfoa-panel wc-gfoa-status">
-      <div>
-        <strong>2nd Year</strong>
-        <span>Received</span>
-      </div>
-      <a class="wc-gfoa-link-button" href="https://www.gfoa.org/budget-award-winners" target="_blank" rel="noopener">View GFOA Winners</a>
-    </aside>
+    <div class="wc-gfoa-hero-badges">
+      <span class="wc-gfoa-badge"><strong>2nd Year</strong> Received</span>
+      <span class="wc-gfoa-badge">Submitted for Renewal</span>
+    </div>
+  </div>
+
+  <div class="wc-gfoa-certificate-showcase">
+    <div class="wc-gfoa-certificate-card">
+      <img alt="GFOA Distinguished Budget Presentation Award certificate for Walton County" src="../assets/images/Page Images/gfoa-budget-award-certificate.png">
+    </div>
+    <a class="wc-gfoa-link-button" href="https://www.gfoa.org/budget-award-winners" target="_blank" rel="noopener">View GFOA Winners</a>
   </div>
 
   <section class="wc-gfoa-criteria">
