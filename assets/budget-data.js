@@ -246,14 +246,22 @@
     // multiple itemized equipment purchases under object 564000). The
     // account-level actual total only needs computing once per group;
     // every other row in that group is zeroed so a total doesn't multiply
-    // it by however many budget lines exist under that account.
+    // it by however many budget lines exist under that account. Dept_Name is
+    // part of the group key (not just Dept_Code) because some departments
+    // split one Dept_Code across multiple Dept_Names/sub-programs (e.g. Code
+    // Compliance / Code Compliance Beach both under 00102030) -- actuals
+    // aren't tracked at that sub-program grain, so each Dept_Name still
+    // needs its own (undivided, department-wide) actual total rather than
+    // having a sibling Dept_Name's row claim it and leave this one at zero.
+    // Cross-Dept_Name double-counting at the fund level is guarded against
+    // separately in buildFundFinancialSchedule's sumFor.
     const seenGroups = new Set();
     return (rows || []).map((row) => {
       // Expense rows key on Object_Code; revenue rows have no Object_Code
       // at all and key on Revenue_Code instead.
       const codeValue = row.Object_Code !== undefined ? row.Object_Code : row.Revenue_Code;
       const org = row.Dept_Code;
-      const groupKey = String(org || "").trim() + "|" + String(codeValue || "").trim();
+      const groupKey = String(org || "").trim() + "|" + String(row.Dept_Name || "").trim() + "|" + String(codeValue || "").trim();
       const isFirstInGroup = !seenGroups.has(groupKey);
       seenGroups.add(groupKey);
 
@@ -286,7 +294,7 @@
     return (rows || []).map((row) => {
       const codeValue = row.Object_Code !== undefined ? row.Object_Code : row.Revenue_Code;
       const org = row.Dept_Code;
-      const groupKey = String(org || "").trim() + "|" + String(codeValue || "").trim();
+      const groupKey = String(org || "").trim() + "|" + String(row.Dept_Name || "").trim() + "|" + String(codeValue || "").trim();
       const isFirstInGroup = !seenGroups.has(groupKey);
       seenGroups.add(groupKey);
 
@@ -893,6 +901,19 @@
       String((row && row.Dept_Code) || "").trim(),
       String((row && row.Revenue_Code) || "").trim(),
       String((row && row.Project_Code) || "").trim()
+    ].join("|");
+  }
+
+  // Deliberately omits Dept_Name: a few departments split one Dept_Code
+  // across multiple Dept_Names/sub-programs that each carry the full,
+  // undivided account-level actual/budget total (see applyActualsToRows).
+  // Fund-level rollups need that counted once per account, not once per
+  // sub-program sharing the code.
+  function expenseActualUniqueKey(row) {
+    return [
+      fundCodeForRow(row),
+      String((row && row.Dept_Code) || "").trim(),
+      String((row && row.Object_Code) || "").trim()
     ].join("|");
   }
 
@@ -1819,15 +1840,19 @@
     const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
     function sumFor(rows, predicate, field) {
-      const shouldDedupeRevenue =
-        rows === revenueRows && (revenueActualFields.has(field) || field === "FY2026_Original_Budget");
-      const seenRevenueAmounts = shouldDedupeRevenue ? new Set() : null;
+      const isActualOrBudgetField = revenueActualFields.has(field) || field === "FY2026_Original_Budget";
+      const shouldDedupeRevenue = rows === revenueRows && isActualOrBudgetField;
+      // Expense rows can have the same account-level actual/budget total
+      // duplicated across multiple Dept_Names sharing one Dept_Code (e.g.
+      // Code Compliance / Code Compliance Beach) -- see expenseActualUniqueKey.
+      const shouldDedupeExpense = rows === expenseRows && isActualOrBudgetField;
+      const seenAmounts = (shouldDedupeRevenue || shouldDedupeExpense) ? new Set() : null;
       return rows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
-        if (seenRevenueAmounts) {
-          const key = revenueBudgetUniqueKey(r);
-          if (seenRevenueAmounts.has(key)) return sum;
-          seenRevenueAmounts.add(key);
+        if (seenAmounts) {
+          const key = shouldDedupeRevenue ? revenueBudgetUniqueKey(r) : expenseActualUniqueKey(r);
+          if (seenAmounts.has(key)) return sum;
+          seenAmounts.add(key);
         }
         if (field === "FY2026_Original_Budget") {
           const value = r.FY2026_Original_Budget || r.FY2026_Budget || 0;
