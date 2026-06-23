@@ -205,8 +205,11 @@
   // Maintenance (now solely 00117000) has actuals split across 00117010,
   // 00117020, and 10117000 in Supabase, so those need to be pulled in
   // alongside the current code or its prior-year actuals read as zero.
+  // Engineering (now 10116002) has its actuals/FY2026 budget booked under
+  // legacy code 00120000.
   const DEPT_CODE_ACTUALS_ALIASES = {
-    "00117000": ["00117010", "00117020", "10117000"]
+    "00117000": ["00117010", "00117020", "10117000"],
+    "10116002": ["00120000"]
   };
 
   // Sums every raw Supabase actuals row matching a department+account+year,
