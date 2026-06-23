@@ -191,9 +191,7 @@
         supabaseData,
         expenseRows,
         revenueRows,
-        expenseLookup: supabaseData.buildActualsLookup(expenseRows),
-        revenueLookup: supabaseData.buildActualsLookup(revenueRows),
-        originalBudgetLookup: supabaseData.buildActualsLookup(originalBudgetRows)
+        originalBudgetRows
       }));
     }).catch((err) => {
       console.error("WCBudgetData: Supabase actuals could not be loaded; using Google Sheets fallbacks.", err);
@@ -201,16 +199,65 @@
     });
   }
 
-  function applyActualsToRows(rows, lookup, supabaseData) {
-    if (!lookup || !supabaseData || typeof supabaseData.actualOrFallback !== "function") {
-      return rows;
+  // Sums every raw Supabase actuals row matching a department+account+year,
+  // regardless of its project dimension. Budget-side FY2027 line items
+  // don't carry a comparable project breakdown (expense Project_Code is
+  // budget-only/itemization-only; revenue rows have no Project_Code field
+  // at all), but the *actuals* data can legitimately have several real,
+  // distinct entries for the same department+account split across
+  // different projects (e.g. a revenue code billed under one project some
+  // years and unassigned in others) -- those are genuine additional
+  // dollars, not duplicates, so they must be summed rather than picking
+  // just one. `matched` distinguishes "found rows, total happens to be 0"
+  // from "no actuals exist for this account" so callers can still fall
+  // back to the budget sheet's own column in the latter case.
+  function sumRawActualsForAccount(rawRows, org, code, year) {
+    const orgNorm = String(org || "").trim();
+    const codeNorm = String(code || "").trim();
+    let matched = false;
+    let total = 0;
+    if (orgNorm && codeNorm) {
+      (rawRows || []).forEach((row) => {
+        if (Number(row.year) !== Number(year)) return;
+        if (String(row.org || "").trim() !== orgNorm) return;
+        if (String(row.object || "").trim() !== codeNorm) return;
+        matched = true;
+        total += Number(row.amount) || 0;
+      });
     }
+    return { matched, total };
+  }
 
+  function applyActualsToRows(rows, rawActualRows) {
+    if (!rawActualRows || !rawActualRows.length) return rows;
+
+    // Several FY2027 budget lines can share one department+account (e.g.
+    // multiple itemized equipment purchases under object 564000). The
+    // account-level actual total only needs computing once per group;
+    // every other row in that group is zeroed so a total doesn't multiply
+    // it by however many budget lines exist under that account.
+    const seenGroups = new Set();
     return (rows || []).map((row) => {
+      // Expense rows key on Object_Code; revenue rows have no Object_Code
+      // at all and key on Revenue_Code instead.
+      const codeValue = row.Object_Code !== undefined ? row.Object_Code : row.Revenue_Code;
+      const org = row.Dept_Code;
+      const groupKey = String(org || "").trim() + "|" + String(codeValue || "").trim();
+      const isFirstInGroup = !seenGroups.has(groupKey);
+      seenGroups.add(groupKey);
+
       const next = { ...row };
+      if (!isFirstInGroup) {
+        HISTORICAL_ACTUAL_YEARS.forEach((year) => {
+          next["FY" + year + "_Actual"] = 0;
+        });
+        return next;
+      }
+
       HISTORICAL_ACTUAL_YEARS.forEach((year) => {
         const field = "FY" + year + "_Actual";
-        next[field] = supabaseData.actualOrFallback(lookup, row, year, row[field]);
+        const result = sumRawActualsForAccount(rawActualRows, org, codeValue, year);
+        next[field] = result.matched ? result.total : (row[field] || 0);
       });
       return next;
     });
@@ -219,15 +266,25 @@
   // FY2026 Original Budget comes from the Supabase BUC cache
   // (expense_original_budget_public). Despite the legacy view name, the
   // BUC source can include revenue and expense codes, so this is applied to
-  // both datasets below.
-  function applyOriginalBudgetToRows(rows, lookup, supabaseData) {
-    if (!lookup || !supabaseData || typeof supabaseData.getActualAmount !== "function") {
-      return rows;
-    }
+  // both datasets below. Same department+account-level grain and the same
+  // sum-across-projects treatment as applyActualsToRows above.
+  function applyOriginalBudgetToRows(rows, rawBudgetRows) {
+    if (!rawBudgetRows || !rawBudgetRows.length) return rows;
 
+    const seenGroups = new Set();
     return (rows || []).map((row) => {
-      const amount = supabaseData.getActualAmount(lookup, row, 2026);
-      return { ...row, FY2026_Original_Budget: amount === undefined ? 0 : amount };
+      const codeValue = row.Object_Code !== undefined ? row.Object_Code : row.Revenue_Code;
+      const org = row.Dept_Code;
+      const groupKey = String(org || "").trim() + "|" + String(codeValue || "").trim();
+      const isFirstInGroup = !seenGroups.has(groupKey);
+      seenGroups.add(groupKey);
+
+      if (!isFirstInGroup) {
+        return { ...row, FY2026_Original_Budget: 0 };
+      }
+
+      const result = sumRawActualsForAccount(rawBudgetRows, org, codeValue, 2026);
+      return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || 0) };
     });
   }
 
@@ -728,10 +785,10 @@
       if (actuals) {
         cache.expenseActualRows = actuals.expenseRows || [];
         cache.revenueActualRows = actuals.revenueRows || [];
-        cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseLookup, actuals.supabaseData);
-        cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueLookup, actuals.supabaseData);
-        cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetLookup, actuals.supabaseData);
-        cache.revenues = applyOriginalBudgetToRows(cache.revenues, actuals.originalBudgetLookup, actuals.supabaseData);
+        cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseRows);
+        cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueRows);
+        cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetRows);
+        cache.revenues = applyOriginalBudgetToRows(cache.revenues, actuals.originalBudgetRows);
       }
 
       cache.machinery = buildMachineryRowsFromExpenditures(cache.expenditures);
@@ -991,7 +1048,6 @@
     }
 
     function groupedPriorYearRows() {
-      if (!isExpense) return mergedRows;
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
       mergedRows.forEach((r) => {
@@ -1040,7 +1096,7 @@
 
     const summaryRows = groupedPriorYearRows();
     const bodyRows = budgetLineRowsHtml(mergedRows, "wc-budget-line-detail-row", false)
-      .concat(isExpense ? budgetLineRowsHtml(summaryRows, "wc-budget-line-summary-row", true) : []);
+      .concat(budgetLineRowsHtml(summaryRows, "wc-budget-line-summary-row", true));
     const totalFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
     const totals = {};
     totalFields.forEach((field) => {

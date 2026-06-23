@@ -18,9 +18,10 @@
   if (!isOmbPage()) return;
 
   var STORAGE_KEY = "wc-budget-pixel-guide:omb-enabled";
+  // 84px keeps Ledger clear of the sticky nav bar; both margins satisfy the
+  // 12px minimum, NAV_CLEARANCE is just stricter for this page's layout.
   var NAV_CLEARANCE = 84;
-  var EDGE_MARGIN = 16;
-  var MASCOT_SIZE = 52;
+  var EDGE_MARGIN = 12;
   var CONTEXT_TIP_COOLDOWN_MS = 10000;
   var CONTEXT_TIP_VISIBLE_MS = 6000;
 
@@ -321,23 +322,52 @@
     button.setAttribute("aria-pressed", enabled ? "true" : "false");
   }
 
-  function clampPosition(left, top) {
-    var maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - MASCOT_SIZE - EDGE_MARGIN);
-    var maxTop = Math.max(NAV_CLEARANCE, window.innerHeight - MASCOT_SIZE - EDGE_MARGIN);
+  // The sprite's on-screen size is driven entirely by CSS (--ledger-frame-size,
+  // 120px desktop / 88px mobile) -- never assume a fixed JS constant for it,
+  // that's exactly what caused Ledger to hang off the right edge before:
+  // clamping math used a stale 52px guess while the real element was 120px.
+  function getMascotSize() {
+    if (els.mascot) {
+      var rect = els.mascot.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) return { width: rect.width, height: rect.height };
+    }
+    return { width: 60, height: 60 };
+  }
+
+  function clampPosition(left, top, size) {
+    var s = size || getMascotSize();
+    var maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - s.width - EDGE_MARGIN);
+    var maxTop = Math.max(NAV_CLEARANCE, window.innerHeight - s.height - EDGE_MARGIN);
     return {
       left: Math.max(EDGE_MARGIN, Math.min(left, maxLeft)),
       top: Math.max(NAV_CLEARANCE, Math.min(top, maxTop))
     };
   }
 
-  // Default idle spot: bottom-right, just above where the control panel
-  // lives, so the mascot reads as "parked on" the panel when not touring.
+  // Default idle spot: attached near the top-right corner of the guide
+  // panel, overlapping its edge slightly (never more than
+  // PANEL_OVERLAP_MAX px outside the panel), then clamped to stay fully
+  // inside the viewport. On narrow screens, centered above the panel
+  // instead, since a panel that already sits near the screen's right edge
+  // leaves no room for Ledger to hang off its corner.
+  var PANEL_OVERLAP_MAX = 20;
+
   function idleHomePosition() {
-    var panelHeight = els.panel ? els.panel.getBoundingClientRect().height : 160;
-    return clampPosition(
-      window.innerWidth - MASCOT_SIZE - EDGE_MARGIN - 4,
-      window.innerHeight - MASCOT_SIZE - EDGE_MARGIN - panelHeight - 14
-    );
+    var size = getMascotSize();
+    if (!els.panel) {
+      return clampPosition(window.innerWidth - size.width - EDGE_MARGIN, window.innerHeight - size.height - EDGE_MARGIN, size);
+    }
+
+    var panelRect = els.panel.getBoundingClientRect();
+    var left, top;
+    if (window.innerWidth <= 640) {
+      left = panelRect.left + (panelRect.width - size.width) / 2;
+      top = panelRect.top - size.height + 10;
+    } else {
+      left = panelRect.right - size.width + PANEL_OVERLAP_MAX;
+      top = panelRect.top - size.height + PANEL_OVERLAP_MAX;
+    }
+    return clampPosition(left, top, size);
   }
 
   function setMascotPosition(pos) {
@@ -346,10 +376,11 @@
   }
 
   function moveMascotToElement(el, ledgerState) {
+    var size = getMascotSize();
     var rect = el.getBoundingClientRect();
     // Dock just outside the target's top-right corner -- reads as "holding
     // the edge" of the table/card without ever covering its content.
-    var pos = clampPosition(rect.right - MASCOT_SIZE * 0.4, rect.top - MASCOT_SIZE * 0.6);
+    var pos = clampPosition(rect.right - size.width * 0.4, rect.top - size.height * 0.6, size);
     setMascotPosition(pos);
     setLedgerState(ledgerState || "pointing");
   }
@@ -410,13 +441,16 @@
     state.mode = "menu";
     state.tourStepIndex = -1;
     hideHighlight();
-    resetMascotToIdle();
+    // Panel content first, then position Ledger off the panel's *actual*
+    // rendered height -- measuring before the content/buttons are set would
+    // use a stale (often shorter) height left over from the prior render.
     setMessage("Hi, I’m Ledger. I can help you read this budget page.");
     renderActionButtons([
       { label: "Start page tour", variant: "primary", onClick: startTour },
       { label: "Ask Ledger", onClick: function () { showThinkingThen(renderAsk); } },
       { label: "Hide Ledger", variant: "quiet", onClick: function () { setEnabled(false); } }
     ]);
+    resetMascotToIdle();
   }
 
   // ---- ask Ledger mode ----
@@ -424,7 +458,6 @@
   function renderAsk() {
     state.mode = "ask";
     hideHighlight();
-    resetMascotToIdle();
     setMessage("Choose a question:");
     var buttons = ASK_QUESTIONS.map(function (q) {
       return { label: q.question, onClick: function () { showThinkingThen(function () { renderAnswer(q.answer); }); } };
@@ -432,15 +465,19 @@
     buttons.push({ label: "Explain this page", onClick: function () { showThinkingThen(renderExplainPage); } });
     buttons.push({ label: "Back", variant: "quiet", onClick: function () { showThinkingThen(renderMenu); } });
     renderActionButtons(buttons);
+    resetMascotToIdle();
   }
 
   function renderAnswer(answerText) {
-    setLedgerState("presenting");
     setMessage(answerText);
     renderActionButtons([
       { label: "Back", onClick: function () { showThinkingThen(renderAsk); } },
       { label: "Hide Ledger", variant: "quiet", onClick: function () { setEnabled(false); } }
     ], true);
+    // Re-anchor to the panel's actual height (an answer can be much longer
+    // than the question list it replaced) before overriding idle's state.
+    resetMascotToIdle();
+    setLedgerState("presenting");
   }
 
   // ---- "Explain this page" -- safe, visible-DOM-only summary ----
@@ -473,12 +510,13 @@
   }
 
   function renderExplainPage() {
-    setLedgerState("presenting");
     setMessage(buildExplainSummary());
     renderActionButtons([
       { label: "Back", onClick: function () { showThinkingThen(renderAsk); } },
       { label: "Hide Ledger", variant: "quiet", onClick: function () { setEnabled(false); } }
     ], true);
+    resetMascotToIdle();
+    setLedgerState("presenting");
   }
 
   // ---- guided tour mode ----
