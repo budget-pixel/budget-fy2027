@@ -10,13 +10,13 @@
     margin:34px 0 32px;
     padding:34px;
     border-radius:24px;
-    background:#f5f9f7;
-    border:1px solid rgba(0,98,49,.14);
+    background:var(--light);
+    border:1px solid var(--border);
   }
   .wc-process-hero p{
     max-width:850px;
     margin:0;
-    color:#5d7085;
+    color:var(--muted);
     font-size:18px;
     line-height:1.75;
   }
@@ -33,23 +33,18 @@
     min-height:42px;
     padding:0 18px;
     border-radius:999px;
-    background:#006231;
+    background:var(--green);
     color:#ffffff;
     font-size:13px;
     font-weight:800;
     text-decoration:none;
-  }
-  .wc-process-button.secondary{
-    background:#ffffff;
-    color:#172033;
-    border:1px solid rgba(36,52,77,.14);
   }
   .wc-process-section{
     margin-top:46px;
   }
   .wc-process-section h2{
     margin:0 0 18px;
-    color:#172033;
+    color:var(--text);
     font-size:clamp(28px, 4vw, 42px);
     line-height:1.1;
   }
@@ -61,14 +56,14 @@
   .wc-process-card{
     min-height:100%;
     padding:24px;
-    border:1px solid rgba(36,52,77,.12);
+    border:1px solid var(--border);
     border-radius:18px;
     background:#ffffff;
   }
   .wc-process-card span{
     display:block;
     margin-bottom:12px;
-    color:#006231;
+    color:var(--green);
     font-size:12px;
     font-weight:900;
     letter-spacing:.12em;
@@ -76,13 +71,13 @@
   }
   .wc-process-card h3{
     margin:0 0 10px;
-    color:#172033;
+    color:var(--text);
     font-size:21px;
     line-height:1.25;
   }
   .wc-process-card p{
     margin:0;
-    color:#5d7085;
+    color:var(--muted);
     font-size:15px;
     line-height:1.65;
   }
@@ -97,16 +92,16 @@
     padding:28px;
     border-radius:20px;
     background:#ffffff;
-    border:1px solid rgba(36,52,77,.12);
+    border:1px solid var(--border);
   }
   .wc-process-panel h3{
     margin:0 0 12px;
-    color:#172033;
+    color:var(--text);
     font-size:24px;
   }
   .wc-process-panel p,
   .wc-process-panel li{
-    color:#5d7085;
+    color:var(--muted);
     font-size:15px;
     line-height:1.7;
   }
@@ -129,17 +124,17 @@
     justify-content:space-between;
     gap:18px;
     padding:18px;
-    border:1px solid rgba(36,52,77,.12);
+    border:1px solid var(--border);
     border-radius:16px;
     background:#ffffff;
-    color:#172033;
+    color:var(--text);
     text-decoration:none;
     font-weight:800;
   }
   .wc-process-link small{
     display:block;
     margin-top:6px;
-    color:#6b7d90;
+    color:var(--muted);
     font-size:12px;
     font-weight:600;
     line-height:1.45;
@@ -157,6 +152,20 @@
     .wc-process-card{
       padding:22px;
     }
+  }
+
+  /* Dark mode: var(--green) becomes a light mint in dark mode, so the solid
+     button needs a dark text color instead of white to stay readable; the
+     white card/panel/link surfaces need an explicit dark surface too,
+     matching the dark card treatment used elsewhere on the site. */
+  :root[data-theme="dark"] .wc-process-button{
+    color:#07110d;
+  }
+  :root[data-theme="dark"] .wc-process-card,
+  :root[data-theme="dark"] .wc-process-panel,
+  :root[data-theme="dark"] .wc-process-link{
+    background: rgba(14,28,22,.92);
+    border-color: var(--border);
   }
 </style>
 </head>
@@ -177,7 +186,7 @@
   <p>The annual budget process turns department needs, revenue forecasts, public priorities, Board direction, and Florida statutory requirements into an adopted spending plan for the fiscal year.</p>
   <div class="wc-process-actions">
     <a class="wc-process-button" href="budget-calendar.html">View Budget Calendar</a>
-    <a class="wc-process-button secondary" href="financial-policies.html">Review Financial Policies</a>
+    <a class="wc-process-button" href="financial-policies.html">Review Financial Policies</a>
   </div>
 </section>
 

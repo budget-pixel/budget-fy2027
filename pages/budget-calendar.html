@@ -10,20 +10,20 @@
     margin:34px 0;
     padding:32px;
     border-radius:24px;
-    background:#f5f9f7;
-    border:1px solid rgba(0,98,49,.14);
+    background:var(--light);
+    border:1px solid var(--border);
   }
   .wc-calendar-intro p{
     max-width:880px;
     margin:0;
-    color:#5d7085;
+    color:var(--muted);
     font-size:17px;
     line-height:1.75;
   }
   .wc-calendar-intro a{
     display:inline-flex;
     margin-top:20px;
-    color:#006231;
+    color:var(--green);
     font-size:13px;
     font-weight:900;
     text-decoration:none;
@@ -39,31 +39,31 @@
   .wc-timeline-month{
     min-height:110px;
     padding:16px;
-    border:1px solid rgba(36,52,77,.10);
+    border:1px solid var(--border);
     border-radius:18px;
     background:#ffffff;
   }
   .wc-timeline-month.featured{
-    border-color:rgba(0,98,49,.18);
-    background:#f5f9f7;
+    border-color:var(--green);
+    background:var(--light);
   }
   .wc-timeline-month strong{
     display:block;
     margin-bottom:8px;
-    color:#006231;
+    color:var(--green);
     font-size:13px;
     text-transform:uppercase;
     letter-spacing:.10em;
   }
   .wc-timeline-month span{
-    color:#172033;
+    color:var(--text);
     font-size:14px;
     font-weight:800;
     line-height:1.35;
   }
   .wc-calendar-table{
     margin-top:28px;
-    border:1px solid rgba(36,52,77,.12);
+    border:1px solid var(--border);
     border-radius:22px;
     overflow:hidden;
     background:#ffffff;
@@ -71,7 +71,7 @@
   .wc-calendar-row{
     display:grid;
     grid-template-columns:180px minmax(0, 1fr);
-    border-bottom:1px solid rgba(36,52,77,.10);
+    border-bottom:1px solid var(--border);
   }
   .wc-calendar-row:last-child{
     border-bottom:0;
@@ -81,28 +81,28 @@
     align-items:center;
     justify-content:center;
     padding:16px 18px;
-    background:#eaf4ee;
-    color:#172033;
+    background:var(--light);
+    color:var(--text);
     font-weight:900;
     text-align:center;
   }
   .wc-calendar-row.featured .wc-calendar-date{
-    background:#dfeee6;
+    background:var(--border);
   }
   .wc-calendar-event{
     padding:16px 20px;
-    color:#5d7085;
+    color:var(--muted);
     font-size:15px;
     line-height:1.65;
   }
   .wc-calendar-row.featured .wc-calendar-event{
-    background:#f5f9f7;
-    color:#344054;
+    background:var(--light);
+    color:var(--text);
   }
   .wc-calendar-note{
     max-width:880px;
     margin:22px auto 0;
-    color:#6b7d90;
+    color:var(--muted);
     font-size:13px;
     line-height:1.55;
     text-align:center;
@@ -112,7 +112,7 @@
   }
   .wc-public-involvement h2{
     margin:0 0 18px;
-    color:#172033;
+    color:var(--text);
     font-size:clamp(28px, 4vw, 42px);
     line-height:1.1;
   }
@@ -123,25 +123,25 @@
   }
   .wc-public-card{
     padding:22px;
-    border:1px solid rgba(36,52,77,.12);
+    border:1px solid var(--border);
     border-radius:18px;
     background:#ffffff;
   }
   .wc-public-card h3{
     margin:0 0 10px;
-    color:#172033;
+    color:var(--text);
     font-size:20px;
   }
   .wc-public-card p{
     margin:0;
-    color:#5d7085;
+    color:var(--muted);
     font-size:15px;
     line-height:1.65;
   }
   .wc-public-card a{
     display:inline-flex;
     margin-top:14px;
-    color:#006231;
+    color:var(--green);
     font-size:13px;
     font-weight:900;
     text-decoration:none;
@@ -168,6 +168,15 @@
       justify-content:flex-start;
       text-align:left;
     }
+  }
+
+  /* Dark mode: the white card surfaces below need an explicit dark surface,
+     matching the dark card treatment used elsewhere on the site. */
+  :root[data-theme="dark"] .wc-timeline-month,
+  :root[data-theme="dark"] .wc-calendar-table,
+  :root[data-theme="dark"] .wc-public-card{
+    background: rgba(14,28,22,.92);
+    border-color: var(--border);
   }
 </style>
 </head>

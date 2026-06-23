@@ -76,14 +76,14 @@
     justify-content:space-between;
     gap:22px;
     padding:26px;
-    border:1px solid rgba(0,63,40,.12);
+    border:1px solid var(--border);
     border-radius:30px;
-    background:#f7fbf7;
+    background:var(--light);
   }
 
   .wc-fund-route-card strong{
     display:block;
-    color:#003f28;
+    color:var(--green);
     font-size:34px;
     line-height:1.05;
   }
@@ -91,7 +91,7 @@
   .wc-fund-route-card span{
     display:block;
     margin-top:8px;
-    color:#607184;
+    color:var(--muted);
     font-size:11px;
     font-weight:900;
     letter-spacing:.10em;
@@ -108,22 +108,22 @@
   .wc-fund-summary-card{
     min-height:178px;
     padding:22px;
-    border:1px solid rgba(0,63,40,.12);
+    border:1px solid var(--border);
     border-radius:20px;
-    background:#f7fbf7;
+    background:var(--light);
   }
 
   .wc-fund-summary-card strong{
     display:block;
     margin:0 0 10px;
-    color:#003f28;
+    color:var(--green);
     font-size:18px;
     line-height:1.2;
   }
 
   .wc-fund-summary-card p{
     margin:0;
-    color:#526577;
+    color:var(--muted);
     font-size:14px;
     line-height:1.6;
   }
@@ -131,7 +131,7 @@
   .wc-fund-flow{
     margin:0 0 42px;
     padding:28px;
-    border:1px solid rgba(23,32,51,.10);
+    border:1px solid var(--border);
     border-radius:28px;
     background:#ffffff;
     box-shadow:0 14px 34px rgba(23,32,51,.05);
@@ -147,7 +147,7 @@
 
   .wc-fund-flow-head h2{
     margin:0 0 8px;
-    color:#172033;
+    color:var(--text);
     font-family:Georgia, "Times New Roman", serif;
     font-size:clamp(30px, 4vw, 48px);
     line-height:1.05;
@@ -157,7 +157,7 @@
   .wc-fund-flow-head p{
     max-width:720px;
     margin:0;
-    color:#607184;
+    color:var(--muted);
     font-size:15px;
     line-height:1.65;
   }
@@ -169,7 +169,7 @@
 
   .wc-fund-flow-total strong{
     display:block;
-    color:#003f28;
+    color:var(--green);
     font-size:30px;
     line-height:1;
   }
@@ -177,7 +177,7 @@
   .wc-fund-flow-total span{
     display:block;
     margin-top:8px;
-    color:#607184;
+    color:var(--muted);
     font-size:11px;
     font-weight:900;
     letter-spacing:.10em;
@@ -195,14 +195,14 @@
     gap:14px;
     align-items:center;
     padding:14px;
-    border:1px solid rgba(0,63,40,.10);
+    border:1px solid var(--border);
     border-radius:18px;
-    background:#f8fbf8;
+    background:var(--light);
   }
 
   .wc-fund-flow-name strong{
     display:block;
-    color:#172033;
+    color:var(--text);
     font-size:15px;
     line-height:1.25;
   }
@@ -210,7 +210,7 @@
   .wc-fund-flow-name span{
     display:block;
     margin-top:6px;
-    color:#607184;
+    color:var(--muted);
     font-size:11px;
     font-weight:900;
     letter-spacing:.08em;
@@ -222,7 +222,7 @@
     height:14px;
     overflow:hidden;
     border-radius:999px;
-    background:rgba(0,63,40,.10);
+    background:var(--border);
   }
 
   .wc-fund-flow-bar{
@@ -231,11 +231,11 @@
     width:var(--fund-share, 0%);
     min-width:8px;
     border-radius:999px;
-    background:#003f28;
+    background:var(--green);
   }
 
   .wc-fund-flow-amount{
-    color:#003f28;
+    color:var(--green);
     font-size:16px;
     font-weight:900;
     text-align:right;
@@ -245,7 +245,7 @@
   .wc-fund-flow-amount span{
     display:block;
     margin-top:5px;
-    color:#607184;
+    color:var(--muted);
     font-size:11px;
     font-weight:900;
     letter-spacing:.08em;
@@ -254,7 +254,7 @@
 
   .wc-fund-flow-note{
     margin:16px 0 0;
-    color:#607184;
+    color:var(--muted);
     font-size:12px;
     line-height:1.55;
   }
@@ -262,10 +262,10 @@
   .wc-fund-flow-loading,
   .wc-fund-flow-error{
     padding:20px;
-    border:1px solid rgba(0,63,40,.12);
+    border:1px solid var(--border);
     border-radius:18px;
-    background:#f7fbf7;
-    color:#526577;
+    background:var(--light);
+    color:var(--muted);
     font-weight:800;
   }
 
@@ -280,7 +280,7 @@
 
   .wc-fund-section-header h2{
     margin:0 0 10px;
-    color:#172033;
+    color:var(--text);
     font-family:Georgia, "Times New Roman", serif;
     font-size:clamp(32px, 4vw, 54px);
     line-height:1.06;
@@ -289,7 +289,7 @@
 
   .wc-fund-section-header p{
     margin:0;
-    color:#607184;
+    color:var(--muted);
     font-size:16px;
     line-height:1.7;
   }
@@ -312,19 +312,19 @@
     justify-content:center;
     padding:20px;
     border-radius:20px;
-    border:1px solid rgba(0,63,40,.12);
-    background:#f7fbf7;
+    border:1px solid var(--border);
+    background:var(--light);
   }
 
   .wc-relationship-node strong{
-    color:#003f28;
+    color:var(--green);
     font-size:20px;
     line-height:1.15;
   }
 
   .wc-relationship-node span{
     margin-top:7px;
-    color:#607184;
+    color:var(--muted);
     font-size:11px;
     font-weight:900;
     letter-spacing:.08em;
@@ -337,7 +337,7 @@
     align-content:flex-start;
     gap:8px;
     padding:18px;
-    border:1px solid rgba(23,32,51,.10);
+    border:1px solid var(--border);
     border-radius:20px;
     background:#ffffff;
     box-shadow:0 14px 34px rgba(23,32,51,.05);
@@ -348,10 +348,10 @@
     align-items:center;
     min-height:34px;
     padding:8px 12px;
-    border:1px solid rgba(0,63,40,.12);
+    border:1px solid var(--border);
     border-radius:999px;
-    background:#f8fbf8;
-    color:#2f4052;
+    background:var(--light);
+    color:var(--text);
     font-size:13px;
     font-weight:800;
     line-height:1.2;
@@ -378,7 +378,7 @@
 
   .wc-fund-detail-card{
     padding:24px;
-    border:1px solid rgba(23,32,51,.10);
+    border:1px solid var(--border);
     border-radius:22px;
     background:#ffffff;
     box-shadow:0 14px 34px rgba(23,32,51,.05);
@@ -386,22 +386,22 @@
 
   .wc-fund-detail-card h3{
     margin:0 0 10px;
-    color:#003f28;
+    color:var(--green);
     font-size:20px;
     line-height:1.2;
   }
 
   .wc-fund-detail-card p{
     margin:0;
-    color:#526577;
+    color:var(--muted);
     font-size:14px;
     line-height:1.65;
   }
 
   .wc-relationship-fund.is-light{
-    border:1px solid rgba(0,63,40,.16);
-    background:#f7fbf7;
-    color:#003f28;
+    border:1px solid var(--border);
+    background:var(--light);
+    color:var(--green);
   }
 
   @media(max-width:960px){
@@ -455,6 +455,27 @@
     .wc-fund-detail-grid{
       grid-template-columns:1fr;
     }
+  }
+
+  /* Dark mode: the light/white card surfaces below need an explicit dark
+     surface, matching the dark card treatment used elsewhere on the site.
+     The dark-green hero block and .wc-relationship-fund tag keep their
+     hardcoded #003f28 background -- those are intentional brand-colored
+     blocks with white text that read fine in either theme, not neutral
+     cards that should react to it. */
+  :root[data-theme="dark"] .wc-fund-route-card,
+  :root[data-theme="dark"] .wc-fund-summary-card,
+  :root[data-theme="dark"] .wc-fund-flow,
+  :root[data-theme="dark"] .wc-fund-flow-row,
+  :root[data-theme="dark"] .wc-fund-flow-loading,
+  :root[data-theme="dark"] .wc-fund-flow-error,
+  :root[data-theme="dark"] .wc-relationship-node,
+  :root[data-theme="dark"] .wc-relationship-list,
+  :root[data-theme="dark"] .wc-relationship-chip,
+  :root[data-theme="dark"] .wc-fund-detail-card,
+  :root[data-theme="dark"] .wc-relationship-fund.is-light{
+    background: rgba(14,28,22,.92);
+    border-color: var(--border);
   }
 </style>
 

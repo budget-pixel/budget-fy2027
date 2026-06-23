@@ -10,13 +10,13 @@
     margin:34px 0 32px;
     padding:34px;
     border-radius:24px;
-    background:#f5f9f7;
-    border:1px solid rgba(0,98,49,.14);
+    background:var(--light);
+    border:1px solid var(--border);
   }
   .wc-fund-hero p{
     max-width:880px;
     margin:0;
-    color:#5d7085;
+    color:var(--muted);
     font-size:18px;
     line-height:1.75;
   }
@@ -25,7 +25,7 @@
   }
   .wc-fund-section h2{
     margin:0 0 18px;
-    color:#172033;
+    color:var(--text);
     font-size:clamp(28px, 4vw, 42px);
     line-height:1.1;
   }
@@ -37,7 +37,7 @@
   .wc-fund-card,
   .wc-fund-panel,
   .wc-fund-link{
-    border:1px solid rgba(36,52,77,.12);
+    border:1px solid var(--border);
     border-radius:18px;
     background:#ffffff;
   }
@@ -47,7 +47,7 @@
   .wc-fund-card span{
     display:block;
     margin-bottom:12px;
-    color:#006231;
+    color:var(--green);
     font-size:12px;
     font-weight:900;
     letter-spacing:.12em;
@@ -56,7 +56,7 @@
   .wc-fund-card h3,
   .wc-fund-panel h3{
     margin:0 0 10px;
-    color:#172033;
+    color:var(--text);
     font-size:21px;
     line-height:1.25;
   }
@@ -64,7 +64,7 @@
   .wc-fund-panel p,
   .wc-fund-panel li{
     margin:0;
-    color:#5d7085;
+    color:var(--muted);
     font-size:15px;
     line-height:1.65;
   }
@@ -89,10 +89,10 @@
   }
   .wc-fund-list li{
     padding:16px;
-    border:1px solid rgba(0,98,49,.12);
+    border:1px solid var(--border);
     border-radius:14px;
-    background:#f5f9f7;
-    color:#172033;
+    background:var(--light);
+    color:var(--text);
     font-size:14px;
     font-weight:800;
     line-height:1.35;
@@ -100,7 +100,7 @@
   .wc-fund-list small{
     display:block;
     margin-top:6px;
-    color:#5d7085;
+    color:var(--muted);
     font-size:12px;
     font-weight:600;
     line-height:1.45;
@@ -115,14 +115,14 @@
     justify-content:space-between;
     gap:18px;
     padding:18px;
-    color:#172033;
+    color:var(--text);
     text-decoration:none;
     font-weight:800;
   }
   .wc-fund-link small{
     display:block;
     margin-top:6px;
-    color:#6b7d90;
+    color:var(--muted);
     font-size:12px;
     font-weight:600;
     line-height:1.45;
@@ -143,6 +143,15 @@
     .wc-fund-list{
       grid-template-columns:1fr;
     }
+  }
+
+  /* Dark mode: the white card surfaces below need an explicit dark surface,
+     matching the dark card treatment used elsewhere on the site. */
+  :root[data-theme="dark"] .wc-fund-card,
+  :root[data-theme="dark"] .wc-fund-panel,
+  :root[data-theme="dark"] .wc-fund-link{
+    background: rgba(14,28,22,.92);
+    border-color: var(--border);
   }
 </style>
 </head>
