@@ -199,6 +199,16 @@
     });
   }
 
+  // Some departments' historical actuals are booked under older Dept_Code
+  // values that predate a county org-code restructuring and no longer
+  // appear anywhere in the current budget sheet. Building Construction and
+  // Maintenance (now solely 00117000) has actuals split across 00117010,
+  // 00117020, and 10117000 in Supabase, so those need to be pulled in
+  // alongside the current code or its prior-year actuals read as zero.
+  const DEPT_CODE_ACTUALS_ALIASES = {
+    "00117000": ["00117010", "00117020", "10117000"]
+  };
+
   // Sums every raw Supabase actuals row matching a department+account+year,
   // regardless of its project dimension. Budget-side FY2027 line items
   // don't carry a comparable project breakdown (expense Project_Code is
@@ -214,12 +224,13 @@
   function sumRawActualsForAccount(rawRows, org, code, year) {
     const orgNorm = String(org || "").trim();
     const codeNorm = String(code || "").trim();
+    const orgNorms = orgNorm ? [orgNorm].concat(DEPT_CODE_ACTUALS_ALIASES[orgNorm] || []) : [];
     let matched = false;
     let total = 0;
-    if (orgNorm && codeNorm) {
+    if (orgNorms.length && codeNorm) {
       (rawRows || []).forEach((row) => {
         if (Number(row.year) !== Number(year)) return;
-        if (String(row.org || "").trim() !== orgNorm) return;
+        if (!orgNorms.includes(String(row.org || "").trim())) return;
         if (String(row.object || "").trim() !== codeNorm) return;
         matched = true;
         total += Number(row.amount) || 0;
