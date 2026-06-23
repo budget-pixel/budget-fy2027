@@ -1220,6 +1220,7 @@
     modal.hidden = true;
     modal.classList.remove("is-open");
     document.body.classList.remove("wc-budget-detail-open");
+    document.body.style.overflow = "";
     const body = modal.querySelector(".wc-budget-detail-body");
     if (body) {
       body.innerHTML = "";
@@ -1259,6 +1260,7 @@
     modal.hidden = false;
     requestAnimationFrame(() => modal.classList.add("is-open"));
     document.body.classList.add("wc-budget-detail-open");
+    document.body.style.overflow = "hidden";
     const closeButton = modal.querySelector(".wc-budget-detail-close");
     if (closeButton) closeButton.focus({ preventScroll: true });
   }
@@ -3777,7 +3779,9 @@
     const tableEl = container.querySelector(".wc-financial-summary-table");
 
     function showDepartment(deptName) {
-      const items = deptName ? rows.filter((r) => r.Dept_Name === deptName) : rows;
+      const items = deptName
+        ? rows.filter((r) => r.Dept_Name === deptName)
+        : rows.slice().sort((a, b) => String(a.Dept_Name || "").localeCompare(String(b.Dept_Name || "")));
       const total = items.reduce((s, r) => s + (r.Amount || 0), 0);
       const showDeptColumn = !deptName;
 
