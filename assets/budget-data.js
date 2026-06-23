@@ -63,6 +63,10 @@
       "beach renourishment",
       "beach tram"
     ],
+    "tourism beach tram": ["beach tram"],
+    "tourism communications": ["communications"],
+    "tourism marketing": ["marketing"],
+    "tourism sales and visitor center": ["sales and visitors center", "sales and visitor center"],
     "tourism lifeguard services and beach safety": [
       "south walton fire lifeguard services",
       "public safety"
