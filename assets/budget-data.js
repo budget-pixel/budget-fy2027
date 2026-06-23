@@ -1487,6 +1487,26 @@
     return match ? match.Activity : "";
   }
 
+  // Object_Code 599000 (Other Uses Contingency / reserve for contingency) is
+  // budgeted appropriation authority, not a transfer or financing item. Some
+  // departments exist solely to hold a contingency line (e.g. "BCC Other
+  // Uses Contingency") and are mapped to an Other Sources/Interfund
+  // Transfers activity in the activities sheet for unrelated reasons, which
+  // would otherwise misroute their dollars into Other Financial Uses instead
+  // of the regular Expenditures Total. These two helpers keep that override
+  // consistent everywhere expenditure rows are classified by activity.
+  function isObjectCode599000(r) {
+    return String(r.Object_Code || "").trim() === "599000";
+  }
+
+  function expenseActivityForRow(r) {
+    return isObjectCode599000(r) ? "General Government" : activityForDeptCode(r.Dept_Code);
+  }
+
+  function isOtherFinancingExpenseRow(r) {
+    return !isObjectCode599000(r) && OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase());
+  }
+
   // Builds a fund-by-category consolidated table. `categoryFor(row)` returns
   // the row's category key (matched case-insensitively against `typeRows`).
   // `isOtherFinancing(row)` flags rows that should be excluded from the
@@ -1560,7 +1580,7 @@
     const typeRowRecords = config.typeRows.map((spec) => {
       const keyNorm = spec.key.toLowerCase();
       const predicate = (r) => String(config.categoryFor(r) || "").toLowerCase() === keyNorm && !config.isOtherFinancing(r);
-      return { label: spec.label, cells: cellsFor(predicate), values: numericValuesFor(predicate) };
+      return { label: spec.label, cells: cellsFor(predicate), values: numericValuesFor(predicate), predicate };
     });
 
     const columnCount = fundColumns.length + 2;
@@ -1571,7 +1591,18 @@
     const otherFinancingCells = cellsFor(config.isOtherFinancing);
     const otherFinancingValues = numericValuesFor(config.isOtherFinancing);
 
-    const grandTotalValues = categoryTotalValues.map((v, i) => v + otherFinancingValues[i]);
+    // A row whose category doesn't exactly match one of the lines above (a
+    // Dept_Code missing from the activities sheet, a Revenue_Type typo, etc.)
+    // would otherwise vanish from every row *and* the grand total with no
+    // indication why. Surface it on its own line instead, so a missing
+    // source-data mapping shows up as a visible dollar amount to chase down
+    // rather than a silent undercount.
+    const isUnclassified = (r) => !config.isOtherFinancing(r) && !typeRowRecords.some((tr) => tr.predicate(r));
+    const unclassifiedCells = cellsFor(isUnclassified);
+    const unclassifiedValues = numericValuesFor(isUnclassified);
+    const hasUnclassified = unclassifiedValues.some((v) => v !== 0);
+
+    const grandTotalValues = categoryTotalValues.map((v, i) => v + otherFinancingValues[i] + unclassifiedValues[i]);
 
     const headerCells = ["ROW LABELS"]
       .concat(fundColumns.map((c) => c.label.toUpperCase()))
@@ -1592,6 +1623,13 @@
       otherFinancingCells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") +
       "</tr>"
     );
+    if (hasUnclassified) {
+      bodyRows.push(
+        '<tr class="wc-table-unclassified-row"><td>Unclassified (check source data mapping)</td>' +
+        unclassifiedCells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") +
+        "</tr>"
+      );
+    }
     bodyRows.push(
       "<tr><td>" + escapeHtml(config.grandTotalLabel) + "</td>" +
       grandTotalValues.map((v) => '<td class="wc-num">' + formatCurrency(v) + "</td>").join("") +
@@ -1635,11 +1673,11 @@
       rows: cache.expenditures,
       fundColumns: CONSOLIDATED_EXPENDITURE_FUND_COLUMNS,
       typeRows: CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS.map((a) => ({ key: a, label: a })),
-      categoryFor: (r) => activityForDeptCode(r.Dept_Code),
+      categoryFor: expenseActivityForRow,
       // Rows classified under a financing activity (transfers, debt
       // proceeds, fund balance) rather than a functional program area are
       // reported on their own line below EXPENDITURES TOTAL instead.
-      isOtherFinancing: (r) => OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase()),
+      isOtherFinancing: isOtherFinancingExpenseRow,
       caption: "Expenditure Budget",
       groupRowLabel: "Expenditures",
       totalRowLabel: "EXPENDITURES TOTAL",
@@ -1747,7 +1785,7 @@
     }
 
     const isOtherFinancingRevenue = (r) => String(r.Revenue_Code || "").trim() === "381000";
-    const isOtherFinancingExpense = (r) => OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase());
+    const isOtherFinancingExpense = isOtherFinancingExpenseRow;
 
     const bodyRows = [];
 
@@ -1776,7 +1814,7 @@
       FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
     );
     const expenseTypeRows = CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS
-      .map((activity) => ({ label: activity, values: rowValues((r) => activityForDeptCode(r.Dept_Code) === activity && !isOtherFinancingExpense(r), expenseRows) }))
+      .map((activity) => ({ label: activity, values: rowValues((r) => expenseActivityForRow(r) === activity && !isOtherFinancingExpense(r), expenseRows) }))
       .sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1]);
     expenseTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
     const expenseTypeValues = expenseTypeRows.map((row) => row.values);
@@ -2030,7 +2068,7 @@
     // Internal Service fund rather than a governmental one.
     const rows = (cache.expenditures || []).filter((r) =>
       !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r)) &&
-      !OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase())
+      !isOtherFinancingExpenseRow(r)
     );
     if (!rows.length) return "";
 
@@ -2039,7 +2077,7 @@
     const allMatchingRows = [];
     const bodyRows = EXPENSE_ACTIVITY_SECTIONS.map((section) => {
       const activityNorm = section.activity.toLowerCase();
-      const matching = rows.filter((r) => activityForDeptCode(r.Dept_Code).toLowerCase() === activityNorm);
+      const matching = rows.filter((r) => expenseActivityForRow(r).toLowerCase() === activityNorm);
       allMatchingRows.push(...matching);
       return (
         "<tr><td>" + escapeHtml(section.title || section.activity) + "</td>" +
@@ -2110,7 +2148,7 @@
     rows.forEach((r) => {
       const name = r.Dept_Name || "Unknown";
       if (!byDept.has(name)) {
-        const entry = { Dept_Name: name, activity: activityForDeptCode(r.Dept_Code) };
+        const entry = { Dept_Name: name, activity: expenseActivityForRow(r) };
         sumFields.forEach((f) => { entry[f] = 0; });
         byDept.set(name, entry);
       }
@@ -2198,7 +2236,7 @@
     const byDept = new Map();
     expenseRows
       .filter((r) =>
-        activityForDeptCode(r.Dept_Code).toLowerCase() === activityNorm &&
+        expenseActivityForRow(r).toLowerCase() === activityNorm &&
         !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
       )
       .forEach((r) => {
