@@ -1,0 +1,285 @@
+/* Budget Pixel Guide -- guided page assistant prototype.
+   Office of Management and Budget page only. Self-contained: does not
+   modify any existing site styles or layout. Not a chatbot: structured
+   modes only (menu / guided tour / approved Q&A). */
+
+.wc-pixel-guide-toggle-wrap {
+  margin: 14px 0 0;
+}
+
+.wc-pixel-guide-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border, #e0e8e4);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--green, #006231);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.wc-pixel-guide-toggle:hover {
+  background: var(--light, #f4f7f5);
+  border-color: var(--green, #006231);
+}
+
+.wc-pixel-guide-toggle:focus-visible {
+  outline: 2px solid var(--green, #006231);
+  outline-offset: 2px;
+}
+
+.wc-pixel-guide-toggle[aria-pressed="true"] {
+  background: var(--green, #006231);
+  border-color: var(--green, #006231);
+  color: #fff;
+}
+
+.wc-pixel-guide-toggle-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  flex: none;
+}
+
+/* Root wrapper: just a grouping node so [hidden] hides everything at once. */
+.wc-pixel-guide[hidden] {
+  display: none;
+}
+
+/* Mascot: the only piece that moves, and only during an active tour step.
+   Never intercepts clicks/scroll. Sized to fit its Ledger sprite child
+   (see Ledger sprite component below) rather than a fixed box of its own. */
+.wc-pixel-guide-mascot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4001;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(23, 32, 51, .22));
+  transition: left 1.4s cubic-bezier(.4, 0, .2, 1), top 1.4s cubic-bezier(.4, 0, .2, 1);
+}
+
+.wc-pixel-guide-mascot.is-reduced-motion {
+  transition: none;
+}
+
+/* ---- Ledger, the Budget Pixel Guide: sprite-sheet character ----
+   assets/images/ledger-sprite.png, 4 columns x 2 rows, 8 frames:
+   1 idle, 2 blink, 3 waving, 4 pointing, 5 holding, 6 presenting,
+   7 thinking, 8 walking/moving. Positioned via percentage background-size/
+   -position so the grid math doesn't depend on the file's exact pixel
+   dimensions -- only on it being a uniform --ledger-sprite-columns x
+   --ledger-sprite-rows grid. */
+.ledger-sprite {
+  --ledger-frame-size: 120px;
+  --ledger-sprite-columns: 4;
+  --ledger-sprite-rows: 2;
+  width: var(--ledger-frame-size);
+  height: var(--ledger-frame-size);
+  background-image: url("./images/ledger-sprite.png");
+  background-repeat: no-repeat;
+  background-size: calc(var(--ledger-sprite-columns) * 100%) calc(var(--ledger-sprite-rows) * 100%);
+  background-position: 0% 0%; /* frame 1: idle */
+  image-rendering: pixelated;
+}
+
+@media (max-width: 640px) {
+  .ledger-sprite {
+    --ledger-frame-size: 88px;
+  }
+}
+
+/* ---- Ledger guide states, applied to .wc-pixel-guide-mascot by JS ----
+   Frame grid (4 cols x 2 rows), 0-based column/row percentages:
+   col 0/1/2/3 -> 0% / 33.333% / 66.667% / 100%; row 0/1 -> 0% / 100%. */
+
+.ledger-guide--idle .ledger-sprite {
+  background-position: 0% 0%; /* frame 1: idle */
+  animation: ledger-sprite-blink 4.5s steps(1) infinite;
+}
+
+.ledger-guide--pointing .ledger-sprite {
+  background-position: 100% 0%; /* frame 4: pointing */
+}
+
+.ledger-guide--holding .ledger-sprite {
+  background-position: 0% 100%; /* frame 5: holding */
+}
+
+.ledger-guide--presenting .ledger-sprite {
+  background-position: 33.333% 100%; /* frame 6: presenting */
+}
+
+.ledger-guide--thinking .ledger-sprite {
+  background-position: 66.667% 100%; /* frame 7: thinking */
+}
+
+/* Subtle occasional blink: mostly the idle frame, briefly the blink frame. */
+@keyframes ledger-sprite-blink {
+  0%, 88%, 100% { background-position: 0% 0%; }    /* frame 1: idle */
+  92% { background-position: 33.333% 0%; }          /* frame 2: blink */
+}
+
+/* Highlight ring: outline only, never a fill, so it never covers text and
+   never blocks clicking or scrolling the section underneath it. */
+.wc-pixel-guide-highlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border: 2px solid var(--gold, #d1be78);
+  border-radius: 10px;
+  box-shadow: 0 0 0 4px rgba(209, 190, 120, .22);
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3500;
+  transition: opacity .3s ease, left .3s ease, top .3s ease, width .3s ease, height .3s ease;
+}
+
+.wc-pixel-guide-highlight.is-reduced-motion {
+  transition: opacity .3s ease;
+}
+
+.wc-pixel-guide-highlight.is-visible {
+  opacity: 1;
+}
+
+/* Panel: the stable control surface. Always bottom-right, never follows
+   the mascot around, so the controls are predictable no matter what the
+   current tour step is doing. */
+.wc-pixel-guide-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 4000;
+  width: 240px;
+  max-width: calc(100vw - 32px);
+  padding: 14px 16px;
+  border: 1px solid var(--border, #e0e8e4);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(23, 32, 51, .18);
+  pointer-events: auto;
+}
+
+.wc-pixel-guide-panel-kicker {
+  display: block;
+  margin: 0 0 6px;
+  color: var(--gold2, #c2ac5f);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.wc-pixel-guide-message {
+  margin: 0 0 10px;
+  color: var(--text, #172033);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.wc-pixel-guide-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wc-pixel-guide-actions-row {
+  display: flex;
+  gap: 6px;
+}
+
+.wc-pixel-guide-actions-row .wc-pixel-guide-action {
+  flex: 1 1 auto;
+}
+
+.wc-pixel-guide-action {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border, #e0e8e4);
+  border-radius: 10px;
+  background: var(--light, #f4f7f5);
+  color: var(--text, #172033);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.wc-pixel-guide-action:hover {
+  background: #fff;
+  border-color: var(--green, #006231);
+}
+
+.wc-pixel-guide-action:focus-visible {
+  outline: 2px solid var(--green, #006231);
+  outline-offset: 1px;
+}
+
+.wc-pixel-guide-action--primary {
+  background: var(--green, #006231);
+  border-color: var(--green, #006231);
+  color: #fff;
+  text-align: center;
+}
+
+.wc-pixel-guide-action--primary:hover {
+  background: var(--green2, #0b7741);
+}
+
+.wc-pixel-guide-action--quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted, #5a6e7f);
+  text-align: center;
+}
+
+.wc-pixel-guide-action--quiet:hover {
+  background: var(--light, #f4f7f5);
+  border-color: var(--border, #e0e8e4);
+}
+
+@media (max-width: 640px) {
+  .wc-pixel-guide-panel {
+    right: 16px;
+    bottom: 16px;
+    width: 210px;
+    padding: 12px 14px;
+  }
+
+  .wc-pixel-guide-message {
+    font-size: 12.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-pixel-guide-mascot {
+    transition: none !important;
+  }
+
+  .wc-pixel-guide-highlight {
+    transition: opacity .3s ease !important;
+  }
+
+  /* Disable the idle/blink frame-swap animation; the base rule above
+     already keeps it on the static idle frame (frame 1) once the
+     animation is removed, satisfying "keep the selected static frame". */
+  .ledger-guide--idle .ledger-sprite {
+    animation: none !important;
+  }
+}
