@@ -256,8 +256,15 @@
   // *other* aid recipients, each under their own distinct Project_Code --
   // unlike the usual case (one department's own purchases itemized across
   // several Project_Codes), these are genuinely different organizations, so
-  // summing by org+account alone pulls in their payments too.
-  const PROJECT_SCOPED_DEPT_NAMES = new Map([["walton county health department", "10255"]]);
+  // summing by org+account alone pulls in their payments too. Non-Profit
+  // Funding Program is the same pattern: its expense row shares Dept_Code
+  // 00102014 and Object_Code 583000 ("Other Grants & Aid") with the
+  // Indigent Cremation Program, a different recipient under a blank
+  // Project_Code.
+  const PROJECT_SCOPED_DEPT_NAMES = new Map([
+    ["walton county health department", "10255"],
+    ["non profit funding program", "10261"]
+  ]);
 
   function projectScopeForRow(row) {
     return PROJECT_SCOPED_DEPT_NAMES.get(normalizeDeptName(row && row.Dept_Name)) || "";
