@@ -130,6 +130,7 @@
     revenues: [],
     expenseActualRows: [],
     revenueActualRows: [],
+    originalBudgetRows: [],
     staffing: [],
     performanceMeasures: [],
     machinery: [],
@@ -411,6 +412,32 @@
   function supabaseLookupsForRow(row, org, codeValue) {
     const key = String((row && row.Dept_Code) || "").trim() + "|" + String(codeValue || "").trim();
     return SUPABASE_LOOKUP_OVERRIDES.get(key) || [{ org: org, object: codeValue }];
+  }
+
+  // The Ad Valorem 5% statutory reduction's one sheet row (Dept_Code
+  // 102389) is filed under fund "102", which isn't one of the funds shown
+  // on the Fund Financial Schedules page -- so on a fund-scoped table this
+  // row is invisible and the reduction never gets subtracted from the
+  // fund(s) it actually applies to (see SUPABASE_LOOKUP_OVERRIDES above).
+  // The county-wide Consolidated Revenue Summary doesn't filter by fund the
+  // same way, so it already nets this out correctly; a fund-scoped table
+  // has to pull each fund's own share back out of Supabase directly.
+  const AD_VALOREM_FIVE_PERCENT_ORG_BY_FUND = { "001": "001389", "105": "105389" };
+
+  function isAdValoremFivePercentRow(row) {
+    return String((row && row.Dept_Code) || "").trim() === "102389" && String((row && row.Revenue_Code) || "").trim() === "389001";
+  }
+
+  function adValoremFivePercentReductionForFunds(fundCodes) {
+    const rows = cache.originalBudgetRows || [];
+    let total = 0;
+    (fundCodes || []).forEach((fundCode) => {
+      const org = AD_VALOREM_FIVE_PERCENT_ORG_BY_FUND[fundCode];
+      if (!org) return;
+      const result = sumRawActualsForAccount(rows, org, "389001", 2026);
+      if (result.matched) total += result.total;
+    });
+    return total ? -Math.abs(total) : 0;
   }
 
   // Sums sumRawActualsForAccount across every (org, object) lookup for a
@@ -1058,6 +1085,11 @@
       if (actuals) {
         cache.expenseActualRows = actuals.expenseRows || [];
         cache.revenueActualRows = actuals.revenueRows || [];
+        // Kept raw (not collapsed per row like applyOriginalBudgetToRows
+        // does) so a fund-scoped schedule can pull one fund's own share
+        // back out of a multi-fund SUPABASE_LOOKUP_OVERRIDES row -- see
+        // adValoremFivePercentReductionForFunds.
+        cache.originalBudgetRows = actuals.originalBudgetRows || [];
         cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseRows);
         cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueRows);
         cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetRows);
@@ -1189,19 +1221,6 @@
       String((row && row.Dept_Code) || "").trim(),
       String((row && row.Revenue_Code) || "").trim(),
       String((row && row.Project_Code) || "").trim()
-    ].join("|");
-  }
-
-  // Deliberately omits Dept_Name: a few departments split one Dept_Code
-  // across multiple Dept_Names/sub-programs that each carry the full,
-  // undivided account-level actual/budget total (see applyActualsToRows).
-  // Fund-level rollups need that counted once per account, not once per
-  // sub-program sharing the code.
-  function expenseActualUniqueKey(row) {
-    return [
-      fundCodeForRow(row),
-      String((row && row.Dept_Code) || "").trim(),
-      String((row && row.Object_Code) || "").trim()
     ].join("|");
   }
 
@@ -2285,21 +2304,32 @@
     if ((!revenueRows.length && !expenseRows.length) || !(cache.fundBalances || []).length) return "";
 
     const isExcludedFund = (r) => CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r));
-    const inFund = (r) => fundCodes.includes(fundCodeForRow(r)) && !isExcludedFund(r);
+    // The Ad Valorem 5% row's nominal Dept_Code (102389) maps to fund
+    // "102" (MSBU), which doesn't actually levy this reduction -- it's
+    // handled separately per-fund via adValoremFivePercentReductionForFunds,
+    // so exclude it here rather than letting it land on MSBU's own table.
+    const inFund = (r) => fundCodes.includes(fundCodeForRow(r)) && !isExcludedFund(r) && !isAdValoremFivePercentRow(r);
     const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
     function sumFor(rows, predicate, field) {
       const isActualOrBudgetField = revenueActualFields.has(field) || field === "FY2026_Original_Budget";
+      // Expense rows are summed directly, same as the Consolidated Expense
+      // Summary -- no extra cross-Dept_Name dedup here. Some departments
+      // legitimately share one Dept_Code+Object_Code across several
+      // distinct rows (e.g. Statutory & Other's many recipients, each its
+      // own Project_Code/amount), and a generic fund+code dedup can't tell
+      // those apart from a true duplicate (e.g. Code Compliance / Code
+      // Compliance Beach both carrying the same undivided account total),
+      // so it ends up stripping out legitimate amounts along with the
+      // real duplicates. Matching the Consolidated page's plain-sum
+      // behavior keeps this table consistent with the schedule the county
+      // already treats as correct.
       const shouldDedupeRevenue = rows === revenueRows && isActualOrBudgetField;
-      // Expense rows can have the same account-level actual/budget total
-      // duplicated across multiple Dept_Names sharing one Dept_Code (e.g.
-      // Code Compliance / Code Compliance Beach) -- see expenseActualUniqueKey.
-      const shouldDedupeExpense = rows === expenseRows && isActualOrBudgetField;
-      const seenAmounts = (shouldDedupeRevenue || shouldDedupeExpense) ? new Set() : null;
+      const seenAmounts = shouldDedupeRevenue ? new Set() : null;
       return rows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
         if (seenAmounts) {
-          const key = shouldDedupeRevenue ? revenueBudgetUniqueKey(r) : expenseActualUniqueKey(r);
+          const key = revenueBudgetUniqueKey(r);
           if (seenAmounts.has(key)) return sum;
           seenAmounts.add(key);
         }
@@ -2344,6 +2374,13 @@
     const revenueTypeRows = CONSOLIDATED_REVENUE_TYPE_ROWS
       .map((spec) => ({ label: spec.label, values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows) }))
       .sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1]);
+    const generalGovTaxesRow = revenueTypeRows.find((row) => row.label === "General Government Taxes");
+    if (generalGovTaxesRow) {
+      const fy2026Index = FUND_SCHEDULE_YEAR_COLUMNS.findIndex((c) => c.field === "FY2026_Original_Budget");
+      if (fy2026Index !== -1) {
+        generalGovTaxesRow.values[fy2026Index] += adValoremFivePercentReductionForFunds(fundCodes);
+      }
+    }
     revenueTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
     const revenueTypeValues = revenueTypeRows.map((row) => row.values);
     const revenueSubtotalValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => revenueTypeValues.reduce((s, v) => s + v[i], 0));
