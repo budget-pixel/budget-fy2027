@@ -228,9 +228,10 @@
   // just one. `matched` distinguishes "found rows, total happens to be 0"
   // from "no actuals exist for this account" so callers can still fall
   // back to the budget sheet's own column in the latter case.
-  function sumRawActualsForAccount(rawRows, org, code, year) {
+  function sumRawActualsForAccount(rawRows, org, code, year, projectCode) {
     const orgNorm = String(org || "").trim();
     const codeNorm = String(code || "").trim();
+    const projectNorm = projectCode ? String(projectCode).trim() : "";
     const orgNorms = orgNorm ? [orgNorm].concat(DEPT_CODE_ACTUALS_ALIASES[orgNorm] || []) : [];
     let matched = false;
     let total = 0;
@@ -239,12 +240,38 @@
         if (Number(row.year) !== Number(year)) return;
         if (!orgNorms.includes(String(row.org || "").trim())) return;
         if (String(row.object || "").trim() !== codeNorm) return;
+        if (projectNorm && String(row.project || "").trim() !== projectNorm) return;
         matched = true;
         total += Number(row.amount) || 0;
       });
     }
     return { matched, total };
   }
+
+  // Departments whose budget/actuals must be scoped to one specific
+  // Project_Code rather than the usual "sum every project under this
+  // org+account" rule (see applyActualsToRows below). Walton County Health
+  // Department's expense row shares Dept_Code 00102012 ("Human Services")
+  // and Object_Code 581000 ("Aid to Government Agencies") with several
+  // *other* aid recipients, each under their own distinct Project_Code --
+  // unlike the usual case (one department's own purchases itemized across
+  // several Project_Codes), these are genuinely different organizations, so
+  // summing by org+account alone pulls in their payments too.
+  const PROJECT_SCOPED_DEPT_NAMES = new Map([["walton county health department", "10255"]]);
+
+  function projectScopeForRow(row) {
+    return PROJECT_SCOPED_DEPT_NAMES.get(normalizeDeptName(row && row.Dept_Name)) || "";
+  }
+
+  // Department-specific data-limitation notices shown alongside a
+  // department's budget lines (see renderBudgetLinesToggle's
+  // departmentDataNote), keyed by normalized Dept_Name.
+  const DEPARTMENT_DATA_NOTES = new Map([
+    [
+      "walton county health department",
+      "Due to an accounting change actuals for 2020, 2021, and 2022 are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
+    ]
+  ]);
 
   function applyActualsToRows(rows, rawActualRows) {
     if (!rawActualRows || !rawActualRows.length) return rows;
@@ -280,9 +307,10 @@
         return next;
       }
 
+      const projectScope = projectScopeForRow(row);
       HISTORICAL_ACTUAL_YEARS.forEach((year) => {
         const field = "FY" + year + "_Actual";
-        const result = sumRawActualsForAccount(rawActualRows, org, codeValue, year);
+        const result = sumRawActualsForAccount(rawActualRows, org, codeValue, year, projectScope);
         next[field] = result.matched ? result.total : (row[field] || 0);
       });
       return next;
@@ -309,7 +337,7 @@
         return { ...row, FY2026_Original_Budget: 0 };
       }
 
-      const result = sumRawActualsForAccount(rawBudgetRows, org, codeValue, 2026);
+      const result = sumRawActualsForAccount(rawBudgetRows, org, codeValue, 2026, projectScopeForRow(row));
       return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || 0) };
     });
   }
@@ -1089,11 +1117,21 @@
 
   // Office of Management and Budget (the original pilot) plus every
   // Constitutional Officers & Other Agencies page except Board of County
-  // Commissioners. Dept_Name values below are the actual sheet values
-  // confirmed against the live data, not the page titles (e.g. the Clerk's
-  // page is titled "Clerk of Courts & County Comptroller" but the sheet
-  // rows are Dept_Name "Clerk of Court"; the Sheriff's page rows are
-  // "Walton County Sheriff's Office").
+  // Commissioners -- both the "Constitutional Officers" section (Clerk,
+  // Property Appraiser, Sheriff, Supervisor of Elections, Tax Collector)
+  // and the "Autonomous Entities" section. Dept_Name values below are the
+  // actual sheet values confirmed against the live data, not the page
+  // titles -- several pages don't match 1:1: the Clerk's page is titled
+  // "Clerk of Courts & County Comptroller" but the sheet rows are Dept_Name
+  // "Clerk of Court"; the Sheriff's page rows are "Walton County Sheriff's
+  // Office"; "Court Technology & Innovations" is split across two sheet
+  // Dept_Names ("Court Innovations" and "Court Technology - Court
+  // Administration"); "South Walton Fire & State Control" is split across
+  // three ("South Walton Fire", "State Fire", "Volunteer Fire" -- not
+  // "South Walton Fire Lifeguard Services", which the activities sheet
+  // classifies under Tourism Administration, not Autonomous Entities, and
+  // belongs to the separate Tourism Lifeguard Services and Beach Safety
+  // page instead).
   const TRANSACTION_DRILLDOWN_DEPT_NAMES = new Set(
     [
       "Office of Management and Budget",
@@ -1101,7 +1139,21 @@
       "Property Appraiser",
       "Supervisor of Elections",
       "Tax Collector",
-      "Walton County Sheriff's Office"
+      "Walton County Sheriff's Office",
+      "Circuit Court",
+      "County Court",
+      "Court Innovations",
+      "Court Technology - Court Administration",
+      "Guardian Ad Litem",
+      "Medical Examiner",
+      "Non-Profit Funding Program",
+      "Public Defender",
+      "South Walton Fire",
+      "State Fire",
+      "Volunteer Fire",
+      "State Attorney",
+      "Statutory & Other",
+      "Walton County Health Department"
     ].map(normalizeDeptName)
   );
 
@@ -1228,13 +1280,20 @@
             // Needed by transactionHrefForBudgetLine/transactionDrilldownEnabledForRow.
             // Dept_Name/Dept_Code are identical across every row here (mergedRows is
             // already scoped to one department), so the first row's value is safe.
-            // Project_Code/Project_Name are deliberately omitted: rows grouped into
-            // one summary line can span several different projects, and picking just
-            // one would make the resulting transaction filter under-count the total
-            // this row displays. Leaving it unset filters by department+code only,
-            // which matches every transaction the summary total was built from.
+            // Project_Code/Project_Name are normally omitted: rows grouped into one
+            // summary line can span several different projects, and picking just one
+            // would make the resulting transaction filter under-count the total this
+            // row displays. Leaving it unset filters by department+code only, which
+            // matches every transaction the summary total was built from.
+            //
+            // PROJECT_SCOPED_DEPT_NAMES departments (e.g. the Health Department) are
+            // the opposite case: every one of their rows belongs to that one fixed
+            // project by definition, so the summary row must carry it through too --
+            // otherwise clicking the summary row drops the project filter and pulls
+            // in the other organizations sharing that department+account again.
             Dept_Name: r.Dept_Name || "",
-            Dept_Code: r.Dept_Code || ""
+            Dept_Code: r.Dept_Code || "",
+            Project_Code: projectScopeForRow(r)
           };
           sumFields.forEach((f) => { row[f] = r[f] || 0; });
           grouped.set(key, row);
@@ -1313,7 +1372,11 @@
     const revenueContextNote = (!isExpense && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
       ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
       : "";
-    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + revenueContextNote + toggleHeader + transactionHelper + "</div>";
+    const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
+    const departmentDataNote = departmentDataNoteText
+      ? '<p class="wc-revenue-actuals-note">' + escapeHtml(departmentDataNoteText) + "</p>"
+      : "";
+    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + revenueContextNote + departmentDataNote + toggleHeader + transactionHelper + "</div>";
 
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
