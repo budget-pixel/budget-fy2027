@@ -55,8 +55,12 @@
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }
 
+  // Returns null (not "") when the param is absent from the URL, distinct
+  // from an explicitly empty value -- needed for projectCode, where "absent"
+  // must mean "don't filter by project" and "" must mean "filter to a blank
+  // Project_Code specifically" (see initTransactionsPage's queryFilters).
   function param(name) {
-    return new URLSearchParams(window.location.search).get(name) || "";
+    return new URLSearchParams(window.location.search).get(name);
   }
 
   function compact(values) {
@@ -220,9 +224,16 @@
       year: context.fy,
       org: context.org,
       object: context.objectCode,
-      fund: context.fundCode || "",
-      project: context.projectCode || ""
+      fund: context.fundCode || ""
     };
+    // The "project" key is only added when the URL actually specified a
+    // projectCode (even an explicitly empty one, for the blank-Project_Code
+    // recipients) -- omitting the key entirely (rather than always setting
+    // it, even to "") is what makes loadTransactions skip filtering by
+    // project at all for a merged/summary row that spans several projects.
+    if (context.projectCode !== null) {
+      queryFilters.project = context.projectCode;
+    }
 
     const rows = await window.WCSupabaseData.loadTransactions(queryFilters);
 

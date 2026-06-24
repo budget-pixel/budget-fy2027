@@ -228,10 +228,17 @@
   // just one. `matched` distinguishes "found rows, total happens to be 0"
   // from "no actuals exist for this account" so callers can still fall
   // back to the budget sheet's own column in the latter case.
+  // projectCode being undefined/null means "no project scoping" (sum every
+  // project under this org+account, the usual rule). Passing "" explicitly
+  // means "scope to rows with a blank project specifically" -- distinct from
+  // not scoping at all, needed for org+account combinations that mix one
+  // blank-project recipient with other recipients under real Project_Codes
+  // (see STATUTORY_EXPENSE_OVERRIDES).
   function sumRawActualsForAccount(rawRows, org, code, year, projectCode) {
     const orgNorm = String(org || "").trim();
     const codeNorm = String(code || "").trim();
-    const projectNorm = projectCode ? String(projectCode).trim() : "";
+    const hasProjectScope = projectCode !== undefined && projectCode !== null;
+    const projectNorm = hasProjectScope ? String(projectCode).trim() : "";
     const orgNorms = orgNorm ? [orgNorm].concat(DEPT_CODE_ACTUALS_ALIASES[orgNorm] || []) : [];
     let matched = false;
     let total = 0;
@@ -240,7 +247,7 @@
         if (Number(row.year) !== Number(year)) return;
         if (!orgNorms.includes(String(row.org || "").trim())) return;
         if (String(row.object || "").trim() !== codeNorm) return;
-        if (projectNorm && String(row.project || "").trim() !== projectNorm) return;
+        if (hasProjectScope && String(row.project || "").trim() !== projectNorm) return;
         matched = true;
         total += Number(row.amount) || 0;
       });
@@ -266,8 +273,71 @@
     ["non profit funding program", "10261"]
   ]);
 
+  // Statutory & Other Agency Funding rolls up several small, independent
+  // aid/grant line items that are each relabeled onto it from a different
+  // original Dept_Name (see STATUTORY_EXPENSE_OVERRIDES) -- unlike the
+  // departments above, these are several *different* recipients, each with
+  // its own distinct Project_Code, that must stay separate from each other
+  // rather than share one fixed scope. So instead of a single fixed
+  // Project_Code, each row is scoped to whatever its own Project_Code
+  // already is (including blank, for the recipients recorded without one).
+  const PROJECT_SCOPED_BY_OWN_ROW_DEPT_NAMES = new Set(["statutory and other"]);
+
+  // projectScopeForRow returns undefined when no row needs project-level
+  // scoping at all (the default, "sum every project" rule applies), so
+  // sumRawActualsForAccount/applyActualsToRows/applyOriginalBudgetToRows can
+  // tell that apart from an explicit "" (scope to a blank Project_Code).
   function projectScopeForRow(row) {
-    return PROJECT_SCOPED_DEPT_NAMES.get(normalizeDeptName(row && row.Dept_Name)) || "";
+    const deptName = normalizeDeptName(row && row.Dept_Name);
+    if (PROJECT_SCOPED_BY_OWN_ROW_DEPT_NAMES.has(deptName)) {
+      return String((row && row.Project_Code) || "").trim();
+    }
+    if (PROJECT_SCOPED_DEPT_NAMES.has(deptName)) {
+      return PROJECT_SCOPED_DEPT_NAMES.get(deptName);
+    }
+    return undefined;
+  }
+
+  // Specific (Dept_Code, Object_Code, Project_Code) expense line items that
+  // belong on the Statutory & Other Agency Funding page but are recorded in
+  // the sheet under a different Dept_Name -- each is its own small,
+  // independent aid/grant recipient with no department page of its own.
+  // Project_Code "" matches a row with a blank Project_Code specifically
+  // (Object_Code is included because some of these orgs have *another*
+  // blank-project row under a different account that must NOT be relabeled,
+  // e.g. Human Services 581001 alongside its 581000 row). Lakeview
+  // (00102013) is the same pattern as the others: three Professional
+  // Services (531000) rows under three distinct Project_Codes, no page of
+  // its own.
+  const STATUTORY_EXPENSE_OVERRIDES = new Set([
+    "00102012|581000|10259",
+    "00102012|581000|10260",
+    "00102012|581000|10720",
+    "00102012|581000|10732",
+    "00102012|581000|",
+    "00102019|581000|10277",
+    "00102019|581000|10278",
+    "00102011|582000|10257",
+    "00102016|582000|10251",
+    "00102014|583000|",
+    "00102013|531000|10246",
+    "00102013|531000|10247",
+    "00102013|531000|10248"
+  ]);
+
+  function statutoryExpenseOverrideKey(row) {
+    return (
+      String((row && row.Dept_Code) || "").trim() + "|" +
+      String((row && row.Object_Code) || "").trim() + "|" +
+      String((row && row.Project_Code) || "").trim()
+    );
+  }
+
+  function applyStatutoryExpenseOverrides(rows) {
+    return (rows || []).map((row) => {
+      if (!STATUTORY_EXPENSE_OVERRIDES.has(statutoryExpenseOverrideKey(row))) return row;
+      return { ...row, Dept_Name: "Statutory & Other" };
+    });
   }
 
   // Department-specific data-limitation notices shown alongside a
@@ -302,7 +372,14 @@
       // at all and key on Revenue_Code instead.
       const codeValue = row.Object_Code !== undefined ? row.Object_Code : row.Revenue_Code;
       const org = row.Dept_Code;
-      const groupKey = String(org || "").trim() + "|" + String(row.Dept_Name || "").trim() + "|" + String(codeValue || "").trim();
+      const projectScope = projectScopeForRow(row);
+      // Project scope is appended to the group key (only when defined, so
+      // every other department's grouping is unaffected) for rows like
+      // Statutory & Other's, where several different recipients share one
+      // org+account and must each get their own group instead of collapsing
+      // into one and zeroing the rest.
+      const groupKey = String(org || "").trim() + "|" + String(row.Dept_Name || "").trim() + "|" + String(codeValue || "").trim() +
+        (projectScope !== undefined ? "|" + projectScope : "");
       const isFirstInGroup = !seenGroups.has(groupKey);
       seenGroups.add(groupKey);
 
@@ -314,7 +391,6 @@
         return next;
       }
 
-      const projectScope = projectScopeForRow(row);
       HISTORICAL_ACTUAL_YEARS.forEach((year) => {
         const field = "FY" + year + "_Actual";
         const result = sumRawActualsForAccount(rawActualRows, org, codeValue, year, projectScope);
@@ -336,7 +412,9 @@
     return (rows || []).map((row) => {
       const codeValue = row.Object_Code !== undefined ? row.Object_Code : row.Revenue_Code;
       const org = row.Dept_Code;
-      const groupKey = String(org || "").trim() + "|" + String(row.Dept_Name || "").trim() + "|" + String(codeValue || "").trim();
+      const projectScope = projectScopeForRow(row);
+      const groupKey = String(org || "").trim() + "|" + String(row.Dept_Name || "").trim() + "|" + String(codeValue || "").trim() +
+        (projectScope !== undefined ? "|" + projectScope : "");
       const isFirstInGroup = !seenGroups.has(groupKey);
       seenGroups.add(groupKey);
 
@@ -344,7 +422,7 @@
         return { ...row, FY2026_Original_Budget: 0 };
       }
 
-      const result = sumRawActualsForAccount(rawBudgetRows, org, codeValue, 2026, projectScopeForRow(row));
+      const result = sumRawActualsForAccount(rawBudgetRows, org, codeValue, 2026, projectScope);
       return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || 0) };
     });
   }
@@ -863,6 +941,8 @@
         }
       });
 
+      cache.expenditures = applyStatutoryExpenseOverrides(cache.expenditures);
+
       if (actuals) {
         cache.expenseActualRows = actuals.expenseRows || [];
         cache.revenueActualRows = actuals.revenueRows || [];
@@ -1211,8 +1291,23 @@
     if (!rows || !rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
-    const showPrior = getShowPriorYears();
     const isExpense = kind !== "revenue";
+    // Statutory & Other Agency Funding's revenue is the shared General Fund
+    // Ad Valorem line (Dept_Code 001311), the same one ~26 other departments
+    // reference -- its prior-year actuals/budget can't be meaningfully
+    // attributed to this page specifically, so the "View Prior Years" option
+    // and its disclaimer are removed entirely here rather than shown with a
+    // caveat. Guarded to combineByName === false since this should only
+    // apply to the department's own single-page breakdown, not a
+    // county-wide summary that happens to include this row among others.
+    const isStatutoryRevenue = !isExpense && !combineByName && rows.length &&
+      normalizeDeptName(rows[0].Dept_Name) === "statutory and other";
+    // The "View Prior Years" preference is a single, page-wide localStorage
+    // value shared by every table (see getShowPriorYears), so it isn't
+    // enough to just hide this table's own checkbox -- showPrior has to be
+    // forced false here too, or toggling it on anywhere else on the page
+    // would still expand this table's prior-year columns.
+    const showPrior = isStatutoryRevenue ? false : getShowPriorYears();
     const codeField = isExpense ? "Object_Code" : "Revenue_Code";
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
@@ -1275,9 +1370,19 @@
     function groupedPriorYearRows() {
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
+      // Tracks every distinct project scope seen per group key, so
+      // Project_Code can be set on the merged row only when every row
+      // folded into it agrees on one scope (see below).
+      const projectScopesSeen = new Map();
       mergedRows.forEach((r) => {
         const key = [r[categoryField] || "", r[codeField] || "", r[nameField] || ""].join("||");
         const existing = grouped.get(key);
+        const scope = projectScopeForRow(r);
+        if (scope !== undefined) {
+          const seen = projectScopesSeen.get(key) || new Set();
+          seen.add(scope);
+          projectScopesSeen.set(key, seen);
+        }
         if (!existing) {
           const row = {
             [categoryField]: r[categoryField] || "",
@@ -1287,26 +1392,30 @@
             // Needed by transactionHrefForBudgetLine/transactionDrilldownEnabledForRow.
             // Dept_Name/Dept_Code are identical across every row here (mergedRows is
             // already scoped to one department), so the first row's value is safe.
-            // Project_Code/Project_Name are normally omitted: rows grouped into one
-            // summary line can span several different projects, and picking just one
-            // would make the resulting transaction filter under-count the total this
-            // row displays. Leaving it unset filters by department+code only, which
-            // matches every transaction the summary total was built from.
-            //
-            // PROJECT_SCOPED_DEPT_NAMES departments (e.g. the Health Department) are
-            // the opposite case: every one of their rows belongs to that one fixed
-            // project by definition, so the summary row must carry it through too --
-            // otherwise clicking the summary row drops the project filter and pulls
-            // in the other organizations sharing that department+account again.
             Dept_Name: r.Dept_Name || "",
-            Dept_Code: r.Dept_Code || "",
-            Project_Code: projectScopeForRow(r)
+            Dept_Code: r.Dept_Code || ""
           };
           sumFields.forEach((f) => { row[f] = r[f] || 0; });
           grouped.set(key, row);
           return;
         }
         sumFields.forEach((f) => { existing[f] += r[f] || 0; });
+      });
+      // Project_Code is set on a merged row only when every row folded into
+      // it shares the exact same project scope (e.g. Health Department,
+      // whose one fixed project applies to its only row). When a group
+      // mixes several different scopes -- Statutory & Other can merge
+      // several distinct recipients sharing one Object_Code/Name under
+      // different Project_Codes -- or a normal department's rows just don't
+      // carry a scope at all, Project_Code is left unset, so the resulting
+      // transaction filter falls back to department+code only, matching
+      // every transaction the merged total was actually built from instead
+      // of under-counting it down to one recipient's project.
+      grouped.forEach((row, key) => {
+        const scopes = projectScopesSeen.get(key);
+        if (scopes && scopes.size === 1) {
+          row.Project_Code = Array.from(scopes)[0];
+        }
       });
       return Array.from(grouped.values());
     }
@@ -1371,12 +1480,12 @@
       bodyRows: bodyRows
     });
 
-    const toggleHeader = priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+    const toggleHeader = isStatutoryRevenue ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
     const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
-    const revenueContextNote = (!isExpense && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
+    const revenueContextNote = (!isExpense && !isStatutoryRevenue && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
       ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
       : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
