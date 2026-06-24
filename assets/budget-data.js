@@ -340,6 +340,18 @@
     });
   }
 
+  // Departments whose own revenue row is really just the shared General
+  // Fund Ad Valorem line (Dept_Code 001311, Revenue_Code 311000) referenced
+  // by two dozen other departments -- its prior-year actuals/budget can't be
+  // meaningfully attributed to this one department specifically, so the
+  // "View Prior Years" option and its disclaimer are removed entirely for
+  // their revenue tables rather than shown with a caveat (see
+  // renderBudgetLinesToggle's isPriorYearsDisabledRevenue).
+  const PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES = new Set([
+    "statutory and other",
+    "non profit funding program"
+  ]);
+
   // Department-specific data-limitation notices shown alongside a
   // department's budget lines (see renderBudgetLinesToggle's
   // departmentDataNote), keyed by normalized Dept_Name.
@@ -1296,22 +1308,18 @@
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
     const isExpense = kind !== "revenue";
-    // Statutory & Other Agency Funding's revenue is the shared General Fund
-    // Ad Valorem line (Dept_Code 001311), the same one ~26 other departments
-    // reference -- its prior-year actuals/budget can't be meaningfully
-    // attributed to this page specifically, so the "View Prior Years" option
-    // and its disclaimer are removed entirely here rather than shown with a
-    // caveat. Guarded to combineByName === false since this should only
-    // apply to the department's own single-page breakdown, not a
-    // county-wide summary that happens to include this row among others.
-    const isStatutoryRevenue = !isExpense && !combineByName && rows.length &&
-      normalizeDeptName(rows[0].Dept_Name) === "statutory and other";
+    // See PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES. Guarded to
+    // combineByName === false since this should only apply to the
+    // department's own single-page breakdown, not a county-wide summary
+    // that happens to include this row among others.
+    const isPriorYearsDisabledRevenue = !isExpense && !combineByName && rows.length &&
+      PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(rows[0].Dept_Name));
     // The "View Prior Years" preference is a single, page-wide localStorage
     // value shared by every table (see getShowPriorYears), so it isn't
     // enough to just hide this table's own checkbox -- showPrior has to be
     // forced false here too, or toggling it on anywhere else on the page
     // would still expand this table's prior-year columns.
-    const showPrior = isStatutoryRevenue ? false : getShowPriorYears();
+    const showPrior = isPriorYearsDisabledRevenue ? false : getShowPriorYears();
     const codeField = isExpense ? "Object_Code" : "Revenue_Code";
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
@@ -1484,12 +1492,12 @@
       bodyRows: bodyRows
     });
 
-    const toggleHeader = isStatutoryRevenue ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+    const toggleHeader = isPriorYearsDisabledRevenue ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
     const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
-    const revenueContextNote = (!isExpense && !isStatutoryRevenue && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
+    const revenueContextNote = (!isExpense && !isPriorYearsDisabledRevenue && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
       ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
       : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
