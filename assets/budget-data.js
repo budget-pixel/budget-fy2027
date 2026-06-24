@@ -2228,10 +2228,12 @@
   ];
 
   const FUND_SCHEDULE_NON_MAJOR_FUNDS = [
+    { code: "102", label: "MSBU Fund" },
     { code: "103", label: "Building Fund" },
     { code: "109", label: "E911 Fund" },
     { code: "110", label: "Housing & Urban Development Fund" },
     { code: "105", label: "Mosquito Control Fund" },
+    { code: "106", label: "Mosquito Control State Aid Fund" },
     { code: "114", label: "Recreation Plat Fee Fund" },
     { code: "113", label: "Preservation Fund" },
     { code: "115", label: "Sidewalk Fund" }
@@ -2292,8 +2294,12 @@
           seenAmounts.add(key);
         }
         if (field === "FY2026_Original_Budget") {
-          const value = r.FY2026_Original_Budget || r.FY2026_Budget || 0;
-          return sum + (rows === revenueRows ? revenueDisplayAmount(value) : value);
+          // Reuse the same FY2026 contribution logic as the Consolidated
+          // Revenue Summary (revenueBudgetMergeContribution) instead of a
+          // separate, drifting copy -- it knows about subtractive revenue
+          // rows (e.g. the Ad Valorem 5% reduction) that must subtract from
+          // their category instead of being sign-flipped positive.
+          return sum + (rows === revenueRows ? revenueBudgetMergeContribution(r) : (r.FY2026_Original_Budget || r.FY2026_Budget || 0));
         }
         return sum + (r[field] || 0);
       }, 0);
@@ -2336,7 +2342,7 @@
     const otherSourcesValues = rowValues(isOtherFinancingRevenue, revenueRows);
     bodyRows.push(rowHtml("Other Financial Sources", otherSourcesValues));
     const revenueTotalValues = revenueSubtotalValues.map((v, i) => v + otherSourcesValues[i]);
-    bodyRows.push(rowHtml("Total Revenue and Other Financial Sources", revenueTotalValues, "wc-table-subtotal-row"));
+    bodyRows.push(rowHtml("Total Revenue and Other Financial Sources", revenueTotalValues, "wc-table-total-row"));
 
     bodyRows.push(
       '<tr class="wc-table-group-row"><td>Expenditures</td>' +
@@ -2353,7 +2359,7 @@
     const otherUsesValues = rowValues(isOtherFinancingExpense, expenseRows);
     bodyRows.push(rowHtml("Other Financial Uses", otherUsesValues));
     const expenseTotalValues = expenseSubtotalValues.map((v, i) => v + otherUsesValues[i]);
-    bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-subtotal-row"));
+    bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-total-row"));
 
     const changeValues = revenueTotalValues.map((v, i) => v - expenseTotalValues[i]);
     bodyRows.push(rowHtml("Change in Fund Balance", changeValues, "wc-table-subtotal-row"));
@@ -2387,6 +2393,29 @@
     );
   }
 
+  // Every distinct fund code actually present in the revenue/expenditure
+  // data, regardless of whether it's been added to FUND_SCHEDULE_MAJOR_FUNDS
+  // / FUND_SCHEDULE_NON_MAJOR_FUNDS. The consolidated schedule must use this
+  // instead of that hand-maintained list (which has already silently missed
+  // a fund twice -- 106, then 102) so it can't drift out of sync with the
+  // Consolidated Revenue/Expense Summary reports, which sum every fund with
+  // no restriction beyond the same CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES
+  // exclusion buildFundFinancialSchedule's own isExcludedFund already
+  // applies. The major/non-major *sections* still use the curated list,
+  // since each fund there needs its own labeled section.
+  function allKnownFundCodes() {
+    const codes = new Set();
+    (cache.revenues || []).forEach((r) => {
+      const code = fundCodeForRow(r);
+      if (code) codes.add(code);
+    });
+    (cache.expenditures || []).forEach((r) => {
+      const code = fundCodeForRow(r);
+      if (code) codes.add(code);
+    });
+    return Array.from(codes);
+  }
+
   function renderFundFinancialScheduleSection(funds) {
     return funds
       .map((f) => buildFundFinancialSchedule([f.code], f.label))
@@ -2409,8 +2438,7 @@
           showErrorState(containers);
           return;
         }
-        const allFundCodes = FUND_SCHEDULE_MAJOR_FUNDS.concat(FUND_SCHEDULE_NON_MAJOR_FUNDS).map((f) => f.code);
-        mountOrHide(consolidatedEl, buildFundFinancialSchedule(allFundCodes, "Consolidated Fund Financial Schedule"));
+        mountOrHide(consolidatedEl, buildFundFinancialSchedule(allKnownFundCodes(), "Consolidated Fund Financial Schedule"));
         mountOrHide(majorEl, renderFundFinancialScheduleSection(FUND_SCHEDULE_MAJOR_FUNDS));
         mountOrHide(nonMajorEl, renderFundFinancialScheduleSection(FUND_SCHEDULE_NON_MAJOR_FUNDS));
         bindPriorYearsToggle(consolidatedEl);
