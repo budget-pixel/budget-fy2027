@@ -347,6 +347,10 @@
     [
       "walton county health department",
       "Due to an accounting change actuals for 2020, 2021, and 2022 are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
+    ],
+    [
+      "statutory and other",
+      "Due to an accounting change actuals for 2020, 2021, and 2022 are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
     ]
   ]);
 
