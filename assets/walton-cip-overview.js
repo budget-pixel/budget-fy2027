@@ -433,7 +433,7 @@ function renderProjects(){
         border:0;
         border-radius:999px;
         background:transparent;
-        color:#172033;
+        color:var(--text);
         font-family:Arial, Helvetica, sans-serif;
         font-size:11px;
         font-weight:800;
@@ -455,19 +455,19 @@ function renderProjects(){
 
       .wc-cip-proxy-button:hover,
       .wc-cip-proxy-link:hover{
-        color:#006231;
+        color:var(--green);
       }
 
       .wc-cip-proxy-button.is-active,
       .wc-cip-proxy-button:hover,
       .wc-cip-proxy-link:hover{
         background:#00623114;
-        color:#006231;
+        color:var(--green);
       }
 
       .wc-cip-proxy-button.is-active{
         background:#00623114;
-        color:#006231;
+        color:var(--green);
       }
 
       .wc-cip-proxy-link.wc-cip-proxy-search{
@@ -514,7 +514,7 @@ function renderProjects(){
       .wc-intro-inner span{
         display:block;
         margin-bottom:8px;
-        color:#006231;
+        color:var(--green);
         font-size:11px;
         font-weight:700;
         letter-spacing:.14em;
@@ -524,7 +524,7 @@ function renderProjects(){
 
       .wc-intro-inner h2{
         margin:0 0 10px 0;
-        color:#172033;
+        color:var(--text);
         font-size:30px;
         line-height:1.12;
         font-weight:700;
@@ -543,7 +543,7 @@ function renderProjects(){
 
       .wc-intro-inner p{
         margin:0 0 12px 0;
-        color:#24344d;
+        color:var(--text);
         font-size:14px;
         line-height:1.55;
         text-align:justify;
@@ -645,7 +645,7 @@ function renderProjects(){
       .wc-cip-label{
         display:block;
         margin-bottom:8px;
-        color:#006231;
+        color:var(--green);
         font-size:10px;
         font-weight:700;
         letter-spacing:.14em;
@@ -655,7 +655,7 @@ function renderProjects(){
       .wc-cip-feature-content h2,
       .wc-cip-content h2{
         margin:0 0 10px 0;
-        color:#172033;
+        color:var(--text);
         font-size:21px;
         line-height:1.15;
         font-weight:700;
@@ -680,7 +680,7 @@ function renderProjects(){
       .wc-cip-feature-content p,
       .wc-cip-content p{
         margin:0;
-        color:#24344d;
+        color:var(--text);
         font-size:13px;
         line-height:1.55;
         text-align:left;
@@ -742,7 +742,7 @@ function renderProjects(){
         position:relative;
         padding:0 0 0 17px;
         margin:0 0 12px 0;
-        color:#24344d;
+        color:var(--text);
         font-size:13px;
         line-height:1.5;
         text-align:left;
@@ -765,7 +765,7 @@ function renderProjects(){
       }
 
       .wc-cip-list strong{
-        color:#172033;
+        color:var(--text);
       }
 
       .wc-cip-story-hero{
@@ -809,7 +809,7 @@ function renderProjects(){
       .wc-cip-kicker{
         display:block;
         margin:0 0 10px;
-        color:#003f28;
+        color:var(--green);
         font-size:12px;
         font-weight:900;
         letter-spacing:.16em;
@@ -860,7 +860,7 @@ function renderProjects(){
 
       .wc-cip-overview-metric strong{
         display:block;
-        color:#003f28;
+        color:var(--green);
         font-size:clamp(30px, 4vw, 46px);
         line-height:1;
       }
@@ -868,7 +868,7 @@ function renderProjects(){
       .wc-cip-overview-metric span{
         display:block;
         margin-top:10px;
-        color:#607184;
+        color:var(--muted);
         font-size:12px;
         font-weight:900;
         letter-spacing:.08em;
@@ -887,7 +887,7 @@ function renderProjects(){
       .wc-cip-story-header h2,
       .wc-cip-story-copy h2{
         margin:0 0 14px;
-        color:#172033;
+        color:var(--text);
         font-family:Georgia, "Times New Roman", serif;
         font-size:clamp(34px, 4vw, 58px);
         line-height:1.05;
@@ -897,7 +897,7 @@ function renderProjects(){
       .wc-cip-story-header p,
       .wc-cip-story-copy p{
         margin:0 0 14px;
-        color:#607184;
+        color:var(--muted);
         font-size:16px;
         line-height:1.75;
       }
@@ -920,7 +920,7 @@ function renderProjects(){
 
       .wc-cip-gfoa-copy h3{
         margin:0 0 16px;
-        color:#172033;
+        color:var(--text);
         font-family:Georgia, "Times New Roman", serif;
         font-size:clamp(28px, 3vw, 42px);
         line-height:1.08;
@@ -930,7 +930,7 @@ function renderProjects(){
       .wc-cip-gfoa-copy > p{
         max-width:720px;
         margin:0 0 26px;
-        color:#607184;
+        color:var(--muted);
         font-size:16px;
         line-height:1.75;
       }
@@ -953,14 +953,14 @@ function renderProjects(){
       .wc-cip-element-card strong{
         display:block;
         margin:0 0 10px;
-        color:#003f28;
+        color:var(--green);
         font-size:18px;
         line-height:1.2;
       }
 
       .wc-cip-element-card p{
         margin:0;
-        color:#526577;
+        color:var(--muted);
         font-size:14px;
         line-height:1.65;
       }
@@ -995,7 +995,7 @@ function renderProjects(){
         border:1px solid rgba(0,63,40,.12);
         border-radius:18px;
         background:#ffffff;
-        color:#526577;
+        color:var(--muted);
         font-size:14px;
         line-height:1.6;
       }
@@ -1003,7 +1003,7 @@ function renderProjects(){
       .wc-cip-finance-list strong{
         display:block;
         margin-bottom:4px;
-        color:#003f28;
+        color:var(--green);
         font-size:13px;
         letter-spacing:.08em;
         text-transform:uppercase;
@@ -1036,7 +1036,7 @@ function renderProjects(){
       .wc-cip-fund-card small{
         display:block;
         min-height:46px;
-        color:#607184;
+        color:var(--muted);
         font-size:12px;
         font-weight:900;
         letter-spacing:.08em;
@@ -1047,14 +1047,14 @@ function renderProjects(){
       .wc-cip-fund-card strong{
         display:block;
         margin-top:18px;
-        color:#003f28;
+        color:var(--green);
         font-size:clamp(28px, 3vw, 42px);
         line-height:1;
       }
 
       .wc-cip-fund-card p{
         margin:16px 0 0;
-        color:#607184;
+        color:var(--muted);
         font-size:14px;
         line-height:1.55;
       }
@@ -1062,7 +1062,7 @@ function renderProjects(){
       .wc-cip-fund-card span{
         margin-top:auto;
         padding-top:18px;
-        color:#003f28;
+        color:var(--green);
         font-size:13px;
         font-weight:900;
       }
@@ -1111,14 +1111,14 @@ function renderProjects(){
 
       .wc-cip-process-card h3{
         margin:0 0 10px;
-        color:#172033;
+        color:var(--text);
         font-size:18px;
         line-height:1.2;
       }
 
       .wc-cip-process-card p{
         margin:0;
-        color:#607184;
+        color:var(--muted);
         font-size:14px;
         line-height:1.6;
       }
@@ -1140,13 +1140,13 @@ function renderProjects(){
 
       .wc-cip-link-card h3{
         margin:0 0 10px;
-        color:#172033;
+        color:var(--text);
         font-size:20px;
       }
 
       .wc-cip-link-card p{
         margin:0;
-        color:#607184;
+        color:var(--muted);
         font-size:14px;
         line-height:1.6;
       }
@@ -1154,7 +1154,7 @@ function renderProjects(){
       .wc-cip-link-card span{
         margin-top:auto;
         padding-top:18px;
-        color:#003f28;
+        color:var(--green);
         font-size:13px;
         font-weight:900;
       }
@@ -1266,7 +1266,7 @@ function renderProjects(){
 
       .wc-project-search-stat strong{
         display:block;
-        color:#003f28;
+        color:var(--green);
         font-size:28px;
         line-height:1;
       }
@@ -1274,7 +1274,7 @@ function renderProjects(){
       .wc-project-search-stat span{
         display:block;
         margin-top:8px;
-        color:#607184;
+        color:var(--muted);
         font-size:11px;
         font-weight:900;
         letter-spacing:.08em;
@@ -1296,7 +1296,7 @@ function renderProjects(){
         border-radius:999px;
         border:1px solid rgba(0,63,40,.18);
         background:#ffffff;
-        color:#003f28;
+        color:var(--green);
         font-family:Arial, Helvetica, sans-serif;
         font-size:12px;
         font-weight:800;
@@ -1337,7 +1337,7 @@ function renderProjects(){
         border:1px solid rgba(0,63,40,.13);
         background:#f7fbf7;
         font-size:16px;
-        color:#172033;
+        color:var(--text);
         outline:none;
         box-sizing:border-box;
         transition:
@@ -1347,12 +1347,12 @@ function renderProjects(){
       }
 
       .wc-project-search::placeholder{
-        color:#5a6e7f;
+        color:var(--muted);
         opacity:1;
       }
 
       .wc-project-search:focus{
-        border-color:#006231;
+        border-color:var(--green);
         background:#ffffff;
         box-shadow:0 0 0 4px rgba(0,98,49,0.08);
       }
@@ -1387,7 +1387,7 @@ function renderProjects(){
       }
 
       .wc-project-filter-label{
-        color:#5a6e7f;
+        color:var(--muted);
         font-size:10px;
         font-weight:800;
         letter-spacing:.12em;
@@ -1401,7 +1401,7 @@ function renderProjects(){
         border-radius:999px;
         border:1px solid rgba(0,98,49,0.14);
         background:#ffffff;
-        color:#172033;
+        color:var(--text);
         font-size:12px;
         font-weight:800;
         cursor:pointer;
@@ -1428,7 +1428,7 @@ function renderProjects(){
         justify-content:space-between;
         gap:12px;
         margin:0 0 14px 0;
-        color:#5a6e7f;
+        color:var(--muted);
         font-size:12px;
         font-weight:700;
       }
@@ -1495,7 +1495,7 @@ function renderProjects(){
 
       .wc-project-card h3{
         margin:0;
-        color:#172033;
+        color:var(--text);
         font-size:19px;
         line-height:1.24;
         font-weight:700;
@@ -1508,7 +1508,7 @@ function renderProjects(){
         padding:5px 8px;
         border-radius:999px;
         background:#f7fbf7;
-        color:#003f28;
+        color:var(--green);
         font-size:9px;
         font-weight:700;
         letter-spacing:.08em;
@@ -1517,7 +1517,7 @@ function renderProjects(){
       }
 
       .wc-project-description{
-        color:#5a6e7f;
+        color:var(--muted);
         font-size:13px;
         line-height:1.6;
         position:relative;
@@ -1558,7 +1558,7 @@ function renderProjects(){
         padding:0;
         border:0;
         background:transparent;
-        color:#006231;
+        color:var(--green);
         font-family:Arial, Helvetica, sans-serif;
         font-size:11px;
         font-weight:800;
@@ -1595,7 +1595,7 @@ function renderProjects(){
       .wc-project-metric span{
         display:block;
         margin-bottom:4px;
-        color:#5a6e7f;
+        color:var(--muted);
         font-size:9px;
         font-weight:700;
         letter-spacing:.10em;
@@ -1604,7 +1604,7 @@ function renderProjects(){
 
       .wc-project-metric strong{
         display:block;
-        color:#172033;
+        color:var(--text);
         font-size:13px;
         line-height:1.25;
         font-weight:700;
@@ -1621,7 +1621,7 @@ function renderProjects(){
         align-items:center;
         justify-content:flex-start;
         margin-top:2px;
-        color:#003f28;
+        color:var(--green);
         font-size:12px;
         font-weight:900;
         letter-spacing:.08em;
@@ -1677,7 +1677,7 @@ function renderProjects(){
         padding:7px 9px;
         border-radius:999px;
         background:rgba(52,64,84,0.08);
-        color:#24344d;
+        color:var(--text);
         border:1px solid rgba(52,64,84,0.16);
         font-size:10px;
         font-weight:800;
@@ -1686,15 +1686,15 @@ function renderProjects(){
       }
 
       .wc-status-planning{ background:rgba(209,190,120,0.18); color:#8b6d12; }
-      .wc-status-design{ background:rgba(90,110,127,0.12); color:#5a6e7f; }
-      .wc-status-construction{ background:rgba(0,98,49,0.12); color:#006231; }
-      .wc-status-complete{ background:rgba(52,64,84,0.10); color:#24344d; }
+      .wc-status-design{ background:rgba(90,110,127,0.12); color:var(--muted); }
+      .wc-status-construction{ background:rgba(0,98,49,0.12); color:var(--green); }
+      .wc-status-complete{ background:rgba(52,64,84,0.10); color:var(--text); }
 
       .wc-project-empty{
         display:none;
         padding:24px 16px;
         text-align:center;
-        color:#5a6e7f;
+        color:var(--muted);
         font-size:13px;
       }
 
@@ -2089,6 +2089,47 @@ function renderProjects(){
         }
       }
 
+      /* Dark mode: this page is built from hardcoded hex colors rather than
+         the shared CSS variables (it's an inline style block, injected after
+         style.css loads, so it would otherwise always win the cascade and
+         force a white page regardless of theme). Text colors close to an
+         existing variable's light-mode value were already substituted for
+         var(--text)/var(--muted)/var(--green) above, which adapts them
+         automatically; the white/light section and card backgrounds below
+         still need an explicit dark surface, matching the dark card
+         treatment used elsewhere on the site. Solid green buttons/badges and
+         decorative gradients/underlines are intentionally left out -- they
+         already have light text and read fine unchanged in both themes. */
+      :root[data-theme="dark"] body,
+      :root[data-theme="dark"] .wc-cip-main-section,
+      :root[data-theme="dark"] .wc-intro-section,
+      :root[data-theme="dark"] .wc-cip-feature-section,
+      :root[data-theme="dark"] .wc-cip-info-section,
+      :root[data-theme="dark"] .wc-project-index-section{
+        background: var(--light);
+      }
+
+      :root[data-theme="dark"] .wc-cip-feature-card,
+      :root[data-theme="dark"] .wc-cip-panel,
+      :root[data-theme="dark"] .wc-cip-finance-list li,
+      :root[data-theme="dark"] .wc-cip-fund-card,
+      :root[data-theme="dark"] .wc-cip-process-card,
+      :root[data-theme="dark"] .wc-cip-link-card,
+      :root[data-theme="dark"] .wc-cip-overview-metric,
+      :root[data-theme="dark"] .wc-cip-element-card,
+      :root[data-theme="dark"] .wc-project-search-stat,
+      :root[data-theme="dark"] .wc-project-full-search-link,
+      :root[data-theme="dark"] .wc-project-toolbar,
+      :root[data-theme="dark"] .wc-project-search:focus,
+      :root[data-theme="dark"] .wc-project-filter,
+      :root[data-theme="dark"] .wc-project-card{
+        background: rgba(14,28,22,.92);
+        border-color: var(--border);
+      }
+
+      :root[data-theme="dark"] body.wc-cip-overview-page .page-nav{
+        border-top-color: var(--border);
+      }
     </style>
 
     ${!isStandaloneSearchPage ? `
