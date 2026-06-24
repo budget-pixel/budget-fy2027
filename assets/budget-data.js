@@ -340,6 +340,95 @@
     });
   }
 
+  // Specific (Dept_Code, Revenue_Code) revenue rows relabeled to a
+  // different Revenue_Name so they merge into the right category on
+  // county-wide summaries (combineByName groups revenue rows by name).
+  // Dept_Code 102389 / Revenue_Code 389001 ("Nonoperating less 5%") is the
+  // statutory 5% Ad Valorem discount Florida's Truth in Millage law
+  // requires budgeting against -- it already shares Ad Valorem Taxes' own
+  // Revenue_Type ("General Government Taxes"), but its generic
+  // "Nonoperating" name keeps it from merging into that line. No dedicated
+  // page shows this row under its original name (only the Summary of
+  // Revenues and a glossary mention), so relabeling it is safe everywhere.
+  const REVENUE_NAME_OVERRIDES = new Map([["102389|389001", "Ad Valorem Taxes"]]);
+
+  function applyRevenueNameOverrides(rows) {
+    return (rows || []).map((row) => {
+      const key = String((row && row.Dept_Code) || "").trim() + "|" + String((row && row.Revenue_Code) || "").trim();
+      const override = REVENUE_NAME_OVERRIDES.get(key);
+      if (!override) return row;
+      return { ...row, Revenue_Name: override };
+    });
+  }
+
+  // Revenue rows that represent a reduction against whatever Revenue_Name
+  // category they're merged into (combineByName) rather than a collection,
+  // so they must subtract from that category's total instead of adding to
+  // it. Dept_Code 102389 / Revenue_Code 389001 (relabeled to Ad Valorem
+  // Taxes above) is the statutory 5% Ad Valorem discount -- it must always
+  // contribute a negative amount to the FY2026 budget merge below,
+  // regardless of which sign the source data happens to carry.
+  const SUBTRACTIVE_REVENUE_KEYS = new Set(["102389|389001"]);
+
+  function isSubtractiveRevenueRow(row) {
+    const key = String((row && row.Dept_Code) || "").trim() + "|" + String((row && row.Revenue_Code) || "").trim();
+    return SUBTRACTIVE_REVENUE_KEYS.has(key);
+  }
+
+  // FY2026 budget contribution for one row being folded into a
+  // combineByName merge: a normal revenue row's raw value is sign-flipped
+  // by revenueDisplayAmount (Supabase stores revenue as a credit/negative
+  // amount), but a subtractive row above must stay negative -- forced
+  // negative outright rather than trusting the source sign, per its
+  // definition as a reduction.
+  function revenueBudgetMergeContribution(row) {
+    const raw = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
+    return isSubtractiveRevenueRow(row) ? -Math.abs(raw) : revenueDisplayAmount(raw);
+  }
+
+  // The sheet's Dept_Code for a row doesn't always match what Supabase
+  // actually has that account under -- a sheet data-entry mismatch, not a
+  // real alternate org. The one sheet row for the Ad Valorem 5% reduction
+  // (Dept_Code 102389 / Revenue_Code 389001) actually needs to sum two
+  // separate per-fund accounts in Supabase, since the 5% statutory
+  // reduction applies separately to each fund that levies Ad Valorem tax:
+  // org 001389 (General Fund) and org 105389 (Mosquito Control), both
+  // Revenue_Code 389001. (The Sheriff Fund's own version of this account is
+  // deliberately left out.) Unlike DEPT_CODE_ACTUALS_ALIASES (a real org
+  // with multiple legitimate codes, summed because they're genuinely the
+  // same account), this overrides the org/object lookups outright for the
+  // one sheet row affected.
+  // org 201389 / object 389000 ($55,000) is a separate, legitimate
+  // Nonoperating Balance Brought Forward account with no sheet row of its
+  // own -- folded into the Board of County Commissioners' own 001389/389000
+  // row (already in the same Other Sources / Nonoperating Balance merge
+  // group on combineByName summaries) rather than redirected away from it.
+  const SUPABASE_LOOKUP_OVERRIDES = new Map([
+    ["102389|389001", [{ org: "001389", object: "389001" }, { org: "105389", object: "389001" }]],
+    ["001389|389000", [{ org: "001389", object: "389000" }, { org: "201389", object: "389000" }]]
+  ]);
+
+  function supabaseLookupsForRow(row, org, codeValue) {
+    const key = String((row && row.Dept_Code) || "").trim() + "|" + String(codeValue || "").trim();
+    return SUPABASE_LOOKUP_OVERRIDES.get(key) || [{ org: org, object: codeValue }];
+  }
+
+  // Sums sumRawActualsForAccount across every (org, object) lookup for a
+  // row (normally just the row's own org/code, but several when an
+  // override above applies), matched if any of them found data.
+  function sumRawActualsForLookups(rawRows, lookups, year, projectScope) {
+    let matched = false;
+    let total = 0;
+    (lookups || []).forEach((lookup) => {
+      const result = sumRawActualsForAccount(rawRows, lookup.org, lookup.object, year, projectScope);
+      if (result.matched) {
+        matched = true;
+        total += result.total;
+      }
+    });
+    return { matched, total };
+  }
+
   // Departments whose own revenue row is really just the shared General
   // Fund Ad Valorem line (Dept_Code 001311, Revenue_Code 311000) referenced
   // by two dozen other departments -- its prior-year actuals/budget can't be
@@ -407,9 +496,10 @@
         return next;
       }
 
+      const lookups = supabaseLookupsForRow(row, org, codeValue);
       HISTORICAL_ACTUAL_YEARS.forEach((year) => {
         const field = "FY" + year + "_Actual";
-        const result = sumRawActualsForAccount(rawActualRows, org, codeValue, year, projectScope);
+        const result = sumRawActualsForLookups(rawActualRows, lookups, year, projectScope);
         next[field] = result.matched ? result.total : (row[field] || 0);
       });
       return next;
@@ -438,7 +528,8 @@
         return { ...row, FY2026_Original_Budget: 0 };
       }
 
-      const result = sumRawActualsForAccount(rawBudgetRows, org, codeValue, 2026, projectScope);
+      const lookups = supabaseLookupsForRow(row, org, codeValue);
+      const result = sumRawActualsForLookups(rawBudgetRows, lookups, 2026, projectScope);
       return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || 0) };
     });
   }
@@ -958,6 +1049,7 @@
       });
 
       cache.expenditures = applyStatutoryExpenseOverrides(cache.expenditures);
+      cache.revenues = applyRevenueNameOverrides(cache.revenues);
 
       if (actuals) {
         cache.expenseActualRows = actuals.expenseRows || [];
@@ -1311,7 +1403,8 @@
     // See PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES. Guarded to
     // combineByName === false since this should only apply to the
     // department's own single-page breakdown, not a county-wide summary
-    // that happens to include this row among others.
+    // (those keep the toggle -- see isRevenueContextNoteSuppressed below,
+    // which removes just the disclaimer for them, not the toggle itself).
     const isPriorYearsDisabledRevenue = !isExpense && !combineByName && rows.length &&
       PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(rows[0].Dept_Name));
     // The "View Prior Years" preference is a single, page-wide localStorage
@@ -1346,7 +1439,7 @@
             if (!isExpense && f === "FY2026_Original_Budget") {
               const key = revenueBudgetUniqueKey(r);
               const seen = seenRevenueOriginalBudget.get(name) || new Set();
-              merged[f] = seen.has(key) ? 0 : revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+              merged[f] = seen.has(key) ? 0 : revenueBudgetMergeContribution(r);
               seen.add(key);
               seenRevenueOriginalBudget.set(name, seen);
             } else {
@@ -1363,7 +1456,7 @@
             const key = revenueBudgetUniqueKey(r);
             const seen = seenRevenueOriginalBudget.get(name) || new Set();
             if (!seen.has(key)) {
-              existing[f] += revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+              existing[f] += revenueBudgetMergeContribution(r);
               seen.add(key);
               seenRevenueOriginalBudget.set(name, seen);
             }
@@ -1497,7 +1590,14 @@
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
-    const revenueContextNote = (!isExpense && !isPriorYearsDisabledRevenue && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
+    // A combineByName revenue table (e.g. Summary of Revenues) keeps the
+    // "View Prior Years" toggle -- it's a legitimate, intentional view of
+    // every department combined -- but the disclaimer itself doesn't apply:
+    // "shows only what is budgeted for this specific department or
+    // program" is never true here, since every row already is the whole
+    // organization combined by design.
+    const isRevenueContextNoteSuppressed = isPriorYearsDisabledRevenue || combineByName;
+    const revenueContextNote = (!isExpense && !isRevenueContextNoteSuppressed && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
       ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
       : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
@@ -2409,7 +2509,7 @@
           seen.add(key);
         }
         if (field === "FY2026_Original_Budget") {
-          return sum + revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+          return sum + revenueBudgetMergeContribution(r);
         }
         return sum + (r[field] || 0);
       }, 0);
