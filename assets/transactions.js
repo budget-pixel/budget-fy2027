@@ -99,6 +99,7 @@
   // be resolved here rather than derived from the URL/title directly.
   const DEPARTMENT_BACK_LINK_PAGES = {
     "office of management and budget": "office-of-management-and-budget.html",
+    "building construction and maintenance": "building-construction-and-maintenance.html",
     "clerk of court": "clerk-of-courts-and-county-comptroller.html",
     "property appraiser": "property-appraiser.html",
     "supervisor of elections": "supervisor-of-elections.html",
@@ -220,11 +221,20 @@
       return;
     }
 
+    // The org link can carry more than one department code (comma-joined)
+    // when a department's transaction history spans a legacy org-code
+    // restructuring -- see DEPT_CODE_ACTUALS_ALIASES in budget-data.js. A
+    // legacy code's fund can differ from the current code's fund (fund
+    // here is just the Dept_Code's first 3 digits, so an org restructuring
+    // can mean a real historical fund move), so the fund filter is only
+    // applied when there's a single, current org code to match against.
+    const orgCodes = String(context.org || "").split(",").map((code) => code.trim()).filter(Boolean);
+
     const queryFilters = {
       year: context.fy,
-      org: context.org,
+      org: orgCodes.length > 1 ? orgCodes : orgCodes[0] || "",
       object: context.objectCode,
-      fund: context.fundCode || ""
+      fund: orgCodes.length > 1 ? "" : (context.fundCode || "")
     };
     // The "project" key is only added when the URL actually specified a
     // projectCode (even an explicitly empty one, for the blank-Project_Code

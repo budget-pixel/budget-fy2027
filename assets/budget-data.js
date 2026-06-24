@@ -1330,6 +1330,7 @@
   const TRANSACTION_DRILLDOWN_DEPT_NAMES = new Set(
     [
       "Office of Management and Budget",
+      "Building Construction and Maintenance",
       "Clerk of Court",
       "Property Appraiser",
       "Supervisor of Elections",
@@ -1376,6 +1377,11 @@
     const projectCode = row.Project_Code || "";
     const projectName = row.Project_Name || "";
     const deptCode = row.Dept_Code || "";
+    // Some departments' transaction history is split across legacy org
+    // codes (see DEPT_CODE_ACTUALS_ALIASES); pass all of them so the
+    // transaction detail page's query isn't limited to the current code
+    // alone and missing years recorded under a prior code.
+    const orgCodes = deptCode ? [deptCode].concat(DEPT_CODE_ACTUALS_ALIASES[deptCode] || []) : [];
     const transactionPage = window.location.pathname.indexOf("/pages/") !== -1 ? "transactions.html" : "pages/transactions.html";
 
     params.set("fy", String(column.year));
@@ -1385,7 +1391,7 @@
     params.set("selectedActual", String((fields.kind || "expense") === "revenue" ? Math.abs(amount) : amount));
     params.set("objectCode", objectCode);
     params.set("objectName", objectName);
-    params.set("org", deptCode);
+    params.set("org", orgCodes.join(","));
     params.set("departmentCode", deptCode);
     params.set("departmentName", row.Dept_Name || "");
     params.set("fundCode", fundCodeForRow(row));

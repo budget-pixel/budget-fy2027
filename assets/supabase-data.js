@@ -197,7 +197,12 @@
     if (options.year !== undefined && options.year !== null && String(options.year).trim() !== "") {
       query = query.eq("fiscal_year", options.year);
     }
-    if (options.org !== undefined && options.org !== null && String(options.org).trim() !== "") {
+    if (Array.isArray(options.org)) {
+      // A department's transaction history can span more than one legacy
+      // org code after a county org-code restructuring (see
+      // DEPT_CODE_ACTUALS_ALIASES in budget-data.js); match any of them.
+      if (options.org.length) query = query.in("department_code", options.org);
+    } else if (options.org !== undefined && options.org !== null && String(options.org).trim() !== "") {
       query = query.eq("department_code", options.org);
     }
     if (options.object !== undefined && options.object !== null && String(options.object).trim() !== "") {
