@@ -438,7 +438,11 @@
   // renderBudgetLinesToggle's isPriorYearsDisabledRevenue).
   const PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES = new Set([
     "statutory and other",
-    "non profit funding program"
+    "non profit funding program",
+    "clerk of court",
+    "tax collector",
+    "supervisor of elections",
+    "property appraiser"
   ]);
 
   // Department-specific data-limitation notices shown alongside a
