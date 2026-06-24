@@ -768,6 +768,26 @@
     return String((row && row.Dept_Code) || "").trim().slice(0, 3);
   }
 
+  // True when a fund is shared by more than one department (e.g. the
+  // General Fund, 001, used by two dozen departments) -- the revenue
+  // actuals/budget disclaimer only applies there, since that's the only
+  // case where the fund-scoped fallbacks above still aggregate across
+  // multiple departments. A single-department fund (e.g. 107, the Sheriff
+  // Fund) has nothing else to aggregate, so the disclaimer would be untrue
+  // for it. An unknown/blank fund code (combineByName's merged,
+  // multi-department rows) defaults to true since those rows really do
+  // span several departments.
+  function fundHasMultipleDepartments(fundCode) {
+    if (!fundCode) return true;
+    const names = new Set();
+    (cache.revenues || []).forEach((r) => {
+      if (fundCodeForRow(r) !== fundCode) return;
+      const name = normalizeDeptName(r.Dept_Name);
+      if (name) names.add(name);
+    });
+    return names.size > 1;
+  }
+
   function fetchCSV(url) {
     return fetch(url, { cache: "no-store" })
       .then((res) => {
@@ -1290,9 +1310,9 @@
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
-    const revenueContextNote = isExpense
-      ? ""
-      : '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>';
+    const revenueContextNote = (!isExpense && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
+      ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
+      : "";
     const budgetLinesTools = '<div class="wc-budget-lines-tools">' + revenueContextNote + toggleHeader + transactionHelper + "</div>";
 
     return {
