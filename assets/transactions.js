@@ -87,9 +87,41 @@
     return amount;
   }
 
-  function initBackLink() {
+  // Maps the departmentName carried in the URL back to the department page
+  // it came from. The static fallback href in the HTML can only point to
+  // one page, and several pages' titles don't match the underlying sheet's
+  // Dept_Name (e.g. the Clerk's page is titled "Clerk of Courts & County
+  // Comptroller" but rows are Dept_Name "Clerk of Court"), so this has to
+  // be resolved here rather than derived from the URL/title directly.
+  const DEPARTMENT_BACK_LINK_PAGES = {
+    "office of management and budget": "office-of-management-and-budget.html",
+    "clerk of court": "clerk-of-courts-and-county-comptroller.html",
+    "property appraiser": "property-appraiser.html",
+    "supervisor of elections": "supervisor-of-elections.html",
+    "tax collector": "tax-collector.html",
+    "walton county sheriffs office": "sheriffs-office.html"
+  };
+
+  function normalizeDeptNameForBackLink(name) {
+    return String(name || "")
+      .trim()
+      .toLowerCase()
+      .replace(/['’]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function initBackLink(context) {
     const link = document.querySelector("[data-transaction-back]");
     if (!link) return;
+
+    // Fix the static "always goes to OMB" href before wiring up the
+    // history.back() enhancement, so the link is correct even if history
+    // isn't usable (e.g. opened in a new tab) and not just when it is.
+    const page = DEPARTMENT_BACK_LINK_PAGES[normalizeDeptNameForBackLink(context && context.departmentName)];
+    if (page) link.setAttribute("href", page);
+
     link.addEventListener("click", function (event) {
       if (window.history.length > 1) {
         event.preventDefault();
@@ -153,6 +185,8 @@
       kind: param("kind") || "expense",
       selectedActual: parseAmount(param("selectedActual"))
     };
+
+    initBackLink(context);
 
     const title = $("#transaction-title");
     const intro = $("#transaction-intro");

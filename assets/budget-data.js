@@ -877,23 +877,57 @@
       .filter(Boolean);
   }
 
-  function revenueActualAmountForCodes(codes, year) {
+  function revenueActualAmountForCodes(codes, year, fundCode) {
     const codeSet = new Set((codes || []).filter(Boolean));
     if (!codeSet.size || !(cache.revenueActualRows || []).length) return 0;
     return (cache.revenueActualRows || []).reduce((sum, row) => {
       if (Number(row.year) !== Number(year)) return sum;
       if (!codeSet.has(String(row.object || "").trim())) return sum;
-      if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(String(row.org || "").trim().slice(0, 3))) return sum;
+      const rowFundCode = String(row.org || "").trim().slice(0, 3);
+      if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return sum;
+      // See revenueBudgetAmountForCodes: a single-department fund (e.g.
+      // 107, the Sheriff Fund) should never borrow another fund's actuals
+      // for a code it has no organization-scoped data of its own for.
+      // Shared funds (e.g. 001) still aggregate across every org in that
+      // fund, since they're all genuinely in the same fund.
+      if (fundCode && rowFundCode !== fundCode) return sum;
       return sum + (Number(row.amount) || 0);
     }, 0);
   }
 
-  function revenueBudgetAmountForCodes(codes, field) {
+  function revenueBudgetAmountForCodes(codes, field, fundCode) {
     const codeSet = new Set((codes || []).filter(Boolean));
     if (!codeSet.size) return 0;
+    // A shared GL code (e.g. the General Fund's Ad Valorem Taxes line,
+    // Dept_Code 001311) can be referenced by two dozen different
+    // departments' own revenue rows under that same Dept_Code. Their
+    // FY2026_Original_Budget is intentionally NOT deduped by Dept_Name in
+    // applyOriginalBudgetToRows (a different case -- one department split
+    // across several Dept_Names, like Code Compliance / Code Compliance
+    // Beach -- needs each one to keep the full total). Summed here without
+    // a guard, that single account-level amount gets counted once per
+    // department referencing it instead of once overall. revenueBudgetUniqueKey
+    // (the same dedup key buildFundFinancialSchedule's sumFor already uses
+    // for this exact scenario) excludes Dept_Name, so it collapses those
+    // department-duplicated rows back down to one.
+    //
+    // fundCode (when given) additionally restricts the fallback to rows in
+    // the same fund as the row being displayed. Single-department funds
+    // (e.g. 107, the Sheriff Fund) should never borrow a county-wide total
+    // from a fund they have nothing to do with -- a department with no
+    // direct match in this fund simply has no budget for that code. Shared
+    // funds (e.g. 001, the General Fund) still aggregate across every
+    // department in that fund exactly as before, since they're all in the
+    // same fund anyway. Callers omit fundCode entirely for combineByName's
+    // merged, multi-fund county-wide rows, where no single fund applies.
+    const seenKeys = new Set();
     return (cache.revenues || []).reduce((sum, row) => {
       if (!codeSet.has(String(row.Revenue_Code || "").trim())) return sum;
       if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(row))) return sum;
+      if (fundCode && fundCodeForRow(row) !== fundCode) return sum;
+      const key = revenueBudgetUniqueKey(row);
+      if (seenKeys.has(key)) return sum;
+      seenKeys.add(key);
       return sum + (row[field] || 0);
     }, 0);
   }
@@ -926,41 +960,88 @@
 
   function budgetLineColumnAmount(row, column, isExpense) {
     if (!isExpense && column.actual) {
-      return revenueDisplayAmount(revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year));
+      // Many revenue codes (Ad Valorem Taxes, Interfund Group Transfer In,
+      // etc.) are reused across many different departments/funds, each with
+      // its own distinct historical amount -- they aren't one pooled,
+      // county-wide collection that happens to get split out at budget
+      // time. So always prefer this row's own department+code actual when
+      // Supabase has it, and only fall back to the unscoped county-wide
+      // lookup when there's genuinely no department-level data to scope to
+      // (e.g. a revenue source that really was only ever tracked centrally).
+      const scoped = sumRawActualsForAccount(cache.revenueActualRows, row.Dept_Code, row.Revenue_Code, column.year);
+      if (scoped.matched) return revenueDisplayAmount(scoped.total);
+      return revenueDisplayAmount(
+        revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year, fundCodeForRow(row))
+      );
     }
     if (!isExpense && column.field === "FY2026_Original_Budget") {
       const codes = splitBudgetLineCodes(row.Revenue_Code);
+      const fundCode = fundCodeForRow(row);
       const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
       return revenueDisplayAmount(rowAmount ||
-        revenueBudgetAmountForCodes(codes, "FY2026_Original_Budget") ||
-        revenueBudgetAmountForCodes(codes, "FY2026_Budget"));
+        revenueBudgetAmountForCodes(codes, "FY2026_Original_Budget", fundCode) ||
+        revenueBudgetAmountForCodes(codes, "FY2026_Budget", fundCode));
     }
     return row[column.field] || 0;
   }
 
   function budgetLineColumnTotal(rows, column, isExpense) {
     if (!isExpense && column.actual) {
+      // See budgetLineColumnAmount: prefer each row's own department-scoped
+      // actual when Supabase has it, summed once per distinct
+      // department+code pair, and only fold a code into the unscoped
+      // county-wide lookup when no row in this table has department-level
+      // data for it at all.
       const codes = [];
+      const scopedPairsSeen = new Set();
+      let scopedTotal = 0;
+      let fundCode = "";
       (rows || []).forEach((row) => {
+        if (!fundCode) fundCode = fundCodeForRow(row);
         splitBudgetLineCodes(row.Revenue_Code).forEach((code) => {
+          const pairKey = String(row.Dept_Code || "").trim() + "|" + code;
+          if (scopedPairsSeen.has(pairKey)) return;
+          const scoped = sumRawActualsForAccount(cache.revenueActualRows, row.Dept_Code, code, column.year);
+          if (scoped.matched) {
+            scopedPairsSeen.add(pairKey);
+            scopedTotal += scoped.total;
+            return;
+          }
           if (!codes.includes(code)) codes.push(code);
         });
       });
-      return revenueDisplayAmount(revenueActualAmountForCodes(codes, column.year));
+      return revenueDisplayAmount(revenueActualAmountForCodes(codes, column.year, fundCode) + scopedTotal);
     }
     if (!isExpense && column.field === "FY2026_Original_Budget") {
+      // A zero rowAmount is ambiguous: it can mean "no data for this row,
+      // fall back to a code-level lookup" (the original intent below) or
+      // "this row's account-level total is already counted by another row
+      // sharing the same code" (applyOriginalBudgetToRows zeroes every row
+      // but the first in a department+code group on purpose). Tracking
+      // which codes already have a real rowAmount keeps the second case
+      // from also pulling in a countywide fallback on top of the correct,
+      // already-counted amount.
+      const codesWithRowAmount = new Set();
       const fallbackCodes = [];
-      const rowTotal = (rows || []).reduce((sum, row) => {
+      let rowTotal = 0;
+      let fundCode = "";
+      (rows || []).forEach((row) => {
+        if (!fundCode) fundCode = fundCodeForRow(row);
         const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
-        if (rowAmount) return sum + rowAmount;
-        splitBudgetLineCodes(row.Revenue_Code).forEach((code) => {
+        const codes = splitBudgetLineCodes(row.Revenue_Code);
+        if (rowAmount) {
+          rowTotal += rowAmount;
+          codes.forEach((code) => codesWithRowAmount.add(code));
+          return;
+        }
+        codes.forEach((code) => {
           if (!fallbackCodes.includes(code)) fallbackCodes.push(code);
         });
-        return sum;
-      }, 0);
+      });
+      const eligibleFallbackCodes = fallbackCodes.filter((code) => !codesWithRowAmount.has(code));
       const fallbackTotal =
-        revenueBudgetAmountForCodes(fallbackCodes, "FY2026_Original_Budget") ||
-        revenueBudgetAmountForCodes(fallbackCodes, "FY2026_Budget");
+        revenueBudgetAmountForCodes(eligibleFallbackCodes, "FY2026_Original_Budget", fundCode) ||
+        revenueBudgetAmountForCodes(eligibleFallbackCodes, "FY2026_Budget", fundCode);
       return revenueDisplayAmount(rowTotal + fallbackTotal);
     }
     return (rows || []).reduce((sum, row) => sum + (row[column.field] || 0), 0);
@@ -986,13 +1067,39 @@
       .replace(/^-+|-+$/g, "");
   }
 
+  // Office of Management and Budget (the original pilot) plus every
+  // Constitutional Officers & Other Agencies page except Board of County
+  // Commissioners. Dept_Name values below are the actual sheet values
+  // confirmed against the live data, not the page titles (e.g. the Clerk's
+  // page is titled "Clerk of Courts & County Comptroller" but the sheet
+  // rows are Dept_Name "Clerk of Court"; the Sheriff's page rows are
+  // "Walton County Sheriff's Office").
+  const TRANSACTION_DRILLDOWN_DEPT_NAMES = new Set(
+    [
+      "Office of Management and Budget",
+      "Clerk of Court",
+      "Property Appraiser",
+      "Supervisor of Elections",
+      "Tax Collector",
+      "Walton County Sheriff's Office"
+    ].map(normalizeDeptName)
+  );
+
   function transactionDrilldownEnabledForRow(row) {
-    return normalizeDeptName(row && row.Dept_Name) === "office of management and budget";
+    return TRANSACTION_DRILLDOWN_DEPT_NAMES.has(normalizeDeptName(row && row.Dept_Name));
   }
 
   function transactionHrefForBudgetLine(row, column, fields) {
     if (!column.actual || !transactionDrilldownEnabledForRow(row)) return "";
-    const amount = row[column.field] || 0;
+    // Must match what the cell actually displays (budgetLineColumnAmount),
+    // not row[column.field] directly: for revenue, the displayed actual is
+    // a county-wide lookup by Revenue_Code, independent of which row in an
+    // account-level dedup group this one is. Reading row[column.field]
+    // directly would show $0 (and no link) for every row that the account
+    // dedup zeroed, even though the cell is correctly showing a real,
+    // non-zero amount sourced from the same account total.
+    const isExpense = !fields || fields.kind !== "revenue";
+    const amount = budgetLineColumnAmount(row, column, isExpense);
     if (!amount) return "";
 
     const params = new URLSearchParams();
@@ -1097,7 +1204,17 @@
             [categoryField]: r[categoryField] || "",
             [codeField]: r[codeField] || "",
             [nameField]: r[nameField] || "",
-            [descField]: ""
+            [descField]: "",
+            // Needed by transactionHrefForBudgetLine/transactionDrilldownEnabledForRow.
+            // Dept_Name/Dept_Code are identical across every row here (mergedRows is
+            // already scoped to one department), so the first row's value is safe.
+            // Project_Code/Project_Name are deliberately omitted: rows grouped into
+            // one summary line can span several different projects, and picking just
+            // one would make the resulting transaction filter under-count the total
+            // this row displays. Leaving it unset filters by department+code only,
+            // which matches every transaction the summary total was built from.
+            Dept_Name: r.Dept_Name || "",
+            Dept_Code: r.Dept_Code || ""
           };
           sumFields.forEach((f) => { row[f] = r[f] || 0; });
           grouped.set(key, row);
