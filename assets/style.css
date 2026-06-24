@@ -1202,11 +1202,24 @@ body {
 .wc-department-financial-grid .wc-finance-card {
   margin: 0;
 }
-/* Only stretch a card to match its row's taller sibling when it's the
-   sole card in its mount; when a mount stacks several sub-program cards
-   (see arrangeDepartmentFinancialDashboard), each stacking 100% would
+/* The solid waste / building construction / bcc supplemental wrappers are
+   `display: contents` so each of their cards becomes its own independent
+   grid cell -- those should always stretch to match whatever they land
+   beside in the row, regardless of how many sibling cards share that
+   wrapper. */
+.wc-department-financial-grid .solid-waste-supplemental-tables .wc-finance-card,
+.wc-department-financial-grid .building-construction-supplemental-tables .wc-finance-card,
+.wc-department-financial-grid .bcc-supplemental-tables .wc-finance-card {
+  height: 100%;
+}
+/* #department-expense-table / #department-revenue-table are different:
+   they can stack several sub-program cards inside ONE mount (e.g. Court
+   Technology & Innovations, Code Compliance -- see
+   arrangeDepartmentFinancialDashboard), so only stretch there when it's
+   the sole card in the mount; stretching every stacked card to 100% would
    overflow the mount and spill into the page content below it. */
-.wc-department-financial-grid .wc-finance-card:only-of-type {
+.wc-department-financial-grid #department-expense-table .wc-finance-card:only-of-type,
+.wc-department-financial-grid #department-revenue-table .wc-finance-card:only-of-type {
   height: 100%;
 }
 .wc-department-financial-grid .wc-finance-card + .wc-finance-card {
