@@ -131,6 +131,10 @@
       return n.toLocaleString("en-US", { maximumFractionDigits:2 }).replace(/\.00$/, "");
     }
 
+    function fundCodeForRow(row){
+      return String((row && row.Dept_Code) || "").trim().slice(0, 3);
+    }
+
     function descriptionFromNarrative(text){
       var clean = String(text || "").replace(/\s+/g, " ").trim();
       if(!clean) return "View budget, staffing, performance measures, and service information for this Walton County department.";
@@ -178,10 +182,40 @@
         .sort(function(a, b){ return a.name.localeCompare(b.name); });
     }
 
+    function fundLabelForDepartment(name, expenditures, fundsByCode){
+      var codes = [];
+      expenditures.forEach(function(row){
+        if(!rowMatchesDepartment(row, name)) return;
+        // Some departments carry a placeholder row under a legacy fund
+        // purely so historical actuals stay visible (e.g. Engineering
+        // moved from the General Fund to the Transportation Fund starting
+        // FY2027 -- see DEPT_CODE_ACTUALS_ALIASES' comment in budget-data.js).
+        // Those placeholders have no FY2027 budget of their own, so they're
+        // skipped here to keep this in sync with the budget figure shown,
+        // which is FY2027-only.
+        if(!(Number(row.FY2027_Proposed) || 0)) return;
+        var code = fundCodeForRow(row);
+        if(code && codes.indexOf(code) === -1) codes.push(code);
+      });
+      if(!codes.length) return "Not listed";
+      var names = codes
+        .map(function(code){
+          var fund = fundsByCode[code];
+          return fund && fund.Fund_Name ? fund.Fund_Name : code;
+        })
+        .sort();
+      return names.join(", ");
+    }
+
     function enrichDepartments(data){
       var narratives = Array.isArray(data && data.departmentNarratives) ? data.departmentNarratives : [];
       var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
+      var funds = Array.isArray(data && data.funds) ? data.funds : [];
+      var fundsByCode = {};
+      funds.forEach(function(fund){
+        if(fund && fund.Fund_Code) fundsByCode[fund.Fund_Code] = fund;
+      });
 
       departments = buildBaseDepartments().map(function(dept){
         var narrative = narratives.find(function(row){ return rowMatchesDepartment(row, dept.name); });
@@ -197,7 +231,8 @@
           href:dept.href,
           description:descriptionFromNarrative(narrative && narrative.Narrative),
           budget:formatCurrency(budget),
-          fte:formatFte(fte)
+          fte:formatFte(fte),
+          fund:fundLabelForDepartment(dept.name, expenditures, fundsByCode)
         };
       });
     }
@@ -208,12 +243,15 @@
       list.innerHTML = departments.map(function(dept){
         var personnelStat = dept.fte === "Not listed" ? "" :
           '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fte) + '</strong><span>Personnel</span></div>';
+        var fundStat = !dept.fund || dept.fund === "Not listed" ? "" :
+          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fund) + '</strong><span>Fund</span></div>';
         return '<li><a class="wc-directory-item" href="' + escapeHtml(dept.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(dept.name) + '</span>' +
             '<span class="wc-directory-item-desc">' + escapeHtml(dept.description) + '</span>' +
           '</div>' +
           '<div class="wc-directory-item-meta">' +
+            fundStat +
             '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.budget) + '</strong><span>FY 2027 Budget</span></div>' +
             personnelStat +
           '</div>' +
@@ -229,7 +267,8 @@
           href:dept.href,
           description:descriptionFromNarrative(""),
           budget:"Loading",
-          fte:"Loading"
+          fte:"Loading",
+          fund:"Loading"
         };
       });
       renderDepartments();
@@ -244,6 +283,7 @@
             departments = departments.map(function(dept){
               dept.budget = "Not listed";
               dept.fte = "Not listed";
+              dept.fund = "Not listed";
               return dept;
             });
             renderDepartments();

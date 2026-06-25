@@ -147,6 +147,31 @@
       return aliasesFor(name, aliasMap).indexOf(dept) !== -1;
     }
 
+    function fundCodeForRow(row){
+      return String((row && row.Dept_Code) || "").trim().slice(0, 3);
+    }
+
+    function fundLabelForItem(budgetRows, fundsByCode){
+      var codes = [];
+      budgetRows.forEach(function(row){
+        // Skip rows with no FY2027 budget of their own (e.g. a legacy-fund
+        // placeholder kept only so historical actuals stay visible -- see
+        // DEPT_CODE_ACTUALS_ALIASES' comment in budget-data.js), so the
+        // fund shown stays in sync with the FY2027 budget figure shown.
+        if(!(Number(row.FY2027_Proposed) || 0)) return;
+        var code = fundCodeForRow(row);
+        if(code && codes.indexOf(code) === -1) codes.push(code);
+      });
+      if(!codes.length) return "Not listed";
+      return codes
+        .map(function(code){
+          var fund = fundsByCode[code];
+          return fund && fund.Fund_Name ? fund.Fund_Name : code;
+        })
+        .sort()
+        .join(", ");
+    }
+
     function expenditureRowsForItem(rows, item, group){
       if(normalize(item.name) === "statutory and other agency funding"){
         return rows.filter(function(row){
@@ -195,6 +220,11 @@
       var narratives = Array.isArray(data && data.departmentNarratives) ? data.departmentNarratives : [];
       var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
+      var funds = Array.isArray(data && data.funds) ? data.funds : [];
+      var fundsByCode = {};
+      funds.forEach(function(fund){
+        if(fund && fund.Fund_Code) fundsByCode[fund.Fund_Code] = fund;
+      });
 
       return baseItems.map(function(item){
         var narrative = narratives.find(function(row){ return rowMatches(row, item.name, group.aliasMap); });
@@ -211,7 +241,8 @@
           href:item.href,
           description:descriptionFromNarrative(narrative && narrative.Narrative, group.defaultDescription),
           budget:formatCurrency(budget),
-          fte:formatFte(fte)
+          fte:formatFte(fte),
+          fund:fundLabelForItem(budgetRows, fundsByCode)
         };
       });
     }
@@ -223,12 +254,15 @@
       list.innerHTML = items.map(function(item){
         var personnelStat = item.fte === "Not listed" ? "" :
           '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.fte) + '</strong><span>Personnel</span></div>';
+        var fundStat = !item.fund || item.fund === "Not listed" ? "" :
+          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.fund) + '</strong><span>Fund</span></div>';
         return '<li><a class="wc-directory-item" href="' + escapeHtml(item.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(item.name) + '</span>' +
             '<span class="wc-directory-item-desc">' + escapeHtml(item.description) + '</span>' +
           '</div>' +
           '<div class="wc-directory-item-meta">' +
+            fundStat +
             '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.budget) + '</strong><span>FY 2027 Budget</span></div>' +
             personnelStat +
           '</div>' +
@@ -246,7 +280,8 @@
             href:item.href,
             description:descriptionFromNarrative("", group.defaultDescription),
             budget:"Loading",
-            fte:"Loading"
+            fte:"Loading",
+            fund:"Loading"
           };
         });
         renderItems(group, loadingItems);
@@ -268,7 +303,8 @@
                   href:item.href,
                   description:descriptionFromNarrative("", entry.group.defaultDescription),
                   budget:"Not listed",
-                  fte:"Not listed"
+                  fte:"Not listed",
+                  fund:"Not listed"
                 };
               }));
             });
