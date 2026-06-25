@@ -1738,11 +1738,23 @@
     return transactionPage + "?" + params.toString();
   }
 
+  // Object codes that should never appear as their own itemized row in any
+  // Budget Lines / Revenue Lines detail table -- not real Chart of
+  // Accounts accounts (500000 is a generic/rollup code with no Object_Name
+  // of its own; 523004 is a stray sub-code variant), just noise picked up
+  // by synthesizeMissingExpenseRows. Filtered here, not at the source, so
+  // they're hidden from every "View Budget Lines" view without touching
+  // whatever totals already sum over cache.expenditures.
+  const HIDDEN_BUDGET_LINE_OBJECT_CODES = new Set(["500000", "523004"]);
+
   function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName) {
     if (!rows || !rows.length) return { button: "", detail: "" };
+    const isExpense = kind !== "revenue";
+    const codeFieldForFilter = isExpense ? "Object_Code" : "Revenue_Code";
+    rows = rows.filter((r) => !HIDDEN_BUDGET_LINE_OBJECT_CODES.has(String(r[codeFieldForFilter] || "").trim()));
+    if (!rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
-    const isExpense = kind !== "revenue";
     // See PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES. Guarded to
     // combineByName === false since this should only apply to the
     // department's own single-page breakdown, not a county-wide summary

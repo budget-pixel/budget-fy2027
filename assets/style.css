@@ -1222,7 +1222,13 @@ body {
 .wc-department-financial-grid #department-revenue-table .wc-finance-card:only-of-type {
   height: 100%;
 }
-.wc-department-financial-grid .wc-finance-card + .wc-finance-card {
+/* Only adds a gap between stacked cards sharing one mount
+   (#department-expense-table / #department-revenue-table); a supplemental
+   wrapper's cards are separate grid cells now (see above), so this same
+   sibling selector would otherwise push the second one down within its
+   row and break its alignment with whatever it sits beside. */
+.wc-department-financial-grid #department-expense-table .wc-finance-card + .wc-finance-card,
+.wc-department-financial-grid #department-revenue-table .wc-finance-card + .wc-finance-card {
   margin-top: 18px;
 }
 .wc-department-financial-grid #department-staffing-table {
