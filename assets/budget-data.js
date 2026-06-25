@@ -4437,6 +4437,13 @@
       TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
       "</section>";
 
+    // Rendered inside the "Tourism Administration" division's own section,
+    // right after its statement-of-function narrative but before its
+    // Expenditure Summary card, instead of the page's standalone
+    // #department-performance-table container, which would otherwise land
+    // after every division's own section -- see DEPTS_WITH_PERFORMANCE_FOLDED_IN.
+    const performanceHtml = renderPerformanceTable(getDepartmentPerformanceMeasures("Tourism Administration", ""));
+
     const sections = TOURISM_ADMIN_SECTIONS.map((spec) => {
       const narrativeRows = rowsForExactNames(cache.departmentNarratives, spec.narrativeNames)
         .filter((r) => r.Narrative && r.Narrative.trim());
@@ -4449,6 +4456,7 @@
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
       const body = [
         narrativeHtml,
+        spec.label === "Tourism Administration" ? performanceHtml : "",
         renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
         renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
         renderStaffingTable(staffingRows)
@@ -4476,7 +4484,7 @@
       narrativeNames: ["Tourism Beach Operations"],
       expenseNames: ["Beach Operations"],
       revenueNames: [],
-      staffingNames: ["Beach Operations"],
+      staffingNames: ["Tourism Beach Operations"],
       machineryNames: [],
       performanceNames: ["Tourism Beach Operations"]
     },
@@ -4493,7 +4501,7 @@
       narrativeNames: ["Beach Tram"],
       expenseNames: ["Beach Tram"],
       revenueNames: [],
-      staffingNames: ["Beach Tram"],
+      staffingNames: ["Tourism Beach Tram"],
       machineryNames: []
     }
   ];
@@ -4612,7 +4620,7 @@
   // Departments whose combined sections (above) already render their own
   // Performance Measures table inline, so the page's standalone
   // performance container should stay empty instead of duplicating it.
-  const DEPTS_WITH_PERFORMANCE_FOLDED_IN = new Set(["tourism beach operations"]);
+  const DEPTS_WITH_PERFORMANCE_FOLDED_IN = new Set(["tourism beach operations", "tourism administration"]);
 
   function renderMosquitoStateAidTables() {
     const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
