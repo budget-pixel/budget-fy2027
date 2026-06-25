@@ -664,6 +664,19 @@
     color:var(--wc-muted);
     font-size:16px;
   }
+  .wc-section-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+    color:var(--wc-green);
+    font-weight:800;
+    font-size:14px;
+    text-decoration:none;
+  }
+  .wc-section-link:hover{
+    text-decoration:underline;
+  }
   .wc-investment-heading{
     margin-top:54px;
   }
@@ -1165,6 +1178,7 @@
           <span>Budget At A Glance</span>
           <h2>The revenues that support countywide services.</h2>
         </div>
+        <a class="wc-section-link" href="pages/summary-of-revenues.html">View Summary of Revenues &rarr;</a>
       </div>
       <div class="wc-budget-grid">
         <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong>$163.4M</strong></div>
@@ -1178,6 +1192,7 @@
           <span>Major Expense Areas</span>
           <h2>Where those resources are invested.</h2>
         </div>
+        <a class="wc-section-link" href="pages/summary-of-expenses.html">View Summary of Expenses &rarr;</a>
       </div>
       <div class="wc-investment-grid">
         <div class="wc-investment-card" data-expense-card="sheriff"><small>Sheriff Fund</small><strong>...</strong><p>Public safety operations and law enforcement services.</p></div>
