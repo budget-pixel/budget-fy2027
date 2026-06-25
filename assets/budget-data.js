@@ -3464,12 +3464,223 @@
     );
   }
 
+  // Traces a rounded-rectangle path on `ctx` without relying on the
+  // browser's native CanvasRenderingContext2D.roundRect (not available in
+  // every supported browser), clamping the radius so it never exceeds half
+  // the rectangle's own width/height -- a too-large radius would otherwise
+  // make the two corners on a short/narrow side overlap and self-intersect.
+  function tracePathForRoundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.arcTo(x + width, y, x + width, y + r, r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
+    ctx.lineTo(x + r, y + height);
+    ctx.arcTo(x, y + height, x, y + height - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  // Chart.js draws each stacked dataset's bar segment as its own flat
+  // rectangle. Rounding any one segment's own corners (e.g. via its
+  // borderRadius option) breaks down two ways: a segment in the middle of
+  // the stack gets rounded on a side that should butt flush against its
+  // neighbor, and the *outermost* segment's rounding gets silently clamped
+  // away by Chart.js whenever that segment's own value is a thin sliver
+  // (a small dollar amount can be only a few pixels tall, too short to fit
+  // a 6px radius) -- the bar still looks flat even though the rounding
+  // logic picked the right segment.
+  //
+  // Clipping the whole bar's silhouette to one rounded rectangle, based on
+  // the bar's *total* stacked height rather than any single segment's
+  // value, fixes both: it's a Chart.js plugin (registered per chart, not
+  // globally, since only these two stacked-bar charts want it) that clips
+  // the canvas to every bar's rounded outline before Chart.js draws the
+  // (otherwise plain, square) bar rectangles, so only the true top/bottom
+  // of the combined stack ever gets rounded, regardless of which dataset
+  // happens to occupy that edge.
+  function stackedBarRoundingPlugin(radius) {
+    return {
+      id: "wcStackedBarRounding",
+      beforeDatasetsDraw(chart) {
+        const datasets = chart.data.datasets;
+        const meta0 = chart.getDatasetMeta(0);
+        if (!datasets.length || !meta0 || !meta0.data.length) return;
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.beginPath();
+        let pathed = false;
+        meta0.data.forEach((firstEl, barIndex) => {
+          let top = Infinity;
+          let bottom = -Infinity;
+          let left = null;
+          let width = 0;
+          datasets.forEach((ds, di) => {
+            const meta = chart.getDatasetMeta(di);
+            if (meta.hidden || !ds.data[barIndex]) return;
+            const el = meta.data[barIndex];
+            if (!el) return;
+            top = Math.min(top, el.y);
+            bottom = Math.max(bottom, el.base);
+            if (left === null) {
+              left = el.x - el.width / 2;
+              width = el.width;
+            }
+          });
+          if (left === null || !isFinite(top)) return;
+          tracePathForRoundedRect(ctx, left, top, width, bottom - top, radius);
+          pathed = true;
+        });
+        if (pathed) {
+          ctx.clip();
+          chart.$wcStackedBarClipped = true;
+        } else {
+          ctx.restore();
+        }
+      },
+      afterDatasetsDraw(chart) {
+        if (chart.$wcStackedBarClipped) {
+          chart.ctx.restore();
+          chart.$wcStackedBarClipped = false;
+        }
+      }
+    };
+  }
+
+  // Chart.js draws straight to <canvas>, so its axis labels/gridlines can't
+  // pick up the site's CSS dark-mode variables the way every other element
+  // on the page does just by being styled in stylesheet.css. Reading the
+  // live CSS variables here (rather than hardcoding a parallel light/dark
+  // color pair in JS) keeps these in sync automatically if the palette in
+  // style.css ever changes.
+  function wcChartThemeColors() {
+    const styles = getComputedStyle(document.documentElement);
+    return {
+      text: (styles.getPropertyValue("--muted") || "#5a6e7f").trim(),
+      grid: (styles.getPropertyValue("--border") || "#e0e8e4").trim()
+    };
+  }
+
+  // Scriptable options (the `() => ...` callbacks set on each chart's
+  // scales/datasets below) only get re-evaluated when something tells
+  // Chart.js to redraw -- they don't repaint on their own just because
+  // --text/--border changed. The theme toggle (walton-budget-nav.js) flips
+  // data-theme on <html> with no page reload and without dispatching any
+  // event of its own, so this observes that attribute directly (one
+  // observer total, regardless of how many listeners are registered) and
+  // re-runs every registered listener -- a chart's own `.update()`, or a
+  // legend swatch recolor, or anything else -- whenever it changes.
+  const wcThemeListeners = [];
+  let wcThemeObserverStarted = false;
+
+  function onWcThemeChange(listener) {
+    wcThemeListeners.push(listener);
+    if (wcThemeObserverStarted) return;
+    wcThemeObserverStarted = true;
+    const observer = new MutationObserver(() => {
+      wcThemeListeners.forEach((fn) => {
+        try {
+          fn();
+        } catch (e) {
+          // A listener's chart/DOM was destroyed since the last theme
+          // change -- nothing to update for it.
+        }
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+
+  function registerWcThemedChart(chart) {
+    onWcThemeChange(() => chart.update());
+  }
+
+  // The site's fixed bar-chart palette (REVENUE_TOPIC_CHART_COLORS) is
+  // tuned for a white chart background -- several entries (near-black
+  // greens, pure black, dark greys) are deliberately dark for contrast
+  // there, which makes them nearly invisible against the dark theme's
+  // near-black chart background instead. Rather than hand-maintaining a
+  // second 24-color palette to keep in sync, this lightens each color by a
+  // fixed amount in HSL space when dark mode is active, preserving its hue
+  // (so position N in the palette still reads as "the same family of
+  // color" in both themes) while guaranteeing every entry ends up legible.
+  function hexToRgb(hex) {
+    const clean = hex.replace("#", "");
+    return [
+      parseInt(clean.slice(0, 2), 16) / 255,
+      parseInt(clean.slice(2, 4), 16) / 255,
+      parseInt(clean.slice(4, 6), 16) / 255
+    ];
+  }
+
+  function rgbToHsl(r, g, b) {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    const d = max - min;
+    if (d === 0) return [0, 0, l * 100];
+    const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    let h;
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+    if (h < 0) h += 360;
+    return [h, s * 100, l * 100];
+  }
+
+  function hslToHex(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+    const toHex = (v) => Math.round(Math.min(1, Math.max(0, v)) * 255).toString(16).padStart(2, "0");
+    return "#" + toHex(r) + toHex(g) + toHex(b);
+  }
+
+  function chartColorForTheme(hex) {
+    if (document.documentElement.getAttribute("data-theme") !== "dark") return hex;
+    const [h, s, l] = rgbToHsl(...hexToRgb(hex));
+    return hslToHex(h, Math.min(85, s + 8), Math.min(82, l + 30));
+  }
+
   // One narrative banner + full-width stacked-bar chart (grouped by
   // contributing department) per expense Activity classification.
   function renderExpenseActivityChart(container, section, idPrefix) {
     if (!container) return;
-    const expenseRows = cache.expenditures || [];
     const activityNorm = section.activity.toLowerCase();
+    const matchesActivityAndFund = (r) =>
+      expenseActivityForRow(r).toLowerCase() === activityNorm &&
+      !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r));
+    const expenseRows = (cache.expenditures || []).filter(matchesActivityAndFund);
+    // FY2020-FY2026 columns are summed from the shared deduped layer
+    // instead of the raw display rows -- see buildDedupedHistoricalExpenseRows.
+    // Some departments split one Dept_Code across multiple display-only
+    // Dept_Names (e.g. Code Compliance / Code Compliance Beach), each
+    // carrying the same full account total for those years -- stacking
+    // both bars would double it. FY2027 Proposed keeps summing the raw
+    // rows directly, since it isn't subject to that display-row
+    // duplication (each Dept_Name's own itemized FY2027 budget lines are
+    // genuinely distinct).
+    const dedupedRows = (cache.dedupedExpenseRows || []).filter(matchesActivityAndFund);
 
     container.innerHTML =
       '<div class="wc-expense-activity-chart-card">' +
@@ -3481,23 +3692,30 @@
     if (typeof Chart === "undefined") return;
 
     const byDept = new Map();
-    expenseRows
-      .filter((r) =>
-        expenseActivityForRow(r).toLowerCase() === activityNorm &&
-        !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
-      )
-      .forEach((r) => {
-        const name = r.Dept_Name || "Unknown";
-        if (!byDept.has(name)) byDept.set(name, []);
-        byDept.get(name).push(r);
-      });
+    expenseRows.forEach((r) => {
+      const name = r.Dept_Name || "Unknown";
+      if (!byDept.has(name)) byDept.set(name, []);
+      byDept.get(name).push(r);
+    });
+    const dedupedByDept = new Map();
+    dedupedRows.forEach((r) => {
+      const name = r.Dept_Name || "Unknown";
+      if (!dedupedByDept.has(name)) dedupedByDept.set(name, []);
+      dedupedByDept.get(name).push(r);
+    });
 
+    const baseColors = Array.from(byDept.keys()).map((_, i) => REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length]);
     const datasets = Array.from(byDept.entries()).map(([name, rowsForName], i) => ({
       label: name,
-      data: REVENUE_TOPIC_CHART_YEARS.map((y) => rowsForName.reduce((s, r) => s + (r[y.field] || 0), 0)),
-      backgroundColor: REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length],
-      borderRadius: 6,
-      borderSkipped: false
+      data: REVENUE_TOPIC_CHART_YEARS.map((y) => {
+        const source = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(y.field) ? (dedupedByDept.get(name) || []) : rowsForName;
+        return source.reduce((s, r) => s + (r[y.field] || 0), 0);
+      }),
+      // Scriptable so it re-resolves (via registerWcThemedChart's
+      // chart.update() on theme change) to a dark-mode-legible variant
+      // instead of staying fixed at the light-mode hex forever -- see
+      // chartColorForTheme.
+      backgroundColor: () => chartColorForTheme(baseColors[i])
     }));
 
     const canvas = document.getElementById(idPrefix);
@@ -3506,16 +3724,21 @@
     const chart = new Chart(canvas, {
       type: "bar",
       data: { labels: REVENUE_TOPIC_CHART_YEARS.map((y) => y.label), datasets: datasets },
+      plugins: [stackedBarRoundingPlugin(6)],
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: { stacked: true, grid: { display: false } },
+          x: {
+            stacked: true,
+            grid: { display: false },
+            ticks: { color: () => wcChartThemeColors().text }
+          },
           y: {
             stacked: true,
             beginAtZero: true,
-            grid: { display: true },
-            ticks: { callback: (v) => formatAbbreviatedCurrency(v) }
+            grid: { display: true, color: () => wcChartThemeColors().grid },
+            ticks: { color: () => wcChartThemeColors().text, callback: (v) => formatAbbreviatedCurrency(v) }
           }
         },
         interaction: { mode: "index", intersect: false },
@@ -3531,15 +3754,21 @@
         }
       }
     });
+    registerWcThemedChart(chart);
 
     const legendEl = document.getElementById(idPrefix + "-legend");
     if (legendEl) {
       legendEl.innerHTML = datasets.map((d, i) =>
         '<button type="button" class="wc-revenue-chart-legend-item" data-index="' + i + '">' +
-        '<span class="wc-revenue-chart-legend-swatch" style="background:' + d.backgroundColor + '"></span>' +
+        '<span class="wc-revenue-chart-legend-swatch" style="background:' + chartColorForTheme(baseColors[i]) + '"></span>' +
         "<span>" + escapeHtml(d.label) + "</span>" +
         "</button>"
       ).join("");
+      onWcThemeChange(() => {
+        legendEl.querySelectorAll(".wc-revenue-chart-legend-swatch").forEach((swatch, i) => {
+          swatch.style.background = chartColorForTheme(baseColors[i]);
+        });
+      });
 
       legendEl.querySelectorAll(".wc-revenue-chart-legend-item").forEach((item) => {
         const i = Number(item.dataset.index);
@@ -3672,7 +3901,12 @@
     { field: "FY2023_Actual", label: "FY 2023 Actual" },
     { field: "FY2024_Actual", label: "FY 2024 Actual" },
     { field: "FY2025_Actual", label: "FY 2025 Actual" },
-    { field: "FY2026_Budget", label: "FY 2026 Budget" },
+    // Sourced from expense_original_budget_public (Supabase), not the
+    // Google Sheets FY2026_Budget field -- the sheet no longer carries that
+    // column at all, so reading it directly left this bar permanently
+    // empty. See BUDGET_LINE_PRIOR_YEAR_COLUMNS for the same field used
+    // everywhere else FY2026 is shown.
+    { field: "FY2026_Original_Budget", label: "FY 2026 Budget" },
     { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
   ];
 
@@ -3709,6 +3943,28 @@
         if (!codes.has(String(row.object || "").trim())) return sum;
         if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(String(row.org || "").trim().slice(0, 3))) return sum;
         return sum + (Number(row.amount) || 0);
+      }, 0);
+    }
+
+    if (field === "FY2026_Original_Budget") {
+      // Same dedup as the Consolidated Revenue Summary's dedupedRevenueSum
+      // (revenueBudgetUniqueKey: fund+Dept_Code+Revenue_Code+Project_Code)
+      // -- a shared GL code (e.g. the General Fund's Ad Valorem Taxes line)
+      // can be referenced by many departments' own rows under the same
+      // Dept_Code, each carrying the *same* full account total rather than
+      // its own share, so summing every row directly would multiply it by
+      // however many departments reference it. Unlike budgetLineColumnTotal
+      // (scoped to one department's own rows, where a code-level fallback
+      // is needed for a row the dedup zeroed out), a chart topic's rows
+      // already span every department county-wide, so deduping by key and
+      // summing each one once is sufficient -- the real amount lives on
+      // whichever row in the group happens to be first.
+      const seen = new Set();
+      return (rows || []).reduce((sum, row) => {
+        const key = revenueBudgetUniqueKey(row);
+        if (seen.has(key)) return sum;
+        seen.add(key);
+        return sum + revenueBudgetMergeContribution(row);
       }, 0);
     }
 
@@ -3764,12 +4020,15 @@
         byName.get(name).push(r);
       });
 
+      const baseColors = Array.from(byName.keys()).map((_, i) => REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length]);
       const datasets = Array.from(byName.entries()).map(([name, rowsForName], i) => ({
         label: name,
         data: REVENUE_TOPIC_CHART_YEARS.map((y) => sumRevenueRowsForField(rowsForName, y.field)),
-        backgroundColor: REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length],
-        borderRadius: 6,
-        borderSkipped: false
+        // Scriptable so it re-resolves (via registerWcThemedChart's
+        // chart.update() on theme change) to a dark-mode-legible variant
+        // instead of staying fixed at the light-mode hex forever -- see
+        // chartColorForTheme.
+        backgroundColor: () => chartColorForTheme(baseColors[i])
       }));
 
       const canvas = document.getElementById(idPrefix + "-" + topicIndex);
@@ -3778,16 +4037,21 @@
       const chart = new Chart(canvas, {
         type: "bar",
         data: { labels: REVENUE_TOPIC_CHART_YEARS.map((y) => y.label), datasets: datasets },
+        plugins: [stackedBarRoundingPlugin(6)],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { stacked: true, grid: { display: false } },
+            x: {
+              stacked: true,
+              grid: { display: false },
+              ticks: { color: () => wcChartThemeColors().text }
+            },
             y: {
               stacked: true,
               beginAtZero: true,
-              grid: { display: true },
-              ticks: { callback: (v) => formatAbbreviatedCurrency(v) }
+              grid: { display: true, color: () => wcChartThemeColors().grid },
+              ticks: { color: () => wcChartThemeColors().text, callback: (v) => formatAbbreviatedCurrency(v) }
             }
           },
           interaction: { mode: "index", intersect: false },
@@ -3803,6 +4067,7 @@
           }
         }
       });
+      registerWcThemedChart(chart);
 
       // Chart.js's built-in bottom legend gets cramped/overlaps once a
       // topic has more than a few revenue codes (e.g. State Fuel Taxes),
@@ -3811,10 +4076,15 @@
       if (legendEl) {
         legendEl.innerHTML = datasets.map((d, i) =>
           '<button type="button" class="wc-revenue-chart-legend-item" data-index="' + i + '">' +
-          '<span class="wc-revenue-chart-legend-swatch" style="background:' + d.backgroundColor + '"></span>' +
+          '<span class="wc-revenue-chart-legend-swatch" style="background:' + chartColorForTheme(baseColors[i]) + '"></span>' +
           "<span>" + escapeHtml(d.label) + "</span>" +
           "</button>"
         ).join("");
+        onWcThemeChange(() => {
+          legendEl.querySelectorAll(".wc-revenue-chart-legend-swatch").forEach((swatch, i) => {
+            swatch.style.background = chartColorForTheme(baseColors[i]);
+          });
+        });
 
         legendEl.querySelectorAll(".wc-revenue-chart-legend-item").forEach((item) => {
           const i = Number(item.dataset.index);

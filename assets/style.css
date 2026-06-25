@@ -1981,6 +1981,37 @@ body {
   color: var(--green) !important;
 }
 
+/* Summary of Expenses/Revenues' "Expenditure/Revenue Classification" hero
+   blocks (.wc-revenue-*) are hardcoded light-only in each page's own inline
+   <style> block, including an inline `background` on .wc-revenue-full-bleed
+   itself -- overridden here (needs !important to beat that inline style)
+   rather than duplicated per page. */
+:root[data-theme="dark"] .wc-revenue-full-bleed {
+  background: linear-gradient(135deg, rgba(123,211,159,.05) 0%, rgba(9,18,14,.4) 100%) !important;
+}
+
+:root[data-theme="dark"] .wc-revenue-heading-inner {
+  background: rgba(14,28,22,.92) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 18px 42px rgba(0,0,0,.32), 0 6px 18px rgba(0,0,0,.22) !important;
+}
+
+:root[data-theme="dark"] .wc-revenue-heading-inner span {
+  color: var(--green) !important;
+}
+
+:root[data-theme="dark"] .wc-revenue-heading-inner h2 {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .wc-revenue-heading-inner h2::after {
+  background: linear-gradient(90deg, var(--green) 0%, var(--green2) 100%) !important;
+}
+
+:root[data-theme="dark"] .wc-revenue-heading-inner p {
+  color: var(--muted) !important;
+}
+
 :root[data-theme="dark"] .index-card,
 :root[data-theme="dark"] .wc-metric-card,
 :root[data-theme="dark"] .wc-directory-list li,
@@ -1991,6 +2022,8 @@ body {
 :root[data-theme="dark"] .wc-census-iframe-card,
 :root[data-theme="dark"] .wc-expense-activity-chart-card,
 :root[data-theme="dark"] .wc-expense-activity-chart-wrap,
+:root[data-theme="dark"] .wc-revenue-topic-chart-wrap,
+:root[data-theme="dark"] .wc-revenue-chart-legend,
 :root[data-theme="dark"] .wc-finance-card,
 :root[data-theme="dark"] .wc-data-table-wrap,
 :root[data-theme="dark"] .wc-data-table-scroll,
