@@ -127,6 +127,7 @@
 
   const cache = {
     expenditures: [],
+    dedupedExpenseRows: [],
     revenues: [],
     expenseActualRows: [],
     revenueActualRows: [],
@@ -210,11 +211,20 @@
   // Maintenance (now solely 00117000) has actuals split across 00117010,
   // 00117020, and 10117000 in Supabase, so those need to be pulled in
   // alongside the current code or its prior-year actuals read as zero.
-  // Engineering (now 10116002) has its actuals/FY2026 budget booked under
-  // legacy code 00120000.
+  //
+  // Engineering is NOT listed here even though its FY2020-FY2026
+  // actuals/budget are booked under legacy code 00120000 while its FY2027
+  // sheet row uses 10116002 -- unlike Building Construction's aliases, this
+  // wasn't just an org-code rename: the department itself moved from the
+  // General Fund (001, 00120000's own fund) to the Transportation Fund
+  // (101, 10116002's own fund) starting FY2027. Aliasing 00120000 into
+  // 10116002 would pull FY2020-FY2026 dollars onto the Transportation
+  // Fund's schedule a year before the department actually got there.
+  // synthesizeMissingExpenseRows instead synthesizes 00120000 as its own
+  // standalone row (see considerRow), keeping FY2020-FY2026 on fund 001 and
+  // FY2027 (the sheet's own 10116002 rows) on fund 101.
   const DEPT_CODE_ACTUALS_ALIASES = {
-    "00117000": ["00117010", "00117020", "10117000"],
-    "10116002": ["00120000"]
+    "00117000": ["00117010", "00117020", "10117000"]
   };
 
   // Sums every raw Supabase actuals row matching a department+account+year,
@@ -360,6 +370,263 @@
       if (!override) return row;
       return { ...row, Revenue_Name: override };
     });
+  }
+
+  function isFundScheduleDebugEnabled(flagName) {
+    try {
+      return new URLSearchParams(window.location.search).get(flagName) === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isMissingRowsDebugEnabled() {
+    return isFundScheduleDebugEnabled("debugMissingRows");
+  }
+
+  // Florida's Uniform Accounting System: revenue codes are 3xx, with no
+  // overlap with expense's 5xx/6xx (see isLikelyExpenseObjectCode).
+  function isLikelyRevenueCode(code) {
+    return String(code || "").trim().charAt(0) === "3";
+  }
+
+  // "COA Revenue Codes" -- like buildExpenseObjectCatalog, but there's no
+  // dedicated tab for this either, so it's derived from the revenues
+  // sheet's own Revenue_Code/Revenue_Name/Revenue_Type columns.
+  function buildRevenueCodeCatalog(revenueRows) {
+    const catalog = new Map();
+    (revenueRows || []).forEach((r) => {
+      const code = String(r.Revenue_Code || "").trim();
+      if (!code || catalog.has(code)) return;
+      catalog.set(code, { Revenue_Code: code, Revenue_Name: r.Revenue_Name || "", Revenue_Type: r.Revenue_Type || "" });
+    });
+    return catalog;
+  }
+
+  // Departments/recipients that already have at least one real row
+  // somewhere in the sheet -- a synthesized row (see
+  // synthesizeMissingExpenseRows/synthesizeMissingRevenueRows below) only
+  // gets attributed to a department name pulled from the activities sheet
+  // when that name is confirmed here. Some Dept_Codes in the activities
+  // sheet are revenue-category labels rather than real departments (e.g.
+  // 107342 maps to Dept_Name "Public Safety", not an actual department) --
+  // trusting those blindly previously misattributed rows to the wrong page
+  // entirely. Anything not confirmed here becomes Dept_Name "Unclassified"
+  // instead.
+  function buildKnownDeptNames(expenditureRows, revenueRows) {
+    const names = new Set();
+    (expenditureRows || []).forEach((r) => {
+      const n = normalizeDeptName(r.Dept_Name);
+      if (n) names.add(n);
+    });
+    (revenueRows || []).forEach((r) => {
+      const n = normalizeDeptName(r.Dept_Name);
+      if (n) names.add(n);
+    });
+    return names;
+  }
+
+  const UNCLASSIFIED_DEPT_NAME = "Unclassified";
+
+  // (org, object) keys that SUPABASE_LOOKUP_OVERRIDES already redirects
+  // into an existing sheet row's own lookup (e.g. 105389/389001 is summed
+  // into the 102389/389001 sheet row's Ad Valorem 5% figure) -- excluded
+  // from synthesis below so those dollars aren't also counted via a brand
+  // new row.
+  function overrideRedirectTargetKeys() {
+    const keys = new Set();
+    SUPABASE_LOOKUP_OVERRIDES.forEach((targets) => {
+      targets.forEach((t) => keys.add(String(t.org || "").trim() + "|" + String(t.object || "").trim()));
+    });
+    return keys;
+  }
+
+  // Org codes that are DEPT_CODE_ACTUALS_ALIASES targets (e.g. 00117010,
+  // an alias of canonical org 00117000) -- excluded from revenue synthesis
+  // wholesale, any object code, because sumRawActualsForAccount already
+  // folds all of an alias target's Supabase rows into the canonical org's
+  // own sum, AS LONG AS the canonical org has its own row for that exact
+  // object code. (Expense synthesis below checks this per object code
+  // instead of blanket-excluding the org -- see synthesizeMissingExpenseRows
+  // -- since an alias org can have an account under an object code its
+  // canonical org has no row for at all, which this blanket exclusion would
+  // otherwise silently drop.)
+  function aliasTargetOrgCodes() {
+    const codes = new Set();
+    Object.keys(DEPT_CODE_ACTUALS_ALIASES).forEach((canonicalOrg) => {
+      DEPT_CODE_ACTUALS_ALIASES[canonicalOrg].forEach((aliasOrg) => codes.add(aliasOrg));
+    });
+    return codes;
+  }
+
+  // Supabase actuals/original-budget rows can reference a department+
+  // account combination with no row at all in the FY2027 budget sheet --
+  // without a row to attach a value to, applyActualsToRows/
+  // applyOriginalBudgetToRows have nothing to populate, and every table
+  // that reads cache.expenditures (Summary of Expenses, every department's
+  // Budget Lines popup, the Fund Financial Schedule) never sees it. This
+  // synthesizes a minimal placeholder row for each one found, so the
+  // existing actuals/budget machinery picks it up the same way it does for
+  // every other row, with no per-table special-casing needed.
+  function synthesizeMissingExpenseRows(expenditureRows, originalBudgetRows, actualRows, coaDepartments, coaExpenses, knownDeptNames, excludedKeys) {
+    const rows = expenditureRows || [];
+
+    // Coverage already provided by *existing* sheet rows, mirroring exactly
+    // what applyOriginalBudgetToRows/applyActualsToRows will later match on:
+    // an unscoped row (projectScopeForRow undefined) catches every project
+    // under its org+object, while a project-scoped row only catches its own
+    // project (see projectScopeForRow). Needed to tell a genuinely missing
+    // account apart from one that's already covered by an existing row
+    // under a *different* Project_Code than the Supabase row happens to
+    // carry -- e.g. Walton County Health Department/Statutory & Other carve
+    // out specific projects under 00102012/581000, but a Supabase project
+    // matching none of them (and with no unscoped row to fall back to)
+    // would otherwise never be attached to any row at all.
+    const coverage = new Map();
+    function coverageFor(org, object) {
+      const key = org + "|" + object;
+      let cov = coverage.get(key);
+      if (!cov) {
+        cov = { any: false, scopes: new Set() };
+        coverage.set(key, cov);
+      }
+      return cov;
+    }
+    rows.forEach((r) => {
+      const org = String(r.Dept_Code || "").trim();
+      const object = String(r.Object_Code || "").trim();
+      if (!org || !object) return;
+      const scope = projectScopeForRow(r);
+      const cov = coverageFor(org, object);
+      if (scope === undefined) cov.any = true;
+      else cov.scopes.add(scope);
+    });
+
+    // Reverse of DEPT_CODE_ACTUALS_ALIASES: an alias org's Supabase rows
+    // are normally already folded into its canonical org's own row via
+    // sumRawActualsForAccount's org expansion -- but only for an object
+    // code the canonical org actually has a row for. An alias org's
+    // account under an object code the canonical org has no row for at all
+    // would otherwise be silently dropped (no row anywhere ever attaches to
+    // it), so it still needs its own synthesized row -- attributed to the
+    // *canonical* org's code (see considerRow below), not the legacy alias
+    // code, since the alias can carry a different (now-stale) fund than
+    // where the department actually sits today. E.g. Engineering's legacy
+    // code 00120000 was General Fund; its current code 10116002 is the
+    // Transportation Fund -- a row left under 00120000 would land on the
+    // wrong fund's schedule even though it's the same department's money.
+    // sumRawActualsForAccount's alias expansion still finds the alias org's
+    // own Supabase rows regardless of which org code the new row carries.
+    const canonicalOrgForAlias = new Map();
+    Object.keys(DEPT_CODE_ACTUALS_ALIASES).forEach((canonicalOrg) => {
+      DEPT_CODE_ACTUALS_ALIASES[canonicalOrg].forEach((aliasOrg) => canonicalOrgForAlias.set(aliasOrg, canonicalOrg));
+    });
+
+    function isCovered(org, object, project) {
+      const cov = coverage.get(org + "|" + object);
+      if (cov && (cov.any || cov.scopes.has(project))) return true;
+      const canonicalOrg = canonicalOrgForAlias.get(org);
+      if (!canonicalOrg) return false;
+      const canonicalCov = coverage.get(canonicalOrg + "|" + object);
+      return !!(canonicalCov && (canonicalCov.any || canonicalCov.scopes.has(project)));
+    }
+
+    const deptByCode = new Map((coaDepartments || []).map((d) => [String(d.Dept_Code || "").trim(), d]));
+    const seenNewKeys = new Set();
+    const extraRows = [];
+
+    function considerRow(org, object, project) {
+      if (!org || !object || !isLikelyExpenseObjectCode(object) || excludedKeys.has(org + "|" + object)) return;
+      if (isCovered(org, object, project)) return;
+
+      // Route a leftover alias-org account to its canonical org's own code
+      // (see canonicalOrgForAlias above) rather than the legacy alias code.
+      const targetOrg = canonicalOrgForAlias.get(org) || org;
+
+      const key = targetOrg + "|" + object + "|" + project;
+      if (seenNewKeys.has(key)) return;
+      seenNewKeys.add(key);
+
+      // A (targetOrg,object) with *some* existing project-scoped coverage
+      // already (just not this Supabase project) is a shared GL line
+      // across several distinct recipients -- the same pattern as
+      // Statutory & Other -- so this new row must be scoped to its own
+      // project too, or it would unscope-sum the whole account and
+      // re-duplicate its siblings' amounts.
+      const existingCov = coverage.get(targetOrg + "|" + object);
+      const needsOwnProjectScope = !!(existingCov && existingCov.scopes.size > 0);
+
+      const dept = deptByCode.get(targetOrg);
+      const deptName = needsOwnProjectScope
+        ? "Statutory & Other"
+        : (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Name))) ? dept.Dept_Name : UNCLASSIFIED_DEPT_NAME;
+      const expense = coaExpenses.get(object);
+
+      extraRows.push({
+        Dept_Code: targetOrg,
+        Dept_Name: deptName,
+        Note: "",
+        Project_Code: needsOwnProjectScope ? project : "",
+        Project_Name: "",
+        Object_Code: object,
+        Object_Name: expense ? expense.Object_Name : "Unclassified Account",
+        Object_Type: expense ? expense.Object_Type : "",
+        FY2027_Proposed: 0
+      });
+
+      if (needsOwnProjectScope) coverageFor(targetOrg, object).scopes.add(project);
+      else coverageFor(targetOrg, object).any = true;
+    }
+
+    (originalBudgetRows || []).forEach((r) => considerRow(String(r.org || "").trim(), String(r.object || "").trim(), String(r.project || "").trim()));
+    (actualRows || []).forEach((r) => considerRow(String(r.org || "").trim(), String(r.object || "").trim(), String(r.project || "").trim()));
+
+    if (isMissingRowsDebugEnabled()) {
+      console.log("MissingRows debug: synthesized " + extraRows.length + " expense row(s)", extraRows);
+    }
+    if (!extraRows.length) return rows;
+    return rows.concat(extraRows);
+  }
+
+  // Revenue counterpart of synthesizeMissingExpenseRows above.
+  function synthesizeMissingRevenueRows(revenueRows, originalBudgetRows, actualRows, coaDepartments, coaRevenueCodes, knownDeptNames, excludedKeys, excludedOrgs) {
+    const existingKeys = new Set(
+      (revenueRows || []).map((r) => String(r.Dept_Code || "").trim() + "|" + String(r.Revenue_Code || "").trim())
+    );
+    const deptByCode = new Map((coaDepartments || []).map((d) => [String(d.Dept_Code || "").trim(), d]));
+    const seenNewKeys = new Set();
+    const extraRows = [];
+
+    function considerRow(org, object) {
+      if (!org || !object || !isLikelyRevenueCode(object) || excludedOrgs.has(org)) return;
+      const key = org + "|" + object;
+      if (existingKeys.has(key) || seenNewKeys.has(key) || excludedKeys.has(key)) return;
+      seenNewKeys.add(key);
+
+      const dept = deptByCode.get(org);
+      const deptName = (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Name))) ? dept.Dept_Name : UNCLASSIFIED_DEPT_NAME;
+      const revenue = coaRevenueCodes.get(object);
+
+      extraRows.push({
+        Dept_Code: org,
+        Dept_Name: deptName,
+        Note: "",
+        Project_Name: "",
+        Revenue_Code: object,
+        Revenue_Name: revenue ? revenue.Revenue_Name : "Unclassified Account",
+        Revenue_Type: revenue ? revenue.Revenue_Type : "Miscellaneous Revenue",
+        FY2027_Proposed: 0
+      });
+    }
+
+    (originalBudgetRows || []).forEach((r) => considerRow(String(r.org || "").trim(), String(r.object || "").trim()));
+    (actualRows || []).forEach((r) => considerRow(String(r.org || "").trim(), String(r.object || "").trim()));
+
+    if (isMissingRowsDebugEnabled()) {
+      console.log("MissingRows debug: synthesized " + extraRows.length + " revenue row(s)", extraRows);
+    }
+    if (!extraRows.length) return revenueRows || [];
+    return (revenueRows || []).concat(extraRows);
   }
 
   // Revenue rows that represent a reduction against whatever Revenue_Name
@@ -994,8 +1261,9 @@
   }
 
   // Doubles as the "COA Departments" Chart of Accounts source for
-  // buildSupabaseOriginalBudgetScheduleRows below (Dept_Group/Org_Type
-  // weren't previously kept since nothing else used them).
+  // synthesizeMissingExpenseRows/synthesizeMissingRevenueRows below
+  // (Dept_Group/Org_Type weren't previously kept since nothing else used
+  // them).
   function normalizeActivityRow(row) {
     return {
       Dept_Code: (row.Dept_Code || "").trim(),
@@ -1020,8 +1288,19 @@
   // fund is encoded as the leading 3 digits of each row's Dept_Code, which
   // line up with Fund_Code values in the funds sheet (e.g. "00104000" and
   // "001381" both start with "001" for the General Fund).
+  // org 20146000 (Infrastructure, a synthesized expense row -- see
+  // synthesizeMissingExpenseRows) derives a fund code of "201" by the
+  // normal Dept_Code.slice(0,3) rule, but that's the same fund-code
+  // mismatch as its revenue counterpart (org 201389, already folded into
+  // the General Fund's own 001389 row) -- General Fund carries this
+  // expense too, so its fund code is corrected here, generally, rather
+  // than treating "201" as a fund of its own anywhere a row's fund is
+  // determined.
+  const DEPT_CODE_FUND_OVERRIDES = new Map([["20146000", "001"]]);
+
   function fundCodeForRow(row) {
-    return String((row && row.Dept_Code) || "").trim().slice(0, 3);
+    const deptCode = String((row && row.Dept_Code) || "").trim();
+    return DEPT_CODE_FUND_OVERRIDES.get(deptCode) || deptCode.slice(0, 3);
   }
 
   // True when a fund is shared by more than one department (e.g. the
@@ -1095,11 +1374,41 @@
         // back out of a multi-fund SUPABASE_LOOKUP_OVERRIDES row -- see
         // adValoremFivePercentReductionForFunds.
         cache.originalBudgetRows = actuals.originalBudgetRows || [];
+
+        // Add a placeholder row for any Supabase department+account that
+        // has no row at all in the sheet, before the actuals/budget
+        // machinery below runs, so it picks them up the same way it does
+        // every other row -- and so does every table downstream that reads
+        // cache.expenditures/cache.revenues (Summary of Expenses/Revenues,
+        // every department's own Budget/Revenue Lines popup), with no
+        // per-table special-casing needed. Built from the sheet's
+        // *pre-synthesis* state, since these are catalogs/known-name lists,
+        // not row data that needs the new rows reflected in it.
+        const knownDeptNames = buildKnownDeptNames(cache.expenditures, cache.revenues);
+        const excludedKeys = overrideRedirectTargetKeys();
+        const excludedOrgs = aliasTargetOrgCodes();
+        const expenseObjectCatalog = buildExpenseObjectCatalog(cache.expenditures);
+        const revenueCodeCatalog = buildRevenueCodeCatalog(cache.revenues);
+        cache.expenditures = synthesizeMissingExpenseRows(
+          cache.expenditures, actuals.originalBudgetRows, actuals.expenseRows,
+          cache.activities, expenseObjectCatalog, knownDeptNames, excludedKeys
+        );
+        cache.revenues = synthesizeMissingRevenueRows(
+          cache.revenues, actuals.originalBudgetRows, actuals.revenueRows,
+          cache.activities, revenueCodeCatalog, knownDeptNames, excludedKeys, excludedOrgs
+        );
+
         cache.expenditures = applyActualsToRows(cache.expenditures, actuals.expenseRows);
         cache.revenues = applyActualsToRows(cache.revenues, actuals.revenueRows);
         cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetRows);
         cache.revenues = applyOriginalBudgetToRows(cache.revenues, actuals.originalBudgetRows);
       }
+
+      // Computed once per load from the now-finalized cache.expenditures,
+      // and shared by the Consolidated Expense Summary and
+      // buildFundFinancialSchedule for FY2020-FY2026 -- see
+      // buildDedupedHistoricalExpenseRows.
+      cache.dedupedExpenseRows = buildDedupedHistoricalExpenseRows(cache);
 
       cache.machinery = buildMachineryRowsFromExpenditures(cache.expenditures);
 
@@ -2012,13 +2321,13 @@
   ];
 
   const CONSOLIDATED_REVENUE_TYPE_ROWS = [
-    { key: "Charges for Services", label: "Charges for Services" },
     { key: "General Government Taxes", label: "General Government Taxes" },
+    { key: "Permits Fees and Special Assessments", label: "Permits, Fees, and Special Assessments" },
     { key: "Intergovernmental Revenues", label: "Intergovernmental Revenues" },
+    { key: "Charges for Services", label: "Charges for Services" },
     { key: "Judgments, Fines and Forfeits", label: "Judgments, Fines and Forfeits" },
     { key: "Miscellaneous Revenue", label: "Miscellaneous Revenue" },
-    { key: "Other Sources", label: "Other Sources" },
-    { key: "Permits Fees and Special Assessments", label: "Permits, Fees, and Special Assessments" }
+    { key: "Other Sources", label: "Other Sources" }
   ];
 
   // Expenditures are grouped by function/activity (General Government,
@@ -2064,6 +2373,203 @@
 
   function isOtherFinancingExpenseRow(r) {
     return !isObjectCode599000(r) && OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase());
+  }
+
+  // ---- shared deduped historical expense layer ----
+  //
+  // Some departments split one Dept_Code across multiple display-only
+  // Dept_Names (e.g. Code Compliance / Code Compliance Beach, both under
+  // 00102030) -- applyActualsToRows/applyOriginalBudgetToRows deliberately
+  // give each Dept_Name its own full, undivided historical total, since
+  // actuals aren't tracked at that sub-program grain (see those functions'
+  // own comments). That's correct for a single department's own "View
+  // Budget Lines" detail, but summing every display row directly -- as the
+  // Consolidated Expense Summary and fund-level tables otherwise do --
+  // counts that one true account total once per Dept_Name sharing it,
+  // inflating FY2020-FY2026 history (and any Activity category those rows
+  // roll up into). This layer collapses back down to one row per true
+  // accounting record (see expenseAccountingKey for the exact grain) so
+  // both tables can report the real historical total instead.
+  //
+  // FY2027 Proposed is intentionally untouched here: it comes straight from
+  // the Google Sheet's own budget rows, which are not subject to this
+  // duplication (each is its own itemized budget line, not a repeated
+  // historical actual).
+  const HISTORICAL_EXPENSE_DEDUP_FIELDS = HISTORICAL_ACTUAL_YEARS
+    .map((year) => "FY" + year + "_Actual")
+    .concat(["FY2026_Original_Budget"]);
+  const HISTORICAL_EXPENSE_DEDUP_FIELD_SET = new Set(HISTORICAL_EXPENSE_DEDUP_FIELDS);
+
+  function isHistoricalExpenseDedupDebugEnabled() {
+    return isFundScheduleDebugEnabled("debugHistoricalExpenseDedup");
+  }
+
+  function yearForHistoricalExpenseField(field) {
+    return field === "FY2026_Original_Budget" ? 2026 : Number(field.slice(2, 6));
+  }
+
+  function historicalExpenseFieldValue(row, field) {
+    return field === "FY2026_Original_Budget"
+      ? (row.FY2026_Original_Budget || row.FY2026_Budget || 0)
+      : (row[field] || 0);
+  }
+
+  function firstNonZeroHistoricalValue(groupRows, field) {
+    for (let i = 0; i < groupRows.length; i++) {
+      const value = historicalExpenseFieldValue(groupRows[i], field);
+      if (value) return value;
+    }
+    return 0;
+  }
+
+  // The true accounting grain: fund, org (Dept_Code), object (Object_Code),
+  // and -- only when the row's own actual/budget lookup is itself scoped to
+  // one -- project. Dept_Name is deliberately excluded -- it's a
+  // display/sub-program label, not part of how the county books the
+  // underlying transaction.
+  //
+  // Project_Code is NOT part of this grain for most rows, even though it's
+  // a real column: projectScopeForRow is undefined for the default case,
+  // which means applyActualsToRows/applyOriginalBudgetToRows themselves sum
+  // every project under org+object with no project filter at all (see
+  // sumRawActualsForAccount's hasProjectScope). So two display rows with
+  // different Project_Code values but the same Dept_Code+Object_Code --
+  // e.g. Code Compliance (blank project) / Code Compliance Beach ("BEACH"),
+  // or Planning (blank project) / Planning Short-Term Rental ("10639") --
+  // still resolve to the exact same unscoped total under the hood and must
+  // collapse to one key here, or the very duplication this layer exists to
+  // fix goes undetected. Project_Code only belongs in the key for rows
+  // where projectScopeForRow returns a defined scope (Walton County Health
+  // Department, Non-Profit Funding Program, Statutory & Other) -- those
+  // lookups really are restricted to one project, so a different
+  // Project_Code there is a genuinely different recipient/amount, not a
+  // duplicate.
+  function expenseAccountingKey(row) {
+    const base = [
+      fundCodeForRow(row),
+      String((row && row.Dept_Code) || "").trim(),
+      String((row && row.Object_Code) || "").trim()
+    ].join("|");
+    const projectScope = projectScopeForRow(row);
+    return projectScope !== undefined ? base + "|" + projectScope : base;
+  }
+
+  // Builds one merged row per true accounting key from cache.expenditures
+  // (after synthesizeMissingExpenseRows has already filled in any
+  // Supabase-only accounts), with each HISTORICAL_EXPENSE_DEDUP_FIELDS
+  // amount counted once per key instead of once per Dept_Name sharing it.
+  // Used by both the Consolidated Expense Summary ("Summary of Expenses")
+  // and buildFundFinancialSchedule for FY2020-FY2026 -- see callers.
+  function buildDedupedHistoricalExpenseRows(cache) {
+    const sourceRows = cache.expenditures || [];
+    const debug = isHistoricalExpenseDedupDebugEnabled();
+
+    const groups = new Map();
+    sourceRows.forEach((row) => {
+      const key = expenseAccountingKey(row);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(row);
+    });
+
+    const debugDuplicateEntries = debug ? [] : null;
+    const reductionByCategoryAndField = new Map();
+
+    function addReduction(activity, field, amount) {
+      if (!amount) return;
+      const bucketKey = activity + "|" + field;
+      reductionByCategoryAndField.set(bucketKey, (reductionByCategoryAndField.get(bucketKey) || 0) + amount);
+    }
+
+    const dedupedRows = [];
+    groups.forEach((groupRows, key) => {
+      // Classification metadata (Dept_Name for display, Object_Type) is
+      // taken from the first row in the group with a non-empty value, kept
+      // consistent across every field for this key. Activity and fund code
+      // are derived from Dept_Code/Object_Code, which are already part of
+      // the key itself, so they can't conflict across the group.
+      const deptNameRow = groupRows.find((r) => String(r.Dept_Name || "").trim()) || groupRows[0];
+      const objectTypeRow = groupRows.find((r) => String(r.Object_Type || "").trim()) || groupRows[0];
+
+      if (debug && groupRows.length > 1) {
+        const distinctDeptNames = uniqueSorted(groupRows.map((r) => r.Dept_Name));
+        const distinctObjectTypes = uniqueSorted(groupRows.map((r) => r.Object_Type));
+        if (distinctDeptNames.length > 1 || distinctObjectTypes.length > 1) {
+          console.warn("HistoricalExpenseDedup: conflicting classification metadata for key " + key, {
+            distinctDeptNames,
+            distinctObjectTypes,
+            chosenDeptName: deptNameRow.Dept_Name,
+            chosenObjectType: objectTypeRow.Object_Type
+          });
+        }
+      }
+
+      const merged = {
+        Dept_Code: groupRows[0].Dept_Code,
+        Dept_Name: deptNameRow.Dept_Name || "",
+        Object_Code: groupRows[0].Object_Code,
+        Object_Type: objectTypeRow.Object_Type || "",
+        Project_Code: groupRows[0].Project_Code
+      };
+
+      HISTORICAL_EXPENSE_DEDUP_FIELDS.forEach((field) => {
+        // Every row sharing this key should carry the same full, undivided
+        // total (see applyActualsToRows/applyOriginalBudgetToRows), but
+        // scanning the whole group for the first non-zero value -- rather
+        // than always reading groupRows[0] -- protects against landing on a
+        // zero placeholder row (e.g. one of several itemized FY2027 budget
+        // lines under the same Dept_Name, zeroed by applyActualsToRows' own
+        // narrower per-Dept_Name dedup).
+        const value = firstNonZeroHistoricalValue(groupRows, field);
+        merged[field] = value;
+
+        if (groupRows.length > 1) {
+          const beforeTotal = groupRows.reduce((sum, r) => sum + historicalExpenseFieldValue(r, field), 0);
+          const reduction = beforeTotal - value;
+          if (reduction) {
+            const activity = expenseActivityForRow(merged);
+            addReduction(activity, field, reduction);
+            if (debugDuplicateEntries) {
+              debugDuplicateEntries.push({
+                key: key,
+                field: field,
+                year: yearForHistoricalExpenseField(field),
+                activity: activity,
+                displayRows: groupRows.map((r) => ({ Dept_Name: r.Dept_Name, amount: historicalExpenseFieldValue(r, field) })),
+                amountBeforeDedup: beforeTotal,
+                amountAfterDedup: value,
+                reduction: reduction
+              });
+            }
+          }
+        }
+      });
+
+      dedupedRows.push(merged);
+    });
+
+    if (debug) {
+      console.groupCollapsed(
+        "HistoricalExpenseDedup debug -- shared by Summary of Expenses & Fund Financial Schedule " +
+        "(compare this log across both pages to confirm parity)"
+      );
+      console.log("Duplicate accounting keys found:", debugDuplicateEntries.length);
+      debugDuplicateEntries.forEach((entry) => console.log(entry));
+      const totalsByCategory = new Map();
+      const totalsByYear = new Map();
+      reductionByCategoryAndField.forEach((amount, bucketKey) => {
+        const sep = bucketKey.lastIndexOf("|");
+        const activity = bucketKey.slice(0, sep);
+        const field = bucketKey.slice(sep + 1);
+        totalsByCategory.set(activity, (totalsByCategory.get(activity) || 0) + amount);
+        const year = yearForHistoricalExpenseField(field);
+        totalsByYear.set(year, (totalsByYear.get(year) || 0) + amount);
+      });
+      console.log("Total reduction by category:", Array.from(totalsByCategory.entries()));
+      console.log("Total reduction by year:", Array.from(totalsByYear.entries()));
+      console.groupEnd();
+    }
+
+    return dedupedRows;
   }
 
   // Builds a fund-by-category consolidated table. `categoryFor(row)` returns
@@ -2297,18 +2803,11 @@
     return Number(field.slice(2, 6));
   }
 
-  function isFundScheduleOriginalBudgetDebugEnabled() {
-    try {
-      return new URLSearchParams(window.location.search).get("debugFundScheduleOriginalBudget") === "1";
-    } catch (e) {
-      return false;
-    }
-  }
-
   // "COA Expenses" (Object_Code/Object_Name/Object_Type) has no dedicated
   // Google Sheet tab, so this catalog is derived from the expenditures
   // sheet's own Object_Code/Object_Name/Object_Type columns instead (first
   // row seen per code) -- classification/label use only, never dollars.
+  // Used by synthesizeMissingExpenseRows.
   function buildExpenseObjectCatalog(expenditureRows) {
     const catalog = new Map();
     (expenditureRows || []).forEach((r) => {
@@ -2319,163 +2818,13 @@
     return catalog;
   }
 
-  // The Fund Financial Schedule's FY2026 Original Budget *dollars* come
-  // directly from Supabase (cache.originalBudgetRows / expense_original_
-  // budget_public) -- this enriches each raw row with Chart of Accounts
-  // metadata for classification/labels only. A Supabase row is never
-  // dropped for lacking a matching Google Sheet expenditure row; it's also
-  // never required to find COA metadata -- missing matches are flagged via
-  // classificationStatus instead, so the amount still lands somewhere
-  // (Unclassified) rather than disappearing. coaDepartments is the
-  // activities sheet (Dept_Code/Dept_Name/Dept_Group/Org_Type/Activity),
-  // coaExpenses is the Map from buildExpenseObjectCatalog, coaFunds is the
-  // funds sheet (Fund_Code/Fund_Name/Fund_Type/Fund_Category/Major_NonMajor).
-  // cache.originalBudgetRows (expense_original_budget_public) mixes revenue
-  // and expense object codes despite the view's name. Florida's Uniform
-  // Accounting System object codes are 3xx for revenue and 5xx/6xx for
-  // expense, with no overlap -- used here to keep revenue-coded rows (e.g.
-  // Ad Valorem's 311000, already handled by the revenue-side FY2026 fix) out
-  // of this expense-only pipeline, so they land neither in a wrong activity
-  // bucket nor inflate Unclassified with dollars that were never expenses.
+  // Florida's Uniform Accounting System object codes are 3xx for revenue
+  // and 5xx/6xx for expense, with no overlap -- used by
+  // synthesizeMissingExpenseRows to keep revenue-coded Supabase rows out of
+  // its expense-only synthesis.
   function isLikelyExpenseObjectCode(object) {
     const firstDigit = String(object || "").trim().charAt(0);
     return firstDigit === "5" || firstDigit === "6";
-  }
-
-  // org 20146000 (Infrastructure, $55,000) derives a fund code of "201" by
-  // the normal org.slice(0,3) rule, but that's the same fund-code mismatch
-  // as its revenue counterpart (org 201389, already folded into the General
-  // Fund's own 001389 row) -- General Fund carries this expense too, so its
-  // fund code is corrected here rather than treating "201" as a fund of
-  // its own.
-  const SUPABASE_FUND_CODE_OVERRIDES = new Map([["20146000", "001"]]);
-
-  function buildSupabaseOriginalBudgetScheduleRows(originalBudgetRows, coaDepartments, coaExpenses, coaFunds) {
-    const deptByCode = new Map((coaDepartments || []).map((d) => [String(d.Dept_Code || "").trim(), d]));
-    const fundByCode = new Map((coaFunds || []).map((f) => [String(f.Fund_Code || "").trim(), f]));
-
-    return (originalBudgetRows || [])
-      .filter((row) => isLikelyExpenseObjectCode(row.object))
-      .map((row) => {
-      const org = String(row.org || "").trim();
-      const object = String(row.object || "").trim();
-      const fundCode = SUPABASE_FUND_CODE_OVERRIDES.get(org) || org.slice(0, 3);
-
-      const dept = deptByCode.get(org);
-      const expense = coaExpenses ? coaExpenses.get(object) : undefined;
-      const fund = fundByCode.get(fundCode);
-      const hasDeptMatch = !!dept;
-      const hasExpenseMatch = !!expense;
-
-      // Object_Code 599000 (Other Uses Contingency) is always General
-      // Government regardless of which department holds it -- the same
-      // special case expenseActivityForRow/isOtherFinancingExpenseRow apply
-      // to Google Sheet rows (isObjectCode599000), replicated here for
-      // Supabase rows since there's no sheet row to run that check against.
-      const isContingencyObject = object === "599000";
-      const activity = isContingencyObject ? "General Government" : (dept ? dept.Activity : "");
-      const isOtherFinancing = !isContingencyObject && OTHER_FINANCING_ACTIVITIES.has(String(activity || "").toLowerCase());
-
-      return {
-        year: row.year,
-        org: row.org,
-        object: row.object,
-        project: row.project,
-        amount: Number(row.amount) || 0,
-        fundCode,
-        fundName: fund ? fund.Fund_Name : "",
-        deptName: dept ? dept.Dept_Name : "",
-        activity,
-        objectName: expense ? expense.Object_Name : "",
-        objectType: expense ? expense.Object_Type : "",
-        isOtherFinancing,
-        hasDeptMatch,
-        hasExpenseMatch,
-        classificationStatus: (hasDeptMatch && hasExpenseMatch) ? "classified" : "unclassified"
-      };
-    });
-  }
-
-  // Sums enriched Supabase original-budget rows (see
-  // buildSupabaseOriginalBudgetScheduleRows) for one Fund Financial Schedule
-  // line: FY2026 only, restricted to the fund codes that schedule table
-  // covers, filtered by the line's own classification predicate.
-  function sumSupabaseOriginalBudgetForFundSchedule(enrichedRows, fundCodes, linePredicate, year) {
-    const codes = fundCodes || [];
-    return (enrichedRows || []).reduce((sum, r) => {
-      if (Number(r.year) !== year) return sum;
-      if (!codes.includes(r.fundCode)) return sum;
-      if (!linePredicate(r)) return sum;
-      return sum + r.amount;
-    }, 0);
-  }
-
-  let cachedEnrichedOriginalBudgetRows = null;
-  let cachedEnrichedOriginalBudgetRowsSource = null;
-
-  // Memoized: buildFundFinancialSchedule runs once per fund plus once for
-  // the consolidated table, and the enrichment join is the same every time
-  // for as long as cache.originalBudgetRows hasn't been reloaded.
-  function logEnrichedExpenseRowsDebugSummary(rawSourceLabel, rawSource, enrichedRows, year) {
-    if (!isFundScheduleOriginalBudgetDebugEnabled()) return;
-    const rowsForYear = enrichedRows.filter((r) => Number(r.year) === year);
-    const sumBy = (keyFn) => {
-      const totals = new Map();
-      rowsForYear.forEach((r) => {
-        const key = keyFn(r) || "(blank)";
-        totals.set(key, (totals.get(key) || 0) + r.amount);
-      });
-      return Object.fromEntries(totals);
-    };
-    console.group("FundScheduleOriginalBudget debug: " + rawSourceLabel + " load summary (FY" + year + ")");
-    console.log("Supabase rows loaded (raw, all years/kinds):", (rawSource || []).length);
-    console.log("Supabase rows loaded (expense-coded, 5xx/6xx only):", enrichedRows.length);
-    console.log("FY" + year + " rows used:", rowsForYear.length);
-    console.log("FY" + year + " total by fund:", sumBy((r) => r.fundCode));
-    console.log("FY" + year + " total by activity:", sumBy((r) => r.activity));
-    console.log("FY" + year + " total by object type:", sumBy((r) => r.objectType));
-    console.log("Rows missing COA Department metadata:", rowsForYear.filter((r) => !r.hasDeptMatch));
-    console.log("Rows missing COA Expense metadata:", rowsForYear.filter((r) => !r.hasExpenseMatch));
-    console.log("Rows assigned to Unclassified:", rowsForYear.filter((r) => r.classificationStatus === "unclassified"));
-    console.groupEnd();
-  }
-
-  function getEnrichedOriginalBudgetRows() {
-    if (cachedEnrichedOriginalBudgetRows && cachedEnrichedOriginalBudgetRowsSource === cache.originalBudgetRows) {
-      return cachedEnrichedOriginalBudgetRows;
-    }
-    const coaExpenses = buildExpenseObjectCatalog(cache.expenditures);
-    cachedEnrichedOriginalBudgetRows = buildSupabaseOriginalBudgetScheduleRows(cache.originalBudgetRows, cache.activities, coaExpenses, cache.funds);
-    cachedEnrichedOriginalBudgetRowsSource = cache.originalBudgetRows;
-    logEnrichedExpenseRowsDebugSummary("original budget", cache.originalBudgetRows, cachedEnrichedOriginalBudgetRows, 2026);
-    return cachedEnrichedOriginalBudgetRows;
-  }
-
-  let cachedEnrichedExpenseActualRows = null;
-  let cachedEnrichedExpenseActualRowsSource = null;
-
-  // Same Supabase-sourced, COA-classified approach as
-  // getEnrichedOriginalBudgetRows, but for historical actuals
-  // (expense_actuals_public) -- a fund with no Google Sheet row at all
-  // (e.g. the Preservation Fund) would otherwise show $0 actuals on its
-  // schedule even though Supabase has real history for it, since
-  // applyActualsToRows can only attach a value to a sheet row that exists.
-  function getEnrichedExpenseActualRows() {
-    if (cachedEnrichedExpenseActualRows && cachedEnrichedExpenseActualRowsSource === cache.expenseActualRows) {
-      return cachedEnrichedExpenseActualRows;
-    }
-    const coaExpenses = buildExpenseObjectCatalog(cache.expenditures);
-    cachedEnrichedExpenseActualRows = buildSupabaseOriginalBudgetScheduleRows(cache.expenseActualRows, cache.activities, coaExpenses, cache.funds);
-    cachedEnrichedExpenseActualRowsSource = cache.expenseActualRows;
-    HISTORICAL_ACTUAL_YEARS.forEach((year) => {
-      logEnrichedExpenseRowsDebugSummary("actuals", cache.expenseActualRows, cachedEnrichedExpenseActualRows, year);
-    });
-    return cachedEnrichedExpenseActualRows;
-  }
-
-  function logFundScheduleLineAmount(caption, label, fundCodes, amount) {
-    if (!isFundScheduleOriginalBudgetDebugEnabled()) return;
-    console.log("FundScheduleOriginalBudget line: [" + caption + "] " + label + " (funds " + fundCodes.join(",") + ") =", amount);
   }
 
   // One or more fund codes combined into a single Beginning Fund Balance ->
@@ -2496,35 +2845,33 @@
     // so exclude it here rather than letting it land on MSBU's own table.
     const inFund = (r) => fundCodes.includes(fundCodeForRow(r)) && !isExcludedFund(r) && !isAdValoremFivePercentRow(r);
     const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
-    // Every expense actual/budget column's dollars come from Supabase
-    // (getEnrichedOriginalBudgetRows / getEnrichedExpenseActualRows), never
-    // from Google Sheet expenditure rows -- a fund with no Google Sheet row
-    // at all (e.g. the Preservation Fund) would otherwise show $0 across
-    // the board, which applyActualsToRows/applyOriginalBudgetToRows' sheet-
-    // row grain can't avoid. See withExpenseSupabaseValues below, which
-    // splices the Supabase-sourced totals into these columns after
-    // rowValues runs (only FY2027 Proposed stays sheet-driven).
-    const enrichedOriginalBudgetRows = getEnrichedOriginalBudgetRows();
-    const enrichedExpenseActualRows = getEnrichedExpenseActualRows();
 
     function sumFor(rows, predicate, field) {
       const isActualOrBudgetField = revenueActualFields.has(field) || field === "FY2026_Original_Budget";
-      // Revenue rows are summed directly, same as the Consolidated Expense
-      // Summary -- no extra cross-Dept_Name dedup here. Some departments
-      // legitimately share one Dept_Code+Object_Code across several
-      // distinct rows (e.g. Statutory & Other's many recipients, each its
-      // own Project_Code/amount), and a generic fund+code dedup can't tell
-      // those apart from a true duplicate (e.g. Code Compliance / Code
-      // Compliance Beach both carrying the same undivided account total),
-      // so it ends up stripping out legitimate amounts along with the
-      // real duplicates. Matching the Consolidated page's plain-sum
-      // behavior keeps this table consistent with the schedule the county
-      // already treats as correct. Expense rows never need this dedup at
-      // all now -- every expense actual/budget column is replaced wholesale
-      // by Supabase afterward (see withExpenseSupabaseValues).
+      // Revenue rows are summed directly here, same as the Consolidated
+      // Revenue Summary table, with a cross-department dedup for shared
+      // account-level actuals/budget (see revenueBudgetUniqueKey/
+      // revenueBudgetAmountForCodes). Some departments legitimately share
+      // one Dept_Code+Object_Code across several distinct expense rows
+      // (e.g. Statutory & Other's many recipients, each its own
+      // Project_Code/amount) -- revenueBudgetUniqueKey's fund+org+code+
+      // project grain tells those apart from a true duplicate by keeping
+      // Project_Code in the key, so it's safe to reuse for expenses too.
       const shouldDedupeRevenue = rows === revenueRows && isActualOrBudgetField;
+      // For historical expense fields (FY2020-FY2026), source from the
+      // shared deduped layer instead of the raw display rows -- some
+      // departments split one Dept_Code across multiple display-only
+      // Dept_Names (e.g. Code Compliance / Code Compliance Beach), each
+      // carrying the same full account total (see applyActualsToRows), and
+      // summing every display row directly would count that total once per
+      // Dept_Name sharing it. buildDedupedHistoricalExpenseRows collapses
+      // that back to one row per true accounting record; inFund/predicate
+      // below still apply to it unchanged since fund code and Dept_Code/
+      // Object_Code (what they key off) are preserved on every deduped row.
+      const isHistoricalExpenseField = rows === expenseRows && HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(field);
+      const sourceRows = isHistoricalExpenseField ? (cache.dedupedExpenseRows || []) : rows;
       const seenAmounts = shouldDedupeRevenue ? new Set() : null;
-      return rows.reduce((sum, r) => {
+      return sourceRows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
         if (seenAmounts) {
           const key = revenueBudgetUniqueKey(r);
@@ -2536,18 +2883,8 @@
           // Revenue Summary (revenueBudgetMergeContribution) instead of a
           // separate, drifting copy -- it knows about subtractive revenue
           // rows (e.g. the Ad Valorem 5% reduction) that must subtract from
-          // their category instead of being sign-flipped positive. Expense
-          // rows don't need a value here at all (always overwritten by
-          // withExpenseSupabaseValues), but returning 0 rather than reading
-          // r.FY2026_Original_Budget keeps this function from depending on
-          // applyOriginalBudgetToRows' expense output entirely.
-          return sum + (rows === revenueRows ? revenueBudgetMergeContribution(r) : 0);
-        }
-        if (isActualOrBudgetField && rows === expenseRows) {
-          // Expense actuals: also always overwritten by
-          // withExpenseSupabaseValues, so skip applyActualsToRows' sheet
-          // output entirely rather than depend on a sheet row existing.
-          return sum;
+          // their category instead of being sign-flipped positive.
+          return sum + (rows === revenueRows ? revenueBudgetMergeContribution(r) : (r.FY2026_Original_Budget || r.FY2026_Budget || 0));
         }
         return sum + (r[field] || 0);
       }, 0);
@@ -2555,28 +2892,6 @@
 
     function rowValues(predicate, rows) {
       return FUND_SCHEDULE_YEAR_COLUMNS.map((c) => sumFor(rows, predicate, c.field));
-    }
-
-    // For an expense row's values array, overwrites every actual (FY2020-
-    // 2025) and FY2026 Original Budget column with the Supabase-sourced
-    // total for linePredicate (an enriched-row predicate, the Supabase-row
-    // equivalent of whatever sheet-row predicate built `values`). FY2027
-    // Proposed (the last column) is left untouched -- still sheet-driven
-    // per spec. Logs each column in debug mode.
-    function withExpenseSupabaseValues(values, linePredicate, label) {
-      FUND_SCHEDULE_YEAR_COLUMNS.forEach((column, i) => {
-        let amount;
-        if (column.field === "FY2026_Original_Budget") {
-          amount = sumSupabaseOriginalBudgetForFundSchedule(enrichedOriginalBudgetRows, fundCodes, linePredicate, 2026);
-        } else if (column.actual) {
-          amount = sumSupabaseOriginalBudgetForFundSchedule(enrichedExpenseActualRows, fundCodes, linePredicate, column.year);
-        } else {
-          return;
-        }
-        values[i] = amount;
-        logFundScheduleLineAmount(caption, label + " (" + column.label + ")", fundCodes, amount);
-      });
-      return values;
     }
 
     function rowHtml(label, values, rowClass) {
@@ -2602,8 +2917,7 @@
       FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
     );
     const revenueTypeRows = CONSOLIDATED_REVENUE_TYPE_ROWS
-      .map((spec) => ({ label: spec.label, values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows) }))
-      .sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1]);
+      .map((spec) => ({ label: spec.label, values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows) }));
     const generalGovTaxesRow = revenueTypeRows.find((row) => row.label === "General Government Taxes");
     if (generalGovTaxesRow) {
       const fy2026Index = FUND_SCHEDULE_YEAR_COLUMNS.findIndex((c) => c.field === "FY2026_Original_Budget");
@@ -2625,35 +2939,37 @@
       '<tr class="wc-table-group-row"><td>Expenditures</td>' +
       FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
     );
+    // Case-insensitive, matching the Consolidated Expense Summary -- the
+    // activities sheet has a few inconsistently-cased entries (e.g.
+    // "economic Environment").
+    const knownExpenseActivities = new Set(CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS.map((a) => a.toLowerCase()));
     const expenseTypeRows = CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS.map((activity) => {
       const activityNorm = activity.toLowerCase();
-      const values = rowValues((r) => expenseActivityForRow(r) === activity && !isOtherFinancingExpense(r), expenseRows);
-      withExpenseSupabaseValues(
-        values,
-        (er) => String(er.activity || "").toLowerCase() === activityNorm && !er.isOtherFinancing,
-        activity
+      const values = rowValues(
+        (r) => expenseActivityForRow(r).toLowerCase() === activityNorm && !isOtherFinancingExpense(r),
+        expenseRows
       );
       return { label: activity, values };
     });
-    // Supabase rows whose org/object had no matching COA Department or COA
-    // Expense metadata can't be placed into any activity above -- rather
-    // than drop that amount, it lands on its own Unclassified line so the
-    // schedule's total still accounts for every Supabase dollar.
-    const unclassifiedValues = FUND_SCHEDULE_YEAR_COLUMNS.map(() => 0);
-    withExpenseSupabaseValues(
-      unclassifiedValues,
-      (er) => er.classificationStatus === "unclassified" && !er.isOtherFinancing,
-      "Unclassified"
+    // Rows whose activity doesn't match a known section above (e.g. a row
+    // synthesized from a Supabase-only account with no COA classification --
+    // see synthesizeMissingExpenseRows) land on their own Unclassified line
+    // instead of being dropped, same as the Consolidated Expense Summary.
+    const unclassifiedValues = rowValues(
+      (r) => !knownExpenseActivities.has(expenseActivityForRow(r).toLowerCase()) && !isOtherFinancingExpense(r),
+      expenseRows
     );
-    expenseTypeRows.push({ label: "Unclassified", values: unclassifiedValues });
-    expenseTypeRows.sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1]);
+    // Hidden when every column is exactly $0 -- an always-zero row is just
+    // visual noise on a fund table that has nothing unclassified.
+    if (unclassifiedValues.some((v) => v !== 0)) {
+      expenseTypeRows.push({ label: "Unclassified", values: unclassifiedValues });
+    }
     expenseTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
     const expenseTypeValues = expenseTypeRows.map((row) => row.values);
     const expenseSubtotalValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => expenseTypeValues.reduce((s, v) => s + v[i], 0));
     bodyRows.push(rowHtml("Expenditures Total", expenseSubtotalValues, "wc-table-subtotal-row"));
 
     const otherUsesValues = rowValues(isOtherFinancingExpense, expenseRows);
-    withExpenseSupabaseValues(otherUsesValues, (er) => er.isOtherFinancing, "Other Financial Uses");
     bodyRows.push(rowHtml("Other Financial Uses", otherUsesValues));
     const expenseTotalValues = expenseSubtotalValues.map((v, i) => v + otherUsesValues[i]);
     bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-total-row"));
@@ -2711,20 +3027,19 @@
       if (code) codes.add(code);
     });
     // Some funds exist only in Supabase with no Google Sheet row at all
-    // (e.g. fund 201, a small carryforward-balance-funded infrastructure
-    // project) -- the sheet-only scan above would never see them, silently
-    // excluding their Supabase-sourced expense dollars from every fund
-    // table's total even though buildSupabaseOriginalBudgetScheduleRows
-    // can see the underlying rows just fine.
+    // (e.g. the Preservation Fund) -- synthesizeMissingExpenseRows/
+    // synthesizeMissingRevenueRows now add a sheet row for these, so the
+    // scans above already see them via fundCodeForRow's same DEPT_CODE_
+    // FUND_OVERRIDES correction. These extra scans stay as a defensive
+    // backstop in case a Supabase org/object combination is excluded from
+    // synthesis (e.g. an alias target or override redirect target) but
+    // still needs its fund represented somewhere.
     (cache.originalBudgetRows || []).forEach((r) => {
-      const code = String(r.org || "").trim().slice(0, 3);
+      const code = fundCodeForRow({ Dept_Code: r.org });
       if (code) codes.add(code);
     });
-    // Same reasoning for historical actuals -- a fund could have actuals
-    // history in Supabase with no FY2026 budget row and no sheet presence
-    // at all (e.g. the Preservation Fund, fund 113).
     (cache.expenseActualRows || []).forEach((r) => {
-      const code = String(r.org || "").trim().slice(0, 3);
+      const code = fundCodeForRow({ Dept_Code: r.org });
       if (code) codes.add(code);
     });
     return Array.from(codes);
@@ -2813,12 +3128,12 @@
   // revenue category, live from the revenues sheet.
   const CONSOLIDATED_REVENUE_SUMMARY_ROWS = [
     { type: "General Government Taxes", label: "General Government Taxes" },
-    { type: "Intergovernmental Revenues", label: "Intergovernmental Revenues" },
-    { type: "Miscellaneous Revenue", label: "Miscellaneous Revenue" },
-    { type: "Other Sources", label: "Other Sources" },
-    { type: "Charges for Services", label: "Charges for Services" },
     { type: "Permits Fees and Special Assessments", label: "Permits, Fees, and Special Assessments" },
-    { type: "Judgments, Fines and Forfeits", label: "Judgments, Fines and Forfeits" }
+    { type: "Intergovernmental Revenues", label: "Intergovernmental Revenues" },
+    { type: "Charges for Services", label: "Charges for Services" },
+    { type: "Judgments, Fines and Forfeits", label: "Judgments, Fines and Forfeits" },
+    { type: "Miscellaneous Revenue", label: "Miscellaneous Revenue" },
+    { type: "Other Sources", label: "Other Sources" }
   ];
 
   const CONSOLIDATED_REVENUE_SUMMARY_COLUMNS = [
@@ -2857,16 +3172,16 @@
       }, 0);
     }
 
+    const isReportedElsewhere = (r) =>
+      String(r.Revenue_Code || "").trim() === "381000" ||
+      CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r));
+
     const bodyRows = CONSOLIDATED_REVENUE_SUMMARY_ROWS.map((spec) => {
       // Revenue_Code 381000 (Interfund Group Transfer In) is reported on
       // the Summary of Interfund Transfers page instead, and the
       // Self-Insurance Fund (503) is an Internal Service fund rather than
       // a governmental one, so both are excluded here.
-      const matching = rows.filter((r) =>
-        r.Revenue_Type === spec.type &&
-        String(r.Revenue_Code || "").trim() !== "381000" &&
-        !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r))
-      );
+      const matching = rows.filter((r) => r.Revenue_Type === spec.type && !isReportedElsewhere(r));
       allMatchingRows.push(...matching);
       return (
         "<tr><td>" + escapeHtml(spec.label) + "</td>" +
@@ -2878,6 +3193,30 @@
         "</tr>"
       );
     });
+    // Catch-all for any row whose Revenue_Type doesn't match a known
+    // category above -- e.g. a row synthesized from a Supabase-only
+    // account with no COA classification (see synthesizeMissingRevenueRows).
+    // Without this, an unrecognized type would be silently excluded from
+    // every category row *and* from Total, which defeats the entire point
+    // of never dropping a Supabase dollar.
+    const knownRevenueTypes = new Set(CONSOLIDATED_REVENUE_SUMMARY_ROWS.map((spec) => spec.type));
+    const unclassifiedRevenueRows = rows.filter((r) => !knownRevenueTypes.has(r.Revenue_Type) && !isReportedElsewhere(r));
+    allMatchingRows.push(...unclassifiedRevenueRows);
+    const unclassifiedRevenueValues = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
+      const sum = dedupedRevenueSum(unclassifiedRevenueRows, col.field);
+      totals[i] += sum;
+      return sum;
+    });
+    // Hidden when every column is exactly $0 -- still folded into totals
+    // above either way, but an always-zero row is just visual noise on a
+    // table that has nothing unclassified.
+    if (unclassifiedRevenueValues.some((v) => v !== 0)) {
+      bodyRows.push(
+        "<tr><td>Unclassified</td>" +
+        unclassifiedRevenueValues.map((v, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>").join("") +
+        "</tr>"
+      );
+    }
     bodyRows.push(
       '<tr class="wc-table-total-row"><td>Total</td>' +
       totals.map((t, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(t) + "</td>").join("") +
@@ -2937,11 +3276,22 @@
     // of Interfund Transfers page instead, same as the revenue summary
     // excludes Revenue_Code 381000; the Self-Insurance Fund (503) is an
     // Internal Service fund rather than a governmental one.
-    const rows = (cache.expenditures || []).filter((r) =>
+    const matchesFundAndFinancing = (r) =>
       !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r)) &&
-      !isOtherFinancingExpenseRow(r)
-    );
+      !isOtherFinancingExpenseRow(r);
+    const rows = (cache.expenditures || []).filter(matchesFundAndFinancing);
     if (!rows.length) return "";
+
+    // FY2020-FY2026 columns are summed from the shared deduped layer
+    // instead of the raw display rows -- see buildDedupedHistoricalExpenseRows.
+    // FY2027 Proposed keeps summing the raw rows directly, since it isn't
+    // subject to the same display-row duplication.
+    const dedupedRows = (cache.dedupedExpenseRows || []).filter(matchesFundAndFinancing);
+
+    function columnSum(matchingRaw, matchingDeduped, col) {
+      const source = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(col.field) ? matchingDeduped : matchingRaw;
+      return source.reduce((s, r) => s + (r[col.field] || 0), 0);
+    }
 
     const lastIndex = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.length - 1;
     const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
@@ -2949,17 +3299,43 @@
     const bodyRows = EXPENSE_ACTIVITY_SECTIONS.map((section) => {
       const activityNorm = section.activity.toLowerCase();
       const matching = rows.filter((r) => expenseActivityForRow(r).toLowerCase() === activityNorm);
+      const matchingDeduped = dedupedRows.filter((r) => expenseActivityForRow(r).toLowerCase() === activityNorm);
       allMatchingRows.push(...matching);
       return (
         "<tr><td>" + escapeHtml(section.title || section.activity) + "</td>" +
         CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
-          const sum = matching.reduce((s, r) => s + (r[col.field] || 0), 0);
+          const sum = columnSum(matching, matchingDeduped, col);
           totals[i] += sum;
           return '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(sum) + "</td>";
         }).join("") +
         "</tr>"
       );
     });
+    // Catch-all for any row whose activity doesn't match a known section
+    // above -- e.g. a row synthesized from a Supabase-only account with no
+    // COA classification (see synthesizeMissingExpenseRows). Without this,
+    // an unrecognized activity would be silently excluded from every
+    // section *and* from Total, which defeats the entire point of never
+    // dropping a Supabase dollar.
+    const knownActivities = new Set(EXPENSE_ACTIVITY_SECTIONS.map((s) => s.activity.toLowerCase()));
+    const unclassifiedExpenseRows = rows.filter((r) => !knownActivities.has(expenseActivityForRow(r).toLowerCase()));
+    const unclassifiedDedupedRows = dedupedRows.filter((r) => !knownActivities.has(expenseActivityForRow(r).toLowerCase()));
+    allMatchingRows.push(...unclassifiedExpenseRows);
+    const unclassifiedExpenseValues = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
+      const sum = columnSum(unclassifiedExpenseRows, unclassifiedDedupedRows, col);
+      totals[i] += sum;
+      return sum;
+    });
+    // Hidden when every column is exactly $0 -- still folded into totals
+    // above either way, but an always-zero row is just visual noise on a
+    // table that has nothing unclassified.
+    if (unclassifiedExpenseValues.some((v) => v !== 0)) {
+      bodyRows.push(
+        "<tr><td>Unclassified</td>" +
+        unclassifiedExpenseValues.map((v, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>").join("") +
+        "</tr>"
+      );
+    }
     bodyRows.push(
       '<tr class="wc-table-total-row"><td>Total</td>' +
       totals.map((t, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(t) + "</td>").join("") +
