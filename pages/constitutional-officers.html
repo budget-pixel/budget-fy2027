@@ -420,15 +420,20 @@
       // Every stat renders in the same fixed-width slot, in the same order,
       // on every row -- even when an entity has no data for it -- so the
       // columns line up down the whole list instead of shifting left
-      // whenever one entity is missing a fund, trend, or FTE figure.
+      // whenever one entity is missing a fund or trend figure. The
+      // Personnel/YoY FTE pair is the exception: most Other Agencies
+      // entities have no staffing data tracked at all (only Circuit Court
+      // does), so that pair is dropped entirely instead of showing a
+      // "Not listed"/"—" placeholder on rows with nothing to show.
       list.innerHTML = items.map(function(item){
         var fundStat = statBlockHtml("wc-directory-item-stat--fund", escapeHtml(item.fund && item.fund !== "Not listed" ? item.fund : "Not listed"), "Fund");
         var budgetStat = statBlockHtml("wc-directory-item-stat--budget", escapeHtml(item.budget), "FY 2027 Budget");
         var trendClass = item.trend ? (item.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(item.trend, item.trendDollar), "YoY Change", trendClass);
-        var personnelStat = statBlockHtml("wc-directory-item-stat--personnel", escapeHtml(item.fte), "Personnel");
+        var hasFte = item.fte && item.fte !== "Not listed";
+        var personnelStat = hasFte ? statBlockHtml("wc-directory-item-stat--personnel", escapeHtml(item.fte), "Personnel") : "";
         var fteTrendClass = item.fteTrend ? (item.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
-        var fteTrendStat = statBlockHtml("wc-directory-item-stat--fte-trend", item.fteTrend ? escapeHtml(item.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass);
+        var fteTrendStat = hasFte ? statBlockHtml("wc-directory-item-stat--fte-trend", item.fteTrend ? escapeHtml(item.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass) : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(item.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(item.name) + '</span>' +
