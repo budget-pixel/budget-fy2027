@@ -5854,7 +5854,7 @@
   // Budget Lines"/"View Position Detail" elsewhere (see
   // openBudgetDetailModal), just scoped to one department's own position
   // list instead of a department page's own staffing card.
-  function personnelDeptDetailHtml(deptRows) {
+  function personnelDeptDetailHtml(deptRows, deptName) {
     budgetLinesDetailCounter += 1;
     const detailId = "wc-personnel-dept-detail-" + budgetLinesDetailCounter;
     const years = [2024, 2025, 2026, 2027];
@@ -5884,6 +5884,16 @@
       }).join("") +
       "</tr>"
     );
+    // Same "contact the office" note shown on these constitutional
+    // officers' own staffing cards (see STAFFING_GROUP_NOTES) -- repeated
+    // here since this modal is the only place their position list is
+    // surfaced on the all-departments Summary of Personnel schedule.
+    const extraNotes = STAFFING_GROUP_NOTES[normalizeDeptName(deptName || "")] || [];
+    const notesHtml = extraNotes.length
+      ? '<div class="wc-staffing-notes"><p class="wc-staffing-notes-title">Staffing Notes:</p>' +
+        extraNotes.map((n) => "<p>" + n + "</p>").join("") +
+        "</div>"
+      : "";
     const detailHtml =
       '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPriorLocal ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
         priorYearsToggleHtml(showPriorLocal, "wc-budget-lines-detail-header") +
@@ -5893,6 +5903,7 @@
         priorYears.map((y) => '<th class="wc-num wc-prior-year">FY ' + y + "</th>").join("") +
         '<th class="wc-num">FY 2027</th>' +
         "</tr></thead><tbody>" + bodyRows.join("") + "</tbody></table></div>" +
+        notesHtml +
       "</div>";
     return { detailId, detailHtml };
   }
@@ -6008,7 +6019,7 @@
       const detailMarkup = [];
       const bodyRows = deptsInView.map((d) => {
         const t = totalsByDept.get(d);
-        const { detailId, detailHtml } = personnelDeptDetailHtml(rowsByDept.get(d));
+        const { detailId, detailHtml } = personnelDeptDetailHtml(rowsByDept.get(d), d);
         detailMarkup.push(detailHtml);
         return (
           "<tr><td>" +

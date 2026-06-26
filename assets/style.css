@@ -1778,15 +1778,23 @@ body {
 /* Plain-text variant used for clickable department names inside a data
    table (see personnelDeptDetailHtml in budget-data.js) -- same
    .wc-view-budget-lines-toggle click/modal behavior, but it should read
-   like a normal table cell, not a pill button. */
+   like a normal table cell, not a pill button. Styled to match the CIP
+   project links (.wc-cip-project-link in walton-cip-fund-schedule.js) --
+   bold, light green, no underline until hover. */
 .wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link {
   display: inline; padding: 0; border: 0; border-radius: 0;
-  background: none; color: inherit; font: inherit; letter-spacing: normal;
-  text-decoration-line: underline; text-decoration-style: dotted;
-  text-decoration-color: var(--border); text-underline-offset: 3px;
+  background: none; font: inherit; letter-spacing: normal;
+  color: #003f28; font-weight: 800;
+  text-decoration: none; text-underline-offset: 3px;
 }
 .wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link:hover {
-  background: none; color: var(--green); text-decoration-color: var(--green);
+  background: none; color: #003f28; text-decoration: underline;
+}
+:root[data-theme="dark"] .wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link,
+:root[data-theme="dark"] .wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link:hover {
+  /* .wc-data-table td/th sets color via !important for dark mode (see
+     above) -- needs matching !important to win here too. */
+  color: var(--green) !important;
 }
 .wc-budget-lines-detail {
   margin-top: 14px;
