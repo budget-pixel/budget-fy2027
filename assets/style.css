@@ -204,9 +204,29 @@ body {
   white-space: nowrap;
 }
 @media (max-width: 640px) {
-  .wc-directory-item { flex-wrap: wrap; }
-  .wc-directory-item-meta { width: 100%; justify-content: flex-start; }
-  .wc-directory-item-stat { text-align: left; }
+  .wc-directory-list li { border-radius: 12px; }
+  .wc-directory-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 16px;
+    padding: 18px;
+  }
+  .wc-directory-item-main { grid-column: 1 / -1; }
+  .wc-directory-item-title { font-size: 1.05rem; line-height: 1.25; }
+  .wc-directory-item-desc { font-size: .86rem; line-height: 1.5; }
+  .wc-directory-item-meta {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 14px 16px;
+    padding-top: 2px;
+  }
+  .wc-directory-item-stat {
+    min-width: 0;
+    text-align: left;
+  }
   .wc-directory-item-stat--fund,
   .wc-directory-item-stat--budget,
   .wc-directory-item-stat--trend,
@@ -215,7 +235,22 @@ body {
   .wc-directory-item-stat--fund-budget,
   .wc-directory-item-stat--fund-projects,
   .wc-directory-item-stat--fund-inhouse {
-    width: auto; flex: 1 1 calc(50% - 9px);
+    width: auto; flex: none;
+  }
+  .wc-directory-item-stat--fund,
+  .wc-directory-item-stat--trend {
+    grid-column: 1 / -1;
+  }
+  .wc-directory-item-stat strong { font-size: 1rem; line-height: 1.2; }
+  .wc-directory-item-stat span { font-size: .62rem; line-height: 1.2; }
+  .wc-directory-item-stat--trend strong.wc-directory-item-trend-up,
+  .wc-directory-item-stat--trend strong.wc-directory-item-trend-down {
+    white-space: normal;
+  }
+  .wc-directory-item-arrow {
+    grid-column: 1 / -1;
+    justify-self: start;
+    line-height: 1;
   }
 }
 

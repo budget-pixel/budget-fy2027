@@ -3272,8 +3272,9 @@
     }
 
     function rowHtml(label, values, rowClass) {
+      const labelClass = rowClass && rowClass.indexOf("wc-table-total-row") !== -1 ? ' class="wc-fund-total-label-cell"' : "";
       return (
-        "<tr" + (rowClass ? ' class="' + rowClass + '"' : "") + "><td>" + escapeHtml(label) + "</td>" +
+        "<tr" + (rowClass ? ' class="' + rowClass + '"' : "") + "><td" + labelClass + ">" + escapeHtml(label) + "</td>" +
         values.map((v, i) =>
           '<td class="wc-num' + (i < values.length - 1 ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>"
         ).join("") +
@@ -3473,8 +3474,8 @@
       '<p class="wc-table-label">' + escapeHtml(caption) + "</p>" +
       priorYearsToggleHtml(showPrior) +
       "</div>" +
-      '<div class="wc-data-table-scroll">' +
-      '<table class="wc-data-table">' +
+      '<div class="wc-data-table-scroll wc-fund-financial-schedule-scroll">' +
+      '<table class="wc-data-table wc-fund-financial-schedule-table">' +
       "<thead><tr><th>" + escapeHtml(headerCells[0]) + "</th>" +
       headerCells.slice(1).map((h) => '<th class="wc-num' + (h.prior ? " wc-prior-year" : "") + '">' + escapeHtml(h.label) + "</th>").join("") +
       "</tr></thead>" +

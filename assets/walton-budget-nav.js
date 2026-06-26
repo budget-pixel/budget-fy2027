@@ -85,7 +85,7 @@
       mobileStylesheet.id = mobileStylesheetId;
       mobileStylesheet.rel = "stylesheet";
     }
-    mobileStylesheet.href = wcBudgetAssetBaseUrl + "walton-budget-mobile.css?v=8";
+    mobileStylesheet.href = wcBudgetAssetBaseUrl + "walton-budget-mobile.css?v=23";
     document.head.appendChild(mobileStylesheet);
   }
   function loadWcScriptOnce(scriptId, src, onload){
@@ -1000,6 +1000,7 @@
     color:#ffffff !important;
     cursor:pointer !important;
     position:relative !important;
+    padding:0 !important;
   }
   nav#nav-menu .wc-nav-search-toggle:hover,
   nav#nav-menu .wc-theme-toggle:hover,
@@ -1028,15 +1029,19 @@
   }
   nav#nav-menu .wc-nav-menu-toggle span{
     position:absolute !important;
-    left:11px !important;
-    width:16px !important;
+    left:50% !important;
+    top:50% !important;
+    --wc-menu-icon-x:1px;
+    --wc-menu-icon-y:2px;
+    width:18px !important;
     height:2px !important;
     border-radius:999px !important;
     background:currentColor !important;
+    transform:translate(calc(-50% + var(--wc-menu-icon-x)), calc(-50% + var(--wc-menu-icon-y))) !important;
+    transform-origin:center !important;
   }
-  nav#nav-menu .wc-nav-menu-toggle span:nth-child(1){top:13px !important}
-  nav#nav-menu .wc-nav-menu-toggle span:nth-child(2){top:19px !important}
-  nav#nav-menu .wc-nav-menu-toggle span:nth-child(3){top:25px !important}
+  nav#nav-menu .wc-nav-menu-toggle span:nth-child(1){transform:translate(calc(-50% + var(--wc-menu-icon-x)), calc(-50% + var(--wc-menu-icon-y) - 6px)) !important}
+  nav#nav-menu .wc-nav-menu-toggle span:nth-child(3){transform:translate(calc(-50% + var(--wc-menu-icon-x)), calc(-50% + var(--wc-menu-icon-y) + 6px)) !important}
   @media (max-width:860px){
     nav#nav-menu.nav-menu{
       display:flex !important;
