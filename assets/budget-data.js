@@ -1805,7 +1805,7 @@
   // whatever totals already sum over cache.expenditures.
   const HIDDEN_BUDGET_LINE_OBJECT_CODES = new Set(["500000", "523004"]);
 
-  function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName) {
+  function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName, forceDisablePriorYears) {
     if (!rows || !rows.length) return { button: "", detail: "" };
     const isExpense = kind !== "revenue";
     const codeFieldForFilter = isExpense ? "Object_Code" : "Revenue_Code";
@@ -1818,14 +1818,18 @@
     // department's own single-page breakdown, not a county-wide summary
     // (those keep the toggle -- see isRevenueContextNoteSuppressed below,
     // which removes just the disclaimer for them, not the toggle itself).
-    const isPriorYearsDisabledRevenue = !isExpense && !combineByName && rows.length &&
-      PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(rows[0].Dept_Name));
+    // forceDisablePriorYears additionally covers secondary sub-program
+    // expense cards (e.g. Code Compliance Beach) whose FY2026 figures
+    // aren't reliable on their own -- see renderTypeSummaryTable's
+    // showChange.
+    const isPriorYearsDisabled = !!forceDisablePriorYears || (!isExpense && !combineByName && rows.length &&
+      PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(rows[0].Dept_Name)));
     // The "View Prior Years" preference is a single, page-wide localStorage
     // value shared by every table (see getShowPriorYears), so it isn't
     // enough to just hide this table's own checkbox -- showPrior has to be
     // forced false here too, or toggling it on anywhere else on the page
     // would still expand this table's prior-year columns.
-    const showPrior = isPriorYearsDisabledRevenue ? false : getShowPriorYears();
+    const showPrior = isPriorYearsDisabled ? false : getShowPriorYears();
     const codeField = isExpense ? "Object_Code" : "Revenue_Code";
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
@@ -1998,7 +2002,7 @@
       bodyRows: bodyRows
     });
 
-    const toggleHeader = isPriorYearsDisabledRevenue ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+    const toggleHeader = isPriorYearsDisabled ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
     const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
@@ -2009,7 +2013,7 @@
     // "shows only what is budgeted for this specific department or
     // program" is never true here, since every row already is the whole
     // organization combined by design.
-    const isRevenueContextNoteSuppressed = isPriorYearsDisabledRevenue || combineByName;
+    const isRevenueContextNoteSuppressed = isPriorYearsDisabled || combineByName;
     const revenueContextNote = (!isExpense && !isRevenueContextNoteSuppressed && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
       ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
       : "";
@@ -2284,6 +2288,24 @@
     });
   }
 
+  // A category row's own FY2026 -> FY2027 dollar change (e.g. Personnel
+  // Services, Operating Expenditures, Capital Outlay), shown beside that
+  // row's current-year amount on every Expenditure Summary card -- and
+  // every secondary/supplemental one, since they all render through this
+  // same renderFinancialDashboardCard. A category with no FY2026 figure
+  // (new this year) or no change shows nothing rather than a misleading
+  // divide-by-zero/false "no change".
+  function renderFinanceCardRowChange(amount, priorAmount) {
+    if (!priorAmount) return "";
+    const diff = amount - priorAmount;
+    const direction = diff > 0 ? "up" : diff < 0 ? "down" : "flat";
+    // formatCurrency(0) returns "Not listed" (it's built for "no data" --
+    // not a literal $0), so a genuine zero change is formatted here
+    // instead, rather than being silently dropped like a missing amount.
+    const dollarText = diff === 0 ? "$0" : (diff > 0 ? "+" : "-") + formatCurrency(Math.abs(diff));
+    return '<div class="wc-finance-card-change wc-finance-card-change-' + direction + '">' + escapeHtml(dollarText) + ' <span class="wc-finance-card-change-label">YoY Change</span></div>';
+  }
+
   function renderFinancialDashboardCard(options) {
     const rows = options.rows || [];
     const caption = options.caption || "Financial Summary";
@@ -2294,17 +2316,39 @@
     const updated = lastUpdatedNoteHtml();
     const zeroClass = total === 0 ? " is-zero" : "";
     const currentLabel = kind === "revenue" ? "FY 2027 Proposed Revenue" : "FY 2027 Proposed Budget";
+    // Secondary sub-program cards (e.g. Code Compliance Beach) pass
+    // showChange: false -- their FY2026 figures share the same per-account
+    // dedup unreliability as their "View Prior Years" toggle (already
+    // disabled for them in renderTypeSummaryGroup), so no YoY change shows
+    // there either; that comparison belongs on the primary card only.
+    const showChange = kind === "expense" && options.showChange !== false;
+    // A category with $0 FY2027 (e.g. Capital Outlay eliminated entirely
+    // this year) still has a real, meaningful FY2026 -> FY2027 change worth
+    // showing -- so "relevant" means either year is nonzero, not just the
+    // current one, and the row's rank uses whichever year is larger so a
+    // zeroed-out category isn't pushed out of the top-3 by smaller-but-
+    // still-funded categories.
+    function rowRelevance(row) {
+      return Math.max(Math.abs(row.amount || 0), showChange ? Math.abs(row.priorAmount || 0) : 0);
+    }
     const sortedRows = rows
       .slice()
-      .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
-    const nonZeroRows = sortedRows.filter((row) => (row.amount || 0) !== 0);
+      .sort((a, b) => rowRelevance(b) - rowRelevance(a));
+    const nonZeroRows = sortedRows.filter((row) => rowRelevance(row) !== 0);
     const visibleRows = nonZeroRows.slice(0, 3);
     const rowCountClass = " wc-finance-card-rows-" + Math.max(visibleRows.length, 0);
     const itemHtml = visibleRows.map((row) => {
       const amount = row.amount || 0;
+      const priorAmount = row.priorAmount || 0;
       const percent = total ? Math.abs(amount) / Math.abs(total) * 100 : 0;
       const width = total ? Math.max(percent, amount ? 2 : 0) : 0;
-      const isZero = amount === 0;
+      const isZero = amount === 0 && !(showChange && priorAmount);
+      // Each category's own FY2026 -> FY2027 dollar change, shown beside
+      // that category's current amount -- distinct from the
+      // %-of-total-budget badge in the row head above, which is a
+      // same-year share, not a year-over-year comparison.
+      const changeHtml = showChange ? renderFinanceCardRowChange(amount, priorAmount) : "";
+      const amountText = amount === 0 && !isZero ? "$0" : formatCurrency(amount);
       return (
         '<div class="wc-finance-card-row' + (isZero ? " is-zero" : "") + '">' +
           '<div class="wc-finance-card-row-head">' +
@@ -2314,7 +2358,10 @@
           '<div class="wc-finance-card-track" aria-hidden="true">' +
             '<span style="width:' + width.toFixed(2) + '%"></span>' +
           '</div>' +
-          '<div class="wc-finance-card-amount">' + escapeHtml(formatCurrency(amount)) + '</div>' +
+          '<div class="wc-finance-card-amount-row">' +
+            '<div class="wc-finance-card-amount">' + escapeHtml(amountText) + '</div>' +
+            changeHtml +
+          '</div>' +
         '</div>'
       );
     }).join("");
@@ -2342,7 +2389,7 @@
   // Department-page expense/revenue tables: rolled up to category level
   // (Personnel Services, Operating Expenditures, Capital Outlay, etc.)
   // rather than individual object/revenue codes.
-  function renderTypeSummaryGroup(rows, kind, caption, notes, descriptionField) {
+  function renderTypeSummaryGroup(rows, kind, caption, notes, descriptionField, showChange) {
     const isExpense = kind === "expense";
     const typeField = isExpense ? "Object_Type" : "Revenue_Type";
     const typeLabel = isExpense ? "Object Type" : "Revenue Type";
@@ -2362,8 +2409,14 @@
       totalsByType.set(type, totals);
     });
 
-    const showPrior = getShowPriorYears();
-    const detail = renderBudgetLinesToggle(rows, descriptionField, kind);
+    // Secondary sub-program cards (showChange === false, e.g. Code
+    // Compliance Beach) don't get a "View Prior Years" toggle either --
+    // their FY2026 figures share the same per-account dedup unreliability
+    // that already keeps them from showing a YoY change (see
+    // renderTypeSummaryTable).
+    const forceDisablePriorYears = showChange === false;
+    const showPrior = forceDisablePriorYears ? false : getShowPriorYears();
+    const detail = renderBudgetLinesToggle(rows, descriptionField, kind, false, forceDisablePriorYears);
     if (detail.button && !isExpense) {
       detail.button = detail.button
         .replace('data-closed-label="View Budget Lines"', 'data-closed-label="View Revenue Lines"')
@@ -2372,7 +2425,8 @@
     }
     const cardRows = Array.from(totalsByType.entries()).map(([type, totals]) => ({
       label: type,
-      amount: totals.FY2027_Proposed || 0
+      amount: totals.FY2027_Proposed || 0,
+      priorAmount: totals.FY2026_Original_Budget || 0
     }));
 
     return renderFinancialDashboardCard({
@@ -2382,7 +2436,8 @@
       total: grandTotals.FY2027_Proposed || 0,
       showPrior,
       detail,
-      notes: isExpense ? notes : null
+      notes: isExpense ? notes : null,
+      showChange: showChange !== false
     });
   }
 
@@ -2418,9 +2473,15 @@
     return groupNames
       .map((name) => {
         const nameNorm = normalizeDeptName(name);
-        const groupCaption = nameNorm === norm ? caption : (DEPT_NAME_DISPLAY_OVERRIDES[nameNorm] || name);
-        const notes = nameNorm === norm ? null : EXPENSE_GROUP_NOTES[nameNorm];
-        return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption, notes);
+        const isPrimary = nameNorm === norm;
+        const groupCaption = isPrimary ? caption : (DEPT_NAME_DISPLAY_OVERRIDES[nameNorm] || name);
+        const notes = isPrimary ? null : EXPENSE_GROUP_NOTES[nameNorm];
+        // Secondary sub-program cards (e.g. Code Compliance Beach) share a
+        // Dept_Code with the primary group, so their own FY2026 figures
+        // aren't reliably split between the two -- no YoY change or "View
+        // Prior Years" toggle on those cards; the primary card is where
+        // that comparison belongs.
+        return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption, notes, undefined, isPrimary);
       })
       .join("");
   }

@@ -1447,11 +1447,29 @@ body {
   background: #003f28;
 }
 .wc-finance-card-amount {
-  margin-top: 7px;
   color: #526577;
   font-size: .86rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+.wc-finance-card-amount-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px; margin-top: 7px; flex-wrap: wrap;
+}
+/* Each category's own FY2026 -> FY2027 change (see
+   renderFinanceCardRowChange in budget-data.js) -- distinct from the
+   %-of-total-budget badge in the row head above, which is a same-year
+   share, not a year-over-year comparison. */
+.wc-finance-card-change {
+  font-size: .78rem; font-weight: 800; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.wc-finance-card-change-up { color: var(--green); }
+.wc-finance-card-change-down { color: #b3261e; }
+.wc-finance-card-change-flat { color: var(--muted); }
+.wc-finance-card-change-label {
+  font-weight: 700; opacity: .85; text-transform: uppercase;
+  letter-spacing: .04em; font-size: .92em;
 }
 .wc-finance-card-footer {
   display: flex;
@@ -2170,6 +2188,10 @@ body {
 
 :root[data-theme="dark"] .wc-directory-item-stat strong.wc-directory-item-trend-down {
   color: #e0837a !important;
+}
+
+:root[data-theme="dark"] .wc-finance-card-change-down {
+  color: #e0837a;
 }
 
 /* Summary of Expenses/Revenues' "Expenditure/Revenue Classification" hero
