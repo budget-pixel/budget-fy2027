@@ -78,15 +78,20 @@
       "tourism administration": [
         "sales and visitor center",
         "sales and visitors center",
+        "tourism sales and visitor center",
+        "tourism sales and visitors center",
         "communications",
+        "tourism communications",
         "marketing",
+        "tourism marketing",
         "north walton",
         "north walton tourist development tax"
       ],
       "tourism beach operations": [
         "beach operations",
         "beach renourishment",
-        "beach tram"
+        "beach tram",
+        "tourism beach tram"
       ],
       "tourism lifeguard services and beach safety": [
         "south walton fire lifeguard services",
@@ -129,6 +134,12 @@
       var n = Number(value) || 0;
       if(!n) return "Not listed";
       return n.toLocaleString("en-US", { maximumFractionDigits:2 }).replace(/\.00$/, "");
+    }
+
+    function formatTrend(current, prior){
+      if(!prior) return "";
+      var pct = ((current - prior) / prior) * 100;
+      return (pct > 0 ? "+" : "") + pct.toFixed(2) + "%";
     }
 
     function fundCodeForRow(row){
@@ -210,6 +221,16 @@
     function enrichDepartments(data){
       var narratives = Array.isArray(data && data.departmentNarratives) ? data.departmentNarratives : [];
       var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
+      // Some departments split one Dept_Code across multiple display-only
+      // Dept_Names (e.g. Code Compliance / Code Compliance Beach) that each
+      // carry the *same* full FY2026_Original_Budget total for a shared
+      // account (see applyOriginalBudgetToRows in budget-data.js) -- summing
+      // every raw row would double-count that total once per Dept_Name
+      // sharing it. dedupedExpenseRows collapses that back to one row per
+      // true accounting record, so the prior-year total here matches the
+      // one used for the Fund Financial Schedules/Consolidated Expense
+      // Summary instead of being inflated.
+      var dedupedExpenditures = Array.isArray(data && data.dedupedExpenseRows) ? data.dedupedExpenseRows : expenditures;
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
       var funds = Array.isArray(data && data.funds) ? data.funds : [];
       var fundsByCode = {};
@@ -222,6 +243,9 @@
         var budget = expenditures.reduce(function(sum, row){
           return rowMatchesDepartment(row, dept.name) ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
         }, 0);
+        var priorBudget = dedupedExpenditures.reduce(function(sum, row){
+          return rowMatchesDepartment(row, dept.name) ? sum + (Number(row.FY2026_Original_Budget) || 0) : sum;
+        }, 0);
         var fte = staffing.reduce(function(sum, row){
           return rowMatchesDepartment(row, dept.name) ? sum + (Number(row["2027"]) || 0) : sum;
         }, 0);
@@ -231,6 +255,7 @@
           href:dept.href,
           description:descriptionFromNarrative(narrative && narrative.Narrative),
           budget:formatCurrency(budget),
+          trend:formatTrend(budget, priorBudget),
           fte:formatFte(fte),
           fund:fundLabelForDepartment(dept.name, expenditures, fundsByCode)
         };
@@ -245,6 +270,8 @@
           '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fte) + '</strong><span>Personnel</span></div>';
         var fundStat = !dept.fund || dept.fund === "Not listed" ? "" :
           '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fund) + '</strong><span>Fund</span></div>';
+        var trendStat = !dept.trend ? "" :
+          '<div class="wc-directory-item-stat"><strong class="' + (dept.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") + '">' + escapeHtml(dept.trend) + '</strong><span>YoY Change</span></div>';
         return '<li><a class="wc-directory-item" href="' + escapeHtml(dept.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(dept.name) + '</span>' +
@@ -253,6 +280,7 @@
           '<div class="wc-directory-item-meta">' +
             fundStat +
             '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.budget) + '</strong><span>FY 2027 Budget</span></div>' +
+            trendStat +
             personnelStat +
           '</div>' +
           '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +

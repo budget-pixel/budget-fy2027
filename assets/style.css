@@ -160,6 +160,8 @@ body {
   font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
 }
 .wc-directory-item-arrow { flex: 0 0 auto; color: var(--green); font-size: 18px; font-weight: 700; }
+.wc-directory-item-stat strong.wc-directory-item-trend-up { color: var(--green); }
+.wc-directory-item-stat strong.wc-directory-item-trend-down { color: #b3261e !important; }
 @media (max-width: 640px) {
   .wc-directory-item { flex-wrap: wrap; }
   .wc-directory-item-meta { width: 100%; justify-content: flex-start; }
@@ -1174,6 +1176,21 @@ body {
 
 #department-expense-table { margin-top: 32px; }
 .court-innovations-supplemental-tables { margin-top: 32px; }
+.court-innovations-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+.court-innovations-cards .wc-finance-card {
+  margin: 0;
+  height: 100%;
+}
+@media (max-width: 768px) {
+  .court-innovations-cards {
+    grid-template-columns: 1fr;
+  }
+}
 
 .wc-department-financial-grid {
   display: grid;
@@ -1985,6 +2002,10 @@ body {
 :root[data-theme="dark"] .wc-directory-item-arrow,
 :root[data-theme="dark"] .page-nav a:hover {
   color: var(--green) !important;
+}
+
+:root[data-theme="dark"] .wc-directory-item-stat strong.wc-directory-item-trend-down {
+  color: #e0837a !important;
 }
 
 /* Summary of Expenses/Revenues' "Expenditure/Revenue Classification" hero

@@ -36,12 +36,18 @@
     "environmental resources": ["environmental services"],
     "probation": ["probation services"],
     "purchasing": ["procurement"],
+    // "Court Innovations" is deliberately NOT an alias here -- its rows
+    // (Dept_Code 001348/00101000) get their own dedicated card via
+    // renderCourtInnovationsSupplementalTables instead of the generic
+    // Expense/Revenue Summary, same as its narrative (see
+    // renderDepartmentNarrative's "court technology and innovations"
+    // branch). Including it here would pull the same rows into both,
+    // showing duplicate cards.
     "court technology and innovations": [
       "court technology court administration",
       "court technology state attorney",
       "court technology public defender",
       "court technology innovations",
-      "court innovations",
       "court technology"
     ],
     "public defender": ["court technology public defender"],
@@ -53,15 +59,20 @@
     "tourism administration": [
       "sales and visitor center",
       "sales and visitors center",
+      "tourism sales and visitor center",
+      "tourism sales and visitors center",
       "communications",
+      "tourism communications",
       "marketing",
+      "tourism marketing",
       "north walton",
       "north walton tourist development tax"
     ],
     "tourism beach operations": [
       "beach operations",
       "beach renourishment",
-      "beach tram"
+      "beach tram",
+      "tourism beach tram"
     ],
     "tourism beach tram": ["beach tram"],
     "tourism communications": ["communications"],
@@ -4344,9 +4355,9 @@
 
     // The $65 court cost itself (Additional Court Cost — Law Library,
     // Juvenile Justice, Legal Aid, Innovative Programs) is booked under
-    // Dept_Name "Court Innovation" (singular) in the revenues sheet.
+    // Dept_Name "Court Innovations" (Dept_Code 001348) in the revenues sheet.
     const revenueRows = (cache.revenues || []).filter(
-      (r) => normalizeDeptName(r.Dept_Name) === "court innovation"
+      (r) => normalizeDeptName(r.Dept_Name) === "court innovations"
     );
     const revenuePiece = renderTypeSummaryGroup(revenueRows, "revenue", "Revenue Summary");
 
@@ -4363,8 +4374,10 @@
       "<h2>Court Innovations</h2>" +
       narrativeHtml +
       "</section>" +
+      '<div class="court-innovations-cards">' +
       expensePiece +
-      revenuePiece
+      revenuePiece +
+      "</div>"
     );
   }
 
@@ -4385,7 +4398,7 @@
       narrativeNames: ["Sales and Visitor Center"],
       expenseNames: ["Sales and Visitors Center"],
       revenueNames: [],
-      staffingNames: ["Sales and Visitors Center"],
+      staffingNames: ["Sales and Visitors Center", "Tourism Sales and Visitors Center"],
       machineryNames: []
     },
     {
@@ -4393,7 +4406,7 @@
       narrativeNames: ["Communications"],
       expenseNames: ["Communications"],
       revenueNames: [],
-      staffingNames: ["Communications"],
+      staffingNames: ["Communications", "Tourism Communications"],
       machineryNames: []
     },
     {
@@ -4401,7 +4414,7 @@
       narrativeNames: ["Marketing"],
       expenseNames: ["Marketing"],
       revenueNames: [],
-      staffingNames: ["Marketing"],
+      staffingNames: ["Marketing", "Tourism Marketing"],
       machineryNames: []
     },
     {
@@ -4475,8 +4488,8 @@
   }
 
   // Tourism Beach Operations' page combines three separately budgeted
-  // programs. The narrative/performance sheets call the main program
-  // "Tourism Beach Operations" while the expenditure/staffing/machinery
+  // programs. The narrative/performance/staffing sheets call the main
+  // program "Tourism Beach Operations" while the expenditure/machinery
   // sheets call it plain "Beach Operations" for the same Dept_Code.
   const TOURISM_BEACH_SECTIONS = [
     {
