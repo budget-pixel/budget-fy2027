@@ -356,7 +356,7 @@ function renderFundSchedule(config){
             <div class="wc-cip-schedule-control-top">
               <div>
                 <h2>${escapeHtml(yearLabel)} Schedule</h2>
-                <p>FY 2027 is shown by default. Use the year controls to review planned future-year capital projects without loading every schedule at once.</p>
+                <p>Use the year controls to review planned future-year capital projects.</p>
               </div>
               <div class="wc-cip-active-total">
                 <strong>${money(data.total)}</strong>
