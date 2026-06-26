@@ -20,6 +20,8 @@
 <h1 class="page-title">Departments</h1>
 <p class="page-intro">Explore Walton County departments, budgets, staffing, performance measures, and services.</p>
 
+<section class="wc-dept-fund-summary" aria-label="Departments by fund, at a glance" id="departmentFundSummary"></section>
+
 <section aria-label="Department directory">
   <ul class="wc-directory-list" id="departmentList"></ul>
 </section>
@@ -163,6 +165,113 @@
 
     function fundCodeForRow(row){
       return String((row && row.Dept_Code) || "").trim().slice(0, 3);
+    }
+
+    // Top-of-page "at a glance" callouts -- one card per fund, each showing
+    // that fund's total FY2026 -> FY2027 dollar change, total FY2027
+    // personnel, and FY2026 -> FY2027 FTE change, summed across every
+    // department/program booked under that fund code (not just the
+    // departments listed below, which only cover ones with their own page).
+    var FUND_SUMMARY_GROUPS = [
+      { code:"001", label:"General Fund (Board Departments)" },
+      { code:"101", label:"Transportation Fund" },
+      { code:"111", label:"Tourist Development Fund" },
+      { code:"112", label:"Solid Waste Fund" },
+      { code:"105", label:"Mosquito Control Fund" },
+      { code:"103", label:"Building Fund" },
+      { code:"110", label:"Housing & Urban Development Fund" }
+    ];
+
+    function computeFundSummaries(data){
+      var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
+      // Same dedup as enrichDepartments' own priorBudget -- a shared
+      // account split across multiple Dept_Names (e.g. Code Compliance /
+      // Code Compliance Beach) would otherwise count its FY2026 total once
+      // per Dept_Name sharing it.
+      var dedupedExpenditures = Array.isArray(data && data.dedupedExpenseRows) ? data.dedupedExpenseRows : expenditures;
+      var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
+
+      // General Fund (and, in principle, any fund) is also used by
+      // constitutional officers and other agencies that have their own
+      // separate directory (constitutional-officers.html) -- those aren't
+      // "Board Departments" and have no page listed below, so a row only
+      // counts toward a fund callout here when it also matches one of the
+      // departments actually listed on this page.
+      var deptNames = departments.map(function(d){ return d.name; });
+      function isListedDepartmentRow(row){
+        for(var i = 0; i < deptNames.length; i++){
+          if(rowMatchesDepartment(row, deptNames[i])) return true;
+        }
+        return false;
+      }
+      var listedExpenditures = expenditures.filter(isListedDepartmentRow);
+      var listedDedupedExpenditures = dedupedExpenditures.filter(isListedDepartmentRow);
+      var listedStaffing = staffing.filter(isListedDepartmentRow);
+
+      return FUND_SUMMARY_GROUPS.map(function(group){
+        var budget = listedExpenditures.reduce(function(sum, row){
+          return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
+        }, 0);
+        var priorBudget = listedDedupedExpenditures.reduce(function(sum, row){
+          return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2026_Original_Budget) || 0) : sum;
+        }, 0);
+        var fte = listedStaffing.reduce(function(sum, row){
+          return fundCodeForRow(row) === group.code ? sum + (Number(row["2027"]) || 0) : sum;
+        }, 0);
+        var priorFte = listedStaffing.reduce(function(sum, row){
+          return fundCodeForRow(row) === group.code ? sum + (Number(row["2026"]) || 0) : sum;
+        }, 0);
+
+        return {
+          label:group.label,
+          budget:formatCurrency(budget),
+          trend:formatTrend(budget, priorBudget),
+          trendDollar:formatTrendDollar(budget, priorBudget),
+          fte:formatFte(fte),
+          fteTrend:formatFteTrend(fte, priorFte)
+        };
+      });
+    }
+
+    function fundChipHtml(value, label, trendClass){
+      return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">' + escapeHtml(label) + '</span><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + value + '</strong></div>';
+    }
+
+    // The YoY Change chip needs its own markup: the % is dropped onto its
+    // own line under the $ amount (there's no room to keep label + $
+    // amount + (%) all on one line on the narrower cards), so the label
+    // and the dollar amount stay inline with each other while the percent
+    // sits stacked below the dollar amount, right-aligned to match it.
+    function fundTrendChipHtml(trendDollar, trendPercent, trendClass){
+      var valueHtml = trendDollar ? escapeHtml(trendDollar) : "&mdash;";
+      var percentHtml = (trendDollar && trendPercent)
+        ? '<span class="wc-dept-fund-chip-percent">' + escapeHtml(trendPercent) + "</span>"
+        : "";
+      return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">YoY Change</span>' +
+        '<span class="wc-dept-fund-chip-value-wrap"><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + "</strong>" + percentHtml + "</span></div>";
+    }
+
+    // Compact cards, one per fund, beside each other -- each card lists its
+    // own budget/change/personnel/FTE metrics one per line, with that
+    // line's own label and value sitting inline with each other (not
+    // stacked), so every metric's label/value pair lines up the same way
+    // down the card.
+    function renderFundSummary(fundSummaries){
+      var el = $("#departmentFundSummary");
+      if(!el) return;
+      el.innerHTML = fundSummaries.map(function(f){
+        var trendClass = f.trendDollar ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var fteTrendClass = f.fteTrend ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        return '<div class="wc-dept-fund-card">' +
+          '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +
+          '<div class="wc-dept-fund-card-chips">' +
+            fundChipHtml(escapeHtml(f.budget), "Budget") +
+            fundTrendChipHtml(f.trendDollar, f.trend, trendClass) +
+            fundChipHtml(escapeHtml(f.fte), "Personnel") +
+            fundChipHtml(f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass) +
+          '</div>' +
+        '</div>';
+      }).join("");
     }
 
     function descriptionFromNarrative(text){
@@ -348,6 +457,7 @@
           .then(function(data){
             enrichDepartments(data);
             renderDepartments();
+            renderFundSummary(computeFundSummaries(data));
           })
           .catch(function(){
             departments = departments.map(function(dept){

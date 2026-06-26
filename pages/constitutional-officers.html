@@ -20,6 +20,8 @@
 <h1 class="page-title">Constitutional Officers & Other Agencies</h1>
 <p class="page-intro">Explore Walton County's independently elected constitutional officers and autonomous entities, their budgets, staffing, and services.</p>
 
+<section class="wc-dept-fund-summary" aria-label="Constitutional officers and agencies by fund, at a glance" id="officerFundSummary"></section>
+
 <section aria-label="Constitutional Officers directory" class="page-text">
   <h2>Constitutional Officers</h2>
   <ul class="wc-directory-list" id="officerList"></ul>
@@ -303,6 +305,102 @@
       });
     }
 
+    // Top-of-page "at a glance" callouts. General Fund is split into two
+    // cards instead of one combined total -- "Constitutional Officers"
+    // (Board of County Commissioners, Clerk, Property Appraiser, Sheriff's
+    // Office, Supervisor of Elections, Tax Collector) and "Agencies & State
+    // Mandates" (the Autonomous Entities group below) draw on the same
+    // General Fund for very different reasons, so lumping them together
+    // would hide which side of a county-wide change came from which.
+    // Sheriff Fund gets its own card since Sheriff's Office is the only
+    // listed entity that uses it.
+    var FUND_SUMMARY_SPECS = [
+      { code:"001", label:"General Fund (Constitutional Officers)", groupIndex:0 },
+      { code:"001", label:"General Fund (Agencies & State Mandates)", groupIndex:1 },
+      { code:"107", label:"Sheriff Fund", groupIndex:0 }
+    ];
+
+    function computeFundSummaries(data){
+      var expenditures = Array.isArray(data && data.expenditures) ? data.expenditures : [];
+      var dedupedExpenditures = Array.isArray(data && data.dedupedExpenseRows) ? data.dedupedExpenseRows : expenditures;
+      var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
+
+      function sumForGroup(group, code){
+        var items = buildBaseItems(group);
+        var totals = { budget:0, priorBudget:0, fte:0, priorFte:0 };
+        items.forEach(function(item){
+          var expRows = expenditureRowsForItem(expenditures, item, group);
+          // Staffing rows for these entities (Board of County
+          // Commissioners, Sheriff, Clerk, etc.) carry no usable Dept_Code
+          // of their own (it's blank in the sheet) -- so which fund an
+          // item's personnel count belongs to is determined from its
+          // EXPENDITURE rows instead (those do carry a real Dept_Code):
+          // an item's staffing counts toward this fund only if the item
+          // itself has real FY2027 spending booked under this same code.
+          var itemUsesThisFund = expRows.some(function(row){
+            return fundCodeForRow(row) === code && (Number(row.FY2027_Proposed) || 0) !== 0;
+          });
+          expRows.forEach(function(row){
+            if(fundCodeForRow(row) === code) totals.budget += Number(row.FY2027_Proposed) || 0;
+          });
+          priorBudgetRowsForItem(dedupedExpenditures, expenditures, item, group).forEach(function(row){
+            if(fundCodeForRow(row) === code) totals.priorBudget += Number(row.FY2026_Original_Budget) || 0;
+          });
+          if(itemUsesThisFund){
+            staffing.forEach(function(row){
+              if(!rowMatches(row, item.name, group.aliasMap)) return;
+              totals.fte += Number(row["2027"]) || 0;
+              totals.priorFte += Number(row["2026"]) || 0;
+            });
+          }
+        });
+        return totals;
+      }
+
+      return FUND_SUMMARY_SPECS.map(function(spec){
+        var t = sumForGroup(GROUPS[spec.groupIndex], spec.code);
+        return {
+          label:spec.label,
+          budget:formatCurrency(t.budget),
+          trend:formatTrend(t.budget, t.priorBudget),
+          trendDollar:formatTrendDollar(t.budget, t.priorBudget),
+          fte:formatFte(t.fte),
+          fteTrend:formatFteTrend(t.fte, t.priorFte)
+        };
+      });
+    }
+
+    function fundChipHtml(value, label, trendClass){
+      return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">' + escapeHtml(label) + '</span><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + value + '</strong></div>';
+    }
+
+    function fundTrendChipHtml(trendDollar, trendPercent, trendClass){
+      var valueHtml = trendDollar ? escapeHtml(trendDollar) : "&mdash;";
+      var percentHtml = (trendDollar && trendPercent)
+        ? '<span class="wc-dept-fund-chip-percent">' + escapeHtml(trendPercent) + "</span>"
+        : "";
+      return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">YoY Change</span>' +
+        '<span class="wc-dept-fund-chip-value-wrap"><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + "</strong>" + percentHtml + "</span></div>";
+    }
+
+    function renderFundSummary(fundSummaries){
+      var el = $("#officerFundSummary");
+      if(!el) return;
+      el.innerHTML = fundSummaries.map(function(f){
+        var trendClass = f.trendDollar ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var fteTrendClass = f.fteTrend ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        return '<div class="wc-dept-fund-card">' +
+          '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +
+          '<div class="wc-dept-fund-card-chips">' +
+            fundChipHtml(escapeHtml(f.budget), "Budget") +
+            fundTrendChipHtml(f.trendDollar, f.trend, trendClass) +
+            fundChipHtml(escapeHtml(f.fte), "Personnel") +
+            fundChipHtml(f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass) +
+          '</div>' +
+        '</div>';
+      }).join("");
+    }
+
     function statBlockHtml(modifierClass, valueHtml, label, trendClass){
       return '<div class="wc-directory-item-stat ' + modifierClass + '">' +
         '<strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + '</strong>' +
@@ -371,6 +469,7 @@
             groupItems.forEach(function(entry){
               renderItems(entry.group, enrichItems(entry.group, entry.baseItems, data));
             });
+            renderFundSummary(computeFundSummaries(data));
           })
           .catch(function(){
             groupItems.forEach(function(entry){

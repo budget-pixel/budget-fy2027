@@ -5697,6 +5697,55 @@
     return fundNameForRow(row);
   }
 
+  // The Summary of Personnel all-departments table's per-department
+  // "View Positions" detail -- same hidden-detail-div + delegated
+  // .wc-view-budget-lines-toggle click handling already used for "View
+  // Budget Lines"/"View Position Detail" elsewhere (see
+  // openBudgetDetailModal), just scoped to one department's own position
+  // list instead of a department page's own staffing card.
+  function personnelDeptDetailHtml(deptRows) {
+    budgetLinesDetailCounter += 1;
+    const detailId = "wc-personnel-dept-detail-" + budgetLinesDetailCounter;
+    const years = [2024, 2025, 2026, 2027];
+    const priorYears = years.filter((y) => y < 2027);
+    const showPriorLocal = getShowPriorYears();
+    const sortedPositions = deptRows
+      .slice()
+      .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""));
+    const totals = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
+    const bodyRows = sortedPositions.map((r) => {
+      years.forEach((y) => { totals[y] += r[y] || 0; });
+      const rowClass = (r[2027] || 0) === 0 ? ' class="wc-staffing-zero-current"' : "";
+      return (
+        "<tr" + rowClass + "><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
+        years.map((y) => {
+          const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
+          return '<td class="' + classes.join(" ") + '">' + formatNumber(r[y] || 0) + "</td>";
+        }).join("") +
+        "</tr>"
+      );
+    });
+    bodyRows.push(
+      '<tr class="wc-table-total-row"><td>Total FTE</td>' +
+      years.map((y) => {
+        const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
+        return '<td class="' + classes.join(" ") + '">' + formatNumber(totals[y]) + "</td>";
+      }).join("") +
+      "</tr>"
+    );
+    const detailHtml =
+      '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPriorLocal ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+        priorYearsToggleHtml(showPriorLocal, "wc-budget-lines-detail-header") +
+        '<div class="wc-data-table-scroll">' +
+        '<table class="wc-data-table wc-staffing-table">' +
+        "<thead><tr><th>Position Name</th>" +
+        priorYears.map((y) => '<th class="wc-num wc-prior-year">FY ' + y + "</th>").join("") +
+        '<th class="wc-num">FY 2027</th>' +
+        "</tr></thead><tbody>" + bodyRows.join("") + "</tbody></table></div>" +
+      "</div>";
+    return { detailId, detailHtml };
+  }
+
   // Shared by the Summary of Personnel page's own callout row and the
   // Financials directory's "Summary of Personnel" link card (see
   // financials.html), so both stay in sync with one grouping definition.
@@ -5780,15 +5829,20 @@
       }
 
       const totalsByDept = new Map();
+      const rowsByDept = new Map();
       filtered.forEach((r) => {
         // Code Compliance's two sub-programs (Code Compliance Beach/Street)
         // are shown as their own staffing cards on the department's own
         // page, but on this all-departments schedule they should read as
         // one "Code Compliance" line rather than split across two rows.
         const name = personnelDeptDisplayName(r.Dept_Name);
-        if (!totalsByDept.has(name)) totalsByDept.set(name, { 2024: 0, 2025: 0, 2026: 0, 2027: 0 });
+        if (!totalsByDept.has(name)) {
+          totalsByDept.set(name, { 2024: 0, 2025: 0, 2026: 0, 2027: 0 });
+          rowsByDept.set(name, []);
+        }
         const t = totalsByDept.get(name);
         years.forEach((y) => { t[y] += r[y] || 0; });
+        rowsByDept.get(name).push(r);
       });
       const deptsInView = sortByFte
         ? Array.from(totalsByDept.keys()).sort((a, b) => totalsByDept.get(b)[2027] - totalsByDept.get(a)[2027])
@@ -5796,9 +5850,23 @@
       const grand = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
       totalsByDept.forEach((t) => years.forEach((y) => { grand[y] += t[y]; }));
 
+      // Each department name is a "View Positions" toggle, opening the
+      // same budget-detail modal used for "View Budget Lines" elsewhere
+      // (see openBudgetDetailModal) with that department's own position
+      // list instead of leaving users stuck at the department-level total.
+      const detailMarkup = [];
       const bodyRows = deptsInView.map((d) => {
         const t = totalsByDept.get(d);
-        return "<tr><td>" + escapeHtml(d) + "</td>" + years.map((y) => '<td class="wc-num">' + formatNumber(t[y]) + "</td>").join("") + "</tr>";
+        const { detailId, detailHtml } = personnelDeptDetailHtml(rowsByDept.get(d));
+        detailMarkup.push(detailHtml);
+        return (
+          "<tr><td>" +
+          '<button type="button" class="wc-view-budget-lines-toggle wc-table-row-link" data-target="' + detailId + '" data-closed-label="' + escapeHtml(d) + '" aria-expanded="false">' +
+          escapeHtml(d) + "</button>" +
+          "</td>" +
+          years.map((y) => '<td class="wc-num">' + formatNumber(t[y]) + "</td>").join("") +
+          "</tr>"
+        );
       });
       bodyRows.push(
         '<tr class="wc-table-total-row"><td>Total FTE</td>' +
@@ -5812,7 +5880,7 @@
           caption: fundName || "All Departments",
           columns: [{ label: "Department" }].concat(years.map((y) => ({ label: "FY " + y, num: true }))),
           bodyRows: bodyRows
-        })
+        }) + detailMarkup.join("")
       );
     }
 

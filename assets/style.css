@@ -1757,6 +1757,19 @@ body {
   background: var(--green);
   color: #ffffff;
 }
+/* Plain-text variant used for clickable department names inside a data
+   table (see personnelDeptDetailHtml in budget-data.js) -- same
+   .wc-view-budget-lines-toggle click/modal behavior, but it should read
+   like a normal table cell, not a pill button. */
+.wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link {
+  display: inline; padding: 0; border: 0; border-radius: 0;
+  background: none; color: inherit; font: inherit; letter-spacing: normal;
+  text-decoration-line: underline; text-decoration-style: dotted;
+  text-decoration-color: var(--border); text-underline-offset: 3px;
+}
+.wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link:hover {
+  background: none; color: var(--green); text-decoration-color: var(--green);
+}
 .wc-budget-lines-detail {
   margin-top: 14px;
   padding-top: 14px;
@@ -1917,6 +1930,69 @@ body {
 }
 @media (max-width: 560px) {
   .wc-personnel-fund-stats--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Departments directory's "at a glance" per-fund callouts (see
+   computeFundSummaries/renderFundSummary in departments.html) -- compact
+   cards, one per fund, beside each other; each card lists its own FY2027
+   budget, YoY $ change, personnel count, and YoY FTE change one per line,
+   with that line's own label and value inline with each other, summed
+   county-wide for that fund code rather than just the departments listed
+   below. */
+.wc-dept-fund-summary {
+  /* auto-fit (rather than a fixed column count) so a page with only a
+     few cards (e.g. constitutional-officers.html's 3) stretches them to
+     fill the row instead of cramming them into a handful of a 7-column
+     grid's tracks and leaving the rest of the row empty. */
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px; margin: 24px 0;
+}
+.wc-dept-fund-card {
+  padding: 18px 16px; border: 1px solid var(--border);
+  border-radius: 16px; background: #fff; min-width: 0;
+}
+:root[data-theme="dark"] .wc-dept-fund-card { background: rgba(14,28,22,.92); }
+.wc-dept-fund-card-label {
+  /* Reserves space for 3 lines always, even on labels short enough to fit
+     on one ("Sheriff Fund") or two ("Tourist Development Fund") --
+     otherwise those cards' Budget/YoY Change/etc. rows start higher than
+     a card whose longer fund name actually wraps further (e.g. "General
+     Fund (Constitutional Officers)"). */
+  margin: 0 0 12px; color: var(--navy); font-size: .82rem; font-weight: 800;
+  line-height: 1.3; min-height: 3.9em;
+}
+.wc-dept-fund-card-chips { display: flex; flex-direction: column; gap: 8px; }
+.wc-dept-fund-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+}
+.wc-dept-fund-chip:first-child { padding-top: 0; border-top: 0; }
+.wc-dept-fund-chip-label {
+  color: var(--muted); font-size: .65rem; font-weight: 800;
+  letter-spacing: .02em; text-transform: uppercase; white-space: nowrap;
+  flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis;
+}
+.wc-dept-fund-chip strong {
+  flex: 0 0 auto; color: var(--green); font-size: .88rem; font-weight: 800;
+  white-space: nowrap; text-align: right;
+}
+.wc-dept-fund-chip strong.wc-directory-item-trend-up { color: var(--green); }
+.wc-dept-fund-chip strong.wc-directory-item-trend-down { color: #b3261e; }
+:root[data-theme="dark"] .wc-dept-fund-chip strong.wc-directory-item-trend-down { color: #e0837a; }
+/* The YoY Change chip stacks its $ amount above the (%) instead of
+   keeping them on one line -- see fundTrendChipHtml in departments.html --
+   so the label still fits inline beside the $ amount on narrower cards. */
+.wc-dept-fund-chip-value-wrap {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end;
+}
+.wc-dept-fund-chip-percent {
+  margin-top: 1px; color: var(--muted); font-size: .68rem; font-weight: 700;
+}
+@media (max-width: 1100px) {
+  .wc-dept-fund-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .wc-dept-fund-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .wc-filter-bar {
