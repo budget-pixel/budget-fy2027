@@ -106,6 +106,54 @@
     ],
     "south walton fire": [
       "The rise in the budget is attributed to contractual obligations, specifically, the contractual provision for incremental adjustments within the agreement with the South Walton Fire District, tied to the Consumer Price Index Municipal Class Size D - South, calculated from April of the preceding year to April of the current year."
+    ],
+    "clerk of courts and county comptroller": [
+      "Contact the Clerk of Courts & County Comptroller's office directly for additional budget line detail."
+    ],
+    "tax collector": [
+      "Contact the Tax Collector's office directly for additional budget line detail."
+    ],
+    "sheriffs office": [
+      "Contact the Sheriff's Office directly for additional budget line detail."
+    ],
+    "property appraiser": [
+      "Contact the Property Appraiser's office directly for additional budget line detail."
+    ],
+    "supervisor of elections": [
+      "Contact the Supervisor of Elections' office directly for additional budget line detail."
+    ]
+  };
+
+  // These constitutional officers only roll an FTE total up here rather
+  // than itemized position-level data -- see renderStaffingGroup's
+  // extraNotes -- so their staffing card points readers to that office
+  // directly for a detailed position-level FTE table.
+  const STAFFING_GROUP_NOTES = {
+    "clerk of courts and county comptroller": [
+      "Contact the Clerk of Courts & County Comptroller's office directly for a detailed position-level FTE table."
+    ],
+    // The staffing sheet's own Dept_Name for the Clerk uses "Clerk of
+    // Circuit Court" rather than the page's "Clerk of Courts & County
+    // Comptroller" title.
+    "clerk of circuit court": [
+      "Contact the Clerk of Courts & County Comptroller's office directly for a detailed position-level FTE table."
+    ],
+    "tax collector": [
+      "Contact the Tax Collector's office directly for a detailed position-level FTE table."
+    ],
+    "sheriffs office": [
+      "Contact the Sheriff's Office directly for a detailed position-level FTE table."
+    ],
+    // The staffing sheet's own Dept_Name for the Sheriff is just "Sheriff"
+    // rather than the page's "Sheriff's Office" title.
+    sheriff: [
+      "Contact the Sheriff's Office directly for a detailed position-level FTE table."
+    ],
+    "property appraiser": [
+      "Contact the Property Appraiser's office directly for a detailed position-level FTE table."
+    ],
+    "supervisor of elections": [
+      "Contact the Supervisor of Elections' office directly for a detailed position-level FTE table."
     ]
   };
 
@@ -4622,7 +4670,7 @@
       }, []);
   }
 
-  function renderStaffingGroup(rows, label, forcedOtherMaxFte) {
+  function renderStaffingGroup(rows, label, forcedOtherMaxFte, extraNotes) {
     const showPrior = getShowPriorYears();
     const years = [2024, 2025, 2026, 2027];
     const priorYears = years.filter((y) => y < 2027);
@@ -4654,7 +4702,12 @@
         }).join("") +
         "</tr>"
     );
-    const notes = buildStaffingNotes(rows);
+    // Some constitutional officers (Clerk, Tax Collector, Sheriff,
+    // Property Appraiser, Supervisor of Elections) only roll an FTE total
+    // up here rather than itemized position-level data they publish
+    // elsewhere -- see STAFFING_GROUP_NOTES -- so a static note pointing to
+    // that office is appended alongside any auto-generated FTE-change notes.
+    const notes = buildStaffingNotes(rows).concat(extraNotes || []);
     const notesHtml = notes.length
       ? '<div class="wc-staffing-notes"><p class="wc-staffing-notes-title">Staffing Notes:</p>' +
         notes.map((n) => "<p>" + n + "</p>").join("") +
@@ -4747,13 +4800,14 @@
     if (!rows.length) return "";
     const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
     if (groupNames.length <= 1) {
-      return renderStaffingGroup(rows, "Staffing / FTE");
+      return renderStaffingGroup(rows, "Staffing / FTE", null, STAFFING_GROUP_NOTES[normalizeDeptName(rows[0].Dept_Name || "")]);
     }
     return groupNames
       .map((name) => renderStaffingGroup(
         rows.filter((r) => (r.Dept_Name || "") === name),
         name,
-        STAFFING_GROUP_FORCED_OTHER_MAX_FTE[normalizeDeptName(name)]
+        STAFFING_GROUP_FORCED_OTHER_MAX_FTE[normalizeDeptName(name)],
+        STAFFING_GROUP_NOTES[normalizeDeptName(name)]
       ))
       .join("");
   }
