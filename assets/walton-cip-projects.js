@@ -205,8 +205,14 @@
     if (/\bsheriff\b/.test(source)) return "Sheriff";
     if (/\btdt\b|\btdc\b|tourist|tourism|beach|dune|30a|miramar|visitor|gulfview|blue mountain/.test(source)) return "Beach Operations";
     if (/\bpw\b|\beng\b|public works|engineering|road|bridge|sidewalk|path|stormwater|drainage|intersection|connector|pave|overlay|resurfacing|transportation/.test(source)) return "Public Works/Engineering";
-    if (/admin|library|building construction|maintenance|facility|county buildings|renovation|rehab/.test(source)) return "Administration";
-    if (/\bfm\b/.test(source)) return "Building Construction & Maintenance";
+    // Checked before the generic Administration bucket below -- a sheet Dept
+    // of "Building & Contruction Maintenance" (sic) would otherwise match
+    // Administration's own "building construction"/"maintenance" terms
+    // first and get misclassified (see the Roof Replacement Fire Station 4
+    // project, which only ever showed up under the Administration filter
+    // because of this).
+    if (/\bfm\b|building.{0,4}(construction|contruction|maintenance)|\bfacilit|county buildings|renovation|rehab/.test(source)) return "Building Construction & Maintenance";
+    if (/admin|library/.test(source)) return "Administration";
     return rawDept || "Capital Projects";
   }
 

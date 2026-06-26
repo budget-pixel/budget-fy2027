@@ -90,7 +90,7 @@
   // amounts aren't counted twice.
   const EXPENSE_OBJECT_CODES_BROKEN_OUT = {
     "solid waste": ["534000"],
-    "building construction and maintenance": ["562000", "563000", "543000"],
+    "building construction and maintenance": ["543000"],
     "board of county commissioners": ["531001", "531002", "531003", "531004"]
   };
 
@@ -4143,7 +4143,17 @@
     {
       containerId: "general-government-tax-topics",
       topics: [
-        { title: "Ad Valorem Taxes", narrativeKey: "Property Tax", matches: byRevenueCodes(["311000", "311001"]) },
+        {
+          title: "Ad Valorem Taxes",
+          narrativeKey: "Property Tax",
+          // Also matches the statutory 5% Ad Valorem discount row
+          // (Dept_Code 102389/Revenue_Code 389001, relabeled to "Ad Valorem
+          // Taxes" by REVENUE_NAME_OVERRIDES) so its FY2026 reduction nets
+          // into this chart's bar the same way it already does on the
+          // Summary of Revenues table -- without it, the chart's FY2026 bar
+          // showed the gross amount instead of net-of-5%.
+          matches: (r) => byRevenueCodes(["311000", "311001"])(r) || byRevenueCodeAndDeptCode("389001", "102389")(r)
+        },
         { title: "Tourist Development Taxes", narrativeKey: "Tourist Development Tax", matches: byRevenueCodes(["312120", "312130", "312150", "312160", "312170"]) },
         { title: "Local Discretionary Sales Surtax", narrativeKey: "Local Discretionary Sales Surtax", matches: byRevenueCodes(["312600"]) },
         { title: "Local Option Fuel Tax", narrativeKey: "Local Option Fuel Tax", matches: byRevenueCodes(["312300", "312410"]) }
@@ -4556,15 +4566,11 @@
 
   function renderBuildingConstructionSupplementalTables() {
     const rows = rowsForExactDepartment(cache.expenditures, "Building Construction and Maintenance");
-    const parksRows = rows.filter((r) => ["562000", "563000"].includes(String(r.Object_Code || "").trim()));
     const utilityRows = rows.filter((r) => String(r.Object_Code || "").trim() === "543000");
-    const pieces = [
-      renderTypeSummaryTable(parksRows, "expense", "Parks, Recreation, and Public Facilities Capital Program", "Building Construction and Maintenance"),
-      renderTypeSummaryTable(utilityRows, "expense", "County-Wide Utilities", "Building Construction and Maintenance")
-    ].filter(Boolean);
+    const piece = renderTypeSummaryTable(utilityRows, "expense", "County-Wide Utilities", "Building Construction and Maintenance");
 
-    if (!pieces.length) return "";
-    return '<section class="building-construction-supplemental-tables">' + pieces.join("") + "</section>";
+    if (!piece) return "";
+    return '<section class="building-construction-supplemental-tables">' + piece + "</section>";
   }
 
   function renderBoardOfCountyCommissionersSupplementalTables() {

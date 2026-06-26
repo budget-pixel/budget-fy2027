@@ -304,6 +304,7 @@ function renderProjects(){
     "Public Works/Engineering",
     "Beach Operations",
     "Sheriff",
+    "Building Construction & Maintenance",
     "Administration",
     "Capital Projects"
   ]);
@@ -2117,6 +2118,7 @@ function renderProjects(){
       :root[data-theme="dark"] .wc-cip-link-card,
       :root[data-theme="dark"] .wc-cip-overview-metric,
       :root[data-theme="dark"] .wc-cip-element-card,
+      :root[data-theme="dark"] .wc-project-index-header,
       :root[data-theme="dark"] .wc-project-search-stat,
       :root[data-theme="dark"] .wc-project-full-search-link,
       :root[data-theme="dark"] .wc-project-toolbar,

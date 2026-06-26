@@ -23,9 +23,9 @@
 
   body{
     margin:0;
-    background:#f4f7f5;
+    background:var(--light);
     font-family:Arial, Helvetica, sans-serif;
-    color:#172033;
+    color:var(--text);
   }
 
   .wc-project-page{
@@ -60,7 +60,7 @@
   }
 
   .wc-project-back{
-    color:#006231;
+    color:var(--green);
     background:#ffffff;
     border:1px solid rgba(0,98,49,0.14);
   }
@@ -84,7 +84,7 @@
     padding:8px 14px;
     border-radius:999px;
     background:rgba(0,98,49,0.08);
-    color:#006231;
+    color:var(--green);
     font-size:12px;
     font-weight:700;
     letter-spacing:.08em;
@@ -121,20 +121,20 @@
     font-size:34px;
     line-height:1.12;
     font-weight:800;
-    color:#172033;
+    color:var(--text);
   }
 
   .wc-project-description{
     font-size:15px;
     line-height:1.62;
-    color:#5a6e7f;
+    color:var(--muted);
     max-width:920px;
   }
 
   .wc-project-overview-text{
     font-size:14px;
     line-height:1.62;
-    color:#5a6e7f;
+    color:var(--muted);
     text-align:justify;
     text-justify:inter-word;
   }
@@ -149,7 +149,7 @@
     margin:0;
     overflow:hidden;
     border-radius:12px;
-    background:#f4f7f5;
+    background:var(--light);
     border:1px solid rgba(0,98,49,0.08);
   }
 
@@ -158,13 +158,13 @@
     width:100%;
     height:190px;
     object-fit:cover;
-    background:#f4f7f5;
+    background:var(--light);
     cursor:zoom-in;
   }
 
   .wc-project-image-card figcaption{
     padding:9px 11px;
-    color:#5a6e7f;
+    color:var(--muted);
     font-size:13px;
     line-height:1.45;
   }
@@ -276,7 +276,7 @@
   .wc-project-panel h2{
     margin:0 0 14px 0;
     font-size:17px;
-    color:#172033;
+    color:var(--text);
   }
 
   .wc-project-panel p{
@@ -309,7 +309,7 @@
   }
 
   .wc-project-list-item span{
-    color:#5a6e7f;
+    color:var(--muted);
     font-size:10px;
     font-weight:700;
     letter-spacing:.08em;
@@ -317,7 +317,7 @@
   }
 
   .wc-project-list-item strong{
-    color:#172033;
+    color:var(--text);
     font-size:13px;
     line-height:1.4;
     text-align:right;
@@ -436,12 +436,12 @@
     gap:16px;
     padding:9px 11px;
     border-radius:10px;
-    background:#f4f7f5;
+    background:var(--light);
     border:1px solid rgba(0,98,49,0.08);
   }
 
   .wc-project-year-row span{
-    color:#5a6e7f;
+    color:var(--muted);
     font-size:10px;
     font-weight:700;
     letter-spacing:.08em;
@@ -449,7 +449,7 @@
   }
 
   .wc-project-year-row strong{
-    color:#172033;
+    color:var(--text);
     font-size:13px;
     line-height:1.35;
     text-align:right;
@@ -492,7 +492,7 @@
     padding:8px 11px;
     border-radius:999px;
     background:rgba(0,98,49,0.10);
-    color:#006231;
+    color:var(--green);
     font-size:11px;
     font-weight:700;
     letter-spacing:.04em;
@@ -567,7 +567,7 @@
   .wc-project-timeline-item span{
     display:block;
     margin-bottom:5px;
-    color:#5a6e7f;
+    color:var(--muted);
     font-size:10px;
     font-weight:700;
     letter-spacing:.08em;
@@ -576,7 +576,7 @@
 
   .wc-project-timeline-item strong{
     display:block;
-    color:#172033;
+    color:var(--text);
     font-size:13px;
     line-height:1.45;
   }
@@ -683,6 +683,23 @@
 
   }
 
+  /* Card/panel backgrounds below are hardcoded white -- close to but not
+     identical to var(--light), so left as-is for light mode and only
+     overridden here for dark, matching the dark surface treatment used on
+     the Project Search page (walton-cip-overview.js). The lightbox and its
+     close button are left out: that overlay is always a dark backdrop
+     regardless of site theme, so a white close button already reads fine
+     unchanged in both. */
+  :root[data-theme="dark"] .wc-project-back,
+  :root[data-theme="dark"] .wc-project-hero,
+  :root[data-theme="dark"] .wc-project-panel{
+    background: rgba(14,28,22,.92);
+    border-color: var(--border);
+  }
+
+  :root[data-theme="dark"] .wc-project-list-item{
+    border-bottom-color: var(--border);
+  }
 
 </style>
 <div id="app"></div>
