@@ -1543,6 +1543,43 @@ body {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
   color: var(--navy); font-weight: 800; border-bottom: 0;
 }
+
+/* Fund Financial Schedule: collapsible Revenues/Expenditures activity rows
+   (see buildFundFinancialSchedule/closeFundActivityDetail in budget-data.js). */
+.wc-data-table tr.wc-fund-activity-group-toggle { cursor: pointer; }
+.wc-data-table tr.wc-fund-activity-toggle { cursor: pointer; }
+.wc-data-table tr.wc-fund-activity-toggle:hover td,
+.wc-data-table tr.wc-fund-activity-group-toggle:hover td { background: rgba(0,98,49,.06); }
+.wc-fund-activity-chevron {
+  display: inline-block;
+  margin-left: 8px;
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  vertical-align: middle;
+  transition: transform .15s ease;
+}
+.wc-fund-activity-group-toggle[aria-expanded="true"] .wc-fund-activity-chevron,
+.wc-fund-activity-toggle[aria-expanded="true"] .wc-fund-activity-chevron {
+  transform: rotate(180deg);
+}
+.wc-fund-activity-detail-row > td { padding: 0 !important; border-bottom: 0 !important; }
+.wc-fund-activity-detail {
+  margin: 4px 14px 14px 28px;
+  padding: 10px 14px;
+  background: var(--light);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.wc-fund-activity-detail .wc-data-table { font-size: .68rem; margin: 0; }
+.wc-fund-activity-detail .wc-data-table th, .wc-fund-activity-detail .wc-data-table td { padding: 6px 8px; }
+.wc-fund-activity-detail .wc-data-table thead th {
+  position: static; background: none; color: var(--muted);
+  text-transform: uppercase; font-size: .62rem; letter-spacing: .04em;
+  border-bottom: 2px solid var(--border);
+}
+
 .wc-table-label-row {
   display: flex;
   align-items: center;

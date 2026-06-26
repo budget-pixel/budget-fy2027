@@ -1081,6 +1081,52 @@
       .replace(/\s+/g, " ");
   }
 
+  // Some Dept_Codes are shared by Dept_Names that are NOT the same
+  // department split into sub-programs -- they're unrelated line items that
+  // happen to book under one shared org code (e.g. Court Innovations and
+  // Board of County Commissioners both sit on 00101000; Indigent Cremation
+  // Program and Non-Profit Funding Program both sit on 00102014). Naively
+  // grouping every row by Dept_Code alone would wrongly merge those into one
+  // row. The actual sub-program splits that should collapse (Code
+  // Compliance / Code Compliance Beach, Planning / Planning Short-Term
+  // Rental) always have one Dept_Name that's a literal prefix of the other,
+  // so only those are clustered here -- the shorter, prefix name becomes the
+  // cluster's representative/display name. Used by both
+  // renderExpenseDepartmentBudgetLinesFooter and buildFundFinancialSchedule's
+  // activity breakdowns.
+  function clusterDeptNamesByCode(allRows) {
+    const namesByCode = new Map();
+    allRows.forEach((r) => {
+      const code = String(r.Dept_Code || "").trim();
+      const name = r.Dept_Name || "";
+      if (!code || !name) return;
+      if (!namesByCode.has(code)) namesByCode.set(code, new Set());
+      namesByCode.get(code).add(name);
+    });
+    const repByCodeAndName = new Map();
+    namesByCode.forEach((nameSet, code) => {
+      const names = Array.from(nameSet).sort((a, b) => a.length - b.length);
+      const repMap = new Map();
+      names.forEach((name) => {
+        if (repMap.has(name)) return;
+        repMap.set(name, name);
+        const norm = name.trim().toLowerCase();
+        names.forEach((other) => {
+          if (other === name || repMap.has(other)) return;
+          if (other.trim().toLowerCase().startsWith(norm)) repMap.set(other, name);
+        });
+      });
+      repByCodeAndName.set(code, repMap);
+    });
+    return repByCodeAndName;
+  }
+
+  function representativeDeptName(repByCodeAndName, r) {
+    const code = String(r.Dept_Code || "").trim();
+    const repMap = code && repByCodeAndName.get(code);
+    return (repMap && repMap.get(r.Dept_Name)) || r.Dept_Name || "Unknown";
+  }
+
   function matchNames(deptName) {
     const norm = normalizeDeptName(deptName);
     const set = new Set([norm]);
@@ -1452,6 +1498,7 @@
   }
 
   let budgetLinesDetailCounter = 0;
+  let fundScheduleActivityCounter = 0;
 
   // The expandable "View Budget Lines" detail under an Expenditure Summary
   // table: every individual object-code line behind that table's rolled-up
@@ -2067,6 +2114,63 @@
     const detail = document.getElementById(toggle.dataset.target);
     if (!detail) return;
     openBudgetDetailModal(toggle, detail);
+  });
+
+  // Fund Financial Schedule activity rows (see buildFundFinancialSchedule):
+  // a Revenues/Expenditures group's activity rows are collapsed by default
+  // until its group header is clicked, and each visible activity row can
+  // then be clicked to expand its own department/revenue breakdown inline --
+  // accordion-style within that one table, so opening another activity
+  // closes whichever one was already open instead of stacking several at
+  // once.
+  function closeFundActivityDetail(toggle) {
+    if (!toggle) return;
+    const target = document.getElementById(toggle.dataset.target);
+    if (target) target.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  document.addEventListener("click", (event) => {
+    const groupToggle = event.target.closest(".wc-fund-activity-group-toggle");
+    if (groupToggle) {
+      const table = groupToggle.closest("table");
+      if (!table) return;
+      const groupKey = groupToggle.dataset.fundActivityGroup;
+      const expanded = groupToggle.getAttribute("aria-expanded") === "true";
+      table.querySelectorAll('.wc-fund-activity-row[data-fund-activity-group="' + groupKey + '"]').forEach((row) => {
+        row.hidden = expanded;
+      });
+      if (expanded) {
+        table.querySelectorAll('.wc-fund-activity-toggle[data-fund-activity-group="' + groupKey + '"]').forEach(closeFundActivityDetail);
+      }
+      groupToggle.setAttribute("aria-expanded", String(!expanded));
+      return;
+    }
+
+    const activityToggle = event.target.closest(".wc-fund-activity-toggle");
+    if (!activityToggle) return;
+    const table = activityToggle.closest("table");
+    const wasOpen = activityToggle.getAttribute("aria-expanded") === "true";
+    if (table) {
+      table.querySelectorAll(".wc-fund-activity-toggle").forEach((other) => {
+        if (other !== activityToggle) closeFundActivityDetail(other);
+      });
+    }
+    if (wasOpen) {
+      closeFundActivityDetail(activityToggle);
+    } else {
+      const target = document.getElementById(activityToggle.dataset.target);
+      if (target) target.hidden = false;
+      activityToggle.setAttribute("aria-expanded", "true");
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const toggle = event.target.closest(".wc-fund-activity-group-toggle, .wc-fund-activity-toggle");
+    if (!toggle) return;
+    event.preventDefault();
+    toggle.click();
   });
 
   function lastUpdatedNoteHtml() {
@@ -2930,49 +3034,151 @@
     const isOtherFinancingRevenue = (r) => String(r.Revenue_Code || "").trim() === "381000";
     const isOtherFinancingExpense = isOtherFinancingExpenseRow;
 
+    // Each activity/type row's own breakdown -- by revenue source for a
+    // Revenues row, by department for an Expenditures row -- computed with
+    // the same sumFor/rowValues this table's own totals use, so a row's
+    // breakdown always foots to that row's own displayed total. Rendered
+    // collapsed inside the activity row's own detail row (see
+    // activityRowHtml) rather than always-on, since most users only ever
+    // need to drill into one or two activities at a time.
+    function activityBreakdownHtml(predicate, isExpenseKind, extraLine) {
+      const sourceRows = isExpenseKind ? expenseRows : revenueRows;
+      const matchingRaw = sourceRows.filter((r) => inFund(r) && predicate(r));
+      if (!matchingRaw.length && !extraLine) return "";
+
+      let labelFor;
+      let names;
+      if (isExpenseKind) {
+        const matchingDeduped = (cache.dedupedExpenseRows || []).filter((r) => inFund(r) && predicate(r));
+        const repByCodeAndName = clusterDeptNamesByCode(matchingRaw.concat(matchingDeduped));
+        labelFor = (r) => representativeDeptName(repByCodeAndName, r);
+        names = uniqueSorted(matchingRaw.concat(matchingDeduped).map(labelFor));
+      } else {
+        labelFor = (r) => r.Revenue_Name || r.Dept_Name || "Unknown";
+        names = uniqueSorted(matchingRaw.map(labelFor));
+      }
+
+      const lastIndex = FUND_SCHEDULE_YEAR_COLUMNS.length - 1;
+      let entries = names.map((name) => ({
+        label: name,
+        values: rowValues((r) => predicate(r) && labelFor(r) === name, sourceRows)
+      }));
+      // The Ad Valorem 5% statutory reduction (see
+      // adValoremFivePercentReductionForFunds) isn't a row this fund's
+      // revenue rows can be filtered/grouped to -- it's pulled separately
+      // from Supabase and only folded into General Government Taxes' own
+      // total above. Folded into its matching source row here (by label)
+      // too, so that row -- and this breakdown as a whole -- still foots to
+      // the activity row's displayed total instead of running short by the
+      // reduction amount, without showing it as its own separate line.
+      if (extraLine) {
+        const merge = entries.find((e) => e.label === extraLine.label);
+        if (merge) {
+          merge.values = merge.values.map((v, i) => v + extraLine.values[i]);
+        } else {
+          entries.push(extraLine);
+        }
+      }
+      // Rows that are exactly $0 across every column add nothing but
+      // clutter to a fund-scoped breakdown -- most funds only touch a
+      // handful of the county-wide revenue sources/departments under any
+      // given activity.
+      entries = entries.filter((e) => e.values.some((v) => v));
+      entries.sort((a, b) => (b.values[lastIndex] || 0) - (a.values[lastIndex] || 0));
+      if (!entries.length) return "";
+
+      return (
+        '<div class="wc-fund-activity-detail">' +
+        '<table class="wc-data-table wc-fund-activity-detail-table">' +
+        "<thead><tr><th>" + escapeHtml(isExpenseKind ? "Department" : "Revenue Source") + "</th>" +
+        FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<th class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + escapeHtml(c.label.toUpperCase()) + "</th>").join("") +
+        "</tr></thead><tbody>" +
+        entries.map((e) => rowHtml(e.label, e.values)).join("") +
+        "</tbody></table></div>"
+      );
+    }
+
+    // The Revenues/Expenditures group header and each activity row below it
+    // are collapsed by default -- clicking the group header reveals its
+    // activity rows (see the delegated click handler further down), and
+    // clicking a visible activity row expands its own breakdown inline,
+    // closing whichever other activity in the same table was already open.
+    function groupHeaderHtml(label, groupKey) {
+      return (
+        '<tr class="wc-table-group-row wc-fund-activity-group-toggle" data-fund-activity-group="' + groupKey + '" tabindex="0" role="button" aria-expanded="false">' +
+        "<td>" + escapeHtml(label) + '<span class="wc-fund-activity-chevron" aria-hidden="true"></span></td>' +
+        FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") +
+        "</tr>"
+      );
+    }
+    function activityRowHtml(label, values, groupKey, predicate, isExpenseKind, extraLine) {
+      fundScheduleActivityCounter += 1;
+      const rowId = "wc-fund-activity-detail-" + fundScheduleActivityCounter;
+      const detailHtml = predicate ? activityBreakdownHtml(predicate, isExpenseKind, extraLine) : "";
+      const toggleClass = detailHtml ? " wc-fund-activity-toggle" : "";
+      const toggleAttrs = detailHtml ? ' data-target="' + rowId + '" tabindex="0" role="button" aria-expanded="false"' : "";
+      const row =
+        '<tr class="wc-fund-activity-row' + toggleClass + '" data-fund-activity-group="' + groupKey + '"' + toggleAttrs + " hidden><td>" +
+        escapeHtml(label) + (detailHtml ? '<span class="wc-fund-activity-chevron" aria-hidden="true"></span>' : "") + "</td>" +
+        values.map((v, i) => '<td class="wc-num' + (i < values.length - 1 ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>").join("") +
+        "</tr>";
+      const detailRow = detailHtml
+        ? '<tr class="wc-fund-activity-detail-row" id="' + rowId + '" data-fund-activity-group="' + groupKey + '" hidden><td colspan="' + (values.length + 1) + '">' + detailHtml + "</td></tr>"
+        : "";
+      return row + detailRow;
+    }
+
     const bodyRows = [];
 
     const beginningValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c) => fundBalanceForYear(fundCodes, fiscalYearForField(c.field) - 1));
     bodyRows.push(rowHtml("Beginning Fund Balance", beginningValues, "wc-table-subtotal-row"));
 
-    bodyRows.push(
-      '<tr class="wc-table-group-row"><td>Revenues</td>' +
-      FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
-    );
+    bodyRows.push(groupHeaderHtml("Revenues", "revenue"));
     const revenueTypeRows = CONSOLIDATED_REVENUE_TYPE_ROWS
-      .map((spec) => ({ label: spec.label, values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows) }));
+      .map((spec) => ({
+        label: spec.label,
+        predicate: (r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r),
+        values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows)
+      }));
     const generalGovTaxesRow = revenueTypeRows.find((row) => row.label === "General Government Taxes");
     if (generalGovTaxesRow) {
       const fy2026Index = FUND_SCHEDULE_YEAR_COLUMNS.findIndex((c) => c.field === "FY2026_Original_Budget");
+      const adValoremFivePercent = adValoremFivePercentReductionForFunds(fundCodes);
       if (fy2026Index !== -1) {
-        generalGovTaxesRow.values[fy2026Index] += adValoremFivePercentReductionForFunds(fundCodes);
+        generalGovTaxesRow.values[fy2026Index] += adValoremFivePercent;
+        if (adValoremFivePercent) {
+          generalGovTaxesRow.extraLine = {
+            label: "Ad Valorem Taxes",
+            values: FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => (i === fy2026Index ? adValoremFivePercent : 0))
+          };
+        }
       }
     }
-    revenueTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
+    // A row that's exactly $0 across every column is just visual noise on a
+    // fund-scoped schedule -- most funds don't touch every revenue
+    // type/expenditure activity the county has. Still summed into the
+    // subtotal below either way (trivially, since it's 0).
+    revenueTypeRows.forEach((row) => {
+      if (row.values.some((v) => v)) bodyRows.push(activityRowHtml(row.label, row.values, "revenue", row.predicate, false, row.extraLine));
+    });
     const revenueTypeValues = revenueTypeRows.map((row) => row.values);
     const revenueSubtotalValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => revenueTypeValues.reduce((s, v) => s + v[i], 0));
-    bodyRows.push(rowHtml("Total Revenues", revenueSubtotalValues, "wc-table-subtotal-row"));
+    bodyRows.push(rowHtml("Total Revenues", revenueSubtotalValues, "wc-table-total-row"));
 
     const otherSourcesValues = rowValues(isOtherFinancingRevenue, revenueRows);
-    bodyRows.push(rowHtml("Other Financial Sources", otherSourcesValues));
+    if (otherSourcesValues.some((v) => v)) bodyRows.push(rowHtml("Other Financial Sources", otherSourcesValues));
     const revenueTotalValues = revenueSubtotalValues.map((v, i) => v + otherSourcesValues[i]);
-    bodyRows.push(rowHtml("Total Revenue and Other Financial Sources", revenueTotalValues, "wc-table-total-row"));
+    bodyRows.push(rowHtml("Total Revenue and Other Financial Sources", revenueTotalValues, "wc-table-subtotal-row"));
 
-    bodyRows.push(
-      '<tr class="wc-table-group-row"><td>Expenditures</td>' +
-      FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => '<td class="' + (i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 ? "wc-prior-year" : "") + '"></td>').join("") + "</tr>"
-    );
+    bodyRows.push(groupHeaderHtml("Expenditures", "expense"));
     // Case-insensitive, matching the Consolidated Expense Summary -- the
     // activities sheet has a few inconsistently-cased entries (e.g.
     // "economic Environment").
     const knownExpenseActivities = new Set(CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS.map((a) => a.toLowerCase()));
     const expenseTypeRows = CONSOLIDATED_EXPENDITURE_ACTIVITY_ROWS.map((activity) => {
       const activityNorm = activity.toLowerCase();
-      const values = rowValues(
-        (r) => expenseActivityForRow(r).toLowerCase() === activityNorm && !isOtherFinancingExpense(r),
-        expenseRows
-      );
-      return { label: activity, values };
+      const predicate = (r) => expenseActivityForRow(r).toLowerCase() === activityNorm && !isOtherFinancingExpense(r);
+      return { label: activity, predicate, values: rowValues(predicate, expenseRows) };
     });
     // Rows whose activity doesn't match a known section above (e.g. a row
     // synthesized from a Supabase-only account with no COA classification --
@@ -2985,17 +3191,19 @@
     // Hidden when every column is exactly $0 -- an always-zero row is just
     // visual noise on a fund table that has nothing unclassified.
     if (unclassifiedValues.some((v) => v !== 0)) {
-      expenseTypeRows.push({ label: "Unclassified", values: unclassifiedValues });
+      expenseTypeRows.push({ label: "Unclassified", predicate: null, values: unclassifiedValues });
     }
-    expenseTypeRows.forEach((row) => bodyRows.push(rowHtml(row.label, row.values)));
+    expenseTypeRows.forEach((row) => {
+      if (row.values.some((v) => v)) bodyRows.push(activityRowHtml(row.label, row.values, "expense", row.predicate, true));
+    });
     const expenseTypeValues = expenseTypeRows.map((row) => row.values);
     const expenseSubtotalValues = FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => expenseTypeValues.reduce((s, v) => s + v[i], 0));
-    bodyRows.push(rowHtml("Expenditures Total", expenseSubtotalValues, "wc-table-subtotal-row"));
+    bodyRows.push(rowHtml("Total Expenditures", expenseSubtotalValues, "wc-table-total-row"));
 
     const otherUsesValues = rowValues(isOtherFinancingExpense, expenseRows);
-    bodyRows.push(rowHtml("Other Financial Uses", otherUsesValues));
+    if (otherUsesValues.some((v) => v)) bodyRows.push(rowHtml("Other Financial Uses", otherUsesValues));
     const expenseTotalValues = expenseSubtotalValues.map((v, i) => v + otherUsesValues[i]);
-    bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-total-row"));
+    bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-subtotal-row"));
 
     const changeValues = revenueTotalValues.map((v, i) => v - expenseTotalValues[i]);
     bodyRows.push(rowHtml("Change in Fund Balance", changeValues, "wc-table-subtotal-row"));
@@ -3319,11 +3527,13 @@
     const lastIndex = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.length - 1;
     const totals = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map(() => 0);
     const allMatchingRows = [];
+    const allMatchingDedupedRows = [];
     const bodyRows = EXPENSE_ACTIVITY_SECTIONS.map((section) => {
       const activityNorm = section.activity.toLowerCase();
       const matching = rows.filter((r) => expenseActivityForRow(r).toLowerCase() === activityNorm);
       const matchingDeduped = dedupedRows.filter((r) => expenseActivityForRow(r).toLowerCase() === activityNorm);
       allMatchingRows.push(...matching);
+      allMatchingDedupedRows.push(...matchingDeduped);
       return (
         "<tr><td>" + escapeHtml(section.title || section.activity) + "</td>" +
         CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
@@ -3344,6 +3554,7 @@
     const unclassifiedExpenseRows = rows.filter((r) => !knownActivities.has(expenseActivityForRow(r).toLowerCase()));
     const unclassifiedDedupedRows = dedupedRows.filter((r) => !knownActivities.has(expenseActivityForRow(r).toLowerCase()));
     allMatchingRows.push(...unclassifiedExpenseRows);
+    allMatchingDedupedRows.push(...unclassifiedDedupedRows);
     const unclassifiedExpenseValues = CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
       const sum = columnSum(unclassifiedExpenseRows, unclassifiedDedupedRows, col);
       totals[i] += sum;
@@ -3382,7 +3593,7 @@
       "</table>" +
       "</div>" +
       "</div>" +
-      renderExpenseDepartmentBudgetLinesFooter(allMatchingRows) +
+      renderExpenseDepartmentBudgetLinesFooter(allMatchingRows, allMatchingDedupedRows) +
       "</div>"
     );
   }
@@ -3391,7 +3602,7 @@
   // department-level subtotals (with each department's category) rather
   // than individual object-code lines, since the visible table above is
   // already rolled up to the 8 broad categories.
-  function renderExpenseDepartmentBudgetLinesFooter(rows) {
+  function renderExpenseDepartmentBudgetLinesFooter(rows, dedupedRows) {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     const updated = '<em>Last Updated: ' + escapeHtml(stamp) + "</em>";
     if (!rows.length) {
@@ -3413,17 +3624,43 @@
       return match ? (match.title || match.activity) : "Other";
     }
 
-    const sumFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    // FY2020-FY2026 columns are summed per department from the shared
+    // deduped layer, same as the visible table above (see
+    // buildDedupedHistoricalExpenseRows) -- some departments split one
+    // Dept_Code across multiple display-only Dept_Names (e.g. Code
+    // Compliance / Code Compliance Beach) that each carry the *same* full
+    // historical/FY2026 total for a shared account, so summing those fields
+    // from the raw display rows per Dept_Name would double-count it.
+    // FY2027 Proposed still sums from the raw rows, since it isn't subject
+    // to that duplication.
+    const historicalFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field);
+    const currentYearField = "FY2027_Proposed";
+
+    const repByCodeAndName = clusterDeptNamesByCode(rows.concat(dedupedRows || []));
+    function representativeName(r) {
+      return representativeDeptName(repByCodeAndName, r);
+    }
+    function groupKeyFor(r) {
+      const code = String(r.Dept_Code || "").trim();
+      return code ? code + "|" + normalizeDeptName(representativeName(r)) : "name:" + normalizeDeptName(r.Dept_Name);
+    }
+    function entryFor(byDept, r) {
+      const key = groupKeyFor(r);
+      const name = representativeName(r);
+      if (!byDept.has(key)) {
+        const entry = { Dept_Name: name, activity: expenseActivityForRow(r), [currentYearField]: 0 };
+        historicalFields.forEach((f) => { entry[f] = 0; });
+        byDept.set(key, entry);
+      }
+      return byDept.get(key);
+    }
     const byDept = new Map();
     rows.forEach((r) => {
-      const name = r.Dept_Name || "Unknown";
-      if (!byDept.has(name)) {
-        const entry = { Dept_Name: name, activity: expenseActivityForRow(r) };
-        sumFields.forEach((f) => { entry[f] = 0; });
-        byDept.set(name, entry);
-      }
-      const entry = byDept.get(name);
-      sumFields.forEach((f) => { entry[f] += r[f] || 0; });
+      entryFor(byDept, r)[currentYearField] += r[currentYearField] || 0;
+    });
+    (dedupedRows || rows).forEach((r) => {
+      const entry = entryFor(byDept, r);
+      historicalFields.forEach((f) => { entry[f] += r[f] || 0; });
     });
 
     const deptRows = Array.from(byDept.values()).sort((a, b) => {
@@ -3446,7 +3683,7 @@
       );
     });
     const totals = {};
-    sumFields.forEach((field) => {
+    historicalFields.concat([currentYearField]).forEach((field) => {
       totals[field] = deptRows.reduce((sum, row) => sum + (row[field] || 0), 0);
     });
     bodyRows.push(
