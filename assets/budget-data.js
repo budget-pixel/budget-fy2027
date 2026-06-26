@@ -2351,6 +2351,17 @@
       const changePriorAmount = row.changePriorAmount !== undefined ? row.changePriorAmount : priorAmount;
       const changeHtml = showChange ? renderFinanceCardRowChange(changeAmount, changePriorAmount) : "";
       const amountText = amount === 0 && !isZero ? "$0" : formatCurrency(amount);
+      // Optional small indented sub-lines under a category's own amount
+      // (e.g. Code Compliance's Personnel Services broken into its
+      // Street/Beach sides -- see renderCodeComplianceExpenseCard) instead
+      // of a whole separate card per sub-program.
+      const sublinesHtml = Array.isArray(row.sublines) && row.sublines.length
+        ? '<div class="wc-finance-card-sublines">' +
+          row.sublines.map((s) =>
+            '<div class="wc-finance-card-subline"><span>' + escapeHtml(s.label || "Other") + '</span><strong>' + escapeHtml(formatCurrency(s.amount || 0)) + "</strong></div>"
+          ).join("") +
+          "</div>"
+        : "";
       return (
         '<div class="wc-finance-card-row' + (isZero ? " is-zero" : "") + '">' +
           '<div class="wc-finance-card-row-head">' +
@@ -2364,6 +2375,7 @@
             '<div class="wc-finance-card-amount">' + escapeHtml(amountText) + '</div>' +
             changeHtml +
           '</div>' +
+          sublinesHtml +
         '</div>'
       );
     }).join("");
@@ -2471,6 +2483,76 @@
     );
   }
 
+  // Code Compliance's Street/Beach split (sharing one Dept_Code) renders
+  // as one combined Expenditure Summary card instead of two separate
+  // cards -- Personnel Services shows each side's own current-year
+  // subtotal as a small indented subline instead of a whole separate
+  // card. FY2026 still has to come from the shared deduped layer (keyed
+  // by Dept_Code, not Dept_Name): the per-(Dept_Code,Dept_Name,
+  // Object_Code) FY2026 dedup (see applyOriginalBudgetToRows) can
+  // attribute a shared account's full prior-year total to either side
+  // unpredictably, so summing the raw rows directly would risk
+  // double-counting it.
+  function renderCodeComplianceExpenseCard(rows, caption) {
+    const yearFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    const totalsByType = new Map();
+    const grandTotals = {};
+    yearFields.forEach((f) => { grandTotals[f] = 0; });
+    const personnelByDept = new Map();
+    rows.forEach((r) => {
+      const type = r.Object_Type || "Other";
+      const totals = totalsByType.get(type) || {};
+      yearFields.forEach((f) => {
+        const amt = r[f] || 0;
+        totals[f] = (totals[f] || 0) + amt;
+        grandTotals[f] += amt;
+      });
+      totalsByType.set(type, totals);
+      if (type === "Personnel Services") {
+        const deptKey = r.Dept_Name || "Other";
+        personnelByDept.set(deptKey, (personnelByDept.get(deptKey) || 0) + (r.FY2027_Proposed || 0));
+      }
+    });
+
+    const deptCodes = new Set(rows.map((r) => String(r.Dept_Code || "").trim()).filter(Boolean));
+    const priorByType = new Map();
+    (cache.dedupedExpenseRows || [])
+      .filter((r) => deptCodes.has(String(r.Dept_Code || "").trim()))
+      .forEach((r) => {
+        const type = r.Object_Type || "Other";
+        priorByType.set(type, (priorByType.get(type) || 0) + (r.FY2026_Original_Budget || 0));
+      });
+
+    function sublineLabel(deptName) {
+      const norm = normalizeDeptName(deptName);
+      if (norm === "code compliance beach") return "Beach";
+      if (norm === "code compliance" || norm === "code compliance street") return "Street";
+      return deptName;
+    }
+
+    const cardRows = Array.from(totalsByType.entries()).map(([type, totals]) => {
+      const amount = totals.FY2027_Proposed || 0;
+      const priorAmount = priorByType.get(type) || 0;
+      const row = { label: type, amount, priorAmount, changeAmount: amount, changePriorAmount: priorAmount };
+      if (type === "Personnel Services" && personnelByDept.size > 1) {
+        row.sublines = Array.from(personnelByDept.entries())
+          .map(([name, amt]) => ({ label: sublineLabel(name), amount: amt }))
+          .sort((a, b) => b.amount - a.amount);
+      }
+      return row;
+    });
+
+    return renderFinancialDashboardCard({
+      caption,
+      kind: "expense",
+      rows: cardRows,
+      total: grandTotals.FY2027_Proposed || 0,
+      showPrior: getShowPriorYears(),
+      detail: renderBudgetLinesToggle(rows, undefined, "expense"),
+      showChange: true
+    });
+  }
+
   // When a department's rows span more than one distinct Dept_Name (e.g.
   // "Planning" includes a separately tracked "Planning Short-Term Rental"
   // program), render one labeled table per sub-program instead of merging
@@ -2482,6 +2564,9 @@
     const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
     if (groupNames.length <= 1) {
       return renderTypeSummaryGroup(rows, kind, caption, EXPENSE_GROUP_NOTES[normalizeDeptName(deptName || "")]);
+    }
+    if (kind === "expense" && normalizeDeptName(deptName || "") === "code compliance") {
+      return renderCodeComplianceExpenseCard(rows, caption);
     }
     const norm = normalizeDeptName(deptName || "");
 
@@ -4537,7 +4622,7 @@
       }, []);
   }
 
-  function renderStaffingGroup(rows, label) {
+  function renderStaffingGroup(rows, label, forcedOtherMaxFte) {
     const showPrior = getShowPriorYears();
     const years = [2024, 2025, 2026, 2027];
     const priorYears = years.filter((y) => y < 2027);
@@ -4576,11 +4661,25 @@
         "</div>"
       : "";
     const detailId = "wc-staffing-lines-" + (++budgetLinesDetailCounter);
-    const activeStaffingRows = sortedRows
+    // Any position at or below a card-specific FTE threshold is folded
+    // into "All Other" on this card's own breakdown regardless of how it'd
+    // otherwise rank (e.g. Code Compliance Street folds every 0.5-FTE
+    // position, not just a specific named one) -- still counted in the
+    // total and listed individually in the "View Position Detail" table
+    // below, just not surfaced as its own top-5 line here.
+    const rankableRows = forcedOtherMaxFte
+      ? sortedRows.filter((r) => (r[2027] || 0) > forcedOtherMaxFte)
+      : sortedRows;
+    const forcedOtherFte = forcedOtherMaxFte
+      ? sortedRows
+        .filter((r) => (r[2027] || 0) > 0 && (r[2027] || 0) <= forcedOtherMaxFte)
+        .reduce((sum, row) => sum + (row[2027] || 0), 0)
+      : 0;
+    const activeStaffingRows = rankableRows
       .filter((r) => (r[2027] || 0) !== 0)
       .sort((a, b) => (b[2027] || 0) - (a[2027] || 0));
     const visibleStaffingRows = activeStaffingRows.slice(0, 5);
-    const otherStaffingFte = activeStaffingRows
+    const otherStaffingFte = forcedOtherFte + activeStaffingRows
       .slice(5)
       .reduce((sum, row) => sum + (row[2027] || 0), 0);
     if (otherStaffingFte !== 0) {
@@ -4637,6 +4736,13 @@
   // (e.g. "Code Compliance" is split into "Code Compliance Street" and
   // "Code Compliance Beach" in the sheet), render one labeled table per
   // sub-unit instead of merging them into a single undifferentiated list.
+  // Position names always folded into "All Other" on a specific
+  // sub-program's own staffing card, keyed by normalized Dept_Name -- see
+  // renderStaffingGroup's forcedOtherPositions.
+  const STAFFING_GROUP_FORCED_OTHER_MAX_FTE = {
+    "code compliance street": 0.5
+  };
+
   function renderStaffingTable(rows) {
     if (!rows.length) return "";
     const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
@@ -4644,7 +4750,11 @@
       return renderStaffingGroup(rows, "Staffing / FTE");
     }
     return groupNames
-      .map((name) => renderStaffingGroup(rows.filter((r) => (r.Dept_Name || "") === name), name))
+      .map((name) => renderStaffingGroup(
+        rows.filter((r) => (r.Dept_Name || "") === name),
+        name,
+        STAFFING_GROUP_FORCED_OTHER_MAX_FTE[normalizeDeptName(name)]
+      ))
       .join("");
   }
 
@@ -5263,19 +5373,6 @@
       cards[0].parentNode.insertBefore(grid, cards[0]);
     }
     cards.forEach((card) => grid.appendChild(card));
-
-    // Code Compliance's two sub-program Expenditure Summary cards (Code
-    // Compliance / Code Compliance Beach) sit side by side in their own row,
-    // with the Revenue Summary card(s) spanning full width underneath --
-    // rather than the generic pairing below (each sub-program's expense and
-    // revenue card side by side, one pair per row), which buries the second
-    // expense card under the first revenue card instead of next to the
-    // first expense card.
-    if (normalizeDeptName(deptName) === "code compliance") {
-      if (expenseEl) expenseEl.classList.add("wc-financial-mount-cards-as-row");
-      if (revenueEl) revenueEl.classList.add("wc-financial-mount-full-width");
-      return;
-    }
 
     // Departments with multiple sub-programs (distinct Dept_Name values,
     // e.g. Code Compliance / Code Compliance Beach) render one stacked

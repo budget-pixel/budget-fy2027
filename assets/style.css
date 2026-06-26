@@ -1471,6 +1471,24 @@ body {
   font-weight: 700; opacity: .85; text-transform: uppercase;
   letter-spacing: .04em; font-size: .92em;
 }
+/* Small indented sub-lines under a category's own amount (e.g. Code
+   Compliance's Personnel Services broken into its Street/Beach sides --
+   see renderCodeComplianceExpenseCard in budget-data.js) instead of a
+   whole separate card per sub-program. */
+.wc-finance-card-sublines {
+  margin: 8px 0 0 12px; padding-left: 10px; border-left: 2px solid var(--border);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.wc-finance-card-subline {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+}
+.wc-finance-card-subline span {
+  color: var(--muted); font-size: .76rem; font-weight: 700;
+}
+.wc-finance-card-subline strong {
+  color: var(--muted); font-size: .78rem; font-weight: 800;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
 .wc-finance-card-footer {
   display: flex;
   align-items: center;
