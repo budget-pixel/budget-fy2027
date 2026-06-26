@@ -103,6 +103,12 @@
         .replace(/"/g, "&quot;");
     }
 
+    // Bouncing-dots markup shown in place of a real fund chip while
+    // loadBudgetData() is in flight (see style.css's .wc-loading-dots) --
+    // otherwise this row shows nothing at all until data loads, then pops
+    // in afterward and shifts the rows below it.
+    var LOADING_DOTS_HTML = '<span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>';
+
     // Each chip is its own link (not nested inside the row's own
     // wc-directory-item anchor -- browsers don't support nested links) to
     // the Personnel page pre-filtered to that fund, so clicking a callout
@@ -118,9 +124,26 @@
         '</div>';
     }
 
-    function renderHub(personnelCallouts){
+    // The real chip count/labels depend on the loaded staffing data (see
+    // getPersonnelFundCallouts), so a handful of inert placeholder chips
+    // (not real links -- href="#", not focusable) stand in for them while
+    // loading, just to give this row roughly its eventual shape instead of
+    // not existing at all.
+    function personnelCalloutsLoadingHtml(){
+      var placeholderCount = 4;
+      var chips = "";
+      for(var i = 0; i < placeholderCount; i++){
+        chips += '<a class="wc-personnel-fund-stat" href="#" aria-hidden="true" tabindex="-1">' +
+          '<strong>' + LOADING_DOTS_HTML + '</strong><span>&nbsp;</span></a>';
+      }
+      return '<div class="wc-personnel-fund-stats wc-personnel-fund-stats--compact">' + chips + '</div>';
+    }
+
+    function renderHub(personnelCallouts, isLoading){
       $("#hubList").innerHTML = pages.map(function(page){
-        var calloutsHtml = page.showFteCallouts ? personnelCalloutsHtml(page.href, personnelCallouts) : "";
+        var calloutsHtml = page.showFteCallouts
+          ? (isLoading ? personnelCalloutsLoadingHtml() : personnelCalloutsHtml(page.href, personnelCallouts))
+          : "";
         return '<li>' +
           '<a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
             '<div class="wc-directory-item-main">' +
@@ -135,15 +158,15 @@
     }
 
     document.addEventListener("DOMContentLoaded", function(){
-      renderHub([]);
+      renderHub([], true);
       if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
         window.WCBudgetData.loadBudgetData()
           .then(function(data){
             var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
             var callouts = staffing.length ? window.WCBudgetData.getPersonnelFundCallouts(staffing) : [];
-            renderHub(callouts);
+            renderHub(callouts, false);
           })
-          .catch(function(){ renderHub([]); });
+          .catch(function(){ renderHub([], false); });
       }
     });
   })();
