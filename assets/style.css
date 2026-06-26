@@ -1825,6 +1825,33 @@ body {
   background: var(--green);
   color: #ffffff;
 }
+.wc-forecast-sort-toggle {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wc-forecast-sort-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--green);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.wc-forecast-sort-button:hover {
+  background: var(--green);
+  color: #ffffff;
+}
+.wc-forecast-sort-button.is-active {
+  background: var(--green);
+  color: #ffffff;
+}
 /* Plain-text variant used for clickable department names inside a data
    table (see personnelDeptDetailHtml in budget-data.js) -- same
    .wc-view-budget-lines-toggle click/modal behavior, but it should read
@@ -2006,6 +2033,108 @@ body {
 }
 @media (max-width: 560px) {
   .wc-personnel-fund-stats--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.wc-forecast-intro,
+.wc-forecast-note {
+  max-width: 980px;
+}
+.wc-forecast-section {
+  margin: 30px 0;
+}
+.wc-forecast-chart {
+  display: grid;
+  gap: 12px;
+}
+.wc-forecast-chart-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: 14px;
+  align-items: stretch;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,.72);
+}
+.wc-forecast-chart-label {
+  font-weight: 800;
+  color: var(--navy);
+}
+.wc-forecast-chart-years {
+  display: grid;
+  gap: 8px;
+}
+.wc-forecast-bar-wrap {
+  display: grid;
+  grid-template-columns: 62px minmax(120px, 1fr) minmax(110px, auto);
+  gap: 10px;
+  align-items: center;
+  font-size: .82rem;
+}
+.wc-forecast-bar-wrap span {
+  color: var(--muted);
+  font-weight: 800;
+}
+.wc-forecast-bar-wrap strong {
+  text-align: right;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+.wc-forecast-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0,63,40,.12);
+  overflow: hidden;
+}
+.wc-forecast-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), var(--gold));
+}
+.wc-forecast-fund {
+  margin: 22px 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,.66);
+}
+.wc-forecast-fund h3 {
+  margin: 0 0 6px;
+  color: var(--navy);
+}
+.wc-forecast-detail {
+  margin-top: 12px;
+}
+.wc-forecast-detail summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--green);
+}
+:root[data-theme="dark"] .wc-forecast-chart-row,
+:root[data-theme="dark"] .wc-forecast-fund {
+  background: rgba(14,28,22,.92);
+}
+:root[data-theme="dark"] .wc-forecast-chart-label,
+:root[data-theme="dark"] .wc-forecast-fund h3 {
+  color: var(--text);
+}
+:root[data-theme="dark"] .wc-forecast-bar {
+  background: rgba(237,243,239,.13);
+}
+@media (max-width: 760px) {
+  .wc-forecast-chart-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .wc-forecast-bar-wrap {
+    grid-template-columns: 54px 1fr;
+  }
+  .wc-forecast-bar-wrap strong {
+    grid-column: 2;
+    text-align: left;
+  }
 }
 
 /* Departments directory's "at a glance" per-fund callouts (see
@@ -2488,12 +2617,17 @@ body {
 }
 
 :root[data-theme="dark"] .wc-view-budget-lines-toggle,
+:root[data-theme="dark"] .wc-forecast-sort-button,
 :root[data-theme="dark"] .page-nav a,
 :root[data-theme="dark"] .wc-fy-column-toggle-wrap,
 :root[data-theme="dark"] .wc-budget-detail-close {
   background: rgba(10,20,16,.86) !important;
   border-color: rgba(216,199,126,.5) !important;
   color: var(--text) !important;
+}
+:root[data-theme="dark"] .wc-forecast-sort-button.is-active {
+  background: var(--green) !important;
+  color: #ffffff !important;
 }
 
 :root[data-theme="dark"] .wc-fy-column-toggle-label,

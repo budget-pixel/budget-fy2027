@@ -2230,6 +2230,33 @@
     toggle.click();
   });
 
+  // Forecast Assumptions tables (see renderForecastAssumptionsDetailTable):
+  // each row's <tr> already carries data-sort-value/data-sort-name, so
+  // re-sorting on click is just a DOM reorder -- no need to re-run the
+  // forecast model or re-fetch anything.
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".wc-forecast-sort-button");
+    if (!button) return;
+    const toggleGroup = button.closest(".wc-forecast-sort-toggle");
+    const tableWrap = button.closest(".wc-data-table-wrap");
+    const tbody = tableWrap && tableWrap.querySelector("table tbody");
+    if (!toggleGroup || !tbody) return;
+
+    const mode = button.dataset.sortMode;
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    rows.sort((a, b) => {
+      if (mode === "abc") return a.dataset.sortName.localeCompare(b.dataset.sortName);
+      const diff = Number(b.dataset.sortValue) - Number(a.dataset.sortValue);
+      return mode === "smallest" ? -diff : diff;
+    });
+    rows.forEach((row) => tbody.appendChild(row));
+
+    toggleGroup.querySelectorAll(".wc-forecast-sort-button").forEach((other) => {
+      other.classList.toggle("is-active", other === button);
+      other.setAttribute("aria-pressed", String(other === button));
+    });
+  });
+
   function lastUpdatedNoteHtml() {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     return '<p class="wc-data-updated-note"><em>Last Updated: ' + escapeHtml(stamp) + "</em></p>";
@@ -3165,6 +3192,793 @@
     return (cache.fundBalances || [])
       .filter((r) => codes.includes(r.Fund_Code) && r.Year === String(year))
       .reduce((sum, r) => sum + (r.Fund_Balance || 0), 0);
+  }
+
+  const FINANCIAL_FORECAST_FUNDS = [
+    { code: "001", label: "General Fund" },
+    { code: "101", label: "Transportation Fund" },
+    { code: "107", label: "Fine & Forfeiture / Sheriff" },
+    { code: "111", label: "Tourist Development Fund" },
+    { code: "112", label: "Solid Waste Fund" },
+    { code: "300", label: "Capital Projects Fund" }
+  ];
+
+  const FINANCIAL_FORECAST_YEARS = [2027, 2028, 2029, 2030, 2031];
+  const FINANCIAL_FORECAST_ACTUAL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+
+  function forecastMoney(value) {
+    const rounded = Math.round(Number(value) || 0);
+    const sign = rounded < 0 ? "-" : "";
+    return sign + "$" + Math.abs(rounded).toLocaleString("en-US");
+  }
+
+  function forecastPercent(value) {
+    if (value === null || value === undefined || value === "") return "N/A";
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "N/A";
+    return (n * 100).toFixed(n === 0 ? 0 : 1) + "%";
+  }
+
+  function forecastAssumptionValue(row, year) {
+    if (!row) return null;
+    const value = row["fy" + year + "_assumption"];
+    if (value === null || value === undefined || value === "") return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function normalizeForecastCategory(value, lineType) {
+    const text = String(value || "").trim();
+    if (lineType === "expense") {
+      if (/operating/i.test(text)) return "Operating Expenses";
+      if (/grant/i.test(text)) return "Grants and Aids";
+      if (/debt/i.test(text)) return "Debt Service";
+      if (/other|transfer|reserve/i.test(text)) return "Other Uses / Transfers";
+      return text || "Other Uses / Transfers";
+    }
+    if (/permit/i.test(text)) return "Permits Fees and Special Assessments";
+    if (/judgment|fine|forfeit/i.test(text)) return "Judgments, Fines and Forfeits";
+    if (/other/i.test(text)) return "Other Sources";
+    return text || "Miscellaneous Revenue";
+  }
+
+  // FY2020-FY2023 Ad Valorem Taxes (Revenue_Code 311000) actuals were
+  // booked per fund under that fund's own org code -- 001311 (General
+  // Fund), 101311 (Transportation), 107311 (Sheriff) -- each collecting
+  // its own millage. Starting FY2024 the county books all of it under
+  // 001311 alone; 101311 and 107311 go to zero from FY2024 on. Read as-is,
+  // the General Fund's Ad Valorem trend looks like it quadrupled in
+  // FY2024, when the same countywide collection is now just booked in one
+  // place. Scoped to the forecast model only (not a sitewide actuals
+  // correction, which would also change how Summary of Revenues/Fund
+  // Financial Schedules display Transportation's and Sheriff's own
+  // historical actuals): the General Fund's historical trend folds in the
+  // other two funds' pre-2024 share, and those two funds' own trend has
+  // its now-merged-away share zeroed so the same dollars aren't double
+  // counted across funds.
+  const FORECAST_AD_VALOREM_REVENUE_CODE = "311000";
+  const FORECAST_AD_VALOREM_PRIMARY_ORG = "001311";
+  const FORECAST_AD_VALOREM_MERGED_AWAY_ORGS = ["101311", "107311"];
+  const FORECAST_AD_VALOREM_MERGE_ORGS = [FORECAST_AD_VALOREM_PRIMARY_ORG].concat(FORECAST_AD_VALOREM_MERGED_AWAY_ORGS);
+
+  function forecastAdValoremHistoricalOverride(row, yearField) {
+    if (String(row.Revenue_Code || "").trim() !== FORECAST_AD_VALOREM_REVENUE_CODE) return undefined;
+    const org = String(row.Dept_Code || "").trim();
+    const isPrimary = org === FORECAST_AD_VALOREM_PRIMARY_ORG;
+    const isMergedAway = FORECAST_AD_VALOREM_MERGED_AWAY_ORGS.indexOf(org) !== -1;
+    if (!isPrimary && !isMergedAway) return undefined;
+    if (isMergedAway) return 0;
+
+    const actualYearMatch = /^FY(\d{4})_Actual$/.exec(yearField);
+    if (actualYearMatch) {
+      const year = Number(actualYearMatch[1]);
+      const total = FORECAST_AD_VALOREM_MERGE_ORGS.reduce(
+        (sum, mergeOrg) => sum + sumRawActualsForAccount(cache.revenueActualRows, mergeOrg, FORECAST_AD_VALOREM_REVENUE_CODE, year).total,
+        0
+      );
+      return revenueDisplayAmount(total);
+    }
+    if (yearField === "FY2026_Original_Budget") {
+      const total = FORECAST_AD_VALOREM_MERGE_ORGS.reduce(
+        (sum, mergeOrg) => sum + sumRawActualsForAccount(cache.originalBudgetRows, mergeOrg, FORECAST_AD_VALOREM_REVENUE_CODE, 2026).total,
+        0
+      );
+      return revenueDisplayAmount(total);
+    }
+    return undefined;
+  }
+
+  // FY2020-FY2025 actuals and the FY2026 Original Budget are recorded once
+  // per account, but a sheet account shared by many departments (e.g. the
+  // General Fund's Ad Valorem Taxes line, Dept_Code 001311) repeats that
+  // same full account total on every department's own row referencing it
+  // (see applyActualsToRows/applyOriginalBudgetToRows, and
+  // buildDedupedHistoricalExpenseRows/revenueBudgetUniqueKey, which exist
+  // specifically to undo this for other tables). Summed here without the
+  // same guard, those years would multiply a shared account's total once
+  // per department referencing it -- which is what was inflating General
+  // Government Taxes (dominated by the Ad Valorem line) on this page.
+  // FY2027 Proposed is left alone: it comes straight from the sheet's own
+  // itemized budget lines, which legitimately differ row to row.
+  function forecastCategoryRows(lineType, fundCode, yearField) {
+    const needsDedup = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(yearField);
+    const categoryField = lineType === "expense" ? "Object_Type" : "Revenue_Type";
+    const totals = new Map();
+    if (lineType === "expense") {
+      const rows = needsDedup ? (cache.dedupedExpenseRows || []) : (cache.expenditures || []);
+      rows.forEach((row) => {
+        if (fundCodeForRow(row) !== fundCode) return;
+        const category = normalizeForecastCategory(row[categoryField], lineType);
+        totals.set(category, (totals.get(category) || 0) + (Number(row[yearField]) || 0));
+      });
+      return totals;
+    }
+    const seenKeys = needsDedup ? new Set() : null;
+    (cache.revenues || []).forEach((row) => {
+      if (fundCodeForRow(row) !== fundCode) return;
+      if (seenKeys) {
+        const key = revenueBudgetUniqueKey(row);
+        if (seenKeys.has(key)) return;
+        seenKeys.add(key);
+      }
+      const category = normalizeForecastCategory(row[categoryField], lineType);
+      // Actuals/FY2026 budget come from Supabase, which stores revenue as a
+      // credit (negative) amount -- every other reader of these two fields
+      // (budgetLineColumnAmount, revenueBudgetMergeContribution) flips the
+      // sign with revenueDisplayAmount before summing/displaying.
+      const rawValue = Number(row[yearField]) || 0;
+      let value = needsDedup ? revenueDisplayAmount(rawValue) : rawValue;
+      if (needsDedup) {
+        const override = forecastAdValoremHistoricalOverride(row, yearField);
+        if (override !== undefined) value = override;
+      }
+      totals.set(category, (totals.get(category) || 0) + value);
+    });
+    return totals;
+  }
+
+  // Same source rows and dedup/sign rules as forecastCategoryRows, but
+  // bucketed by the line's own name (Revenue_Name for revenue, Dept_Name
+  // for expense) instead of its broad category -- used for the "Category
+  // Forecast Detail" breakdown table, which lists individual revenue
+  // sources and departments rather than the handful of growth-assumption
+  // categories. Each bucket still remembers its parent category so the
+  // matching category's growth assumption can be applied to it.
+  // Sub-program Dept_Names that split out of their parent department
+  // elsewhere on the site (e.g. Code Compliance / Code Compliance Beach,
+  // sharing one Dept_Code -- see synthesizeMissingExpenseRows) are folded
+  // back into the parent here: the forecast's department breakdown is
+  // meant to show one driver per department, not its internal street/beach
+  // sub-program split.
+  const FORECAST_DETAIL_NAME_MERGE = new Map([
+    ["Code Compliance Beach", "Code Compliance"]
+  ]);
+
+  function forecastDetailRows(lineType, fundCode, yearField) {
+    const needsDedup = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(yearField);
+    const categoryField = lineType === "expense" ? "Object_Type" : "Revenue_Type";
+    const nameField = lineType === "expense" ? "Dept_Name" : "Revenue_Name";
+    const totals = new Map();
+
+    function addRow(row, value) {
+      const category = normalizeForecastCategory(row[categoryField], lineType);
+      const rawName = String(row[nameField] || "").trim() || "Unclassified";
+      const name = FORECAST_DETAIL_NAME_MERGE.get(rawName) || rawName;
+      const existing = totals.get(name);
+      if (existing) {
+        existing.value += value;
+      } else {
+        totals.set(name, { category, value });
+      }
+    }
+
+    if (lineType === "expense") {
+      const rows = needsDedup ? (cache.dedupedExpenseRows || []) : (cache.expenditures || []);
+      rows.forEach((row) => {
+        if (fundCodeForRow(row) !== fundCode) return;
+        addRow(row, Number(row[yearField]) || 0);
+      });
+      return totals;
+    }
+
+    const seenKeys = needsDedup ? new Set() : null;
+    (cache.revenues || []).forEach((row) => {
+      if (fundCodeForRow(row) !== fundCode) return;
+      if (seenKeys) {
+        const key = revenueBudgetUniqueKey(row);
+        if (seenKeys.has(key)) return;
+        seenKeys.add(key);
+      }
+      const rawValue = Number(row[yearField]) || 0;
+      let value = needsDedup ? revenueDisplayAmount(rawValue) : rawValue;
+      if (needsDedup) {
+        const override = forecastAdValoremHistoricalOverride(row, yearField);
+        if (override !== undefined) value = override;
+      }
+      addRow(row, value);
+    });
+    return totals;
+  }
+
+  function summarizeForecastHistory(lineType, fundCode) {
+    return FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => {
+      const field = "FY" + year + "_Actual";
+      const categories = forecastCategoryRows(lineType, fundCode, field);
+      let total = 0;
+      categories.forEach((value) => { total += value; });
+      return { year, total, categories };
+    });
+  }
+
+  function summarizeForecastOriginalBudget(lineType, fundCode) {
+    const categories = forecastCategoryRows(lineType, fundCode, "FY2026_Original_Budget");
+    let total = 0;
+    categories.forEach((value) => { total += value; });
+    return { year: 2026, total, categories };
+  }
+
+  function forecastAvailableTrendValues(valuesByYear) {
+    return FINANCIAL_FORECAST_ACTUAL_YEARS
+      .map((year) => ({ year, value: Number(valuesByYear[year]) || 0 }))
+      .filter((item) => item.value !== 0);
+  }
+
+  function historicalAverageGrowth(valuesByYear) {
+    const available = forecastAvailableTrendValues(valuesByYear);
+    const growthRates = [];
+    for (let i = 1; i < available.length; i += 1) {
+      const previous = available[i - 1].value;
+      const current = available[i].value;
+      if (previous !== 0) growthRates.push((current - previous) / Math.abs(previous));
+    }
+    if (!growthRates.length) return null;
+    return growthRates.reduce((sum, value) => sum + value, 0) / growthRates.length;
+  }
+
+  // A leading year that's zero/near-zero (an account that didn't exist
+  // yet, or was barely funded) makes a terrible CAGR base -- dividing a
+  // healthy current value by a near-zero one inflates the rate into
+  // meaninglessness. A base year only counts as "stable" once it reaches
+  // at least half of the latest actual year's value or half of the
+  // median of all nonzero actuals, whichever bar is lower to clear --
+  // either is evidence the account was already at a normal run rate, not
+  // still ramping up from nothing.
+  function historicalCagr(valuesByYear) {
+    const nonZero = forecastAvailableTrendValues(valuesByYear).filter((item) => item.value > 0);
+    if (nonZero.length < 2) return null;
+
+    const latestValue = nonZero[nonZero.length - 1].value;
+    const sortedValues = nonZero.map((item) => item.value).sort((a, b) => a - b);
+    const mid = Math.floor(sortedValues.length / 2);
+    const median = sortedValues.length % 2 !== 0
+      ? sortedValues[mid]
+      : (sortedValues[mid - 1] + sortedValues[mid]) / 2;
+    const stableThreshold = 0.5 * Math.min(latestValue, median);
+
+    const baseIndex = nonZero.findIndex((item) => item.value >= stableThreshold);
+    const stableYears = baseIndex === -1 ? [] : nonZero.slice(baseIndex);
+    if (stableYears.length < 3) return null;
+
+    const first = stableYears[0];
+    const last = stableYears[stableYears.length - 1];
+    const periods = last.year - first.year;
+    if (periods <= 0 || first.value <= 0 || last.value <= 0) return null;
+    return Math.pow(last.value / first.value, 1 / periods) - 1;
+  }
+
+  function suggestedForecastGrowth(avgGrowth, cagr) {
+    const candidates = [avgGrowth, cagr].filter((value) => Number.isFinite(value));
+    if (!candidates.length) return null;
+    const blended = candidates.reduce((sum, value) => sum + value, 0) / candidates.length;
+    return Math.max(-0.03, Math.min(0.05, blended));
+  }
+
+  function buildForecastAssumptionLookup() {
+    const rows = Array.isArray(window.WCFinancialForecastAssumptions) ? window.WCFinancialForecastAssumptions : [];
+    const lookup = new Map();
+    rows.forEach((row) => {
+      const fundCode = String(row.fund_code || "").trim();
+      const lineType = String(row.line_type || "").trim().toLowerCase();
+      const category = normalizeForecastCategory(row.category, lineType);
+      if (!fundCode || !lineType || !category) return;
+      lookup.set([fundCode, lineType, category].join("|"), row);
+    });
+    return lookup;
+  }
+
+  function assumptionForForecast(lookup, fund, lineType, category, missingRows) {
+    const normalizedCategory = normalizeForecastCategory(category, lineType);
+    const key = [fund.code, lineType, normalizedCategory].join("|");
+    const row = lookup.get(key);
+    if (row) return row;
+    if (!missingRows.some((missing) => [missing.fund_code, missing.line_type, missing.category].join("|") === key)) {
+      missingRows.push({ fund_code: fund.code, fund_name: fund.label, line_type: lineType, category: normalizedCategory });
+    }
+    return {
+      fund_code: fund.code,
+      fund_name: fund.label,
+      line_type: lineType,
+      category: normalizedCategory,
+      fy2028_assumption: null,
+      fy2029_assumption: null,
+      fy2030_assumption: null,
+      fy2031_assumption: null,
+      method: "missing assumption fallback",
+      manual_override: false,
+      notes: "No assumption row found; forecast uses suggested trend when available, otherwise held flat."
+    };
+  }
+
+  function categoryValuesForTrend(lineType, fundCode, category) {
+    const values = {};
+    FINANCIAL_FORECAST_ACTUAL_YEARS.forEach((year) => {
+      values[year] = forecastCategoryRows(lineType, fundCode, "FY" + year + "_Actual").get(category) || 0;
+    });
+    values[2026] = forecastCategoryRows(lineType, fundCode, "FY2026_Original_Budget").get(category) || 0;
+    values[2027] = forecastCategoryRows(lineType, fundCode, "FY2027_Proposed").get(category) || 0;
+    return values;
+  }
+
+  function forecastAssumptionDetails(fund, lineType, category, assumptionLookup, missingRows) {
+    const values = categoryValuesForTrend(lineType, fund.code, category);
+    const avgGrowth = historicalAverageGrowth(values);
+    const cagr = historicalCagr(values);
+    const suggested = suggestedForecastGrowth(avgGrowth, cagr);
+    const assumption = assumptionForForecast(assumptionLookup, fund, lineType, category, missingRows);
+    return { values, avgGrowth, cagr, suggested, assumption };
+  }
+
+  function forecastAnnualCategories(fund, lineType, baselineCategories, assumptionLookup, missingRows, assumptionDetails) {
+    const categories = new Map();
+    baselineCategories.forEach((value, category) => {
+      categories.set(category, { 2027: value });
+    });
+    FINANCIAL_FORECAST_YEARS.slice(1).forEach((year) => {
+      Array.from(categories.keys()).forEach((category) => {
+        const detailsKey = [fund.code, lineType, category].join("|");
+        const details = assumptionDetails.get(detailsKey) || forecastAssumptionDetails(fund, lineType, category, assumptionLookup, missingRows);
+        assumptionDetails.set(detailsKey, details);
+        const previous = categories.get(category)[year - 1] || 0;
+        const manual = forecastAssumptionValue(details.assumption, year);
+        const growth = manual !== null ? manual : (Number.isFinite(details.suggested) ? details.suggested : 0);
+        categories.get(category)[year] = previous * (1 + growth);
+      });
+    });
+    return categories;
+  }
+
+  // Forecasts each individual revenue source/department (see
+  // forecastDetailRows) forward the same way forecastAnnualCategories
+  // forecasts its broader category -- by applying that detail row's own
+  // parent category's growth assumption. assumptionDetails is expected to
+  // already hold every category for this fund/lineType (forecastAnnualCategories
+  // populates it first, from the same underlying baseline), so growth here
+  // is read, not recomputed.
+  function forecastAnnualDetails(fund, lineType, baselineDetails, assumptionDetails) {
+    const details = new Map();
+    baselineDetails.forEach((entry, name) => {
+      details.set(name, { category: entry.category, values: { 2027: entry.value } });
+    });
+    FINANCIAL_FORECAST_YEARS.slice(1).forEach((year) => {
+      details.forEach((entry) => {
+        const detailsKey = [fund.code, lineType, entry.category].join("|");
+        const categoryDetails = assumptionDetails.get(detailsKey);
+        const manual = categoryDetails ? forecastAssumptionValue(categoryDetails.assumption, year) : null;
+        const suggested = categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : 0;
+        const growth = manual !== null ? manual : suggested;
+        const previous = entry.values[year - 1] || 0;
+        entry.values[year] = previous * (1 + growth);
+      });
+    });
+    return details;
+  }
+
+  // Same eight year-fields forecastAssumptionDetails reads per category,
+  // but bucketed by forecastDetailRows' own name (Revenue_Name/Dept_Name)
+  // instead -- so the "Forecast Assumptions" table can show each
+  // individual revenue source/department's own historical trend, which is
+  // what actually drives its parent category's blended growth rate (see
+  // the Ad Valorem Taxes case: one line item dominated "General Government
+  // Taxes" enough to make a recording change in that one account look like
+  // the whole category's trend).
+  function forecastDetailHistoryByYear(lineType, fundCode) {
+    const yearFields = FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => "FY" + year + "_Actual").concat(["FY2026_Original_Budget", "FY2027_Proposed"]);
+    const byYear = new Map();
+    yearFields.forEach((field) => byYear.set(field, forecastDetailRows(lineType, fundCode, field)));
+    return byYear;
+  }
+
+  // assumptionDetails is expected to already hold every category for this
+  // fund/lineType (forecastAnnualCategories populates it first, from the
+  // same underlying baseline) -- the "Assumption" shown per name is its
+  // parent category's, since that's the rate actually applied to it (see
+  // forecastAnnualDetails); each name's own avgGrowth/cagr below is its
+  // own, independent of the category, to surface it as an individual driver.
+  function forecastDetailAssumptionRows(fund, lineType, assumptionDetails) {
+    const byYearDetailMaps = forecastDetailHistoryByYear(lineType, fund.code);
+    const baseline = byYearDetailMaps.get("FY2027_Proposed");
+    return Array.from(baseline.keys()).map((name) => {
+      const category = baseline.get(name).category;
+      const values = {};
+      FINANCIAL_FORECAST_ACTUAL_YEARS.forEach((year) => {
+        const entry = byYearDetailMaps.get("FY" + year + "_Actual").get(name);
+        values[year] = entry ? entry.value : 0;
+      });
+      const entry2026 = byYearDetailMaps.get("FY2026_Original_Budget").get(name);
+      values[2026] = entry2026 ? entry2026.value : 0;
+      values[2027] = baseline.get(name).value;
+      const categoryDetails = assumptionDetails.get([fund.code, lineType, category].join("|"));
+      return {
+        name,
+        category,
+        values,
+        avgGrowth: historicalAverageGrowth(values),
+        cagr: historicalCagr(values),
+        categoryAssumption: categoryDetails ? categoryDetails.assumption : null
+      };
+    });
+  }
+
+  function sumForecastCategories(categories, year) {
+    let total = 0;
+    categories.forEach((values) => { total += values[year] || 0; });
+    return total;
+  }
+
+  function getCipProjectYearAmount(project, year) {
+    const key = "FY" + year;
+    return (project.funding_by_year || [])
+      .filter((item) => item.year === key)
+      .reduce((sum, item) => sum + (Number(item.amount_value) || 0), 0);
+  }
+
+  function isCapitalProjectsFundCipProject(project) {
+    return String(project && project.funding || "").trim().toLowerCase() === "capital projects fund";
+  }
+
+  function buildCapitalProjectsCipForecast(projectList) {
+    const projects = (Array.isArray(projectList) ? projectList : (window.wcCipProjects || []))
+      .filter(isCapitalProjectsFundCipProject)
+      .filter((project) => !project.is_legacy_in_house_engineering_row);
+    const byYear = {};
+    const missingYearValues = [];
+    FINANCIAL_FORECAST_YEARS.forEach((year) => {
+      const rows = projects
+        .map((project) => ({
+          title: project.title || "Capital Project",
+          project_code: project.project_code || "",
+          year: "FY" + year,
+          amount: getCipProjectYearAmount(project, year)
+        }))
+        .filter((row) => row.amount > 0);
+      byYear[year] = {
+        rows,
+        total: rows.reduce((sum, row) => sum + row.amount, 0)
+      };
+      if (!rows.length) missingYearValues.push({ fund_code: "300", year: "FY" + year, note: "No Capital Projects Fund CIP project values found for this year." });
+    });
+    return { projects, byYear, missingYearValues };
+  }
+
+  function buildFinancialForecastModel(cipProjectList) {
+    const debugEnabled = new URLSearchParams(window.location.search).get("debugForecast") === "1";
+    const assumptionLookup = buildForecastAssumptionLookup();
+    const missingAssumptions = [];
+    const assumptionDetails = new Map();
+    const cipForecast = buildCapitalProjectsCipForecast(cipProjectList);
+    const funds = FINANCIAL_FORECAST_FUNDS.map((fund) => {
+      const baselineRevenueCategories = forecastCategoryRows("revenue", fund.code, "FY2027_Proposed");
+      const baselineExpenseCategories = forecastCategoryRows("expense", fund.code, "FY2027_Proposed");
+      const revenueCategories = forecastAnnualCategories(fund, "revenue", baselineRevenueCategories, assumptionLookup, missingAssumptions, assumptionDetails);
+      const expenseCategories = forecastAnnualCategories(fund, "expense", baselineExpenseCategories, assumptionLookup, missingAssumptions, assumptionDetails);
+
+      // Detail breakdowns (revenue by source name, expense by department)
+      // for the "Category Forecast Detail" table -- built after the
+      // category-level forecasts above so assumptionDetails already has
+      // every category's growth assumption populated for this fund/lineType.
+      const baselineRevenueDetails = forecastDetailRows("revenue", fund.code, "FY2027_Proposed");
+      const baselineExpenseDetails = forecastDetailRows("expense", fund.code, "FY2027_Proposed");
+      const revenueDetails = forecastAnnualDetails(fund, "revenue", baselineRevenueDetails, assumptionDetails);
+      const expenseDetails = forecastAnnualDetails(fund, "expense", baselineExpenseDetails, assumptionDetails);
+
+      // Individual revenue source/department rows for the "Forecast
+      // Assumptions" table -- see forecastDetailAssumptionRows. Computed
+      // after the category forecasts above so every category this fund's
+      // names belong to already has an assumptionDetails entry.
+      const revenueDetailAssumptions = forecastDetailAssumptionRows(fund, "revenue", assumptionDetails);
+      const expenseDetailAssumptions = forecastDetailAssumptionRows(fund, "expense", assumptionDetails);
+
+      if (fund.code === "300") {
+        Array.from(expenseCategories.keys()).forEach((category) => {
+          FINANCIAL_FORECAST_YEARS.forEach((year) => {
+            expenseCategories.get(category)[year] = 0;
+          });
+        });
+        if (!expenseCategories.has("CIP Project Schedule")) expenseCategories.set("CIP Project Schedule", { 2027: 0 });
+        FINANCIAL_FORECAST_YEARS.forEach((year) => {
+          expenseCategories.get("CIP Project Schedule")[year] = cipForecast.byYear[year] ? cipForecast.byYear[year].total : 0;
+        });
+
+        // Capital Projects Fund expenditures are driven by the CIP
+        // schedule rather than any department's own budget lines -- mirror
+        // the category-level override above onto the department detail
+        // breakdown so the two tables agree.
+        Array.from(expenseDetails.keys()).forEach((name) => {
+          FINANCIAL_FORECAST_YEARS.forEach((year) => {
+            expenseDetails.get(name).values[year] = 0;
+          });
+        });
+        if (!expenseDetails.has("CIP Project Schedule")) expenseDetails.set("CIP Project Schedule", { category: "Capital Outlay", values: { 2027: 0 } });
+        FINANCIAL_FORECAST_YEARS.forEach((year) => {
+          expenseDetails.get("CIP Project Schedule").values[year] = cipForecast.byYear[year] ? cipForecast.byYear[year].total : 0;
+        });
+      }
+
+      const beginningBalanceSourceYear = 2026;
+      const annual = {};
+
+      FINANCIAL_FORECAST_YEARS.forEach((year, index) => {
+        const beginningBalance = index === 0 ? fundBalanceForYear(fund.code, beginningBalanceSourceYear) : annual[year - 1].endingBalance;
+        const revenues = sumForecastCategories(revenueCategories, year);
+        const expenditures = sumForecastCategories(expenseCategories, year);
+        const netChange = revenues - expenditures;
+        annual[year] = {
+          year,
+          beginningBalance,
+          revenues,
+          expenditures,
+          netChange,
+          endingBalance: beginningBalance + netChange
+        };
+      });
+
+      return {
+        fund,
+        beginningBalanceSource: "Fund balance sheet FY " + beginningBalanceSourceYear,
+        historicalRevenue: summarizeForecastHistory("revenue", fund.code),
+        historicalExpense: summarizeForecastHistory("expense", fund.code),
+        originalBudgetRevenue: summarizeForecastOriginalBudget("revenue", fund.code),
+        originalBudgetExpense: summarizeForecastOriginalBudget("expense", fund.code),
+        baselineRevenueCategories,
+        baselineExpenseCategories,
+        revenueCategories,
+        expenseCategories,
+        revenueDetails,
+        expenseDetails,
+        revenueDetailAssumptions,
+        expenseDetailAssumptions,
+        annual
+      };
+    });
+
+    Array.from(assumptionLookup.values()).forEach((row) => {
+      const fund = FINANCIAL_FORECAST_FUNDS.find((item) => item.code === String(row.fund_code || "").trim());
+      const lineType = String(row.line_type || "").trim().toLowerCase();
+      const category = normalizeForecastCategory(row.category, lineType);
+      if (!fund || !lineType || !category) return;
+      const key = [fund.code, lineType, category].join("|");
+      if (!assumptionDetails.has(key)) {
+        assumptionDetails.set(key, forecastAssumptionDetails(fund, lineType, category, assumptionLookup, missingAssumptions));
+      }
+    });
+
+    const model = {
+      funds,
+      missingAssumptions,
+      missingCipYearValues: cipForecast.missingYearValues,
+      cipForecast,
+      assumptions: Array.from(assumptionLookup.values()),
+      assumptionDetails
+    };
+    if (debugEnabled) {
+      const debug = {};
+      funds.forEach((item) => {
+        debug[item.fund.code + " " + item.fund.label] = {
+          fy2027BaselineRevenueByCategory: Object.fromEntries(item.baselineRevenueCategories),
+          fy2027BaselineExpenseByCategory: Object.fromEntries(item.baselineExpenseCategories),
+          beginningFundBalanceSource: item.beginningBalanceSource,
+          assumptionsApplied: model.assumptions.filter((row) => String(row.fund_code) === item.fund.code),
+          annualCalculatedRevenues: Object.fromEntries(FINANCIAL_FORECAST_YEARS.map((y) => [y, item.annual[y].revenues])),
+          annualCalculatedExpenditures: Object.fromEntries(FINANCIAL_FORECAST_YEARS.map((y) => [y, item.annual[y].expenditures])),
+          annualNetChange: Object.fromEntries(FINANCIAL_FORECAST_YEARS.map((y) => [y, item.annual[y].netChange])),
+          annualEndingFundBalance: Object.fromEntries(FINANCIAL_FORECAST_YEARS.map((y) => [y, item.annual[y].endingBalance]))
+        };
+      });
+      console.group("Financial forecast debug");
+      console.log("Forecast model", debug);
+      console.log("Historical trend details", Array.from(assumptionDetails.entries()).map(([key, details]) => ({
+        key,
+        values: details.values,
+        historical_avg_growth: details.avgGrowth,
+        historical_cagr: details.cagr,
+        suggested_growth_rate: details.suggested,
+        manual_assumptions_used: {
+          FY2028: forecastAssumptionValue(details.assumption, 2028),
+          FY2029: forecastAssumptionValue(details.assumption, 2029),
+          FY2030: forecastAssumptionValue(details.assumption, 2030),
+          FY2031: forecastAssumptionValue(details.assumption, 2031)
+        }
+      })));
+      console.log("CIP project rows used for fund 300", cipForecast.byYear);
+      console.log("Missing assumption rows", missingAssumptions);
+      console.log("Missing CIP year values", cipForecast.missingYearValues);
+      console.groupEnd();
+    }
+    return model;
+  }
+
+  function renderForecastDetailTable(item) {
+    const rows = [
+      ["Beginning Fund Balance", "beginningBalance"],
+      ["Revenues", "revenues"],
+      ["Expenditures", "expenditures"],
+      ["Net Change", "netChange"],
+      ["Ending Fund Balance", "endingBalance"]
+    ].map(([label, key]) => (
+      '<tr class="' + (key === "endingBalance" ? "wc-table-total-row" : "") + '">' +
+      '<td>' + escapeHtml(label) + '</td>' +
+      FINANCIAL_FORECAST_YEARS.map((year) => '<td class="wc-num">' + forecastMoney(item.annual[year][key]) + '</td>').join("") +
+      '</tr>'
+    ));
+    return renderTable({
+      caption: item.fund.code + " " + item.fund.label,
+      columns: [{ label: "Line" }].concat(FINANCIAL_FORECAST_YEARS.map((year) => ({ label: "FY " + year + (year === 2027 ? " Baseline" : " Forecast"), num: true }))),
+      bodyRows: rows
+    });
+  }
+
+  function renderForecastDetailBreakdownTable(item, lineType, details) {
+    const label = lineType === "revenue" ? "Revenue Source Forecast" : "Expense Department Forecast";
+    const columnLabel = lineType === "revenue" ? "Revenue Source" : "Department";
+    const rows = Array.from(details.keys())
+      .filter((name) => FINANCIAL_FORECAST_YEARS.some((year) => (details.get(name).values[year] || 0) !== 0))
+      .sort((a, b) => (details.get(b).values[2027] || 0) - (details.get(a).values[2027] || 0))
+      .map((name) => (
+      '<tr><td>' + escapeHtml(name) + '</td>' +
+      FINANCIAL_FORECAST_YEARS.map((year) => '<td class="wc-num">' + forecastMoney(details.get(name).values[year] || 0) + '</td>').join("") +
+      '</tr>'
+    ));
+    return renderTable({
+      caption: label,
+      columns: [{ label: columnLabel }].concat(FINANCIAL_FORECAST_YEARS.map((year) => ({ label: "FY " + year, num: true }))),
+      bodyRows: rows
+    });
+  }
+
+  // Small, faded-out revenue lines specific to one fund -- not worth a
+  // row on the assumptions table (each is a few thousand dollars at most,
+  // several already trailing off to $0). Keyed by "<fund code>|<name,
+  // lowercased>" since the same revenue name can be a real, sizable line
+  // in a different fund (e.g. Ad Valorem Taxes Delinquent is negligible
+  // for Transportation/Sheriff but not necessarily elsewhere).
+  const FORECAST_ASSUMPTIONS_HIDDEN_FUND_ROWS = new Set([
+    "101|federal grant (economic environment)",
+    "101|ad valorem taxes delinquent",
+    "101|state payment in lieu of tax",
+    "107|ad valorem taxes delinquent",
+    "107|state payment in lieu of tax",
+    "111|federal grant (public safety)",
+    "111|state grant (public safety)",
+    "001|non-profit funding program",
+    "001|recreation - fbip boating allocation"
+  ]);
+
+  // Lists each individual revenue source/department (rather than the
+  // handful of broad categories) so the line items actually driving a
+  // category's blended growth rate are visible on their own -- see
+  // forecastDetailAssumptionRows.
+  function renderForecastAssumptionsDetailTable(model, lineType) {
+    const assumptionYears = FINANCIAL_FORECAST_YEARS.slice(1);
+    const nameLabel = lineType === "revenue" ? "Revenue Source" : "Department";
+    const detailsField = lineType === "revenue" ? "revenueDetailAssumptions" : "expenseDetailAssumptions";
+
+    const rowData = model.funds.flatMap((item) => (item[detailsField] || []).map((detail) => ({ fund: item.fund, detail })))
+      .filter(({ detail }) => !/^interfund group transfer/i.test(detail.name))
+      .filter(({ detail }) => !/^refund of prior year expenditures/i.test(detail.name))
+      .filter(({ detail }) => !/^unclassified/i.test(detail.name))
+      .filter(({ fund, detail }) => !FORECAST_ASSUMPTIONS_HIDDEN_FUND_ROWS.has(fund.code + "|" + detail.name.toLowerCase()))
+      // A line with nothing recorded in either of the two most recent
+      // actual years has effectively gone dormant/discontinued -- its
+      // older actuals are stale context, not a useful forward-looking
+      // driver, so it's just noise on this table.
+      .filter(({ detail }) => (detail.values[2024] || 0) !== 0 || (detail.values[2025] || 0) !== 0)
+      .filter(({ detail }) => {
+        const hasData = FINANCIAL_FORECAST_ACTUAL_YEARS.concat([2027]).some((year) => (detail.values[year] || 0) !== 0);
+        const hasGrowthRate = Number.isFinite(detail.avgGrowth) || Number.isFinite(detail.cagr);
+        return hasData && hasGrowthRate;
+      })
+      .map(({ fund, detail }) => ({
+        fund,
+        detail,
+        assumptionValues: assumptionYears.map((year) => forecastAssumptionValue(detail.categoryAssumption, year))
+      }))
+      // Initial server-rendered order, before the sort buttons (added
+      // below) take over client-side: biggest driver first, across every
+      // fund -- grouping by fund first would bury a bigger line item in a
+      // smaller fund below a smaller one in the General Fund just because
+      // of fund order.
+      .sort((a, b) => (b.detail.values[2027] || 0) - (a.detail.values[2027] || 0));
+
+    // The editable assumptions file currently sets one flat rate across
+    // FY2028-FY2031 for every category -- four identical columns are just
+    // noise in that case. Only collapse to one "Assumption" column when
+    // every row's four years agree; if even one category has a year-by-year
+    // assumption, show all four so that distinction stays visible.
+    const allRowsFlat = rowData.every((item) => item.assumptionValues.every((value) => value === item.assumptionValues[0]));
+    const assumptionColumns = allRowsFlat
+      ? [{ label: "Assumption", num: true }]
+      : assumptionYears.map((year) => ({ label: "FY " + year + " Assumption", num: true }));
+
+    const rows = rowData.map(({ fund, detail, assumptionValues }) => {
+      const assumptionCells = allRowsFlat
+        ? '<td class="wc-num">' + escapeHtml(forecastPercent(assumptionValues[0])) + '</td>'
+        : assumptionValues.map((value) => '<td class="wc-num">' + escapeHtml(forecastPercent(value)) + '</td>').join("");
+      // data-sort-value/data-sort-name let the sort buttons below
+      // reorder these rows client-side without re-running the whole
+      // forecast model -- see the delegated click handler for
+      // .wc-forecast-sort-button.
+      return (
+        '<tr data-sort-value="' + (detail.values[2027] || 0) + '" data-sort-name="' + escapeHtml(detail.name.toLowerCase()) + '">' +
+        '<td>' + escapeHtml(fund.code) + '</td>' +
+        '<td>' + escapeHtml(fund.label) + '</td>' +
+        '<td>' + escapeHtml(detail.name) + '</td>' +
+        FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => '<td class="wc-num">' + forecastMoney(detail.values[year] || 0) + '</td>').join("") +
+        '<td class="wc-num">' + escapeHtml(forecastPercent(detail.cagr)) + '</td>' +
+        assumptionCells + '</tr>'
+      );
+    });
+
+    const sortToggleHtml =
+      '<div class="wc-forecast-sort-toggle" role="group" aria-label="Sort ' + escapeHtml(nameLabel.toLowerCase()) + ' rows">' +
+        '<button type="button" class="wc-forecast-sort-button is-active" data-sort-mode="largest" aria-pressed="true">Largest First</button>' +
+        '<button type="button" class="wc-forecast-sort-button" data-sort-mode="smallest" aria-pressed="false">Smallest First</button>' +
+        '<button type="button" class="wc-forecast-sort-button" data-sort-mode="abc" aria-pressed="false">A-Z</button>' +
+      '</div>';
+    return renderTable({
+      caption: lineType === "revenue" ? "Revenue Forecast Assumptions" : "Expense Forecast Assumptions",
+      toggleHtml: sortToggleHtml,
+      columns: [
+        { label: "Fund" },
+        { label: "Fund Name" },
+        { label: nameLabel },
+        { label: "FY 2020 Actual", num: true },
+        { label: "FY 2021 Actual", num: true },
+        { label: "FY 2022 Actual", num: true },
+        { label: "FY 2023 Actual", num: true },
+        { label: "FY 2024 Actual", num: true },
+        { label: "FY 2025 Actual", num: true },
+        { label: "Historical CAGR", num: true }
+      ].concat(assumptionColumns),
+      bodyRows: rows
+    });
+  }
+
+  function renderFinancialForecast(cipProjectList) {
+    const model = buildFinancialForecastModel(cipProjectList);
+    return (
+      '<section class="page-text wc-forecast-note">' +
+        '<p>Forecast years are planning estimates based on the FY 2027 baseline budget, historical trend review, capital project schedules, and selected assumptions. FY 2027 is not forecasted; FY 2028 through FY 2031 are calculated from editable assumptions. Capital Projects Fund expenditures use the Capital Improvement Plan schedule for FY 2027 through FY 2031. Ending fund balance rolls forward as the next year’s beginning fund balance.</p>' +
+      '</section>' +
+      '<section class="wc-forecast-section">' +
+        '<h2 class="wc-fund-section-heading">Major Fund Detail</h2>' +
+        model.funds.map((item) => (
+          '<article class="wc-forecast-fund">' +
+            '<h3>' + escapeHtml(item.fund.code + " " + item.fund.label) + '</h3>' +
+            renderForecastDetailTable(item) +
+            '<details class="wc-forecast-detail"><summary>Category Forecast Detail</summary>' +
+              renderForecastDetailBreakdownTable(item, "revenue", item.revenueDetails) +
+              renderForecastDetailBreakdownTable(item, "expense", item.expenseDetails) +
+            '</details>' +
+          '</article>'
+        )).join("") +
+      '</section>' +
+      '<section class="wc-forecast-section">' +
+        '<h2 class="wc-fund-section-heading">Assumptions</h2>' +
+        renderForecastAssumptionsDetailTable(model, "revenue") +
+        renderForecastAssumptionsDetailTable(model, "expense") +
+      '</section>' +
+      lastUpdatedNoteHtml()
+    );
   }
 
   // The fund roll-forward schedule shows the same prior-year-actuals + FY2026
@@ -6179,6 +6993,28 @@
     initConsolidatedFundTableContainer("consolidated-expenditure-budget-table", renderConsolidatedExpenditureBudgetTable, "consolidated expenditure budget");
   }
 
+  function initFinancialForecastPage() {
+    const container = document.getElementById("financial-forecast");
+    if (!container) return;
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
+
+    Promise.all([
+      loadBudgetData(),
+      window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || [])
+    ])
+      .then(([data, cipProjects]) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        container.innerHTML = renderFinancialForecast(cipProjects);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load financial forecast", err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initDepartmentPage();
     initFinancialSummaryPage();
@@ -6191,6 +7027,7 @@
     initFundFinancialSchedulesPage();
     initConsolidatedExpenseSummaryPage();
     initExpenseActivityChartsPage();
+    initFinancialForecastPage();
   });
 
   window.WCBudgetData = {
@@ -6218,6 +7055,7 @@
     renderInterfundTransfersOutTable,
     renderInterfundTransfersInTable,
     renderConsolidatedRevenueSummaryTable,
-    renderRevenueTopicCards
+    renderRevenueTopicCards,
+    renderFinancialForecast
   };
 })();
