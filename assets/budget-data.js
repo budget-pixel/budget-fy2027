@@ -2347,7 +2347,9 @@
       // that category's current amount -- distinct from the
       // %-of-total-budget badge in the row head above, which is a
       // same-year share, not a year-over-year comparison.
-      const changeHtml = showChange ? renderFinanceCardRowChange(amount, priorAmount) : "";
+      const changeAmount = row.changeAmount !== undefined ? row.changeAmount : amount;
+      const changePriorAmount = row.changePriorAmount !== undefined ? row.changePriorAmount : priorAmount;
+      const changeHtml = showChange ? renderFinanceCardRowChange(changeAmount, changePriorAmount) : "";
       const amountText = amount === 0 && !isZero ? "$0" : formatCurrency(amount);
       return (
         '<div class="wc-finance-card-row' + (isZero ? " is-zero" : "") + '">' +
@@ -2389,7 +2391,7 @@
   // Department-page expense/revenue tables: rolled up to category level
   // (Personnel Services, Operating Expenditures, Capital Outlay, etc.)
   // rather than individual object/revenue codes.
-  function renderTypeSummaryGroup(rows, kind, caption, notes, descriptionField, showChange) {
+  function renderTypeSummaryGroup(rows, kind, caption, notes, descriptionField, showChange, combinedChangeByType) {
     const isExpense = kind === "expense";
     const typeField = isExpense ? "Object_Type" : "Revenue_Type";
     const typeLabel = isExpense ? "Object Type" : "Revenue Type";
@@ -2423,11 +2425,23 @@
         .replace('data-open-label="Hide Budget Lines"', 'data-open-label="Hide Revenue Lines"')
         .replace("View Budget Lines", "View Revenue Lines");
     }
-    const cardRows = Array.from(totalsByType.entries()).map(([type, totals]) => ({
-      label: type,
-      amount: totals.FY2027_Proposed || 0,
-      priorAmount: totals.FY2026_Original_Budget || 0
-    }));
+    const cardRows = Array.from(totalsByType.entries()).map(([type, totals]) => {
+      // The displayed amount/%-of-total stay this card's own slice, but the
+      // YoY change badge uses the combined-across-sub-programs total when
+      // one was supplied (see renderTypeSummaryTable) -- comparing this
+      // card's own FY2027 against its own FY2026 isn't reliable when a
+      // sibling sub-program shares its Dept_Code, since FY2026's
+      // per-account dedup can attribute a shared account's full prior-year
+      // total to either sub-program unpredictably.
+      const combined = combinedChangeByType && combinedChangeByType.get(type);
+      return {
+        label: type,
+        amount: totals.FY2027_Proposed || 0,
+        priorAmount: totals.FY2026_Original_Budget || 0,
+        changeAmount: combined ? combined.amount : (totals.FY2027_Proposed || 0),
+        changePriorAmount: combined ? combined.priorAmount : (totals.FY2026_Original_Budget || 0)
+      };
+    });
 
     return renderFinancialDashboardCard({
       caption,
@@ -2470,18 +2484,55 @@
       return renderTypeSummaryGroup(rows, kind, caption, EXPENSE_GROUP_NOTES[normalizeDeptName(deptName || "")]);
     }
     const norm = normalizeDeptName(deptName || "");
+
+    // The primary card's own YoY change combines every sub-program sharing
+    // this Dept_Code (e.g. Code Compliance + Code Compliance Beach)
+    // instead of comparing the primary's own slice against its own FY2026
+    // -- the per-(Dept_Code,Dept_Name,Object_Code) FY2026 dedup (see
+    // applyOriginalBudgetToRows) can attribute a shared account's full
+    // prior-year total to either sub-program unpredictably, so the primary
+    // alone isn't a trustworthy year-over-year figure on its own. The
+    // shared deduped layer (keyed by Dept_Code, not Dept_Name) gives the
+    // one true combined FY2026 total per category; FY2027 has no such
+    // duplication risk, so it's just summed straight from the raw rows.
+    let combinedChangeByType = null;
+    if (kind === "expense") {
+      const deptCodes = new Set(rows.map((r) => String(r.Dept_Code || "").trim()).filter(Boolean));
+      combinedChangeByType = new Map();
+      rows.forEach((r) => {
+        const type = r.Object_Type || "Other";
+        const entry = combinedChangeByType.get(type) || { amount: 0, priorAmount: 0 };
+        entry.amount += r.FY2027_Proposed || 0;
+        combinedChangeByType.set(type, entry);
+      });
+      (cache.dedupedExpenseRows || [])
+        .filter((r) => deptCodes.has(String(r.Dept_Code || "").trim()))
+        .forEach((r) => {
+          const type = r.Object_Type || "Other";
+          const entry = combinedChangeByType.get(type) || { amount: 0, priorAmount: 0 };
+          entry.priorAmount += r.FY2026_Original_Budget || 0;
+          combinedChangeByType.set(type, entry);
+        });
+    }
+
     return groupNames
       .map((name) => {
         const nameNorm = normalizeDeptName(name);
         const isPrimary = nameNorm === norm;
         const groupCaption = isPrimary ? caption : (DEPT_NAME_DISPLAY_OVERRIDES[nameNorm] || name);
         const notes = isPrimary ? null : EXPENSE_GROUP_NOTES[nameNorm];
-        // Secondary sub-program cards (e.g. Code Compliance Beach) share a
-        // Dept_Code with the primary group, so their own FY2026 figures
-        // aren't reliably split between the two -- no YoY change or "View
-        // Prior Years" toggle on those cards; the primary card is where
-        // that comparison belongs.
-        return renderTypeSummaryGroup(rows.filter((r) => (r.Dept_Name || "") === name), kind, groupCaption, notes, undefined, isPrimary);
+        // Secondary sub-program cards (e.g. Code Compliance Beach) get no
+        // YoY change or "View Prior Years" toggle at all -- that
+        // comparison lives on the primary card, combined, instead.
+        return renderTypeSummaryGroup(
+          rows.filter((r) => (r.Dept_Name || "") === name),
+          kind,
+          groupCaption,
+          notes,
+          undefined,
+          isPrimary,
+          isPrimary ? combinedChangeByType : null
+        );
       })
       .join("");
   }
