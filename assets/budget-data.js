@@ -5138,7 +5138,7 @@
     });
   }
 
-  function arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl, supplementalExpenseEls) {
+  function arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl, supplementalExpenseEls, deptName) {
     const supplementalEls = supplementalExpenseEls || [];
     const cards = [expenseEl].concat(supplementalEls, [revenueEl, staffingEl]).filter((el) =>
       el && !el.hidden && el.innerHTML.trim()
@@ -5151,6 +5151,19 @@
       cards[0].parentNode.insertBefore(grid, cards[0]);
     }
     cards.forEach((card) => grid.appendChild(card));
+
+    // Code Compliance's two sub-program Expenditure Summary cards (Code
+    // Compliance / Code Compliance Beach) sit side by side in their own row,
+    // with the Revenue Summary card(s) spanning full width underneath --
+    // rather than the generic pairing below (each sub-program's expense and
+    // revenue card side by side, one pair per row), which buries the second
+    // expense card under the first revenue card instead of next to the
+    // first expense card.
+    if (normalizeDeptName(deptName) === "code compliance") {
+      if (expenseEl) expenseEl.classList.add("wc-financial-mount-cards-as-row");
+      if (revenueEl) revenueEl.classList.add("wc-financial-mount-full-width");
+      return;
+    }
 
     // Departments with multiple sub-programs (distinct Dept_Name values,
     // e.g. Code Compliance / Code Compliance Beach) render one stacked
@@ -5338,7 +5351,7 @@
           solidWasteEl,
           buildingConstructionEl,
           bccEl
-        ]);
+        ], deptName);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);
@@ -5533,6 +5546,72 @@
     return fund ? fund.Fund_Name : "Constitutional Offices";
   }
 
+  // Summary of Personnel's "at a glance" FTE callouts: the four
+  // constitutional officers whose own staffing rows carry no Dept_Code (so
+  // they'd otherwise get lumped into one undifferentiated catch-all) broken
+  // out individually, then one callout per actual fund for every other
+  // row -- grouped dynamically by fundNameForRow rather than a fixed list,
+  // so nothing ends up unbroken-out in a generic "All Remaining" bucket.
+  // Board of County Commissioners and Circuit Court are explicitly mapped
+  // to General Fund despite their own staffing rows' blank Dept_Code,
+  // since their expenditure rows confirm that's their real fund.
+  const PERSONNEL_NAMED_CALLOUT_GROUPS = [
+    { label: "Clerk of Court", match: (r) => normalizeDeptName(r.Dept_Name) === "clerk of circuit court" },
+    { label: "Tax Collector", match: (r) => normalizeDeptName(r.Dept_Name) === "tax collector" },
+    { label: "Property Appraiser", match: (r) => normalizeDeptName(r.Dept_Name) === "property appraiser" },
+    { label: "Supervisor of Elections", match: (r) => normalizeDeptName(r.Dept_Name) === "supervisor of elections" },
+    { label: "Sheriff Fund", match: (r) => normalizeDeptName(r.Dept_Name) === "sheriff" }
+  ];
+  const PERSONNEL_FUND_NAME_OVERRIDES = new Set(["board of county commissioners", "circuit court"]);
+
+  // Code Compliance's two sub-programs read fine as their own staffing
+  // cards on the department's own page (see renderStaffingTable), but on
+  // the Summary of Personnel all-departments schedule they should roll up
+  // into one "Code Compliance" line instead of splitting across two rows.
+  function personnelDeptDisplayName(deptName) {
+    const norm = normalizeDeptName(deptName);
+    if (norm === "code compliance beach" || norm === "code compliance street") return "Code Compliance";
+    return deptName;
+  }
+
+  // One label per staffing row -- the single source of truth for both the
+  // callout cards above and the page's own "Fund" filter dropdown, so every
+  // callout card corresponds to exactly one selectable filter option (and
+  // vice versa) instead of the two drifting apart.
+  function personnelFundLabelForRow(row) {
+    const group = PERSONNEL_NAMED_CALLOUT_GROUPS.find((g) => g.match(row));
+    if (group) return group.label;
+    if (PERSONNEL_FUND_NAME_OVERRIDES.has(normalizeDeptName(row.Dept_Name))) return "General Fund";
+    return fundNameForRow(row);
+  }
+
+  // Shared by the Summary of Personnel page's own callout row and the
+  // Financials directory's "Summary of Personnel" link card (see
+  // financials.html), so both stay in sync with one grouping definition.
+  // Sorted largest to smallest so the biggest funds/offices read first.
+  function getPersonnelFundCallouts(rows) {
+    const totalsByLabel = new Map();
+    rows.forEach((r) => {
+      const label = personnelFundLabelForRow(r);
+      totalsByLabel.set(label, (totalsByLabel.get(label) || 0) + (Number(r[2027]) || 0));
+    });
+    const callouts = [];
+    totalsByLabel.forEach((total, label) => callouts.push({ label, total }));
+    return callouts.sort((a, b) => b.total - a.total);
+  }
+
+  function renderPersonnelFundCallouts(rows) {
+    const callouts = getPersonnelFundCallouts(rows);
+    return (
+      '<div class="wc-personnel-fund-stats">' +
+      callouts.map((c) =>
+        '<button type="button" class="wc-personnel-fund-stat" data-personnel-fund-filter="' + escapeHtml(c.label) + '">' +
+        "<strong>" + formatNumber(c.total) + "</strong><span>" + escapeHtml(c.label) + "</span></button>"
+      ).join("") +
+      "</div>"
+    );
+  }
+
   function renderPersonnelSummary(container) {
     if (!container) return;
     const rows = cache.staffing || [];
@@ -5542,10 +5621,14 @@
     }
 
     const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
-    const fundNames = uniqueSorted(rows.map((r) => fundNameForRow(r)));
+    // Matches the callout cards above one-for-one -- see
+    // personnelFundLabelForRow -- so every card is also a selectable Fund
+    // filter option, not just a static display.
+    const fundNames = uniqueSorted(rows.map((r) => personnelFundLabelForRow(r)));
     const years = [2024, 2025, 2026, 2027];
 
     container.innerHTML =
+      renderPersonnelFundCallouts(rows) +
       '<div class="wc-filter-bar wc-machinery-picker">' +
       '<label class="wc-filter-field"><span>Department</span>' +
       '<select id="wcPersonnelDeptSelect"><option value="">All</option>' +
@@ -5555,18 +5638,21 @@
       '<select id="wcPersonnelFundSelect"><option value="">All</option>' +
       fundNames.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
       "</select></label>" +
+      '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelSortToggle" aria-pressed="false">Sort: Largest to Smallest</button>' +
       "</div>" +
       '<div class="wc-financial-summary-table"></div>';
 
     const deptSelect = container.querySelector("#wcPersonnelDeptSelect");
     const fundSelect = container.querySelector("#wcPersonnelFundSelect");
+    const sortToggle = container.querySelector("#wcPersonnelSortToggle");
     const tableEl = container.querySelector(".wc-financial-summary-table");
+    let sortByFte = false;
 
     function applyFilters() {
       const deptName = deptSelect.value;
       const fundName = fundSelect.value;
       const filtered = rows.filter((r) =>
-        (!deptName || r.Dept_Name === deptName) && (!fundName || fundNameForRow(r) === fundName)
+        (!deptName || r.Dept_Name === deptName) && (!fundName || personnelFundLabelForRow(r) === fundName)
       );
 
       if (!filtered.length) {
@@ -5581,13 +5667,20 @@
         return;
       }
 
-      const deptsInView = uniqueSorted(filtered.map((r) => r.Dept_Name));
       const totalsByDept = new Map();
-      deptsInView.forEach((d) => totalsByDept.set(d, { 2024: 0, 2025: 0, 2026: 0, 2027: 0 }));
       filtered.forEach((r) => {
-        const t = totalsByDept.get(r.Dept_Name);
+        // Code Compliance's two sub-programs (Code Compliance Beach/Street)
+        // are shown as their own staffing cards on the department's own
+        // page, but on this all-departments schedule they should read as
+        // one "Code Compliance" line rather than split across two rows.
+        const name = personnelDeptDisplayName(r.Dept_Name);
+        if (!totalsByDept.has(name)) totalsByDept.set(name, { 2024: 0, 2025: 0, 2026: 0, 2027: 0 });
+        const t = totalsByDept.get(name);
         years.forEach((y) => { t[y] += r[y] || 0; });
       });
+      const deptsInView = sortByFte
+        ? Array.from(totalsByDept.keys()).sort((a, b) => totalsByDept.get(b)[2027] - totalsByDept.get(a)[2027])
+        : uniqueSorted(Array.from(totalsByDept.keys()));
       const grand = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
       totalsByDept.forEach((t) => years.forEach((y) => { grand[y] += t[y]; }));
 
@@ -5613,7 +5706,45 @@
 
     deptSelect.addEventListener("change", applyFilters);
     fundSelect.addEventListener("change", applyFilters);
+    sortToggle.addEventListener("click", () => {
+      sortByFte = !sortByFte;
+      sortToggle.textContent = sortByFte ? "Sort: A to Z" : "Sort: Largest to Smallest";
+      sortToggle.setAttribute("aria-pressed", String(sortByFte));
+      applyFilters();
+    });
+    const calloutButtons = container.querySelectorAll("[data-personnel-fund-filter]");
+    function syncActiveCallout() {
+      calloutButtons.forEach((button) => {
+        button.classList.toggle("is-active", !deptSelect.value && button.dataset.personnelFundFilter === fundSelect.value);
+      });
+    }
+    fundSelect.addEventListener("change", syncActiveCallout);
+    deptSelect.addEventListener("change", syncActiveCallout);
+    calloutButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        deptSelect.value = "";
+        fundSelect.value = button.dataset.personnelFundFilter;
+        applyFilters();
+        syncActiveCallout();
+        tableEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    // Arriving from a Financials directory callout link (?fund=...) lands
+    // pre-filtered to that fund, same as clicking the matching card here
+    // would -- see personnelCalloutsHtml in financials.html.
+    let requestedFund = "";
+    try {
+      requestedFund = new URLSearchParams(window.location.search).get("fund") || "";
+    } catch (e) {
+      requestedFund = "";
+    }
+    if (requestedFund && fundNames.includes(requestedFund)) {
+      fundSelect.value = requestedFund;
+    }
+
     applyFilters();
+    syncActiveCallout();
   }
 
   // A free-text note shown below the Summary of Personnel schedule, sourced
@@ -5735,6 +5866,7 @@
     renderConsolidatedExpenditureBudgetTable,
     renderMachinerySummary,
     renderPersonnelSummary,
+    getPersonnelFundCallouts,
     renderInterfundTransfersOutTable,
     renderInterfundTransfersInTable,
     renderConsolidatedRevenueSummaryTable,

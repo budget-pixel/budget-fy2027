@@ -28,10 +28,14 @@
 </div>
 
 <script src="../assets/walton-budget-search-data.js"></script>
+<script src="../assets/walton-cip-projects.js?v=20260622-project-images-v3"></script>
 <script src="../assets/walton-budget-nav.js?v=20260622-search-dot-cleanup"></script>
 <script src="../assets/walton-budget-pdf.js"></script>
 <script>
   (function(){
+    // "funding" matches each fund schedule page's own renderFundSchedule
+    // config (see walton-cip-fund-schedule.js) so the stats shown here are
+    // computed the exact same way as that page's own FY2027 callouts.
     var pages = [
       {
         title:"Capital Improvement Plan Overview",
@@ -46,27 +50,32 @@
       {
         title:"Capital Projects Fund Schedule",
         href:"cip-capital-projects.html",
-        description:"View the capital projects fund schedule and related project appropriations."
-      },
-      {
-        title:"Grant Funded Schedule",
-        href:"cip-grants.html",
-        description:"Browse capital projects supported by federal, state, and other grant funding sources."
-      },
-      {
-        title:"Sheriff Fund Schedule",
-        href:"cip-sheriff.html",
-        description:"Review capital projects associated with Sheriff and public safety funding."
-      },
-      {
-        title:"Tourist Development Fund Schedule",
-        href:"cip-tourist-development.html",
-        description:"Explore tourism-related capital investments funded through tourist development resources."
+        description:"View the capital projects fund schedule and related project appropriations.",
+        funding:"capital projects fund"
       },
       {
         title:"Transportation Fund Schedule",
         href:"cip-transportation.html",
-        description:"Review transportation capital investments, road work, and infrastructure schedules."
+        description:"Review transportation capital investments, road work, and infrastructure schedules.",
+        funding:"transportation fund"
+      },
+      {
+        title:"Sheriff Fund Schedule",
+        href:"cip-sheriff.html",
+        description:"Review capital projects associated with Sheriff and public safety funding.",
+        funding:"sheriff fund"
+      },
+      {
+        title:"Tourist Development Fund Schedule",
+        href:"cip-tourist-development.html",
+        description:"Explore tourism-related capital investments funded through tourist development resources.",
+        funding:"tourist development fund"
+      },
+      {
+        title:"Grant Funded Schedule",
+        href:"cip-grants.html",
+        description:"Browse capital projects supported by federal, state, and other grant funding sources.",
+        funding:"grant funded"
       }
     ];
 
@@ -78,22 +87,83 @@
         .replace(/"/g, "&quot;");
     }
 
-    function renderDirectory(){
+    function formatMoneyShort(value){
+      var amount = Number(value) || 0;
+      var abs = Math.abs(amount);
+      if(abs >= 1000000){
+        return "$" + (amount / 1000000).toLocaleString("en-US", { maximumFractionDigits:1 }) + "M";
+      }
+      if(abs >= 1000){
+        return "$" + (amount / 1000).toLocaleString("en-US", { maximumFractionDigits:0 }) + "K";
+      }
+      return "$" + Math.round(amount).toLocaleString("en-US");
+    }
+
+    function isLegacyInHouseEngineeringRow(project){
+      var title = String(project.title || "").toLowerCase();
+      var accountCode = String(project.budget_account_code || "").trim();
+      return Boolean(project.is_legacy_in_house_engineering_row) ||
+        title.indexOf("in-house engineering") !== -1 ||
+        accountCode === "534000";
+    }
+
+    function getFy2027Amount(project){
+      var rows = Array.isArray(project.funding_by_year) ? project.funding_by_year : [];
+      var fy2027 = rows.filter(function(r){ return r.year === "FY2027"; });
+      return fy2027.reduce(function(sum, r){ return sum + (Number(r.amount_value) || 0); }, 0);
+    }
+
+    function getInHouseEngineeringAmount(project){
+      if(Number(project.in_house_engineering_value || 0) > 0){
+        return Number(project.in_house_engineering_value) || 0;
+      }
+      var rows = Array.isArray(project.in_house_engineering_rows) ? project.in_house_engineering_rows : [];
+      return rows.reduce(function(sum, r){ return sum + (Number(r.amount_value) || 0); }, 0);
+    }
+
+    function statHtml(modifierClass, value, label){
+      return '<div class="wc-directory-item-stat ' + modifierClass + '"><strong>' + escapeHtml(value) + '</strong><span>' + escapeHtml(label) + '</span></div>';
+    }
+
+    function fundStatsHtml(funding, allProjects){
+      var matching = allProjects.filter(function(p){
+        return String(p.funding || "").toLowerCase() === funding && !isLegacyInHouseEngineeringRow(p);
+      });
+      var budgetTotal = matching.reduce(function(sum, p){ return sum + getFy2027Amount(p); }, 0);
+      var projectCount = matching.filter(function(p){ return getFy2027Amount(p) > 0; }).length;
+      var inHouseTotal = matching.reduce(function(sum, p){ return sum + getInHouseEngineeringAmount(p); }, 0);
+
+      return statHtml("wc-directory-item-stat--fund-budget", formatMoneyShort(budgetTotal), "FY 2027 Budget") +
+        statHtml("wc-directory-item-stat--fund-projects", projectCount.toLocaleString("en-US"), "Number of Projects") +
+        statHtml("wc-directory-item-stat--fund-inhouse", formatMoneyShort(inHouseTotal), "In-House Engineering");
+    }
+
+    function renderDirectory(allProjects){
       var list = document.getElementById("capitalDirectory");
       if(!list) return;
 
       list.innerHTML = pages.map(function(page){
+        var statsHtml = page.funding ? '<div class="wc-directory-item-meta">' + fundStatsHtml(page.funding, allProjects) + '</div>' : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +
             '<span class="wc-directory-item-desc">' + escapeHtml(page.description) + '</span>' +
           '</div>' +
+          statsHtml +
           '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
         '</a></li>';
       }).join("");
     }
 
-    document.addEventListener("DOMContentLoaded", renderDirectory);
+    document.addEventListener("DOMContentLoaded", function(){
+      renderDirectory([]);
+      var ready = window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || []);
+      ready.then(function(projects){
+        renderDirectory(Array.isArray(projects) ? projects : (window.wcCipProjects || []));
+      }).catch(function(){
+        renderDirectory(window.wcCipProjects || []);
+      });
+    });
   })();
 </script>
 </body>

@@ -137,6 +137,25 @@
       return (pct > 0 ? "+" : "") + pct.toFixed(2) + "%";
     }
 
+    function formatTrendDollar(current, prior){
+      if(!prior) return "";
+      var diff = current - prior;
+      var abs = Math.abs(diff);
+      var amount = abs >= 1000000
+        ? "$" + (abs / 1000000).toLocaleString("en-US", { maximumFractionDigits:1 }) + "M"
+        : abs >= 1000
+        ? "$" + Math.round(abs / 1000).toLocaleString("en-US") + "K"
+        : "$" + Math.round(abs).toLocaleString("en-US");
+      return (diff > 0 ? "+" : diff < 0 ? "-" : "") + amount;
+    }
+
+    function formatFteTrend(current, prior){
+      var diff = current - prior;
+      if(!diff) return "";
+      var amount = Math.abs(diff).toLocaleString("en-US", { maximumFractionDigits:2 }).replace(/\.00$/, "");
+      return (diff > 0 ? "+" : "-") + amount;
+    }
+
     function descriptionFromNarrative(text, fallback){
       var clean = String(text || "").replace(/\s+/g, " ").trim();
       if(!clean) return fallback;
@@ -266,6 +285,9 @@
         var fte = staffing.reduce(function(sum, row){
           return rowMatches(row, item.name, group.aliasMap) ? sum + (Number(row["2027"]) || 0) : sum;
         }, 0);
+        var priorFte = staffing.reduce(function(sum, row){
+          return rowMatches(row, item.name, group.aliasMap) ? sum + (Number(row["2026"]) || 0) : sum;
+        }, 0);
 
         return {
           name:item.name,
@@ -273,23 +295,42 @@
           description:descriptionFromNarrative(narrative && narrative.Narrative, group.defaultDescription),
           budget:formatCurrency(budget),
           trend:formatTrend(budget, priorBudget),
+          trendDollar:formatTrendDollar(budget, priorBudget),
           fte:formatFte(fte),
+          fteTrend:formatFteTrend(fte, priorFte),
           fund:fundLabelForItem(budgetRows, fundsByCode)
         };
       });
+    }
+
+    function statBlockHtml(modifierClass, valueHtml, label, trendClass){
+      return '<div class="wc-directory-item-stat ' + modifierClass + '">' +
+        '<strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + '</strong>' +
+        '<span>' + escapeHtml(label) + '</span></div>';
+    }
+
+    function trendValueHtml(trend, trendDollar){
+      if(!trend) return "&mdash;";
+      var dollarHtml = trendDollar ? escapeHtml(trendDollar) : "";
+      return dollarHtml + ' <span class="wc-directory-item-trend-paren">(' + escapeHtml(trend) + ')</span>';
     }
 
     function renderItems(group, items){
       var list = $("#" + group.listId);
       if(!list) return;
 
+      // Every stat renders in the same fixed-width slot, in the same order,
+      // on every row -- even when an entity has no data for it -- so the
+      // columns line up down the whole list instead of shifting left
+      // whenever one entity is missing a fund, trend, or FTE figure.
       list.innerHTML = items.map(function(item){
-        var personnelStat = item.fte === "Not listed" ? "" :
-          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.fte) + '</strong><span>Personnel</span></div>';
-        var fundStat = !item.fund || item.fund === "Not listed" ? "" :
-          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.fund) + '</strong><span>Fund</span></div>';
-        var trendStat = !item.trend ? "" :
-          '<div class="wc-directory-item-stat"><strong class="' + (item.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") + '">' + escapeHtml(item.trend) + '</strong><span>YoY Change</span></div>';
+        var fundStat = statBlockHtml("wc-directory-item-stat--fund", escapeHtml(item.fund && item.fund !== "Not listed" ? item.fund : "Not listed"), "Fund");
+        var budgetStat = statBlockHtml("wc-directory-item-stat--budget", escapeHtml(item.budget), "FY 2027 Budget");
+        var trendClass = item.trend ? (item.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(item.trend, item.trendDollar), "YoY Change", trendClass);
+        var personnelStat = statBlockHtml("wc-directory-item-stat--personnel", escapeHtml(item.fte), "Personnel");
+        var fteTrendClass = item.fteTrend ? (item.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var fteTrendStat = statBlockHtml("wc-directory-item-stat--fte-trend", item.fteTrend ? escapeHtml(item.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass);
         return '<li><a class="wc-directory-item" href="' + escapeHtml(item.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(item.name) + '</span>' +
@@ -297,9 +338,10 @@
           '</div>' +
           '<div class="wc-directory-item-meta">' +
             fundStat +
-            '<div class="wc-directory-item-stat"><strong>' + escapeHtml(item.budget) + '</strong><span>FY 2027 Budget</span></div>' +
+            budgetStat +
             trendStat +
             personnelStat +
+            fteTrendStat +
           '</div>' +
           '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
         '</a></li>';

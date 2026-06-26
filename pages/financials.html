@@ -44,7 +44,7 @@
         title:"Fund Financial Schedules",
         href:"fund-financial-schedules.html",
         label:"Fund Detail",
-        description:"Explore fund-level financial schedules for major operating, special revenue, enterprise, and capital funds."
+        description:"Explore fund-level financial schedules for major operating, special revenue, and capital funds."
       },
       {
         title:"Summary of Revenues",
@@ -68,7 +68,8 @@
         title:"Summary of Personnel",
         href:"summary-of-personnel.html",
         label:"Personnel",
-        description:"See staffing summaries and position counts supporting County services, programs, and operations."
+        description:"See staffing summaries and position counts supporting County services, programs, and operations.",
+        showFteCallouts:true
       },
       {
         title:"Summary of Machinery, Vehicles & Equipment",
@@ -102,19 +103,49 @@
         .replace(/"/g, "&quot;");
     }
 
-    function renderHub(){
+    // Each chip is its own link (not nested inside the row's own
+    // wc-directory-item anchor -- browsers don't support nested links) to
+    // the Personnel page pre-filtered to that fund, so clicking a callout
+    // both navigates there and applies that filter immediately (see the
+    // ?fund= read in initPersonnelSummaryPage).
+    function personnelCalloutsHtml(href, callouts){
+      if(!callouts || !callouts.length) return "";
+      return '<div class="wc-personnel-fund-stats wc-personnel-fund-stats--compact">' +
+        callouts.map(function(c){
+          return '<a class="wc-personnel-fund-stat" href="' + escapeHtml(href) + '?fund=' + encodeURIComponent(c.label) + '">' +
+            '<strong>' + escapeHtml(window.WCBudgetData.formatNumber(c.total)) + '</strong><span>' + escapeHtml(c.label) + '</span></a>';
+        }).join("") +
+        '</div>';
+    }
+
+    function renderHub(personnelCallouts){
       $("#hubList").innerHTML = pages.map(function(page){
-        return '<li><a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
-          '<div class="wc-directory-item-main">' +
-            '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +
-            '<span class="wc-directory-item-desc">' + escapeHtml(page.description) + '</span>' +
-          '</div>' +
-          '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
-        '</a></li>';
+        var calloutsHtml = page.showFteCallouts ? personnelCalloutsHtml(page.href, personnelCallouts) : "";
+        return '<li>' +
+          '<a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
+            '<div class="wc-directory-item-main">' +
+              '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +
+              '<span class="wc-directory-item-desc">' + escapeHtml(page.description) + '</span>' +
+            '</div>' +
+            '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
+          '</a>' +
+          calloutsHtml +
+        '</li>';
       }).join("");
     }
 
-    document.addEventListener("DOMContentLoaded", renderHub);
+    document.addEventListener("DOMContentLoaded", function(){
+      renderHub([]);
+      if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
+        window.WCBudgetData.loadBudgetData()
+          .then(function(data){
+            var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
+            var callouts = staffing.length ? window.WCBudgetData.getPersonnelFundCallouts(staffing) : [];
+            renderHub(callouts);
+          })
+          .catch(function(){ renderHub([]); });
+      }
+    });
   })();
 </script>
 </body>

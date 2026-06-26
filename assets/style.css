@@ -154,18 +154,54 @@ body {
 .wc-directory-item-desc { display: block; margin-top: 4px; color: var(--muted); font-size: .85rem; line-height: 1.55; }
 .wc-directory-item-meta { display: flex; gap: 18px; flex: 0 0 auto; }
 .wc-directory-item-stat { text-align: right; min-width: 84px; }
+/* Each stat sits in a fixed-width slot, in the same order, on every row --
+   so the columns line up down the whole list instead of shifting based on
+   each row's own content length (e.g. a longer fund name or dollar
+   figure). Wide enough for the longest realistic value in each column
+   ("+$24.1M (+12.34%)" for trend) without wrapping. */
+.wc-directory-item-stat--fund { width: 150px; flex: 0 0 150px; }
+.wc-directory-item-stat--budget { width: 80px; flex: 0 0 80px; }
+.wc-directory-item-stat--trend { width: 190px; flex: 0 0 190px; }
+.wc-directory-item-stat--personnel { width: 70px; flex: 0 0 70px; }
+.wc-directory-item-stat--fte-trend { width: 70px; flex: 0 0 70px; }
+.wc-directory-item-stat--fund-budget { width: 90px; flex: 0 0 90px; }
+.wc-directory-item-stat--fund-projects { width: 110px; flex: 0 0 110px; }
+.wc-directory-item-stat--fund-inhouse { width: 130px; flex: 0 0 130px; }
 .wc-directory-item-stat strong { display: block; color: var(--green); font-size: .95rem; font-weight: 800; }
 .wc-directory-item-stat span {
   display: block; margin-top: 2px; color: var(--muted); font-size: .65rem;
   font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
 }
 .wc-directory-item-arrow { flex: 0 0 auto; color: var(--green); font-size: 18px; font-weight: 700; }
+.wc-directory-item-stat strong.wc-directory-item-trend-up,
+.wc-directory-item-stat strong.wc-directory-item-trend-down { white-space: nowrap; }
 .wc-directory-item-stat strong.wc-directory-item-trend-up { color: var(--green); }
 .wc-directory-item-stat strong.wc-directory-item-trend-down { color: #b3261e !important; }
+.wc-directory-item-stat strong span.wc-directory-item-trend-paren {
+  display: inline;
+  margin-top: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 1em;
+  font-weight: inherit;
+  font-family: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
 @media (max-width: 640px) {
   .wc-directory-item { flex-wrap: wrap; }
   .wc-directory-item-meta { width: 100%; justify-content: flex-start; }
   .wc-directory-item-stat { text-align: left; }
+  .wc-directory-item-stat--fund,
+  .wc-directory-item-stat--budget,
+  .wc-directory-item-stat--trend,
+  .wc-directory-item-stat--personnel,
+  .wc-directory-item-stat--fte-trend,
+  .wc-directory-item-stat--fund-budget,
+  .wc-directory-item-stat--fund-projects,
+  .wc-directory-item-stat--fund-inhouse {
+    width: auto; flex: 1 1 calc(50% - 9px);
+  }
 }
 
 /* ── table label (above walton-styled table) ── */
@@ -1255,6 +1291,20 @@ body {
 .wc-department-financial-grid #department-staffing-table .wc-finance-card {
   height: auto;
 }
+/* Departments with multiple sub-programs (e.g. Code Compliance Beach /
+   Code Compliance Street) render one staffing card per sub-program --
+   shown side by side in their own 2-column row instead of stacked flush
+   against each other. Scoped with :has() to departments with more than one
+   card, so the much more common single-staffing-table department still
+   just gets one full-width card. */
+.wc-department-financial-grid #department-staffing-table:has(.wc-finance-card + .wc-finance-card) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.wc-department-financial-grid #department-staffing-table:has(.wc-finance-card + .wc-finance-card) .wc-finance-card {
+  margin: 0;
+}
 .wc-department-financial-grid #department-staffing-table .wc-finance-card-footer {
   margin-top: 16px;
 }
@@ -1266,6 +1316,32 @@ body {
   align-self: start;
 }
 .wc-department-financial-grid .wc-financial-mount-natural-height .wc-finance-card {
+  height: auto;
+}
+
+/* Code Compliance's two-sub-program layout (see
+   arrangeDepartmentFinancialDashboard): the expense mount's stacked cards
+   become independent grid cells so they sit side by side in their own row,
+   instead of stacking inside one column; the revenue mount then spans the
+   full row width underneath both of them. */
+.wc-department-financial-grid .wc-financial-mount-cards-as-row {
+  display: contents;
+}
+/* #department-expense-table's own ID selector (".wc-finance-card +
+   .wc-finance-card { margin-top: 18px }" above, for the normal stacked
+   case) otherwise outweighs a plain class selector here and keeps pushing
+   the second card down even once it's display:contents -- this needs the
+   ID in the selector too just to win that tie. */
+.wc-department-financial-grid #department-expense-table.wc-financial-mount-cards-as-row .wc-finance-card,
+.wc-department-financial-grid .wc-financial-mount-cards-as-row .wc-finance-card {
+  margin: 0;
+  height: 100%;
+}
+.wc-department-financial-grid .wc-financial-mount-full-width {
+  grid-column: 1 / -1;
+  align-self: start;
+}
+.wc-department-financial-grid .wc-financial-mount-full-width .wc-finance-card {
   height: auto;
 }
 
@@ -1777,6 +1853,54 @@ body {
   min-width: 760px;
 }
 
+/* Summary of Personnel's per-fund FTE callouts (see
+   renderPersonnelFundCallouts in budget-data.js). Fixed 6-column grid --
+   with the current 12 callouts that's two even rows; fewer/more callouts
+   just leave a partial last row rather than reflowing column widths. */
+.wc-personnel-fund-stats {
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.wc-personnel-fund-stat {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  padding: 16px 18px; border: 1px solid var(--border);
+  border-radius: 14px; background: #fff; font: inherit; color: inherit;
+  text-decoration: none; transition: border-color .15s ease, transform .15s ease;
+}
+.wc-personnel-fund-stat:hover { border-color: var(--green); transform: translateY(-1px); }
+.wc-personnel-fund-stat.is-active { border-color: var(--green); border-width: 2px; }
+.wc-personnel-fund-stat strong { display: block; color: var(--green); font-size: 1.4rem; font-weight: 800; }
+.wc-personnel-fund-stat span {
+  display: block; margin-top: 4px; color: var(--muted); font-size: .7rem;
+  font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+}
+:root[data-theme="dark"] .wc-personnel-fund-stat { background: rgba(14,28,22,.92); }
+@media (max-width: 900px) {
+  .wc-personnel-fund-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .wc-personnel-fund-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Compact variant used on the Financials directory's "Summary of
+   Personnel" link card (see financials.html) -- same 6-column grid as the
+   page's own callouts (so it's still two rows of 6), just smaller chips so
+   a dozen of them fit inside one directory row. Each chip is its own link
+   to the Personnel page pre-filtered to that fund (?fund=...), sitting
+   beside (not inside) that row's own wc-directory-item link. */
+.wc-personnel-fund-stats--compact { gap: 8px; margin: 14px 22px 18px; }
+.wc-personnel-fund-stats--compact .wc-personnel-fund-stat {
+  padding: 8px 10px; border-radius: 10px; text-decoration: none;
+}
+.wc-personnel-fund-stats--compact .wc-personnel-fund-stat strong { font-size: .9rem; }
+.wc-personnel-fund-stats--compact .wc-personnel-fund-stat span { font-size: .58rem; margin-top: 2px; }
+@media (max-width: 900px) {
+  .wc-personnel-fund-stats--compact { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .wc-personnel-fund-stats--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 .wc-filter-bar {
   display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
   padding: 16px; margin-bottom: 14px;
@@ -1907,6 +2031,9 @@ body {
     display: block;
   }
   .wc-department-financial-grid #department-staffing-table .wc-finance-card-breakdown {
+    grid-template-columns: 1fr;
+  }
+  .wc-department-financial-grid #department-staffing-table:has(.wc-finance-card + .wc-finance-card) {
     grid-template-columns: 1fr;
   }
   .wc-budget-detail-modal {

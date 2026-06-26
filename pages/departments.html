@@ -142,6 +142,25 @@
       return (pct > 0 ? "+" : "") + pct.toFixed(2) + "%";
     }
 
+    function formatTrendDollar(current, prior){
+      if(!prior) return "";
+      var diff = current - prior;
+      var abs = Math.abs(diff);
+      var amount = abs >= 1000000
+        ? "$" + (abs / 1000000).toLocaleString("en-US", { maximumFractionDigits:1 }) + "M"
+        : abs >= 1000
+        ? "$" + Math.round(abs / 1000).toLocaleString("en-US") + "K"
+        : "$" + Math.round(abs).toLocaleString("en-US");
+      return (diff > 0 ? "+" : diff < 0 ? "-" : "") + amount;
+    }
+
+    function formatFteTrend(current, prior){
+      var diff = current - prior;
+      if(!diff) return "";
+      var amount = Math.abs(diff).toLocaleString("en-US", { maximumFractionDigits:2 }).replace(/\.00$/, "");
+      return (diff > 0 ? "+" : "-") + amount;
+    }
+
     function fundCodeForRow(row){
       return String((row && row.Dept_Code) || "").trim().slice(0, 3);
     }
@@ -249,6 +268,9 @@
         var fte = staffing.reduce(function(sum, row){
           return rowMatchesDepartment(row, dept.name) ? sum + (Number(row["2027"]) || 0) : sum;
         }, 0);
+        var priorFte = staffing.reduce(function(sum, row){
+          return rowMatchesDepartment(row, dept.name) ? sum + (Number(row["2026"]) || 0) : sum;
+        }, 0);
 
         return {
           name:dept.name,
@@ -256,22 +278,41 @@
           description:descriptionFromNarrative(narrative && narrative.Narrative),
           budget:formatCurrency(budget),
           trend:formatTrend(budget, priorBudget),
+          trendDollar:formatTrendDollar(budget, priorBudget),
           fte:formatFte(fte),
+          fteTrend:formatFteTrend(fte, priorFte),
           fund:fundLabelForDepartment(dept.name, expenditures, fundsByCode)
         };
       });
     }
 
+    function statBlockHtml(modifierClass, valueHtml, label, trendClass){
+      return '<div class="wc-directory-item-stat ' + modifierClass + '">' +
+        '<strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + '</strong>' +
+        '<span>' + escapeHtml(label) + '</span></div>';
+    }
+
+    function trendValueHtml(trend, trendDollar){
+      if(!trend) return "&mdash;";
+      var dollarHtml = trendDollar ? escapeHtml(trendDollar) : "";
+      return dollarHtml + ' <span class="wc-directory-item-trend-paren">(' + escapeHtml(trend) + ')</span>';
+    }
+
     function renderDepartments(){
       var list = $("#departmentList");
 
+      // Every stat renders in the same fixed-width slot, in the same order,
+      // on every row -- even when a department has no data for it -- so
+      // the columns line up down the whole list instead of shifting left
+      // whenever one department is missing a fund, trend, or FTE figure.
       list.innerHTML = departments.map(function(dept){
-        var personnelStat = dept.fte === "Not listed" ? "" :
-          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fte) + '</strong><span>Personnel</span></div>';
-        var fundStat = !dept.fund || dept.fund === "Not listed" ? "" :
-          '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.fund) + '</strong><span>Fund</span></div>';
-        var trendStat = !dept.trend ? "" :
-          '<div class="wc-directory-item-stat"><strong class="' + (dept.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") + '">' + escapeHtml(dept.trend) + '</strong><span>YoY Change</span></div>';
+        var fundStat = statBlockHtml("wc-directory-item-stat--fund", escapeHtml(dept.fund && dept.fund !== "Not listed" ? dept.fund : "Not listed"), "Fund");
+        var budgetStat = statBlockHtml("wc-directory-item-stat--budget", escapeHtml(dept.budget), "FY 2027 Budget");
+        var trendClass = dept.trend ? (dept.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(dept.trend, dept.trendDollar), "YoY Change", trendClass);
+        var personnelStat = statBlockHtml("wc-directory-item-stat--personnel", escapeHtml(dept.fte), "Personnel");
+        var fteTrendClass = dept.fteTrend ? (dept.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var fteTrendStat = statBlockHtml("wc-directory-item-stat--fte-trend", dept.fteTrend ? escapeHtml(dept.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass);
         return '<li><a class="wc-directory-item" href="' + escapeHtml(dept.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(dept.name) + '</span>' +
@@ -279,9 +320,10 @@
           '</div>' +
           '<div class="wc-directory-item-meta">' +
             fundStat +
-            '<div class="wc-directory-item-stat"><strong>' + escapeHtml(dept.budget) + '</strong><span>FY 2027 Budget</span></div>' +
+            budgetStat +
             trendStat +
             personnelStat +
+            fteTrendStat +
           '</div>' +
           '<span class="wc-directory-item-arrow" aria-hidden="true">&rarr;</span>' +
         '</a></li>';
