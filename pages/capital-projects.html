@@ -121,11 +121,23 @@
       return rows.reduce(function(sum, r){ return sum + (Number(r.amount_value) || 0); }, 0);
     }
 
+    // Bouncing-dots markup shown in place of a real stat value while
+    // wcCipProjectsReady hasn't resolved yet (see style.css's
+    // .wc-loading-dots) -- otherwise renderDirectory([]) renders real-
+    // looking "$0"/"0" stats immediately, which then jump to their real
+    // values once project data loads instead of reading as still-loading.
+    var LOADING_DOTS_HTML = '<span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>';
+
     function statHtml(modifierClass, value, label){
-      return '<div class="wc-directory-item-stat ' + modifierClass + '"><strong>' + escapeHtml(value) + '</strong><span>' + escapeHtml(label) + '</span></div>';
+      return '<div class="wc-directory-item-stat ' + modifierClass + '"><strong>' + value + '</strong><span>' + escapeHtml(label) + '</span></div>';
     }
 
-    function fundStatsHtml(funding, allProjects){
+    function fundStatsHtml(funding, allProjects, isLoading){
+      if(isLoading){
+        return statHtml("wc-directory-item-stat--fund-budget", LOADING_DOTS_HTML, "FY 2027 Budget") +
+          statHtml("wc-directory-item-stat--fund-projects", LOADING_DOTS_HTML, "Number of Projects") +
+          statHtml("wc-directory-item-stat--fund-inhouse", LOADING_DOTS_HTML, "In-House Engineering");
+      }
       var matching = allProjects.filter(function(p){
         return String(p.funding || "").toLowerCase() === funding && !isLegacyInHouseEngineeringRow(p);
       });
@@ -133,17 +145,17 @@
       var projectCount = matching.filter(function(p){ return getFy2027Amount(p) > 0; }).length;
       var inHouseTotal = matching.reduce(function(sum, p){ return sum + getInHouseEngineeringAmount(p); }, 0);
 
-      return statHtml("wc-directory-item-stat--fund-budget", formatMoneyShort(budgetTotal), "FY 2027 Budget") +
-        statHtml("wc-directory-item-stat--fund-projects", projectCount.toLocaleString("en-US"), "Number of Projects") +
-        statHtml("wc-directory-item-stat--fund-inhouse", formatMoneyShort(inHouseTotal), "In-House Engineering");
+      return statHtml("wc-directory-item-stat--fund-budget", escapeHtml(formatMoneyShort(budgetTotal)), "FY 2027 Budget") +
+        statHtml("wc-directory-item-stat--fund-projects", escapeHtml(projectCount.toLocaleString("en-US")), "Number of Projects") +
+        statHtml("wc-directory-item-stat--fund-inhouse", escapeHtml(formatMoneyShort(inHouseTotal)), "In-House Engineering");
     }
 
-    function renderDirectory(allProjects){
+    function renderDirectory(allProjects, isLoading){
       var list = document.getElementById("capitalDirectory");
       if(!list) return;
 
       list.innerHTML = pages.map(function(page){
-        var statsHtml = page.funding ? '<div class="wc-directory-item-meta">' + fundStatsHtml(page.funding, allProjects) + '</div>' : "";
+        var statsHtml = page.funding ? '<div class="wc-directory-item-meta">' + fundStatsHtml(page.funding, allProjects, isLoading) + '</div>' : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +
@@ -156,12 +168,12 @@
     }
 
     document.addEventListener("DOMContentLoaded", function(){
-      renderDirectory([]);
+      renderDirectory([], true);
       var ready = window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || []);
       ready.then(function(projects){
-        renderDirectory(Array.isArray(projects) ? projects : (window.wcCipProjects || []));
+        renderDirectory(Array.isArray(projects) ? projects : (window.wcCipProjects || []), false);
       }).catch(function(){
-        renderDirectory(window.wcCipProjects || []);
+        renderDirectory(window.wcCipProjects || [], false);
       });
     });
   })();

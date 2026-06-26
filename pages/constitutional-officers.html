@@ -110,6 +110,14 @@
         .replace(/"/g, "&quot;");
     }
 
+    // Bouncing-dots markup shown in place of the literal "Loading" text
+    // while loadBudgetData() is in flight (see style.css's .wc-loading-dots).
+    var LOADING_DOTS_HTML = '<span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>';
+
+    function valueOrLoadingHtml(value){
+      return value === "Loading" ? LOADING_DOTS_HTML : escapeHtml(value);
+    }
+
     function normalize(value){
       return String(value || "")
         .toLowerCase()
@@ -325,6 +333,28 @@
       var dedupedExpenditures = Array.isArray(data && data.dedupedExpenseRows) ? data.dedupedExpenseRows : expenditures;
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
 
+      // Property Tax funds a fund two ways: directly, as Ad Valorem Taxes
+      // (Revenue_Code 311000, e.g. General Fund), or via an interfund
+      // transfer FROM a fund that collects it INTO a fund that doesn't
+      // levy it directly (e.g. Sheriff Fund's $98M transfer from the
+      // General Fund, tagged with Note "Property Tax" rather than its own
+      // 311000 line). Both are booked fund-wide under a placeholder
+      // Dept_Name ("Interfund Group Transfer In/Out") rather than to any
+      // individual officer/agency, so this is summed across the whole
+      // revenue sheet per fund rather than attributed to a specific group
+      // -- both General Fund cards (Constitutional Officers and Agencies &
+      // State Mandates) draw on that same fund-wide total since the
+      // revenue itself isn't split between them.
+      var revenues = Array.isArray(data && data.revenues) ? data.revenues : [];
+      var propertyTaxByFund = {};
+      revenues.forEach(function(row){
+        var isDirectPropertyTax = String(row.Revenue_Code || "").trim() === "311000";
+        var isPropertyTaxTransfer = String(row.Note || "").trim() === "Property Tax";
+        if(!isDirectPropertyTax && !isPropertyTaxTransfer) return;
+        var code = String(row.Fund_code || fundCodeForRow(row)).trim();
+        propertyTaxByFund[code] = (propertyTaxByFund[code] || 0) + (Number(row.FY2027_Proposed) || 0);
+      });
+
       function sumForGroup(group, code){
         var items = buildBaseItems(group);
         var totals = { budget:0, priorBudget:0, fte:0, priorFte:0 };
@@ -359,22 +389,41 @@
 
       return FUND_SUMMARY_SPECS.map(function(spec){
         var t = sumForGroup(GROUPS[spec.groupIndex], spec.code);
+        // Property tax is booked fund-wide, not to individual officers or
+        // agencies, so this card's own share of it is estimated as its
+        // share of the whole fund's budget (e.g. Constitutional Officers'
+        // ~$34M out of General Fund's full ~$211M) rather than showing the
+        // whole fund's property tax against just this card's own slice.
+        var wholeFundBudget = expenditures.reduce(function(sum, row){
+          return fundCodeForRow(row) === spec.code ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
+        }, 0);
+        var propertyTaxShare = wholeFundBudget ? (propertyTaxByFund[spec.code] || 0) * (t.budget / wholeFundBudget) : 0;
         return {
           label:spec.label,
           budget:formatCurrency(t.budget),
           trend:formatTrend(t.budget, t.priorBudget),
           trendDollar:formatTrendDollar(t.budget, t.priorBudget),
           fte:formatFte(t.fte),
-          fteTrend:formatFteTrend(t.fte, t.priorFte)
+          fteTrend:formatFteTrend(t.fte, t.priorFte),
+          propertyTax:propertyTaxShare ? formatCurrency(propertyTaxShare) : ""
         };
       });
     }
 
+    // sublines is an optional array of { label, value } pairs (value
+    // already-escaped HTML) shown indented under this chip's own
+    // label/value row -- see the Budget chip's "Property Tax Allocation"
+    // line in renderFundSummary.
     function fundChipHtml(value, label, trendClass){
       return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">' + escapeHtml(label) + '</span><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + value + '</strong></div>';
     }
 
     function fundTrendChipHtml(trendDollar, trendPercent, trendClass){
+      if(trendDollar === "Loading"){
+        return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">YoY Change</span>' +
+          '<span class="wc-dept-fund-chip-value-wrap"><strong>' + LOADING_DOTS_HTML + '</strong>' +
+          '<span class="wc-dept-fund-chip-percent">' + LOADING_DOTS_HTML + "</span></span></div>";
+      }
       var valueHtml = trendDollar ? escapeHtml(trendDollar) : "&mdash;";
       var percentHtml = (trendDollar && trendPercent)
         ? '<span class="wc-dept-fund-chip-percent">' + escapeHtml(trendPercent) + "</span>"
@@ -387,15 +436,19 @@
       var el = $("#officerFundSummary");
       if(!el) return;
       el.innerHTML = fundSummaries.map(function(f){
-        var trendClass = f.trendDollar ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
-        var fteTrendClass = f.fteTrend ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var trendClass = (f.trendDollar && f.trendDollar !== "Loading") ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var fteTrendClass = (f.fteTrend && f.fteTrend !== "Loading") ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var propertyTaxValueHtml = f.propertyTax === "Loading"
+          ? LOADING_DOTS_HTML
+          : escapeHtml(f.propertyTax || "$0");
         return '<div class="wc-dept-fund-card">' +
           '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +
           '<div class="wc-dept-fund-card-chips">' +
-            fundChipHtml(escapeHtml(f.budget), "Budget") +
+            fundChipHtml(valueOrLoadingHtml(f.budget), "Budget") +
+            fundChipHtml(propertyTaxValueHtml, "Property Tax") +
             fundTrendChipHtml(f.trendDollar, f.trend, trendClass) +
-            fundChipHtml(escapeHtml(f.fte), "Personnel") +
-            fundChipHtml(f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass) +
+            fundChipHtml(valueOrLoadingHtml(f.fte), "Personnel") +
+            fundChipHtml(f.fteTrend === "Loading" ? LOADING_DOTS_HTML : (f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;"), "YoY FTE", fteTrendClass) +
           '</div>' +
         '</div>';
       }).join("");
@@ -408,9 +461,17 @@
     }
 
     function trendValueHtml(trend, trendDollar){
+      if(trend === "Loading") return LOADING_DOTS_HTML;
       if(!trend) return "&mdash;";
       var dollarHtml = trendDollar ? escapeHtml(trendDollar) : "";
       return dollarHtml + ' <span class="wc-directory-item-trend-paren">(' + escapeHtml(trend) + ')</span>';
+    }
+
+    // "Loading" isn't a real up/down value, so it shouldn't pick up the
+    // green/red trend color while the page is still loading.
+    function trendClassFor(trend){
+      if(!trend || trend === "Loading") return "";
+      return trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up";
     }
 
     function renderItems(group, items){
@@ -426,14 +487,12 @@
       // does), so that pair is dropped entirely instead of showing a
       // "Not listed"/"—" placeholder on rows with nothing to show.
       list.innerHTML = items.map(function(item){
-        var fundStat = statBlockHtml("wc-directory-item-stat--fund", escapeHtml(item.fund && item.fund !== "Not listed" ? item.fund : "Not listed"), "Fund");
-        var budgetStat = statBlockHtml("wc-directory-item-stat--budget", escapeHtml(item.budget), "FY 2027 Budget");
-        var trendClass = item.trend ? (item.trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
-        var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(item.trend, item.trendDollar), "YoY Change", trendClass);
+        var fundStat = statBlockHtml("wc-directory-item-stat--fund", item.fund === "Loading" ? LOADING_DOTS_HTML : escapeHtml(item.fund && item.fund !== "Not listed" ? item.fund : "Not listed"), "Fund");
+        var budgetStat = statBlockHtml("wc-directory-item-stat--budget", valueOrLoadingHtml(item.budget), "FY 2027 Budget");
+        var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(item.trend, item.trendDollar), "YoY Change", trendClassFor(item.trend));
         var hasFte = item.fte && item.fte !== "Not listed";
-        var personnelStat = hasFte ? statBlockHtml("wc-directory-item-stat--personnel", escapeHtml(item.fte), "Personnel") : "";
-        var fteTrendClass = item.fteTrend ? (item.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
-        var fteTrendStat = hasFte ? statBlockHtml("wc-directory-item-stat--fte-trend", item.fteTrend ? escapeHtml(item.fteTrend) : "&mdash;", "YoY FTE", fteTrendClass) : "";
+        var personnelStat = hasFte ? statBlockHtml("wc-directory-item-stat--personnel", valueOrLoadingHtml(item.fte), "Personnel") : "";
+        var fteTrendStat = hasFte ? statBlockHtml("wc-directory-item-stat--fte-trend", item.fteTrend === "Loading" ? LOADING_DOTS_HTML : (item.fteTrend ? escapeHtml(item.fteTrend) : "&mdash;"), "YoY FTE", trendClassFor(item.fteTrend)) : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(item.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(item.name) + '</span>' +
@@ -461,12 +520,30 @@
             description:descriptionFromNarrative("", group.defaultDescription),
             budget:"Loading",
             fte:"Loading",
-            fund:"Loading"
+            fund:"Loading",
+            trend:"Loading",
+            trendDollar:"Loading",
+            fteTrend:"Loading"
           };
         });
         renderItems(group, loadingItems);
         return { group:group, baseItems:baseItems };
       });
+
+      // Render the fund summary cards with placeholder values immediately
+      // (rather than leaving the section empty until loadBudgetData
+      // resolves) so the directory lists below don't shift down once the
+      // real cards pop in -- without this, clicking an officer/agency link
+      // quickly after the page loads but before data arrives can land on
+      // the wrong link once the layout shifts.
+      renderFundSummary(FUND_SUMMARY_SPECS.map(function(spec){
+        // trendDollar/trend both need a truthy placeholder (not "") so the
+        // YoY Change chip's % subline renders during loading too -- see
+        // fundTrendChipHtml's loading branch -- otherwise the placeholder
+        // card is one line shorter than the real card, shifting the
+        // directory lists below once real data with a % arrives.
+        return { label:spec.label, budget:"Loading", trend:"Loading", trendDollar:"Loading", fte:"Loading", fteTrend:"Loading", propertyTax:"Loading" };
+      }));
 
       if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
         window.WCBudgetData.loadBudgetData()
@@ -485,7 +562,10 @@
                   description:descriptionFromNarrative("", entry.group.defaultDescription),
                   budget:"Not listed",
                   fte:"Not listed",
-                  fund:"Not listed"
+                  fund:"Not listed",
+                  trend:"",
+                  trendDollar:"",
+                  fteTrend:""
                 };
               }));
             });

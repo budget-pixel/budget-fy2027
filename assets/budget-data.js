@@ -16,6 +16,11 @@
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
+  // Bouncing-dots markup (see style.css's .wc-loading-dots) appended to the
+  // plain loading text so it's visually obvious data is still in flight,
+  // not just a static label.
+  const LOADING_MESSAGE_HTML = escapeHtml(LOADING_MESSAGE) +
+    ' <span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>';
   const ERROR_MESSAGE = "Budget data could not be loaded. Please try again later.";
   const HISTORICAL_ACTUAL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
   const SUPABASE_CLIENT_SCRIPT = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
@@ -4300,7 +4305,7 @@
     if (!sections.length) return;
 
     sections.forEach((s) => {
-      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
     });
 
     loadBudgetData()
@@ -4627,7 +4632,7 @@
     if (!sections.length) return;
 
     sections.forEach((s) => {
-      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
     });
 
     loadBudgetData()
@@ -5397,7 +5402,7 @@
     const first = containers.find(Boolean);
     if (first) {
       first.hidden = false;
-      first.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+      first.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
     }
   }
 
@@ -5784,7 +5789,7 @@
     const container = document.getElementById("machinery-summary");
     if (!container) return;
 
-    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
 
     loadBudgetData()
       .then((data) => {
@@ -6109,7 +6114,7 @@
     if (!container) return;
     const notesContainer = document.getElementById("personnel-summary-notes");
 
-    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
 
     loadBudgetData()
       .then((data) => {
@@ -6131,7 +6136,7 @@
     if (!container) return;
     const type = container.dataset.summaryType === "revenues" ? "revenues" : "expenses";
 
-    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
 
     loadBudgetData()
       .then((data) => {
@@ -6151,7 +6156,7 @@
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    container.innerHTML = '<div class="wc-data-loading">' + escapeHtml(LOADING_MESSAGE) + "</div>";
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
 
     loadBudgetData()
       .then((data) => {
