@@ -1,0 +1,298 @@
+# Accessibility Verification Checklist
+
+Date: June 27, 2026
+
+## Scope
+
+Browser verification was run against the local static site at:
+
+```text
+http://127.0.0.1:8765/
+```
+
+No financial logic, Supabase logic, or hidden/admin-only dark mode styles were changed as part of this verification pass.
+
+## Local Tooling Inventory
+
+- `package.json`: present
+- `package-lock.json`: present
+- `node_modules`: present
+- Local Playwright dependency: present
+- Chromium browser binary: present
+- Lighthouse dependency/config: not present
+- axe dependency/config: not present
+- Shell `node`: available, `v24.18.0`
+- Shell `npm`: available, `11.16.0`
+- Shell `npx`: available
+
+Note: Chromium launch required unsandboxed command execution in this environment because sandboxed launch failed with a macOS Mach port permission error.
+
+## Local Server Checks
+
+A static server was already running at:
+
+```sh
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+
+The following pages loaded with HTTP `200` in Chromium:
+
+- Home page: `/index.html`
+- Accessibility page: `/pages/accessibility.html`
+- Financial forecast page: `/pages/financial-forecast.html`
+- Fund financial schedule page: `/pages/fund-financial-schedules.html`
+- Department page: `/pages/departments.html`
+
+## Browser Console Checks
+
+No browser console errors, page errors, or failed local asset requests were detected on:
+
+- `/index.html`
+- `/pages/accessibility.html`
+- `/pages/financial-forecast.html`
+- `/pages/fund-financial-schedules.html`
+- `/pages/departments.html`
+
+## Accessibility Page
+
+- `/pages/accessibility.html` loaded successfully.
+- The page has exactly one `<h1>`.
+- The page has one `#main-content` target.
+- No duplicate `#main-content` target was detected.
+- Footer renders once.
+- Footer Accessibility link renders once.
+
+## Footer Accessibility Link
+
+Footer Accessibility link was present once and resolved correctly from:
+
+- Home page: `pages/accessibility.html`
+- Accessibility page: `accessibility.html`
+- Financial forecast page: `accessibility.html`
+- Fund financial schedule page: `accessibility.html`
+- Department page: `accessibility.html`
+
+## Skip Link
+
+The skip link was verified by keyboard on all tested pages.
+
+- The first Tab focused `Skip to main content`.
+- The skip link became visible on focus.
+- Pressing Enter moved the URL hash to `#main-content`.
+- Focus moved to the main content target:
+  - Home page: `<main id="main-content">`
+  - Shared pages: injected `<span id="main-content" tabindex="-1">`
+
+## Keyboard Tab Order Smoke Test
+
+Keyboard Tab order was smoke-tested after using the skip link on:
+
+- Home page
+- Accessibility page
+- Financial forecast page
+- Fund financial schedule page
+- Department page
+
+Observed focus moved through expected interactive controls such as section links, project cards, footer controls, forecast detail toggles, forecast sort buttons, fund schedule toggles, and department directory links.
+
+## Tables
+
+Financial forecast page:
+
+- Rendered 20 tables.
+- Rendered 20 screen-reader-only table captions.
+- First table header alignment checked:
+  - `Line`
+  - `FY 2027 Baseline`
+  - `FY 2028 Forecast`
+  - `FY 2029 Forecast`
+  - `FY 2030 Forecast`
+- First table contained 6 headers and 5 body rows.
+
+Fund financial schedule page:
+
+- Rendered 102 tables.
+- First table contained headers and body rows.
+- First table header alignment checked:
+  - `ROW LABELS`
+  - `FY 2020 ACTUAL`
+  - `FY 2021 ACTUAL`
+  - `FY 2022 ACTUAL`
+  - `FY 2023 ACTUAL`
+- Detected 118 interactive/clickable table controls or values.
+
+## Expandable Table / Detail Interaction
+
+Financial forecast page:
+
+- First `Category Forecast Detail` summary was keyboard-focused.
+- Pressing Enter opened the detail section.
+
+Fund financial schedule page:
+
+- Detected 32 fund activity toggle rows.
+- First `Revenues` row was keyboard-focused.
+- Pressing Enter changed `aria-expanded` from `false` to `true`.
+- No console errors fired during the interaction.
+
+## Financial Forecast Render
+
+The financial forecast page rendered successfully.
+
+- Major fund cards rendered: 6
+- Forecast tables rendered inside `#financial-forecast`: 20
+- Forecast text included FY 2027 baseline through FY 2031 forecast values.
+
+## Items Not Run
+
+- Lighthouse accessibility audit was not run because Lighthouse is not installed in the repo and was not approved to be added.
+- axe audit was not run because axe is not installed in the repo and was not approved to be added.
+
+## Second Browser Verification Pass
+
+Date: June 27, 2026
+
+### Pages Tested
+
+- `/index.html`
+- `/pages/accessibility.html`
+- `/pages/financial-forecast.html`
+- `/pages/fund-financial-schedules.html`
+- `/pages/departments.html`
+- `/pages/building-construction-and-maintenance.html`
+- `/pages/transactions.html` through a public actual-amount drilldown link
+
+### Viewports Tested
+
+- Desktop: `1280 x 900`
+- Mobile/narrow: `375 x 812`
+- 200% zoom equivalent: `640 x 900`
+
+### Modal / Transaction Interaction Result
+
+Test page:
+
+- `/pages/building-construction-and-maintenance.html`
+
+Budget Lines modal:
+
+- `View Budget Lines` button was keyboard reachable.
+- Pressing Enter opened the Budget Lines modal.
+- Focus moved into the modal and landed on the close button.
+- Close button was keyboard reachable.
+- Close button accessible name: `Close budget detail`.
+- Escape closed the modal.
+- Focus returned to the triggering `View Budget Lines` button.
+- No console errors occurred.
+
+Transaction drilldown:
+
+- After enabling prior years in the Budget Lines modal, visible actual-amount links were keyboard reachable.
+- First tested actual link text: `$1,520,912`.
+- Accessible name after fix: `View FY 2020 Actual transaction detail for Regular Salaries & Wages actual amount $1,520,912`.
+- Pressing Enter opened `/pages/transactions.html`.
+- Pressing Space also opened `/pages/transactions.html` after the narrow key activation fix.
+- Transaction page loaded with heading `Transactions for Regular Salaries & Wages — 512000`.
+- No console errors occurred during the tested interaction.
+
+### Mobile Menu Result
+
+Home page mobile menu:
+
+- Tested at `375 x 812`.
+- Menu button was keyboard reachable.
+- Menu button accessible name: `Open navigation menu`.
+- Pressing Enter changed `aria-expanded` from `false` to `true`.
+- Menu links were keyboard reachable.
+- Escape changed `aria-expanded` back to `false` after the narrow Escape-close fix.
+- Focus remained on the menu button after Escape.
+- No console errors occurred.
+
+Shared page mobile menu:
+
+- Tested on `/pages/financial-forecast.html` at `375 x 812`.
+- Menu button was keyboard reachable.
+- Menu button accessible name: `Open navigation menu`.
+- Pressing Enter changed `aria-expanded` from `false` to `true`.
+- Menu links and following page controls were keyboard reachable.
+- Escape changed `aria-expanded` back to `false` after the narrow Escape-close fix.
+- Focus remained on the menu button after Escape.
+- No console errors occurred.
+
+### 200% Zoom Result
+
+Viewport used as a 200% zoom equivalent:
+
+- `640 x 900`
+
+Pages checked:
+
+- `/index.html`
+- `/pages/accessibility.html`
+- `/pages/financial-forecast.html`
+- `/pages/fund-financial-schedules.html`
+
+Results:
+
+- Skip link remained visible on focus.
+- Footer remained reachable.
+- No page-level horizontal scrolling was detected.
+- Financial Forecast used intentional table scroll areas.
+- Fund Financial Schedule used intentional table scroll areas.
+- Fresh-page rerun confirmed no console errors on the Accessibility page or Financial Forecast page.
+
+### Narrow Viewport Result
+
+Viewport:
+
+- `375 x 812`
+
+Pages checked:
+
+- `/index.html`
+- `/pages/accessibility.html`
+- `/pages/financial-forecast.html`
+- `/pages/fund-financial-schedules.html`
+
+Results:
+
+- Skip link remained visible on focus.
+- Footer remained reachable.
+- No page-level horizontal scrolling was detected.
+- Financial Forecast tables remained inside intentional horizontal table scroll regions.
+- Fund Financial Schedule tables remained inside intentional horizontal table scroll regions.
+- Buttons and links tested in the mobile menu remained keyboard reachable.
+
+### Chart / Data-Equivalent Result
+
+Financial Forecast:
+
+- Rendered 6 major fund forecast sections.
+- Rendered 20 forecast tables.
+- No visual-only forecast chart was detected in this pass.
+- Forecast values shown visually are available in tables.
+- Forecast tables include FY 2027 baseline through FY 2031 forecast values.
+- Tooltips or chart-only interactions were not the only place key forecast values appeared.
+
+### Issues Found
+
+- Actual-amount transaction drilldown links had a weak accessible name because the link text was only the formatted dollar amount.
+- Space key did not activate transaction drilldown links.
+- Mobile menu Escape behavior was not implemented for the home page or shared page menu.
+
+### Fixes Made
+
+- Added descriptive `aria-label` text to actual-amount transaction drilldown links in `assets/budget-data.js`.
+- Added Space key activation for `.wc-actual-drilldown-link` in `assets/budget-data.js`.
+- Added Escape-to-close behavior for the shared mobile menu in `assets/walton-budget-nav.js`.
+- Added Escape-to-close behavior for the custom home page mobile menu in `index.html`.
+- Bumped `budget-data.js` cache keys to `20260627-a11y-drilldown-labels`.
+- Bumped `walton-budget-nav.js` cache keys to `20260627-accessibility-menu`.
+
+### Items Still Pending
+
+- Lighthouse audit has not been run.
+- axe audit has not been run.
+- A full WCAG/ADA compliance claim has not been made.
+- A complete manual screen reader pass has not been run.
+- A complete page-by-page keyboard audit across every public page has not been run.

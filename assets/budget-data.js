@@ -2038,8 +2038,10 @@
           priorYearColumns.map((c) => {
             const href = transactionHrefForBudgetLine(r, c, drilldownFields);
             const value = formatCurrency(budgetLineColumnAmount(r, c, isExpense));
+            const drilldownLabel = "View " + c.label + " transaction detail for " +
+              (r[nameField] || r[codeField] || "this budget line") + " actual amount " + value;
             return '<td class="wc-num wc-prior-year">' +
-              (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '">' + value + "</a>" : value) +
+              (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(drilldownLabel) + '">' + value + "</a>" : value) +
               "</td>";
           }).join("") +
           '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
@@ -2162,6 +2164,13 @@
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeBudgetDetailModal();
+    if ((event.key === " " || event.key === "Spacebar") && event.target && event.target.closest) {
+      const drilldownLink = event.target.closest(".wc-actual-drilldown-link");
+      if (drilldownLink) {
+        event.preventDefault();
+        drilldownLink.click();
+      }
+    }
   });
 
   function openBudgetDetailModal(toggle, detail) {
@@ -2294,6 +2303,7 @@
     const bodyRows = options.bodyRows || [];
     if (!bodyRows.length) return "";
     const captionHtml = options.caption ? '<p class="wc-table-label">' + escapeHtml(options.caption) + "</p>" : "";
+    const tableCaptionHtml = options.caption ? '<caption class="wc-sr-only">' + escapeHtml(options.caption) + "</caption>" : "";
     const headerHtml = options.toggleHtml
       ? '<div class="wc-table-label-row">' + captionHtml + options.toggleHtml + "</div>"
       : captionHtml;
@@ -2302,10 +2312,11 @@
       headerHtml +
       '<div class="wc-data-table-scroll">' +
       '<table class="wc-data-table">' +
+      tableCaptionHtml +
       "<thead><tr>" +
       columns.map((c) => {
         const classes = (c.num ? ["wc-num"] : []).concat(c.classes || []);
-        return '<th class="' + classes.join(" ") + '">' + escapeHtml(c.label) + "</th>";
+        return '<th scope="col" class="' + classes.join(" ") + '">' + escapeHtml(c.label) + "</th>";
       }).join("") +
       "</tr></thead>" +
       "<tbody>" + bodyRows.join("") + "</tbody>" +
@@ -3326,7 +3337,7 @@
   // per department referencing it -- which is what was inflating General
   // Government Taxes (dominated by the Ad Valorem line) on this page.
   // FY2027 Proposed is left alone: it comes straight from the sheet's own
-  // itemized budget lines, which legitimately differ row to row.
+  // itemized budget lines, which can legitimately share org/code values.
   function forecastCategoryRows(lineType, fundCode, yearField) {
     const needsDedup = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(yearField);
     const categoryField = lineType === "expense" ? "Object_Type" : "Revenue_Type";

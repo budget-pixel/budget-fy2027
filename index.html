@@ -49,6 +49,30 @@
   a{color:inherit}
   img{max-width:100%;display:block}
 
+  .wc-skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:10000;
+    transform:translateY(-160%);
+    display:inline-flex;
+    align-items:center;
+    min-height:44px;
+    padding:10px 14px;
+    border:2px solid #0b4b3a;
+    border-radius:6px;
+    background:#ffffff;
+    color:#063b2d;
+    font:700 15px/1.2 Arial, Helvetica, sans-serif;
+    text-decoration:none;
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+  }
+  .wc-skip-link:focus{
+    transform:translateY(0);
+    outline:3px solid var(--wc-gold);
+    outline-offset:3px;
+  }
+
   .wc-home-shell{
     width:min(1440px, calc(100% - 32px));
     margin:0 auto;
@@ -1137,6 +1161,7 @@
 </style>
 </head>
 <body>
+<a class="wc-skip-link" href="#main-content">Skip to main content</a>
 <section class="wc-hero" id="top" aria-label="Walton County FY 2027 Proposed Budget">
   <nav id="nav-menu" class="wc-story-nav nav-menu" aria-label="Primary navigation">
     <div class="logo-container"></div>
@@ -1171,7 +1196,7 @@
 </section>
 
 <div class="wc-home-shell">
-  <main>
+  <main id="main-content" tabindex="-1">
     <section class="wc-section wc-reveal" id="budget">
       <div class="wc-section-heading">
         <div>
@@ -1232,6 +1257,7 @@
     </div>
     <nav class="wc-footer-links" aria-label="Footer utility links">
       <a href="mailto:budget@mywaltonfl.gov">Contact Budget Office</a>
+      <a href="pages/accessibility.html">Accessibility</a>
     </nav>
   </footer>
 </div>
@@ -1239,7 +1265,7 @@
 <script src="assets/walton-split-logo.js"></script>
 <script src="assets/walton-budget-search-data.js"></script>
 <script src="assets/walton-budget-search.js?v=20260622-search-input-cleanup"></script>
-<script src="assets/budget-data.js?v=20260626-personnel-left-mobile"></script>
+<script src="assets/budget-data.js?v=20260627-a11y-drilldown-labels"></script>
 <script src="assets/walton-cip-projects.js?v=20260622-project-images-v3"></script>
 <script>
   (function(){
@@ -1398,6 +1424,11 @@
       document.addEventListener("keydown", function(e){
         if(e.key === "Escape" && nav.classList.contains("is-search-open")){
           closeSearch();
+        }
+        if(e.key === "Escape" && nav.classList.contains("is-menu-open")){
+          nav.classList.remove("is-menu-open");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.focus({ preventScroll:true });
         }
       });
     }

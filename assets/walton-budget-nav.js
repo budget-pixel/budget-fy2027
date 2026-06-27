@@ -527,6 +527,40 @@
     max-width:100% !important;
     overflow-x:hidden !important;
   }
+  .wc-sr-only{
+    position:absolute !important;
+    width:1px !important;
+    height:1px !important;
+    padding:0 !important;
+    margin:-1px !important;
+    overflow:hidden !important;
+    clip:rect(0, 0, 0, 0) !important;
+    white-space:nowrap !important;
+    border:0 !important;
+  }
+  .wc-skip-link{
+    position:absolute !important;
+    top:12px !important;
+    left:12px !important;
+    z-index:10000 !important;
+    transform:translateY(-160%) !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    min-height:44px !important;
+    padding:10px 14px !important;
+    border:2px solid #0b4b3a !important;
+    border-radius:6px !important;
+    background:#ffffff !important;
+    color:#063b2d !important;
+    font:700 15px/1.2 Arial, sans-serif !important;
+    text-decoration:none !important;
+    box-shadow:0 8px 20px rgba(0,0,0,.18) !important;
+  }
+  .wc-skip-link:focus{
+    transform:translateY(0) !important;
+    outline:3px solid #d1be78 !important;
+    outline-offset:3px !important;
+  }
   img,
   svg,
   canvas,
@@ -1835,6 +1869,22 @@
     if(!nav){
       return;
     }
+    var main = document.querySelector("main#content") || document.querySelector("main");
+    if(main && !document.getElementById("main-content")){
+      var mainTarget = document.createElement("span");
+      mainTarget.id = "main-content";
+      mainTarget.className = "wc-sr-only";
+      mainTarget.setAttribute("tabindex", "-1");
+      mainTarget.textContent = "Main content";
+      main.insertBefore(mainTarget, main.firstChild);
+    }
+    if(!document.querySelector(".wc-skip-link")){
+      var skipLink = document.createElement("a");
+      skipLink.className = "wc-skip-link";
+      skipLink.href = "#main-content";
+      skipLink.textContent = "Skip to main content";
+      document.body.insertBefore(skipLink, document.body.firstChild);
+    }
     if(!nav.querySelector(".wc-nav-links")){
       var linksWrap = document.createElement("div");
       linksWrap.className = "wc-nav-links";
@@ -1941,6 +1991,11 @@
       document.addEventListener("keydown", function(e){
         if(e.key === "Escape" && nav.classList.contains("is-search-open")){
           closeNavSearch();
+        }
+        if(e.key === "Escape" && nav.classList.contains("is-menu-open")){
+          nav.classList.remove("is-menu-open");
+          menuToggle.setAttribute("aria-expanded", "false");
+          menuToggle.focus({ preventScroll:true });
         }
       });
     }
@@ -2186,6 +2241,7 @@
       footer.insertBefore(footerContainer, footer.firstChild);
     }
     footer.classList.add("wc-search-footer");
+    var accessibilityHref = /\/pages\//.test(window.location.pathname) ? "accessibility.html" : "pages/accessibility.html";
     var desiredFooterHtml = `
       <div class="wc-budget-footer-inner">
         <div class="wc-footer-search-copy">
@@ -2201,6 +2257,7 @@
       </div>
       <nav class="wc-budget-footer-links" aria-label="Footer utility links">
         <a href="mailto:budget@mywaltonfl.gov">Contact Budget Office</a>
+        <a href="${accessibilityHref}">Accessibility</a>
       </nav>
     `;
     if(footerContainer.getAttribute("data-wc-rendered") !== "true" || footerContainer.innerHTML.trim() !== desiredFooterHtml.trim()){
