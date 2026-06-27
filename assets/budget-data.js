@@ -623,7 +623,7 @@
       const dept = deptByCode.get(targetOrg);
       const deptName = needsOwnProjectScope
         ? "Statutory & Other"
-        : (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Name))) ? dept.Dept_Name : UNCLASSIFIED_DEPT_NAME;
+        : DEPT_CODE_NAME_OVERRIDES.get(targetOrg) || resolveSynthesizedDeptName(dept, knownDeptNames);
       const expense = coaExpenses.get(object);
 
       extraRows.push({
@@ -668,7 +668,7 @@
       seenNewKeys.add(key);
 
       const dept = deptByCode.get(org);
-      const deptName = (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Name))) ? dept.Dept_Name : UNCLASSIFIED_DEPT_NAME;
+      const deptName = DEPT_CODE_NAME_OVERRIDES.get(org) || resolveSynthesizedDeptName(dept, knownDeptNames);
       const revenue = coaRevenueCodes.get(object);
 
       extraRows.push({
@@ -1407,6 +1407,33 @@
   // than treating "201" as a fund of its own anywhere a row's fund is
   // determined.
   const DEPT_CODE_FUND_OVERRIDES = new Map([["20146000", "001"]]);
+
+  // org 20146000's own synthesized row (see considerRow below) finds no
+  // match in the department catalog, so it would otherwise fall back to
+  // the generic "Unclassified" Dept_Name -- but it's an Infrastructure
+  // (Object_Code 563000) line, the same kind of spending already booked
+  // under fund 300's own "Capital Projects" Dept_Name elsewhere (e.g. org
+  // 30047030). Naming it "Capital Projects" here too means the Summary of
+  // Expenses' Transportation activity chart groups it with that same
+  // series instead of showing a separate, unhelpful "Unclassified" slice.
+  const DEPT_CODE_NAME_OVERRIDES = new Map([["20146000", "Capital Projects"]]);
+
+  // A synthesized row's catalog entry (the activities sheet) often carries
+  // a Dept_Name too specific/inconsistent to match any real Dept_Name used
+  // in the main expenditures/revenues sheets (e.g. "Supervisor of Elections
+  // - Federal Elections Grant", "Human Resources (JAD)") -- knownDeptNames
+  // rejects those, same as it should. But the same catalog row's Dept_Group
+  // column is the clean rollup name for exactly this case ("Supervisor of
+  // Elections", "Human Resources"), so it's tried next, before falling all
+  // the way to the generic "Unclassified" -- but only when Dept_Group
+  // itself is a real, known department name, so a financial/category
+  // Dept_Group (e.g. "Ad Valorem Taxes", "Debt Service") never leaks in as
+  // a fake department.
+  function resolveSynthesizedDeptName(dept, knownDeptNames) {
+    if (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Name))) return dept.Dept_Name;
+    if (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Group))) return dept.Dept_Group;
+    return UNCLASSIFIED_DEPT_NAME;
+  }
 
   function fundCodeForRow(row) {
     const deptCode = String((row && row.Dept_Code) || "").trim();
