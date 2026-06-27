@@ -291,8 +291,69 @@ Financial Forecast:
 
 ### Items Still Pending
 
-- Lighthouse audit has not been run.
 - axe audit has not been run.
 - A full WCAG/ADA compliance claim has not been made.
+- A complete manual screen reader pass has not been run.
+- A complete page-by-page keyboard audit across every public page has not been run.
+
+## Lighthouse Accessibility Audit
+
+Date: June 27, 2026
+
+Lighthouse was run as an automated accessibility check only against the local site at:
+
+```text
+http://127.0.0.1:8765/
+```
+
+Lighthouse does not establish full ADA or WCAG compliance. Scores below reflect only the automated Lighthouse accessibility category for the tested pages.
+
+### Pages Audited
+
+Initial audited pages:
+
+- `/`
+- `/pages/accessibility.html`
+- `/pages/financial-forecast.html`
+- `/pages/fund-financial-schedules.html`
+- `/pages/departments.html`
+
+Initial scores and issues:
+
+| Page | Initial Score | Lighthouse Issues |
+| --- | ---: | --- |
+| `/` | 96 | Footer utility links failed `color-contrast`. |
+| `/pages/accessibility.html` | 96 | Footer utility links failed `color-contrast`; logo link failed `label-content-name-mismatch`. |
+| `/pages/financial-forecast.html` | 96 | Footer utility links failed `color-contrast`; logo link failed `label-content-name-mismatch`. |
+| `/pages/fund-financial-schedules.html` | 96 | Footer utility links failed `color-contrast`; logo link failed `label-content-name-mismatch`. |
+| `/pages/departments.html` | 96 | Footer utility links failed `color-contrast`; logo link failed `label-content-name-mismatch`. |
+
+### Lighthouse Fixes Made
+
+- Darkened public light-theme home footer utility links in `index.html`.
+- Darkened public light-theme shared footer utility links in `assets/walton-budget-nav.js`.
+- Updated shared logo link accessible name from `Go to Home` to `Walton County Board of County Commissioners Home` so the accessible name includes the visible brand text.
+- Updated the search module logo link label in `assets/walton-budget-search.js`.
+- Bumped `walton-budget-nav.js` and `walton-budget-search.js` cache keys to `20260627-lighthouse-a11y`.
+
+Hidden/admin-only dark mode was not changed.
+
+### Final Lighthouse Results
+
+After the targeted fixes, Lighthouse accessibility was rerun on the same pages.
+
+| Page | Final Score | Remaining Lighthouse Accessibility Issues |
+| --- | ---: | --- |
+| `/` | 100 | None reported. |
+| `/pages/accessibility.html` | 100 | None reported. |
+| `/pages/financial-forecast.html` | 100 | None reported. |
+| `/pages/fund-financial-schedules.html` | 100 | None reported. |
+| `/pages/departments.html` | 100 | None reported. |
+
+### Still Not Claimed
+
+- Full ADA compliance is not claimed.
+- Full WCAG compliance is not claimed.
+- axe audit has not been run.
 - A complete manual screen reader pass has not been run.
 - A complete page-by-page keyboard audit across every public page has not been run.

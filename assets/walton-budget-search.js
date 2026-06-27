@@ -16,7 +16,7 @@
     ){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
         "../index.html",
-        "Go to Home"
+        "Walton County Board of County Commissioners Home"
       );
       if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.equalizeAll === "function"){
         window.WaltonSplitLogo.equalizeAll(logoContainer);

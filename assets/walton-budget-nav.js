@@ -141,7 +141,7 @@
       function(){
         loadWcScriptOnce(
           "wc-budget-search-script",
-          wcBudgetAssetBaseUrl + "walton-budget-search.js?v=20260622-search-input-cleanup",
+          wcBudgetAssetBaseUrl + "walton-budget-search.js?v=20260627-lighthouse-a11y",
           function(){
             var fallbackSlot = document.querySelector(".wc-nav-search-slot-fallback");
             if(fallbackSlot && fallbackSlot.parentNode){
@@ -1603,7 +1603,7 @@
     min-height:38px !important;
     padding:10px 16px !important;
     border-radius:999px !important;
-    color:#24344d !important;
+    color:#172033 !important;
     background:transparent !important;
     border:0 !important;
     text-decoration:none !important;
@@ -1618,7 +1618,7 @@
   }
   .wc-budget-footer-links a:hover{
     background:rgba(0,98,49,0.08) !important;
-    color:#006231 !important;
+    color:#004b2d !important;
   }
   .wc-budget-footer-bottom{
     display:block !important;
@@ -1726,7 +1726,7 @@
     min-height:auto !important;
     padding:0 !important;
     border-radius:0 !important;
-    color:rgba(36,52,77,.62) !important;
+    color:#172033 !important;
     background:transparent !important;
     font-size:11px !important;
     font-weight:700 !important;
@@ -1734,7 +1734,7 @@
     text-transform:none !important;
   }
   .wc-search-footer .wc-budget-footer-links a:hover{
-    color:#006231 !important;
+    color:#004b2d !important;
     background:transparent !important;
   }
   .wc-search-footer .wc-budget-footer-bottom,
@@ -2014,7 +2014,7 @@
       if(!linkHref){
         return splitLogoHtml;
       }
-      var splitLogoLabel = linkLabel || "Walton County";
+      var splitLogoLabel = linkLabel || "Walton County Board of County Commissioners Home";
       return '<a class="wc-split-brand-link" href="' + linkHref + '" aria-label="' + splitLogoLabel + '">' + splitLogoHtml + '</a>';
     }
     var brandHtml = `
@@ -2029,7 +2029,7 @@
     if(!linkHref){
       return brandHtml;
     }
-    return '<a class="wc-split-brand-link" href="' + linkHref + '" aria-label="' + (linkLabel || "Walton County") + '">' + brandHtml + '</a>';
+    return '<a class="wc-split-brand-link" href="' + linkHref + '" aria-label="' + (linkLabel || "Walton County Board of County Commissioners Home") + '">' + brandHtml + '</a>';
   }
 
   function ensureWaltonSplitLogoStyles(){
@@ -2061,7 +2061,7 @@
     if(logoContainer && !logoContainer.querySelector(".wc-split-brand")){
       logoContainer.innerHTML = getWaltonSplitBrandHtml(
         "../index.html",
-        "Go to Home"
+        "Walton County Board of County Commissioners Home"
       );
       if(window.WaltonSplitLogo && typeof window.WaltonSplitLogo.equalizeAll === "function"){
         equalizeWaltonSplitLogo(logoContainer);
