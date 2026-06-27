@@ -3956,9 +3956,6 @@
   function renderFinancialForecast(cipProjectList) {
     const model = buildFinancialForecastModel(cipProjectList);
     return (
-      '<section class="page-text wc-forecast-note">' +
-        '<p>Forecast years are planning estimates based on the FY 2027 baseline budget, historical trend review, capital project schedules, and selected assumptions. FY 2027 is not forecasted; FY 2028 through FY 2031 are calculated from editable assumptions. Capital Projects Fund expenditures use the Capital Improvement Plan schedule for FY 2027 through FY 2031. Ending fund balance rolls forward as the next year’s beginning fund balance.</p>' +
-      '</section>' +
       '<section class="wc-forecast-section">' +
         '<h2 class="wc-fund-section-heading">Major Fund Detail</h2>' +
         model.funds.map((item) => (
@@ -6629,23 +6626,44 @@
     return fund ? fund.Fund_Name : "Constitutional Offices";
   }
 
-  // Summary of Personnel's "at a glance" FTE callouts: the four
-  // constitutional officers whose own staffing rows carry no Dept_Code (so
-  // they'd otherwise get lumped into one undifferentiated catch-all) broken
-  // out individually, then one callout per actual fund for every other
-  // row -- grouped dynamically by fundNameForRow rather than a fixed list,
-  // so nothing ends up unbroken-out in a generic "All Remaining" bucket.
-  // Board of County Commissioners and Circuit Court are explicitly mapped
-  // to General Fund despite their own staffing rows' blank Dept_Code,
-  // since their expenditure rows confirm that's their real fund.
+  // Engineering moved from the General Fund to the Transportation Fund
+  // starting FY2027 (see DEPT_CODE_ACTUALS_ALIASES' comment above) -- the
+  // budget figures reflect that via a brand new FY2027 Dept_Code
+  // (10116002, naturally fund 101) while the legacy code (00120000, fund
+  // 001) keeps holding its real FY2020-FY2026 history. The staffing sheet
+  // has no such split: every position is still booked under the one
+  // legacy 00120000 row regardless of year, so without this override its
+  // FY2027 headcount would land on the General Fund's own Personnel
+  // callout/filter instead of Transportation's. Scoped to
+  // personnelFundLabelForRow specifically (not fundNameForRow itself,
+  // which Summary of Interfund Transfers also uses for expenditure/
+  // revenue rows where this Dept_Code has no special meaning).
+  function fundNameForStaffingRow(row) {
+    if (String((row && row.Dept_Code) || "").trim() === "00120000") return "Transportation Fund";
+    return fundNameForRow(row);
+  }
+
+  // Summary of Personnel's "at a glance" FTE callouts: the constitutional
+  // officers whose own staffing rows carry no Dept_Code (so they'd
+  // otherwise get lumped into one undifferentiated catch-all) broken out
+  // individually, then one callout per actual fund for every other row --
+  // grouped dynamically by fundNameForRow rather than a fixed list, so
+  // nothing ends up unbroken-out in a generic "All Remaining" bucket.
+  // Board of County Commissioners and Circuit Court are General Fund
+  // departments (confirmed by their expenditure rows) but get their own
+  // named callouts here too, same as the constitutional officers, rather
+  // than folding into the General Fund (Board Departments) card -- their
+  // own staffing rows carry the same blank Dept_Code the officers' do, so
+  // without a named group they'd otherwise have nowhere distinct to land.
   const PERSONNEL_NAMED_CALLOUT_GROUPS = [
+    { label: "Board of County Commissioners", match: (r) => normalizeDeptName(r.Dept_Name) === "board of county commissioners" },
+    { label: "Circuit Court", match: (r) => normalizeDeptName(r.Dept_Name) === "circuit court" },
     { label: "Clerk of Court", match: (r) => normalizeDeptName(r.Dept_Name) === "clerk of circuit court" },
     { label: "Tax Collector", match: (r) => normalizeDeptName(r.Dept_Name) === "tax collector" },
     { label: "Property Appraiser", match: (r) => normalizeDeptName(r.Dept_Name) === "property appraiser" },
     { label: "Supervisor of Elections", match: (r) => normalizeDeptName(r.Dept_Name) === "supervisor of elections" },
     { label: "Sheriff Fund", match: (r) => normalizeDeptName(r.Dept_Name) === "sheriff" }
   ];
-  const PERSONNEL_FUND_NAME_OVERRIDES = new Set(["board of county commissioners", "circuit court"]);
 
   // Code Compliance's two sub-programs read fine as their own staffing
   // cards on the department's own page (see renderStaffingTable), but on
@@ -6664,8 +6682,13 @@
   function personnelFundLabelForRow(row) {
     const group = PERSONNEL_NAMED_CALLOUT_GROUPS.find((g) => g.match(row));
     if (group) return group.label;
-    if (PERSONNEL_FUND_NAME_OVERRIDES.has(normalizeDeptName(row.Dept_Name))) return "General Fund";
-    return fundNameForRow(row);
+    const fundName = fundNameForStaffingRow(row);
+    // Board of County Commissioners and Circuit Court (named groups above)
+    // already cover the General Fund's non-department rows, so the plain
+    // "General Fund" fund-name match here is exclusively the rest of the
+    // Board Departments -- relabeled to match departments.html's own
+    // "General Fund (Board Departments)" card.
+    return fundName === "General Fund" ? "General Fund (Board Departments)" : fundName;
   }
 
   // The Summary of Personnel all-departments table's per-department

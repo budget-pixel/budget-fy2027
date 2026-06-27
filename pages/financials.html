@@ -124,13 +124,20 @@
         '</div>';
     }
 
-    // The real chip count/labels depend on the loaded staffing data (see
-    // getPersonnelFundCallouts), so a handful of inert placeholder chips
-    // (not real links -- href="#", not focusable) stand in for them while
-    // loading, just to give this row roughly its eventual shape instead of
-    // not existing at all.
+    // The real chip labels depend on the loaded staffing data (see
+    // getPersonnelFundCallouts), but the real COUNT is fixed -- 7 named
+    // groups (Board of County Commissioners, Circuit Court, Clerk of
+    // Court, Tax Collector, Property Appraiser, Supervisor of Elections,
+    // Sheriff Fund) plus 7 actual funds (General Fund (Board
+    // Departments), Transportation, Tourist Development, Solid Waste,
+    // Building, Mosquito Control, Housing & Urban Development) -- see
+    // PERSONNEL_NAMED_CALLOUT_GROUPS in budget-data.js. Rendering that
+    // many inert placeholder chips (not real links -- href="#", not
+    // focusable) up front means this row already occupies its eventual
+    // two-row height before the data loads, instead of growing/shifting
+    // the page once it does.
     function personnelCalloutsLoadingHtml(){
-      var placeholderCount = 4;
+      var placeholderCount = 14;
       var chips = "";
       for(var i = 0; i < placeholderCount; i++){
         chips += '<a class="wc-personnel-fund-stat" href="#" aria-hidden="true" tabindex="-1">' +

@@ -1988,11 +1988,11 @@ body {
 }
 
 /* Summary of Personnel's per-fund FTE callouts (see
-   renderPersonnelFundCallouts in budget-data.js). Fixed 6-column grid --
-   with the current 12 callouts that's two even rows; fewer/more callouts
+   renderPersonnelFundCallouts in budget-data.js). Fixed 7-column grid --
+   with the current 14 callouts that's two even rows; fewer/more callouts
    just leave a partial last row rather than reflowing column widths. */
 .wc-personnel-fund-stats {
-  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 14px; margin-bottom: 20px;
 }
 .wc-personnel-fund-stat {
@@ -2017,14 +2017,20 @@ body {
 }
 
 /* Compact variant used on the Financials directory's "Summary of
-   Personnel" link card (see financials.html) -- same 6-column grid as the
-   page's own callouts (so it's still two rows of 6), just smaller chips so
-   a dozen of them fit inside one directory row. Each chip is its own link
-   to the Personnel page pre-filtered to that fund (?fund=...), sitting
-   beside (not inside) that row's own wc-directory-item link. */
+   Personnel" link card (see financials.html) -- same 7-column grid as the
+   page's own callouts (so it's still two rows of 7), just smaller chips so
+   they fit inside one directory row. Each chip is its own link to the
+   Personnel page pre-filtered to that fund (?fund=...), sitting beside
+   (not inside) that row's own wc-directory-item link. */
 .wc-personnel-fund-stats--compact { gap: 8px; margin: 14px 22px 18px; }
 .wc-personnel-fund-stats--compact .wc-personnel-fund-stat {
   padding: 8px 10px; border-radius: 10px; text-decoration: none;
+  /* Matches the tallest real chip's height (the longest labels, e.g.
+     "Housing & Urban Development Fund", wrap to two lines) so the
+     loading-state placeholder chips (see personnelCalloutsLoadingHtml in
+     financials.html) already reserve the row's eventual height -- no
+     layout shift once the real, longer labels load in. */
+  min-height: 73px; display: flex; flex-direction: column; justify-content: center;
 }
 .wc-personnel-fund-stats--compact .wc-personnel-fund-stat strong { font-size: .9rem; }
 .wc-personnel-fund-stats--compact .wc-personnel-fund-stat span { font-size: .58rem; margin-top: 2px; }

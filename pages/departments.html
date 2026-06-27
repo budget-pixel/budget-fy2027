@@ -199,25 +199,7 @@
       var dedupedExpenditures = Array.isArray(data && data.dedupedExpenseRows) ? data.dedupedExpenseRows : expenditures;
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
 
-      // Property Tax funds a fund two ways: directly, as Ad Valorem Taxes
-      // (Revenue_Code 311000, e.g. General Fund, Mosquito Control), or via
-      // an interfund transfer FROM a fund that collects it INTO a fund
-      // that doesn't levy it directly (e.g. Sheriff Fund's $98M transfer
-      // from the General Fund, tagged with Note "Property Tax" rather than
-      // its own 311000 line). Both are booked fund-wide under a
-      // placeholder Dept_Name ("Interfund Group Transfer In/Out") rather
-      // than to any individual department, so this can't be scoped to
-      // "listed departments only" like the budget figures above -- it's
-      // summed across the whole revenue sheet per fund instead.
       var revenues = Array.isArray(data && data.revenues) ? data.revenues : [];
-      var propertyTaxByFund = {};
-      revenues.forEach(function(row){
-        var isDirectPropertyTax = String(row.Revenue_Code || "").trim() === "311000";
-        var isPropertyTaxTransfer = String(row.Note || "").trim() === "Property Tax";
-        if(!isDirectPropertyTax && !isPropertyTaxTransfer) return;
-        var code = String(row.Fund_code || fundCodeForRow(row)).trim();
-        propertyTaxByFund[code] = (propertyTaxByFund[code] || 0) + (Number(row.FY2027_Proposed) || 0);
-      });
 
       // General Fund (and, in principle, any fund) is also used by
       // constitutional officers and other agencies that have their own
@@ -235,6 +217,26 @@
       var listedExpenditures = expenditures.filter(isListedDepartmentRow);
       var listedDedupedExpenditures = dedupedExpenditures.filter(isListedDepartmentRow);
       var listedStaffing = staffing.filter(isListedDepartmentRow);
+      var listedRevenues = revenues.filter(isListedDepartmentRow);
+
+      // Engineering moved from the General Fund to the Transportation Fund
+      // starting FY2027 (see budget-data.js's DEPT_CODE_ACTUALS_ALIASES
+      // comment) -- the budget figures reflect that via a brand new FY2027
+      // Dept_Code (10116002, naturally fund 101) while the legacy code
+      // (00120000, fund 001) keeps holding its real FY2020-FY2026 history.
+      // The staffing sheet has no such split: every year's headcount,
+      // including FY2027, is still booked under the one legacy 00120000
+      // row. Left alone that overcounts the General Fund's FY2027
+      // Personnel figure (and undercounts Transportation's) by
+      // Engineering's full headcount, while its FY2026 prior-year
+      // headcount genuinely did still belong to the General Fund and
+      // shouldn't move.
+      var STAFFING_FY2027_FUND_CODE_OVERRIDES = { "00120000": "101" };
+      function fundCodeForStaffingRow(row, isCurrentYear){
+        var code = String((row && row.Dept_Code) || "").trim();
+        if(isCurrentYear && STAFFING_FY2027_FUND_CODE_OVERRIDES[code]) return STAFFING_FY2027_FUND_CODE_OVERRIDES[code];
+        return code.slice(0, 3);
+      }
 
       return FUND_SUMMARY_GROUPS.map(function(group){
         var budget = listedExpenditures.reduce(function(sum, row){
@@ -244,21 +246,34 @@
           return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2026_Original_Budget) || 0) : sum;
         }, 0);
         var fte = listedStaffing.reduce(function(sum, row){
-          return fundCodeForRow(row) === group.code ? sum + (Number(row["2027"]) || 0) : sum;
+          return fundCodeForStaffingRow(row, true) === group.code ? sum + (Number(row["2027"]) || 0) : sum;
         }, 0);
         var priorFte = listedStaffing.reduce(function(sum, row){
-          return fundCodeForRow(row) === group.code ? sum + (Number(row["2026"]) || 0) : sum;
+          return fundCodeForStaffingRow(row, false) === group.code ? sum + (Number(row["2026"]) || 0) : sum;
+        }, 0);
+        // The YoY FTE chip only -- priorFte above (this fund's real,
+        // unadjusted FY2026 headcount) is left alone. Engineering's move
+        // shouldn't read as a personnel change on either fund's card, so
+        // the trend comparison groups its FY2026 headcount with whichever
+        // fund it now belongs to (same attribution fte above already
+        // uses), the same way the actual move means neither fund hired or
+        // lost anyone because of it.
+        var trendPriorFte = listedStaffing.reduce(function(sum, row){
+          return fundCodeForStaffingRow(row, true) === group.code ? sum + (Number(row["2026"]) || 0) : sum;
         }, 0);
 
-        // Property tax is booked fund-wide, not to individual departments,
-        // so the listed departments' own share of it is estimated as their
-        // share of the whole fund's budget (e.g. Board Departments' $38M
-        // out of General Fund's full ~$211M) rather than showing the whole
-        // fund's property tax against just this card's narrower budget.
-        var wholeFundBudget = expenditures.reduce(function(sum, row){
+        // Each listed department's own direct Ad Valorem Taxes line
+        // (Revenue_Code 311000, same Dept_Name match as the budget figure
+        // above) -- the sheet books property tax per department for the
+        // General Fund and Mosquito Control Fund, so this reads the real
+        // allocation rather than estimating a share of the whole fund.
+        // Funds without any department-level 311000 rows (Transportation,
+        // Tourist Development, Solid Waste, Building, Housing & Urban
+        // Development) simply total $0 here, same as before.
+        var propertyTaxShare = listedRevenues.reduce(function(sum, row){
+          if(String(row.Revenue_Code || "").trim() !== "311000") return sum;
           return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
         }, 0);
-        var propertyTaxShare = wholeFundBudget ? (propertyTaxByFund[group.code] || 0) * (budget / wholeFundBudget) : 0;
 
         return {
           label:group.label,
@@ -266,7 +281,7 @@
           trend:formatTrend(budget, priorBudget),
           trendDollar:formatTrendDollar(budget, priorBudget),
           fte:formatFte(fte),
-          fteTrend:formatFteTrend(fte, priorFte),
+          fteTrend:formatFteTrend(fte, trendPriorFte),
           propertyTax:propertyTaxShare ? formatCurrency(propertyTaxShare) : ""
         };
       });

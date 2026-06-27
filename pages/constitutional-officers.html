@@ -334,26 +334,31 @@
       var staffing = Array.isArray(data && data.staffing) ? data.staffing : [];
 
       // Property Tax funds a fund two ways: directly, as Ad Valorem Taxes
-      // (Revenue_Code 311000, e.g. General Fund), or via an interfund
-      // transfer FROM a fund that collects it INTO a fund that doesn't
-      // levy it directly (e.g. Sheriff Fund's $98M transfer from the
-      // General Fund, tagged with Note "Property Tax" rather than its own
-      // 311000 line). Both are booked fund-wide under a placeholder
-      // Dept_Name ("Interfund Group Transfer In/Out") rather than to any
-      // individual officer/agency, so this is summed across the whole
-      // revenue sheet per fund rather than attributed to a specific group
-      // -- both General Fund cards (Constitutional Officers and Agencies &
-      // State Mandates) draw on that same fund-wide total since the
-      // revenue itself isn't split between them.
+      // (Revenue_Code 311000, matched by the item's own Dept_Name the same
+      // way its budget figure is -- e.g. Board of County Commissioners'
+      // own 311000 row), or via an interfund transfer FROM a fund that
+      // collects it INTO a fund that doesn't levy it directly (Sheriff
+      // Fund's transfer from the General Fund, tagged with Note "Property
+      // Tax" on its own 381000 row, Dept_Name "Walton County Sheriff's
+      // Office" -- which matches the Sheriff item by name too). Items with
+      // no revenue row under their own name (Clerk, Tax Collector,
+      // Property Appraiser, Supervisor of Elections, and every Autonomous
+      // Entity) total $0 -- the sheet simply never books property tax
+      // against them individually.
       var revenues = Array.isArray(data && data.revenues) ? data.revenues : [];
-      var propertyTaxByFund = {};
-      revenues.forEach(function(row){
-        var isDirectPropertyTax = String(row.Revenue_Code || "").trim() === "311000";
-        var isPropertyTaxTransfer = String(row.Note || "").trim() === "Property Tax";
-        if(!isDirectPropertyTax && !isPropertyTaxTransfer) return;
-        var code = String(row.Fund_code || fundCodeForRow(row)).trim();
-        propertyTaxByFund[code] = (propertyTaxByFund[code] || 0) + (Number(row.FY2027_Proposed) || 0);
-      });
+      function propertyTaxForGroup(group, code){
+        var items = buildBaseItems(group);
+        return revenues.reduce(function(sum, row){
+          var isDirectPropertyTax = String(row.Revenue_Code || "").trim() === "311000";
+          var isPropertyTaxTransfer = String(row.Note || "").trim() === "Property Tax";
+          if(!isDirectPropertyTax && !isPropertyTaxTransfer) return sum;
+          var rowCode = String(row.Fund_code || fundCodeForRow(row)).trim();
+          if(rowCode !== code) return sum;
+          var matchesItem = items.some(function(item){ return rowMatches(row, item.name, group.aliasMap); });
+          if(!matchesItem) return sum;
+          return sum + (Number(row.FY2027_Proposed) || 0);
+        }, 0);
+      }
 
       function sumForGroup(group, code){
         var items = buildBaseItems(group);
@@ -389,15 +394,7 @@
 
       return FUND_SUMMARY_SPECS.map(function(spec){
         var t = sumForGroup(GROUPS[spec.groupIndex], spec.code);
-        // Property tax is booked fund-wide, not to individual officers or
-        // agencies, so this card's own share of it is estimated as its
-        // share of the whole fund's budget (e.g. Constitutional Officers'
-        // ~$34M out of General Fund's full ~$211M) rather than showing the
-        // whole fund's property tax against just this card's own slice.
-        var wholeFundBudget = expenditures.reduce(function(sum, row){
-          return fundCodeForRow(row) === spec.code ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
-        }, 0);
-        var propertyTaxShare = wholeFundBudget ? (propertyTaxByFund[spec.code] || 0) * (t.budget / wholeFundBudget) : 0;
+        var propertyTaxShare = propertyTaxForGroup(GROUPS[spec.groupIndex], spec.code);
         return {
           label:spec.label,
           budget:formatCurrency(t.budget),
