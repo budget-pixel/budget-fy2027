@@ -4978,6 +4978,27 @@
     return "#" + toHex(r) + toHex(g) + toHex(b);
   }
 
+  // Clicking a custom legend item (see renderExpenseActivityChart/
+  // renderRevenueTopicCards) isolates that one series instead of Chart.js's
+  // default of hiding it -- clicking a series shows ONLY that series;
+  // clicking it again (or whichever series is currently the sole one
+  // shown) restores every series. Clicking a different series while one is
+  // already isolated switches the isolation to the new one rather than
+  // stacking/toggling individually, since "isolate" is a single either/or
+  // view rather than a per-series on/off switch.
+  function handleChartLegendIsolateClick(chart, legendEl, i) {
+    const metas = chart.data.datasets.map((_, di) => chart.getDatasetMeta(di));
+    const isVisible = (di) => metas[di].hidden !== true;
+    const onlyThisVisible = isVisible(i) && metas.every((meta, di) => di === i || !isVisible(di));
+    metas.forEach((meta, di) => {
+      meta.hidden = onlyThisVisible ? false : di !== i;
+    });
+    legendEl.querySelectorAll(".wc-revenue-chart-legend-item").forEach((el, di) => {
+      el.classList.toggle("is-hidden", !!metas[di].hidden);
+    });
+    chart.update();
+  }
+
   function chartColorForTheme(hex) {
     if (document.documentElement.getAttribute("data-theme") !== "dark") return hex;
     const [h, s, l] = rgbToHsl(...hexToRgb(hex));
@@ -5103,10 +5124,7 @@
           chart.update();
         });
         item.addEventListener("click", () => {
-          const meta = chart.getDatasetMeta(i);
-          meta.hidden = meta.hidden === null ? !chart.data.datasets[i].hidden : !meta.hidden;
-          item.classList.toggle("is-hidden", !!meta.hidden);
-          chart.update();
+          handleChartLegendIsolateClick(chart, legendEl, i);
         });
       });
     }
@@ -5429,10 +5447,7 @@
             chart.update();
           });
           item.addEventListener("click", () => {
-            const meta = chart.getDatasetMeta(i);
-            meta.hidden = meta.hidden === null ? !chart.data.datasets[i].hidden : !meta.hidden;
-            item.classList.toggle("is-hidden", !!meta.hidden);
-            chart.update();
+            handleChartLegendIsolateClick(chart, legendEl, i);
           });
         });
       }
