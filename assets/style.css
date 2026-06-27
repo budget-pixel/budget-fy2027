@@ -281,7 +281,10 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   gap: 28px;
-  align-items: start;
+  /* stretch (not start) so both cards in a row match the taller one's
+     height -- the chart card's legend (flex: 1 below) grows to fill
+     whatever extra room that leaves instead of leaving dead whitespace. */
+  align-items: stretch;
 }
 .wc-revenue-topic-chart-card,
 .wc-revenue-topic-narrative-card {
@@ -289,6 +292,8 @@ body {
   border-radius: 20px;
   box-sizing: border-box;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 .wc-revenue-topic-chart-card {
   background: linear-gradient(135deg, #f4f8f5 0%, #eef7f1 100%);
@@ -303,6 +308,7 @@ body {
 .wc-revenue-topic-chart-wrap {
   position: relative;
   height: 320px;
+  flex: 0 0 320px;
   background: #ffffff;
   border-radius: 14px;
   padding: 14px;
@@ -311,8 +317,10 @@ body {
 .wc-revenue-chart-legend {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 6px 14px;
-  max-height: 140px;
+  flex: 1 1 auto;
+  min-height: 140px;
   overflow-y: auto;
   margin-top: 12px;
   padding: 10px 12px;

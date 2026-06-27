@@ -5111,12 +5111,16 @@
             ticks: { color: () => wcChartThemeColors().text, callback: (v) => formatAbbreviatedCurrency(v) }
           }
         },
-        interaction: { mode: "index", intersect: false },
+        // "nearest"/intersect:true so hovering activates just the one bar
+        // segment under the cursor -- the previous "index"/intersect:false
+        // combo showed every dataset's value at that x position regardless
+        // of which segment was actually being pointed at.
+        interaction: { mode: "nearest", intersect: true },
         plugins: {
           legend: { display: false },
           tooltip: {
-            mode: "index",
-            intersect: false,
+            mode: "nearest",
+            intersect: true,
             callbacks: {
               label: (ctx) => ctx.dataset.label + ": " + formatAbbreviatedCurrency(ctx.parsed.y)
             }
@@ -5208,7 +5212,17 @@
     const section8 = { title: "Section 8 Housing Choice Voucher Program", narrativeKey: "Section 8 Housing Choice Voucher Program", matches: byRevenueCodes(["331500"]) };
     const resourceOfficers = { title: "Sheriff Resource Officers", narrativeKey: "Sheriff Resource Officers", matches: byRevenueCodes(["337200"]) };
     const siblings = [halfCent, stateFuel, stateRevenueShare, section8, resourceOfficers].map((t) => t.matches);
-    const remainder = { title: "Intergovernmental Revenue", narrativeKey: "Intergovernmental Revenue", matches: remainderOfType("Intergovernmental Revenues", siblings) };
+    const remainderType = remainderOfType("Intergovernmental Revenues", siblings);
+    // Grant accounts (Federal Grant (...), State Grant (...)) are one-off,
+    // program-specific awards rather than recurring intergovernmental
+    // revenue -- they clutter this catch-all card's chart with a long tail
+    // of small, inconsistent-year-to-year slivers instead of the steady
+    // shared-revenue sources it's meant to show.
+    const remainder = {
+      title: "Intergovernmental Revenue",
+      narrativeKey: "Intergovernmental Revenue",
+      matches: (r) => remainderType(r) && !/grant/i.test(r.Revenue_Name || "")
+    };
     return [halfCent, stateFuel, stateRevenueShare, section8, resourceOfficers, remainder];
   }
 
@@ -5352,7 +5366,13 @@
 
   function renderRevenueTopicCards(container, topics, idPrefix) {
     if (!container) return;
-    const revenueRows = cache.revenues || [];
+    // The Self-Insurance Fund (503) is an Internal Service fund, not a
+    // governmental one, and is excluded from every other revenue
+    // schedule on the site for the same reason (see
+    // CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES) -- its premium/fee
+    // revenue (Employee/Retiree/Cobra Health Fees, etc.) has no business
+    // appearing on these topic cards either.
+    const revenueRows = (cache.revenues || []).filter((r) => !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r)));
     const narrativeRows = cache.departmentNarratives || [];
 
     container.innerHTML = topics.map((topic, topicIndex) => {
@@ -5431,12 +5451,15 @@
               ticks: { color: () => wcChartThemeColors().text, callback: (v) => formatAbbreviatedCurrency(v) }
             }
           },
-          interaction: { mode: "index", intersect: false },
+          // See renderExpenseActivityChart's matching comment -- isolates
+          // the hovered bar segment's own tooltip instead of every
+          // dataset's value at that x position.
+          interaction: { mode: "nearest", intersect: true },
           plugins: {
             legend: { display: false },
             tooltip: {
-              mode: "index",
-              intersect: false,
+              mode: "nearest",
+              intersect: true,
               callbacks: {
                 label: (ctx) => ctx.dataset.label + ": " + formatAbbreviatedCurrency(ctx.parsed.y)
               }
