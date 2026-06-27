@@ -1559,13 +1559,15 @@
 
   function priorYearsToggleHtml(showPrior, extraWrapClass, scope) {
     const priorScope = scope || "budget";
-    const label =
-      '<label class="wc-fy-column-toggle-label">' +
-      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" data-wc-prior-years-scope="' + escapeHtml(priorScope) + '" aria-label="View Prior Years" ' +
-      (showPrior ? "checked" : "") + " />" +
-      '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
-      "</label>";
-    return '<div class="wc-fy-column-toggle-wrap' + (extraWrapClass ? " " + extraWrapClass : "") + '">' + label + "</div>";
+    const expanded = showPrior ? "true" : "false";
+    const visibleLabel = showPrior ? "Hide Prior Years" : "View Prior Years";
+    const accessibleLabel = showPrior ? "Hide prior years" : "View prior years";
+    const button =
+      '<button type="button" class="wc-fy-column-toggle-button" data-wc-prior-years-scope="' + escapeHtml(priorScope) + '" aria-expanded="' + expanded + '" aria-label="' + accessibleLabel + '">' +
+      '<span class="wc-fy-column-toggle-indicator" aria-hidden="true">' + (showPrior ? "✓" : "") + "</span>" +
+      '<span class="wc-fy-column-toggle-text">' + visibleLabel + "</span>" +
+      "</button>";
+    return '<div class="wc-fy-column-toggle-wrap' + (extraWrapClass ? " " + extraWrapClass : "") + '">' + button + "</div>";
   }
 
   function renderNotesHtml(title, notes) {
@@ -2184,6 +2186,9 @@
       body.innerHTML = detail.innerHTML;
       body.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((checkbox) => {
         checkbox.removeAttribute("data-wc-prior-years-bound");
+      });
+      body.querySelectorAll(".wc-fy-column-toggle-button").forEach((button) => {
+        button.removeAttribute("data-wc-prior-years-bound");
       });
       bindPriorYearsToggle(body);
       applyPriorYearsState(false, body);
@@ -6134,11 +6139,10 @@
     return (
       '<section class="wc-performance-card' + (showPrior ? " show-prior-years" : "") + '">' +
       '<div class="wc-fy-column-toggle-wrap">' +
-      '<label class="wc-fy-column-toggle-label">' +
-      '<input type="checkbox" class="wc-fy-column-toggle-checkbox" data-wc-prior-years-scope="performance" aria-label="View Prior Years" ' +
-      (showPrior ? "checked" : "") + " />" +
-      '<span class="wc-fy-column-toggle-text">View Prior Years</span>' +
-      "</label>" +
+      '<button type="button" class="wc-fy-column-toggle-button" data-wc-prior-years-scope="performance" aria-expanded="' + (showPrior ? "true" : "false") + '" aria-label="' + (showPrior ? "Hide prior years" : "View prior years") + '">' +
+      '<span class="wc-fy-column-toggle-indicator" aria-hidden="true">' + (showPrior ? "✓" : "") + "</span>" +
+      '<span class="wc-fy-column-toggle-text">' + (showPrior ? "Hide Prior Years" : "View Prior Years") + "</span>" +
+      "</button>" +
       "</div>" +
       '<div class="wc-performance-table-wrap">' +
       '<table class="wc-performance-table">' +
@@ -6163,6 +6167,27 @@
       (checkbox.closest(".wc-performance-card") ? "performance" : "budget");
   }
 
+  function priorYearsScopeForToggle(toggle) {
+    if (!toggle) return "budget";
+    return toggle.getAttribute("data-wc-prior-years-scope") ||
+      (toggle.closest(".wc-performance-card") ? "performance" : "budget");
+  }
+
+  function syncPriorYearsToggle(toggle, checked) {
+    if (!toggle) return;
+    if (toggle.matches(".wc-fy-column-toggle-checkbox")) {
+      toggle.checked = checked;
+      toggle.setAttribute("aria-label", checked ? "Hide prior years" : "View prior years");
+      return;
+    }
+    toggle.setAttribute("aria-expanded", checked ? "true" : "false");
+    toggle.setAttribute("aria-label", checked ? "Hide prior years" : "View prior years");
+    const indicator = toggle.querySelector(".wc-fy-column-toggle-indicator");
+    if (indicator) indicator.textContent = checked ? "✓" : "";
+    const text = toggle.querySelector(".wc-fy-column-toggle-text");
+    if (text) text.textContent = checked ? "Hide Prior Years" : "View Prior Years";
+  }
+
   function applyPriorYearsState(checked, container, scope) {
     const root = container || document;
     const priorScope = scope || "budget";
@@ -6174,12 +6199,25 @@
       card.classList.toggle("show-prior-years", checked);
     });
     root.querySelectorAll('.wc-fy-column-toggle-checkbox[data-wc-prior-years-scope="' + priorScope + '"]').forEach((cb) => {
-      cb.checked = checked;
+      syncPriorYearsToggle(cb, checked);
+    });
+    root.querySelectorAll('.wc-fy-column-toggle-button[data-wc-prior-years-scope="' + priorScope + '"]').forEach((button) => {
+      syncPriorYearsToggle(button, checked);
     });
   }
 
   function bindPriorYearsToggle(container) {
     if (!container) return;
+    container.querySelectorAll(".wc-fy-column-toggle-button").forEach((button) => {
+      if (button.getAttribute("data-wc-prior-years-bound") === "true") return;
+      button.setAttribute("data-wc-prior-years-bound", "true");
+      button.addEventListener("click", () => {
+        const checked = button.getAttribute("aria-expanded") !== "true";
+        const scope = priorYearsScopeForToggle(button);
+        setShowPriorYears(checked, scope);
+        applyPriorYearsState(checked, null, scope);
+      });
+    });
     container.querySelectorAll(".wc-fy-column-toggle-checkbox").forEach((checkbox) => {
       if (checkbox.getAttribute("data-wc-prior-years-bound") === "true") return;
       checkbox.setAttribute("data-wc-prior-years-bound", "true");

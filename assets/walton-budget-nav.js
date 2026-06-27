@@ -27,7 +27,7 @@
   gtag("config", "G-Z7W0K4BTDP");
   var mobileStylesheetId = "wc-budget-mobile-styles";
   var splitLogoScriptId = "wc-split-logo-script";
-  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "walton-split-logo.js?v=1";
+  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "walton-split-logo.js?v=20260627-axe-a11y";
   var wcThemeStorageKey = "waltonBudgetTheme";
   function applyHiddenAdminThemeParam(){
     try{
@@ -400,24 +400,31 @@
     }
     var wrapper = document.createElement('div');
     wrapper.className = 'wc-fy-column-toggle-wrap';
-    var label = document.createElement('label');
-    label.className = 'wc-fy-column-toggle-label';
-    var checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'wc-fy-column-toggle-checkbox';
-    checkbox.setAttribute('aria-checked', 'false');
-    checkbox.setAttribute('aria-label', 'View Prior Years');
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'wc-fy-column-toggle-button';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-label', 'View prior years');
+    if(table.id){
+      button.setAttribute('aria-controls', table.id);
+    }
+    var indicator = document.createElement('span');
+    indicator.className = 'wc-fy-column-toggle-indicator';
+    indicator.setAttribute('aria-hidden', 'true');
     var labelText = document.createElement('span');
     labelText.className = 'wc-fy-column-toggle-text';
     labelText.textContent = 'View Prior Years';
-    label.appendChild(checkbox);
-    label.appendChild(labelText);
-    checkbox.addEventListener('change', function(){
-      var visible = checkbox.checked;
+    button.appendChild(indicator);
+    button.appendChild(labelText);
+    button.addEventListener('click', function(){
+      var visible = button.getAttribute('aria-expanded') !== 'true';
       setFyColumnsVisible(table, targetIndices, visible);
-      checkbox.setAttribute('aria-checked', visible.toString());
+      button.setAttribute('aria-expanded', visible.toString());
+      button.setAttribute('aria-label', visible ? 'Hide prior years' : 'View prior years');
+      indicator.textContent = visible ? '✓' : '';
+      labelText.textContent = visible ? 'Hide Prior Years' : 'View Prior Years';
     });
-    wrapper.appendChild(label);
+    wrapper.appendChild(button);
     var container = table.closest('[data-report-table-container-id]') || table.parentNode;
     var titleWrap = findFyColumnToggleTitle(table, container);
     if(isPerformanceTable(table, container, titleWrap)){
@@ -2018,7 +2025,7 @@
       return '<a class="wc-split-brand-link" href="' + linkHref + '" aria-label="' + splitLogoLabel + '">' + splitLogoHtml + '</a>';
     }
     var brandHtml = `
-      <div class="wc-split-brand" aria-label="Walton County Board of County Commissioners">
+      <div class="wc-split-brand">
         <span class="wc-split-brand-seal wc-seal-mark" aria-hidden="true"></span>
         <div class="wc-split-brand-text">
           <div class="wc-split-brand-top">Walton County</div>

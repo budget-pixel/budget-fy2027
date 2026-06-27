@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/budget-pixel/budget-fy2027#readme",
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "lighthouse": "^13.4.0"
   }

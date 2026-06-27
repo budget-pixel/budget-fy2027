@@ -2407,8 +2407,11 @@ body {
 .wc-performance-empty{ padding:18px; background:#fff; border:1px solid #d0d5dd; border-radius:18px; color:#475467; font-size:14px; text-align:center; }
 .wc-fy-column-toggle-wrap{ display:flex !important; justify-content:center !important; align-items:center !important; width:114px !important; height:18px !important; padding:0 6px !important; margin:0 !important; background:#fff !important; border:1px solid rgba(209,190,120,0.55) !important; border-radius:999px !important; color:#24344d !important; font-family:Arial, Helvetica, sans-serif !important; font-size:10px !important; font-weight:600 !important; position:absolute !important; right:12px !important; top:12px !important; }
 .wc-performance-card > .wc-fy-column-toggle-wrap{ position:absolute !important; right:12px !important; top:36px !important; width:114px !important; height:18px !important; margin:0 !important; }
-.wc-fy-column-toggle-label{ display:inline-flex !important; align-items:center !important; gap:4px !important; cursor:pointer !important; color:#24344d !important; font-size:10px !important; font-weight:600 !important; font-style:italic !important; }
+.wc-fy-column-toggle-label,
+.wc-fy-column-toggle-button{ display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:4px !important; cursor:pointer !important; color:#24344d !important; font-size:10px !important; font-weight:600 !important; font-style:italic !important; font-family:Arial, Helvetica, sans-serif !important; line-height:1 !important; background:transparent !important; border:0 !important; padding:0 !important; margin:0 !important; min-height:18px !important; }
+.wc-fy-column-toggle-button:focus-visible{ outline:3px solid #d1be78 !important; outline-offset:3px !important; border-radius:999px !important; box-shadow:0 0 0 5px rgba(0,63,40,.35) !important; }
 .wc-fy-column-toggle-checkbox{ width:11px !important; height:11px !important; margin:0 !important; accent-color:#003f28 !important; cursor:pointer !important; }
+.wc-fy-column-toggle-indicator{ display:inline-flex !important; align-items:center !important; justify-content:center !important; width:11px !important; height:11px !important; border:2px solid currentColor !important; border-radius:4px !important; font-size:10px !important; font-weight:800 !important; line-height:1 !important; }
 .wc-fy-column-toggle-text{ font-size:10px !important; line-height:1 !important; font-style:italic !important; }
 .wc-performance-card:not(.show-prior-years) .wc-performance-table .wc-col-prior-year,
 .wc-performance-card:not(.show-prior-years) .wc-performance-table .wc-prior-year{ display:none; }
@@ -2422,7 +2425,8 @@ body {
   .wc-performance-note{ padding-top:10px; font-size:11px; }
   .wc-performance-card > .wc-fy-column-toggle-wrap{ position:absolute !important; top:48px !important; right:50% !important; transform:translateX(50%) !important; width:auto !important; min-width:132px !important; height:24px !important; margin:0 !important; padding:0 10px !important; }
   .wc-fy-column-toggle-wrap{ position:static !important; width:auto !important; height:22px !important; margin:6px auto 12px auto !important; padding:0 9px !important; }
-  .wc-performance-card > .wc-fy-column-toggle-wrap .wc-fy-column-toggle-label{ font-size:11px !important; }
+  .wc-performance-card > .wc-fy-column-toggle-wrap .wc-fy-column-toggle-label,
+  .wc-performance-card > .wc-fy-column-toggle-wrap .wc-fy-column-toggle-button{ font-size:11px !important; }
   .wc-performance-card > .wc-fy-column-toggle-wrap .wc-fy-column-toggle-text{ font-size:11px !important; white-space:nowrap !important; }
 }
 
@@ -2645,6 +2649,7 @@ body {
 }
 
 :root[data-theme="dark"] .wc-fy-column-toggle-label,
+:root[data-theme="dark"] .wc-fy-column-toggle-button,
 :root[data-theme="dark"] .wc-fy-column-toggle-text {
   color: var(--text) !important;
 }

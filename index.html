@@ -704,6 +704,38 @@
   .wc-investment-heading{
     margin-top:54px;
   }
+  .wc-section-heading-aside{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    flex-shrink:0;
+    gap:28px;
+  }
+  .wc-section-stat{
+    display:flex;
+    flex-shrink:0;
+    gap:28px;
+  }
+  .wc-section-stat-item strong{
+    display:block;
+    color:var(--wc-green);
+    font-size:clamp(24px, 2.4vw, 34px);
+    line-height:1;
+  }
+  .wc-section-stat-item small{
+    display:block;
+    margin-top:6px;
+    color:var(--wc-muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  @media (max-width:760px){
+    .wc-section-heading{ flex-wrap:wrap; }
+    .wc-section-stat{ gap:20px; }
+    .wc-section-heading-aside{ flex-wrap:wrap; gap:16px; }
+  }
 
   .wc-budget-grid{
     display:grid;
@@ -753,6 +785,22 @@
     color:var(--wc-muted);
     font-size:14px;
     line-height:1.55;
+  }
+  .wc-budget-card-millage{
+    display:block;
+    margin-top:10px;
+    color:var(--wc-muted);
+    font-size:12px;
+    font-weight:700;
+    line-height:1.5;
+    text-align:left;
+  }
+  .wc-budget-card-millage-label{
+    display:block;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.06em;
+    text-transform:uppercase;
   }
   .wc-project-card:hover{
     transform:translateY(-4px);
@@ -973,6 +1021,7 @@
   html[data-theme="dark"] .wc-budget-card small,
   html[data-theme="dark"] .wc-investment-card small,
   html[data-theme="dark"] .wc-investment-card p,
+  html[data-theme="dark"] .wc-budget-card-millage,
   html[data-theme="dark"] .wc-project-card p,
   html[data-theme="dark"] .wc-footer-search-copy p,
   html[data-theme="dark"] .wc-footer-links a{
@@ -1206,7 +1255,7 @@
         <a class="wc-section-link" href="pages/summary-of-revenues.html">View Summary of Revenues &rarr;</a>
       </div>
       <div class="wc-budget-grid">
-        <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong>$163.4M</strong></div>
+        <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong>$163.4M</strong><span class="wc-budget-card-millage"><span class="wc-budget-card-millage-label">Millage</span>Countywide 3.519<br>North Walton Mosquito Control 0.441</span></div>
         <div class="wc-budget-card" data-revenue-card="tdt"><small>Tourist Development Tax</small><strong>$58.8M</strong></div>
         <div class="wc-budget-card" data-revenue-card="surtax"><small>Local Discretionary Sales Surtax</small><strong>$40.0M</strong></div>
         <div class="wc-budget-card" data-revenue-card="halfcent"><small>Local Government Half-Cent Sales Tax</small><strong>$17.9M</strong></div>
@@ -1233,6 +1282,13 @@
         <div>
           <span>Featured Capital Projects</span>
           <h2>Investments moving from plans to places.</h2>
+        </div>
+        <div class="wc-section-heading-aside">
+          <div class="wc-section-stat" id="projectsStatCallout">
+            <div class="wc-section-stat-item"><strong>...</strong><small>FY 2027 Projects</small></div>
+            <div class="wc-section-stat-item"><strong>...</strong><small>FY 2027 Funding</small></div>
+          </div>
+          <a class="wc-section-link" href="pages/capital-projects.html">View Capital Projects Directory &rarr;</a>
         </div>
       </div>
       <div class="wc-projects-grid" id="featuredProjects">
@@ -1262,10 +1318,10 @@
   </footer>
 </div>
 
-<script src="assets/walton-split-logo.js"></script>
+<script src="assets/walton-split-logo.js?v=20260627-axe-a11y"></script>
 <script src="assets/walton-budget-search-data.js"></script>
 <script src="assets/walton-budget-search.js?v=20260627-lighthouse-a11y"></script>
-<script src="assets/budget-data.js?v=20260627-a11y-drilldown-labels"></script>
+<script src="assets/budget-data.js?v=20260627-prior-years-a11y"></script>
 <script src="assets/walton-cip-projects.js?v=20260622-project-images-v3"></script>
 <script>
   (function(){
@@ -1557,6 +1613,44 @@
       return "";
     }
 
+    // FY2027 funding for one project, summed across whichever
+    // funding_by_year entries (a project can draw from more than one
+    // source/fund in the same year) are tagged "FY2027" -- see
+    // walton-cip-projects.js.
+    function fy2027FundingAmount(project){
+      var entries = Array.isArray(project && project.funding_by_year) ? project.funding_by_year : [];
+      return entries.reduce(function(sum, entry){
+        return entry && entry.year === "FY2027" ? sum + (Number(entry.amount_value) || 0) : sum;
+      }, 0);
+    }
+
+    // Counts every real CIP project with FY2027 funding (not just the 6
+    // featured cards above, which are limited to ones with their own
+    // image) -- the legacy in-house engineering row is excluded the same
+    // way the featured list and the Financial Forecast's own CIP totals
+    // already exclude it.
+    function renderProjectsStatCallout(projects){
+      var callout = $("#projectsStatCallout");
+      if(!callout) return;
+      var items = callout.querySelectorAll(".wc-section-stat-item strong");
+      if(items.length < 2) return;
+
+      // Excludes grant-funded projects (project.funding === "Grant Funded",
+      // same match used by the Grant Funded Schedule page -- see
+      // renderFundSchedule in walton-cip-fund-schedule.js) -- this callout
+      // is meant to reflect the County's own FY2027 capital investment,
+      // not grant dollars that are awarded/administered separately.
+      var realProjects = (projects || []).filter(function(project){
+        return project && !project.is_legacy_in_house_engineering_row &&
+          String(project.funding || "").trim().toLowerCase() !== "grant funded";
+      });
+      var fundedProjects = realProjects.filter(function(project){ return fy2027FundingAmount(project) > 0; });
+      var totalFunding = realProjects.reduce(function(sum, project){ return sum + fy2027FundingAmount(project); }, 0);
+
+      items[0].textContent = fundedProjects.length.toLocaleString("en-US");
+      items[1].textContent = formatCurrencyShort(totalFunding);
+    }
+
     function renderFeaturedProjects(projects){
       var mount = $("#featuredProjects");
       if(!mount) return;
@@ -1587,8 +1681,12 @@
 
     function initProjects(){
       var ready = window.wcCipProjectsReady || Promise.resolve(window.wcCipProjects || []);
-      ready.then(renderFeaturedProjects).catch(function(){
+      ready.then(function(projects){
+        renderFeaturedProjects(projects);
+        renderProjectsStatCallout(projects);
+      }).catch(function(){
         renderFeaturedProjects([]);
+        renderProjectsStatCallout([]);
       });
     }
 

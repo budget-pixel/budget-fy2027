@@ -95,7 +95,7 @@
     var ariaAttr = linkLabel ? ' aria-label="' + linkLabel + '"' : ' aria-hidden="true"';
 
     return `
-      <div class="wc-split-brand" aria-label="Walton County Board of County Commissioners">
+      <div class="wc-split-brand">
         <${sealTag} class="wc-split-brand-seal wc-seal-mark"${hrefAttr}${ariaAttr}></${sealTag}>
         <div class="wc-split-brand-text">
           <div class="wc-split-brand-top">Walton County</div>
@@ -120,7 +120,7 @@
     var gaps = Math.max((bottom.textContent || "").length - 1, 1);
     var baseSpacing = parseFloat(getComputedStyle(bottom).letterSpacing) || 0;
     var nextSpacing = baseSpacing + (topWidth - bottomWidth) / gaps;
-    bottom.style.setProperty("letter-spacing", nextSpacing + "px", "important");
+    bottom.style.setProperty("letter-spacing", nextSpacing + "px");
   }
 
   function equalizeAll(root){

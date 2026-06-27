@@ -291,7 +291,6 @@ Financial Forecast:
 
 ### Items Still Pending
 
-- axe audit has not been run.
 - A full WCAG/ADA compliance claim has not been made.
 - A complete manual screen reader pass has not been run.
 - A complete page-by-page keyboard audit across every public page has not been run.
@@ -354,6 +353,160 @@ After the targeted fixes, Lighthouse accessibility was rerun on the same pages.
 
 - Full ADA compliance is not claimed.
 - Full WCAG compliance is not claimed.
-- axe audit has not been run.
 - A complete manual screen reader pass has not been run.
+- A complete page-by-page keyboard audit across every public page has not been run.
+
+## View Prior Years Toggle Keyboard Fix
+
+Date: June 27, 2026
+
+### Issue Found
+
+Manual keyboard testing found that the "View Prior Years" control was visually clickable, but did not behave reliably as a keyboard-operated disclosure control.
+
+### User Impact
+
+Keyboard-only users needed to be able to Tab to the control and toggle prior-year columns with Enter or Space, with a clear visible focus state and a meaningful accessible name.
+
+### Files Changed
+
+- `assets/budget-data.js`
+- `assets/walton-budget-nav.js`
+- `assets/style.css`
+- Static HTML cache keys for `style.css`, `budget-data.js`, and `walton-budget-nav.js`
+
+### Fix Made
+
+- Replaced the rendered shared "View Prior Years" control with a real `<button type="button">`.
+- Added `aria-expanded="false"` / `aria-expanded="true"` state updates.
+- Updated the accessible name between "View prior years" and "Hide prior years".
+- Updated the visible label between "View Prior Years" and "Hide Prior Years".
+- Added a visible `:focus-visible` focus ring.
+- Preserved the old checkbox handler as a compatibility fallback for any legacy-rendered toggles.
+- Reset cloned button bindings inside budget-detail modal content before rebinding toggle behavior.
+- Updated the older shared-nav injected table toggle to use the same button behavior.
+- Bumped cache keys to `20260627-prior-years-a11y`.
+
+No financial logic, Supabase logic, transaction filters, forecast assumptions, FY2027 revenue dedupe logic, raw data exposure, or hidden/admin-only dark mode behavior was changed.
+
+### Browser / Keyboard Verification Result
+
+Tested with Playwright against:
+
+```text
+http://127.0.0.1:8766/pages/fund-financial-schedules.html
+```
+
+Results:
+
+- The "View Prior Years" control was reached by Tab as a `button`.
+- The focused control had a visible focus ring: `3px` solid outline plus focus shadow.
+- Initial state exposed `aria-expanded="false"` and accessible name `View prior years`.
+- Enter toggled prior-year content on and changed `aria-expanded` to `true`.
+- Space toggled prior-year content back off and changed `aria-expanded` to `false`.
+- Mouse click toggled prior-year content on.
+- No browser console errors or page errors were recorded during the test.
+
+### Remaining Issues
+
+- This was a focused verification of the "View Prior Years" toggle, not a full ADA or WCAG compliance audit.
+
+## Axe-Core Accessibility Audit
+
+Date: June 27, 2026
+
+axe-core was run through Playwright as an automated accessibility check only against:
+
+```text
+http://127.0.0.1:8765/
+```
+
+axe-core does not establish full ADA or WCAG compliance. Results below reflect only automated axe checks for the tested pages.
+
+### Pages Tested
+
+- `/`
+- `/pages/accessibility.html`
+- `/pages/financial-forecast.html`
+- `/pages/fund-financial-schedules.html`
+- `/pages/departments.html`
+
+### Initial Axe Violations Found
+
+All five tested pages reported one `serious` violation:
+
+- `avoid-inline-spacing`: inline text spacing must be adjustable with custom stylesheets.
+- Affected node: `.wc-split-brand-bottom`.
+- Cause: the split-logo equalization script wrote inline `letter-spacing` with `!important`.
+
+The home page also had one axe `incomplete` ARIA item:
+
+- `aria-prohibited-attr`: `.wc-split-brand` was a plain `div` with `aria-label`.
+
+axe also listed `color-contrast` as `incomplete` on the tested pages. These were not reported as violations by axe and still require manual review where relevant.
+
+### Axe Fixes Made
+
+- Removed `!important` from the split-logo dynamic inline `letter-spacing` in `assets/walton-split-logo.js`.
+- Removed unsupported `aria-label` from the plain `.wc-split-brand` `div` in `assets/walton-split-logo.js`.
+- Removed the same unsupported `aria-label` from the fallback `.wc-split-brand` `div` in `assets/walton-budget-nav.js`.
+- Bumped the split-logo cache key to `20260627-axe-a11y`.
+
+No financial logic, Supabase logic, transaction filters, forecast assumptions, raw data exposure, or hidden/admin-only dark mode styles were changed.
+
+### Final Axe Results
+
+After the targeted fixes, axe-core was rerun on the same five pages.
+
+| Page | Axe Violations | Remaining Axe Incomplete Items |
+| --- | ---: | --- |
+| `/` | 0 | `color-contrast`, 13 nodes marked incomplete |
+| `/pages/accessibility.html` | 0 | `color-contrast`, 8 nodes marked incomplete |
+| `/pages/financial-forecast.html` | 0 | `color-contrast`, 102 nodes marked incomplete |
+| `/pages/fund-financial-schedules.html` | 0 | `color-contrast`, 136 nodes marked incomplete |
+| `/pages/departments.html` | 0 | `color-contrast`, 37 nodes marked incomplete |
+
+### Remaining Issues / Manual Review
+
+- axe reported no violations on the tested pages after fixes.
+- axe `color-contrast` results remained incomplete and should be reviewed manually where relevant.
+- Full ADA compliance is not claimed.
+- Full WCAG compliance is not claimed.
+- A complete manual screen reader pass has not been run.
+
+## Accessibility Page Contact Information Update
+
+Date: June 27, 2026
+
+`/pages/accessibility.html` was rewritten to replace placeholder contact text (`[Insert department/contact email]`, `[Insert phone number]`, `[Insert mailing address if desired]`, `[Insert date]`) with the County's actual accessibility/nondiscrimination contact, and to add the page sections requested: Website Accessibility, Accessibility and Nondiscrimination Assistance, Accessibility Design Guidelines, Browser Accessibility Information, Documents and Alternate Formats, Supported Assistive Technology, and Ongoing Accessibility Work.
+
+No financial logic, Supabase logic, transaction filters, forecast assumptions, FY2027 revenue dedupe logic, or hidden/admin-only dark mode styles were touched.
+
+### Contact Information Now Shown
+
+- Jonathon Cornman
+- Walton County Title VI/Nondiscrimination Coordinator
+- 45 N. 6th Street
+- DeFuniak Springs, FL 32433
+- Phone: `(850) 892-8586` (linked as `tel:8508928586`)
+- Email: `corjonathon@co.walton.fl.us` (linked as `mailto:corjonathon@co.walton.fl.us`)
+
+The previous placeholder address (`176 Montgomery Cir., DeFuniak Springs, FL 32435`) and phone number (`(850) 892-8470`) were not present in the prior page content and required no removal beyond replacing the bracketed placeholders.
+
+### Compliance Language Check
+
+- Page does not state or imply "fully ADA compliant," "fully WCAG compliant," "guaranteed accessible," or "complies with all accessibility laws."
+- Page uses "designed to support accessibility," "consistent with Web Content Accessibility Guidelines (WCAG) 2.1 Level AA," and "Accessibility is an ongoing effort."
+
+### Verification Result
+
+Verified in a headless browser against the local static site:
+
+- Exactly one `<h1>` on the page (`Accessibility Statement`).
+- Contact block renders all six required contact lines (name, title, street, city/state/zip, phone, email).
+- No old/placeholder address, phone number, or bracketed placeholder text remains.
+- `mailto:corjonathon@co.walton.fl.us` and `tel:8508928586` links are both present.
+- Footer `Accessibility` link still resolves to `accessibility.html` and renders once.
+- Skip link still works: Tab focuses "Skip to main content," Enter moves the URL hash to `#main-content` and focus to the injected `#main-content` target.
+- No browser console errors or page errors were recorded.
 - A complete page-by-page keyboard audit across every public page has not been run.
