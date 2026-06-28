@@ -6,9 +6,6 @@ Date: June 27, 2026
 
 Browser verification was run against the local static site at:
 
-```text
-http://127.0.0.1:8765/
-```
 
 No financial logic, Supabase logic, or hidden/admin-only dark mode styles were changed as part of this verification pass.
 
