@@ -2024,31 +2024,78 @@
       return Array.from(grouped.values());
     }
 
+    function budgetLineRowHtml(r, rowClass, suppressDescription) {
+      const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
+      const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue" };
+      return (
+        '<tr class="' + rowClass + (isZeroCurrent ? " wc-budget-line-zero-current" : "") + '">' +
+        "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
+        (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
+        "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
+        '<td class="wc-itemized-description-column">' + escapeHtml(suppressDescription ? "" : itemizedDescriptionForBudgetLine(r, descriptionField, isExpense)) + "</td>" +
+        priorYearColumns.map((c) => {
+          const href = transactionHrefForBudgetLine(r, c, drilldownFields);
+          const value = formatCurrency(budgetLineColumnAmount(r, c, isExpense));
+          const drilldownLabel = "View " + c.label + " transaction detail for " +
+            (r[nameField] || r[codeField] || "this budget line") + " actual amount " + value;
+          return '<td class="wc-num wc-prior-year">' +
+            (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(drilldownLabel) + '">' + value + "</a>" : value) +
+            "</td>";
+        }).join("") +
+        '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
+      );
+    }
+
+    function budgetLineSubtotalRowHtml(category, categoryRows, rowClass) {
+      const labelCells =
+        "<td>" + escapeHtml(category) + " Subtotal</td>" +
+        (isExpense ? "<td></td>" : "") +
+        "<td></td>" +
+        '<td class="wc-itemized-description-column"></td>';
+      return (
+        '<tr class="' + rowClass + ' wc-table-subtotal-row">' + labelCells +
+          priorYearColumns.map((c) =>
+            '<td class="wc-num wc-prior-year">' + formatCurrency(budgetLineColumnTotal(categoryRows, c, isExpense)) + "</td>"
+          ).join("") +
+          '<td class="wc-num">' + formatCurrency(categoryRows.reduce((sum, r) => sum + (r.FY2027_Proposed || 0), 0)) + "</td></tr>"
+      );
+    }
+
+    // One subtotal row per category (Personnel Services, Operating
+    // Expenditures, Capital Outlay, etc.) right after that category's own
+    // rows, grouped in the order each category first appears once sorted
+    // by code (which already clusters by category, since object/revenue
+    // codes are assigned in category blocks). Skipped when there's only
+    // one category in this set -- a single-category table (e.g. a
+    // one-line supplemental card) would otherwise get a subtotal that
+    // just repeats the grand total below it.
     function budgetLineRowsHtml(rowsToRender, rowClass, suppressDescription) {
-      return rowsToRender
-      .slice()
-      .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")))
-      .map((r) => {
-        const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
-        const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue" };
-        return (
-          '<tr class="' + rowClass + (isZeroCurrent ? " wc-budget-line-zero-current" : "") + '">' +
-          "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
-          (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
-          "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
-          '<td class="wc-itemized-description-column">' + escapeHtml(suppressDescription ? "" : itemizedDescriptionForBudgetLine(r, descriptionField, isExpense)) + "</td>" +
-          priorYearColumns.map((c) => {
-            const href = transactionHrefForBudgetLine(r, c, drilldownFields);
-            const value = formatCurrency(budgetLineColumnAmount(r, c, isExpense));
-            const drilldownLabel = "View " + c.label + " transaction detail for " +
-              (r[nameField] || r[codeField] || "this budget line") + " actual amount " + value;
-            return '<td class="wc-num wc-prior-year">' +
-              (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(drilldownLabel) + '">' + value + "</a>" : value) +
-              "</td>";
-          }).join("") +
-          '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
-        );
+      const sorted = rowsToRender
+        .slice()
+        .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")));
+
+      const categoryOrder = [];
+      const rowsByCategory = new Map();
+      sorted.forEach((r) => {
+        const category = r[categoryField] || "Other";
+        if (!rowsByCategory.has(category)) {
+          categoryOrder.push(category);
+          rowsByCategory.set(category, []);
+        }
+        rowsByCategory.get(category).push(r);
       });
+
+      if (categoryOrder.length <= 1) {
+        return sorted.map((r) => budgetLineRowHtml(r, rowClass, suppressDescription));
+      }
+
+      const html = [];
+      categoryOrder.forEach((category) => {
+        const categoryRows = rowsByCategory.get(category);
+        categoryRows.forEach((r) => html.push(budgetLineRowHtml(r, rowClass, suppressDescription)));
+        html.push(budgetLineSubtotalRowHtml(category, categoryRows, rowClass));
+      });
+      return html;
     }
 
     const summaryRows = groupedPriorYearRows();
@@ -2418,7 +2465,7 @@
   // same renderFinancialDashboardCard. A category with no FY2026 figure
   // (new this year) or no change shows nothing rather than a misleading
   // divide-by-zero/false "no change".
-  function renderFinanceCardRowChange(amount, priorAmount) {
+  function renderFinanceCardRowChange(amount, priorAmount, label) {
     if (!priorAmount) return "";
     const diff = amount - priorAmount;
     const direction = diff > 0 ? "up" : diff < 0 ? "down" : "flat";
@@ -2426,7 +2473,7 @@
     // not a literal $0), so a genuine zero change is formatted here
     // instead, rather than being silently dropped like a missing amount.
     const dollarText = diff === 0 ? "$0" : (diff > 0 ? "+" : "-") + formatCurrency(Math.abs(diff));
-    return '<div class="wc-finance-card-change wc-finance-card-change-' + direction + '">' + escapeHtml(dollarText) + ' <span class="wc-finance-card-change-label">YoY Change</span></div>';
+    return '<div class="wc-finance-card-change wc-finance-card-change-' + direction + '">' + escapeHtml(dollarText) + ' <span class="wc-finance-card-change-label">' + escapeHtml(label || "YoY Change") + '</span></div>';
   }
 
   function renderFinancialDashboardCard(options) {
@@ -2469,10 +2516,18 @@
       // Each category's own FY2026 -> FY2027 dollar change, shown beside
       // that category's current amount -- distinct from the
       // %-of-total-budget badge in the row head above, which is a
-      // same-year share, not a year-over-year comparison.
+      // same-year share, not a year-over-year comparison. Labeled
+      // "Recurring"/"Non-Recurring" instead of a plain "YoY Change" on
+      // expense cards -- Capital Outlay's own change is the department's
+      // non-recurring capital change; every other category's is recurring
+      // operating change (see isCapitalOutlayRowForYoy).
       const changeAmount = row.changeAmount !== undefined ? row.changeAmount : amount;
       const changePriorAmount = row.changePriorAmount !== undefined ? row.changePriorAmount : priorAmount;
-      const changeHtml = showChange ? renderFinanceCardRowChange(changeAmount, changePriorAmount) : "";
+      // showChange (and therefore this) only renders for expense cards --
+      // see its own definition above. row.label here is the Object_Type
+      // category (e.g. "Capital Outlay", "Personnel Services").
+      const changeLabel = normalizeObjectTypeForYoy(row.label) === "capital outlay" ? "Non-Recurring YoY Change" : "Recurring YoY Change";
+      const changeHtml = showChange ? renderFinanceCardRowChange(changeAmount, changePriorAmount, changeLabel) : "";
       const amountText = amount === 0 && !isZero ? "$0" : formatCurrency(amount);
       // Optional small indented sub-lines under a category's own amount
       // (e.g. Code Compliance's Personnel Services broken into its
@@ -2606,6 +2661,40 @@
     );
   }
 
+  // The "View Budget Lines" modal lists one row per account, summing
+  // FY2020-FY2026 straight from whatever rows are passed in -- correct
+  // when every row is its own distinct account, but Code Compliance's
+  // Street/Beach split shares one Dept_Code, and applyActualsToRows/
+  // applyOriginalBudgetToRows give EACH Dept_Name its own full, undivided
+  // historical total for a shared account (same account, same object
+  // code) rather than splitting it between them. Summing both Dept_Names'
+  // rows straight (whether in the modal's own grand total, or its
+  // collapsed "Prior Years off" one-row-per-account summary line) would
+  // count that one true total twice.
+  //
+  // Each Dept_Name's own row is kept separate here, not merged into one --
+  // Street's and Beach's FY2027 Proposed amounts are genuinely distinct
+  // itemized lines, and merging them away would hide Street's own line
+  // entirely behind a single combined row. Only the *historical* fields
+  // on every row but the first sharing an account are zeroed (the same
+  // "first row keeps it, the rest get zeroed" rule
+  // buildDedupedHistoricalExpenseRows already uses for this exact
+  // scenario), so summing across both Dept_Names' rows lands on the one
+  // true historical total instead of doubling it.
+  function dedupBudgetLinesAcrossDeptNames(rows) {
+    const seenAccountKeys = new Set();
+    return rows.map((row) => {
+      const key = expenseAccountingKey(row);
+      if (!seenAccountKeys.has(key)) {
+        seenAccountKeys.add(key);
+        return row;
+      }
+      const deduped = Object.assign({}, row);
+      HISTORICAL_EXPENSE_DEDUP_FIELDS.forEach((field) => { deduped[field] = 0; });
+      return deduped;
+    });
+  }
+
   // Code Compliance's Street/Beach split (sharing one Dept_Code) renders
   // as one combined Expenditure Summary card instead of two separate
   // cards -- Personnel Services shows each side's own current-year
@@ -2671,7 +2760,7 @@
       rows: cardRows,
       total: grandTotals.FY2027_Proposed || 0,
       showPrior: getShowPriorYears(),
-      detail: renderBudgetLinesToggle(rows, undefined, "expense"),
+      detail: renderBudgetLinesToggle(dedupBudgetLinesAcrossDeptNames(rows), undefined, "expense"),
       showChange: true
     });
   }
@@ -6372,6 +6461,14 @@
     const revenueCardCount = revenueEl ? revenueEl.querySelectorAll(".wc-finance-card").length : 0;
     if (expenseEl) expenseEl.classList.toggle("wc-financial-mount-natural-height", expenseCardCount !== revenueCardCount);
     if (revenueEl) revenueEl.classList.toggle("wc-financial-mount-natural-height", expenseCardCount !== revenueCardCount);
+  }
+
+  // Object_Type (case/whitespace normalized) is how a expense category
+  // row is identified as Capital Outlay vs. everything else (recurring)
+  // -- see renderFinancialDashboardCard's Recurring/Non-Recurring YoY
+  // Change labels.
+  function normalizeObjectTypeForYoy(value) {
+    return String(value || "").trim().toLowerCase();
   }
 
   function initDepartmentPage() {

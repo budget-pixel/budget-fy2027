@@ -2626,6 +2626,11 @@ body {
   color: #111a16 !important;
 }
 
+:root[data-theme="dark"] .wc-data-table tr.wc-table-subtotal-row td {
+  background: rgba(216,199,126,.22) !important;
+  color: var(--text) !important;
+}
+
 :root[data-theme="dark"] .wc-finance-card-track {
   background: rgba(237,243,239,.13);
 }
