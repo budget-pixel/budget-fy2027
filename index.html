@@ -934,7 +934,7 @@
   }
   .wc-tax-metrics{
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
     gap:10px;
     margin-bottom:10px;
   }
@@ -1021,13 +1021,15 @@
     margin-bottom:0;
   }
   .wc-homestead-options{
-    display:flex;
-    flex-wrap:wrap;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:8px;
+    min-width:min(100%, 260px);
   }
   .wc-homestead-option{
-    display:inline-flex;
+    display:flex;
     align-items:center;
+    justify-content:center;
     gap:7px;
     margin:0;
     border:1px solid var(--wc-line);
@@ -1062,6 +1064,40 @@
     color:var(--wc-muted);
     font-size:12px;
     line-height:1.5;
+  }
+  .wc-tax-info-dialog{
+    width:min(92vw, 620px);
+    border:1px solid var(--wc-line);
+    border-radius:16px;
+    background:#fff;
+    color:var(--wc-ink);
+    box-shadow:0 24px 70px rgba(23,32,51,.28);
+    padding:0;
+  }
+  .wc-tax-info-dialog::backdrop{
+    background:rgba(4,16,11,.52);
+  }
+  .wc-tax-info-dialog-inner{
+    padding:22px;
+  }
+  .wc-tax-info-dialog-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:12px;
+  }
+  .wc-tax-info-dialog h5{
+    margin:0;
+    color:var(--wc-ink);
+    font-size:17px;
+    font-weight:900;
+  }
+  .wc-tax-info-dialog p{
+    margin:12px 0 0;
+    color:var(--wc-muted);
+    font-size:13px;
+    line-height:1.55;
   }
   .wc-millage-panel{
     padding:26px;
@@ -1214,28 +1250,31 @@
   .wc-taxpayer-tiers{
     display:grid;
     grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:10px;
+    gap:12px;
   }
   .wc-taxpayer-tier{
     border:1px solid var(--wc-line);
-    border-radius:12px;
-    padding:10px 8px;
+    border-radius:14px;
+    padding:14px 10px;
+    min-height:76px;
     text-align:center;
     background:#fff;
   }
   .wc-taxpayer-tier span{
     display:block;
     color:var(--wc-muted);
-    font-size:10px;
-    font-weight:800;
+    font-size:12px;
+    font-weight:900;
   }
   .wc-taxpayer-tier strong{
     display:block;
-    margin-top:6px;
+    margin-top:8px;
     color:var(--wc-green);
-    font-size:14px;
+    font-size:18px;
+    line-height:1.1;
     font-variant-numeric:tabular-nums;
   }
+  .wc-taxpayer-tier strong.wc-positive-value{ color:var(--wc-green); }
   .wc-taxpayer-tier strong.wc-negative-value{ color:#b3261e; }
   html[data-theme="dark"] .wc-tax-panel{
     background:rgba(14,28,22,.92);
@@ -1289,6 +1328,18 @@
     background:rgba(209,190,120,.14);
     color:var(--wc-ink);
   }
+  html[data-theme="dark"] .wc-tax-info-dialog{
+    background:#0a1410;
+    border-color:var(--wc-line);
+    color:var(--wc-ink);
+    box-shadow:0 24px 70px rgba(0,0,0,.5);
+  }
+  html[data-theme="dark"] .wc-tax-info-dialog h5{
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-tax-info-dialog p{
+    color:var(--wc-muted);
+  }
   html[data-theme="dark"] .wc-property-search-results{
     background:rgba(10,20,16,.96);
     border-color:var(--wc-line);
@@ -1315,6 +1366,7 @@
   @media (max-width:900px){
     .wc-tax-grid{grid-template-columns:1fr;}
     .wc-taxpayer-tiers{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .wc-tax-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
   @media (max-width:560px){
     .wc-millage-grid{grid-template-columns:1fr;}
@@ -1872,17 +1924,17 @@
       <div class="wc-tax-grid">
         <article class="wc-tax-panel wc-tax-calc-panel">
           <div class="wc-millage-panel-head">
-            <h3>Property Tax Calculator</h3>
+            <h3>Property Tax Breakdown</h3>
             <button type="button" class="wc-millage-reset" id="taxCalcReset">Reset</button>
           </div>
-          <p class="wc-tax-calc-intro">Estimate your property tax bill using the countywide millage rate, plus the North Walton Mosquito Control millage if your property is within that district.</p>
+          <p class="wc-tax-calc-intro">Estimate your property tax breakdownusing the last approved budget and countywide millage rate, plus the North Walton Mosquito Control millage if your property is within that district.</p>
           <div class="wc-tax-calc-field wc-property-search-field">
             <span>Find Your Property</span>
             <input id="propertyAddressSearch" type="text" autocomplete="off" placeholder="Search by address">
             <div id="propertyAddressResults" class="wc-property-search-results" hidden></div>
             <p id="propertyAddressStatus" class="wc-property-search-status">Click in the field above, then start typing an address to find your property.</p>
           </div>
-          <label class="wc-tax-calc-field">
+          <label class="wc-tax-calc-field" id="taxManualEstimateField">
             <span>Manual Estimate</span>
             <input id="taxCalcValue" type="text" inputmode="numeric" placeholder="$300,000">
           </label>
@@ -1891,16 +1943,6 @@
             <span>Located within the North Walton Mosquito Control District</span>
           </label>
 
-          <div class="wc-tax-metrics">
-            <div class="wc-tax-metric" id="calcJustValueBox" hidden>
-              <span>Just (Market) Value</span>
-              <strong id="calcJustValue"></strong>
-            </div>
-            <div class="wc-tax-metric">
-              <span>Property Tax Levied (3.519 mills)</span>
-              <strong id="taxCalcCountywide">$0</strong>
-            </div>
-          </div>
           <div class="wc-tax-calc-row wc-tax-calc-row-mosquito" id="taxCalcMosquitoRow" hidden>
             <span>+ North Walton Mosquito Control (0.441 mills)</span>
             <strong id="taxCalcMosquitoAmount"></strong>
@@ -1910,7 +1952,7 @@
             <strong id="taxCalcTotal">$0</strong>
           </div>
 
-          <div class="wc-homestead-block">
+          <div class="wc-homestead-block" id="calcExemptionBlock" hidden>
             <div class="wc-millage-panel-head">
               <h4>Proposed Additional Homestead Exemption</h4>
               <div class="wc-homestead-options" aria-label="Choose exemption scenario">
@@ -1924,7 +1966,6 @@
                 </label>
               </div>
             </div>
-            <p id="calcExemptionIdle" class="wc-tax-breakdown-loading">Enter a taxable value above to see this exemption scenario.</p>
             <div id="calcExemptionResults" hidden>
               <div class="wc-tax-metrics">
                 <div class="wc-tax-metric wc-tax-metric-exemption">
@@ -1949,21 +1990,29 @@
             </div>
           </div>
 
-          <div class="wc-tax-calc-subhead">
+          <div class="wc-tax-calc-subhead" id="taxSupportBreakdownSection" tabindex="-1">
             <div class="wc-millage-panel-head">
               <h4>What Your County Tax Supports</h4>
+              <button type="button" class="wc-millage-reset" id="taxInfoOpen" aria-haspopup="dialog" aria-controls="taxInfoDialog">More Info</button>
             </div>
             <label class="wc-tax-calc-checkbox">
               <input id="showBreakdownPercentages" type="checkbox">
               <span>Show percentages instead of dollar amounts</span>
             </label>
             <div id="personalTaxBreakdown" class="wc-tax-breakdown-list">
-              <p class="wc-tax-breakdown-loading">Enter a taxable value above to see how your county property tax is allocated.</p>
             </div>
           </div>
-          <p class="wc-tax-calc-note">Parcel data is sourced from the Florida GIO statewide dataset. This calculator uses Non-School Taxable Value and the last approved Walton County millage rate of 3.519 mills to estimate the county portion of a user's tax bill. The service breakdown allocates the estimated tax bill proportionally across Walton County's property tax revenue allocations.</p>
-          <p class="wc-tax-calc-note">Some listed services are shown as fully funded by property tax revenue, while others represent only the portion of that service funded by property tax revenue. Some services generate other revenues from charges for services, fees, or other sources; the allocations shown are net of those other revenues and represent the property tax revenue portion.</p>
-          <p class="wc-tax-calc-note">This calculator is provided for informational and educational purposes only. Results are estimates and should not be considered an official determination of taxes. Actual tax amounts may vary based on property classification, exemptions, assessment limitations, taxable value determinations, millage rates, voter-approved levies, and other factors. Users should view official records from the Walton County Property Appraiser for parcel-specific tax information.</p>
+          <dialog class="wc-tax-info-dialog" id="taxInfoDialog" aria-labelledby="taxInfoDialogTitle">
+            <div class="wc-tax-info-dialog-inner">
+              <div class="wc-tax-info-dialog-head">
+                <h5 id="taxInfoDialogTitle">Methodology &amp; Disclaimer</h5>
+                <button type="button" class="wc-millage-reset" id="taxInfoClose">Close</button>
+              </div>
+              <p>Parcel data is sourced from the Florida GIO statewide dataset. This calculator uses Non-School Taxable Value and the last approved Walton County millage rate of 3.519 mills to estimate the county portion of a user's tax bill. The service breakdown allocates the estimated tax bill proportionally across Walton County's property tax revenue allocations.</p>
+              <p>Some listed services are shown as fully funded by property tax revenue, while others represent only the portion of that service funded by property tax revenue. Some services generate other revenues from charges for services, fees, or other sources; the allocations shown are net of those other revenues and represent the property tax revenue portion.</p>
+              <p>This calculator is provided for informational and educational purposes only. Results are estimates and should not be considered an official determination of taxes. Actual tax amounts may vary based on property classification, exemptions, assessment limitations, taxable value determinations, millage rates, voter-approved levies, and other factors. Users should view official records from the Walton County Property Appraiser for parcel-specific tax information.</p>
+            </div>
+          </dialog>
         </article>
         <article class="wc-tax-panel wc-millage-panel">
           <div class="wc-millage-panel-head">
@@ -1999,7 +2048,7 @@
           <div class="wc-taxpayer-impact">
             <p class="wc-taxpayer-impact-label">
               Estimated Annual Change by Taxable Value
-              <button type="button" class="wc-info-button" aria-label="Annual change help" data-tip="Estimated annual change compares the current millage rate with the proposed millage rate for each taxable value shown.">i</button>
+              <button type="button" class="wc-info-button" aria-label="Annual change help" data-tip="Estimated annual change compares the proposed millage rate with the rollback rate for each taxable value shown.">i</button>
             </p>
             <div id="millageTaxpayerTiers" class="wc-taxpayer-tiers"></div>
           </div>
@@ -2459,6 +2508,10 @@
         var n = Number(value) || 0;
         return (n < 0 ? "-" : n > 0 ? "+" : "") + money(Math.abs(n));
       }
+      function signedMoneyWithCents(value){
+        var n = Number(value) || 0;
+        return (n < 0 ? "-" : n > 0 ? "+" : "") + moneyWithCents(Math.abs(n));
+      }
       function toneClass(value){
         var n = Number(value) || 0;
         return n < 0 ? "wc-negative-value" : n > 0 ? "wc-positive-value" : "";
@@ -2468,8 +2521,25 @@
       }
 
       function render(){
-        var proposed = Number(proposedInput.value);
-        if(!isFinite(proposed) || proposed < 0) proposed = ADOPTED_MILLAGE;
+        var proposedText = proposedInput.value.trim();
+        var proposed = Number(proposedText);
+        var hasProposedMillage = proposedText !== "" && isFinite(proposed) && proposed >= 0;
+        if(!hasProposedMillage){
+          $("#millageEstimatedRevenue").textContent = "Enter a millage";
+
+          var idleVsCurrentEl = $("#millageVsCurrent");
+          idleVsCurrentEl.textContent = "--";
+          idleVsCurrentEl.className = "";
+
+          var idleVsRollbackEl = $("#millageVsRollback");
+          idleVsRollbackEl.textContent = "--";
+          idleVsRollbackEl.className = "";
+
+          $("#millageTaxpayerTiers").innerHTML = TAXPAYER_TIERS.map(function(value){
+            return '<div class="wc-taxpayer-tier"><span>' + money(value) + '</span><strong>--</strong></div>';
+          }).join("");
+          return;
+        }
         var estimatedRevenue = revenueAtMillage(proposed);
         var currentRevenue = revenueAtMillage(ADOPTED_MILLAGE);
         var rollbackRevenue = revenueAtMillage(ROLLBACK_RATE);
@@ -2487,20 +2557,20 @@
         vsRollbackEl.className = toneClass(vsRollback);
 
         var tiersEl = $("#millageTaxpayerTiers");
-        var millageDifference = ADOPTED_MILLAGE - proposed;
+        var millageDifference = proposed - ROLLBACK_RATE;
         tiersEl.innerHTML = TAXPAYER_TIERS.map(function(value){
-          var savings = millageDifference * value / 1000;
-          return '<div class="wc-taxpayer-tier"><span>' + money(value) + '</span><strong class="' + toneClass(savings) + '">' + moneyWithCents(savings) + '</strong></div>';
+          var change = millageDifference * value / 1000;
+          return '<div class="wc-taxpayer-tier"><span>' + money(value) + '</span><strong class="' + toneClass(change) + '">' + signedMoneyWithCents(change) + '</strong></div>';
         }).join("");
       }
 
-      proposedInput.value = ADOPTED_MILLAGE.toFixed(4);
+      proposedInput.value = "";
       proposedInput.addEventListener("input", render);
 
       var resetButton = $("#millageReset");
       if(resetButton){
         resetButton.addEventListener("click", function(){
-          proposedInput.value = ADOPTED_MILLAGE.toFixed(4);
+          proposedInput.value = "";
           render();
         });
       }
@@ -2581,6 +2651,10 @@
       var use2028Checkbox = $("#use2028Exemption");
       var showPercentCheckbox = $("#showBreakdownPercentages");
       var resetButton = $("#taxCalcReset");
+      var infoButton = $("#taxInfoOpen");
+      var infoDialog = $("#taxInfoDialog");
+      var infoCloseButton = $("#taxInfoClose");
+      var manualEstimateField = $("#taxManualEstimateField");
       var propertySearchInput = $("#propertyAddressSearch");
       var propertySearchResults = $("#propertyAddressResults");
       var propertySearchStatus = $("#propertyAddressStatus");
@@ -2590,6 +2664,7 @@
       var ADDITIONAL_EXEMPTION_2028 = 250000;
       var BREAKDOWN_PREVIEW_COUNT = 7;
       var lastCountyTax = 0;
+      var lastMosquitoTax = 0;
       var breakdownShowAll = false;
 
       function money(value){
@@ -2599,37 +2674,56 @@
         return "$" + (Number(value) || 0).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 });
       }
 
-      function renderPersonalBreakdown(countyTax){
+      function renderPersonalBreakdown(countyTax, mosquitoTax){
         var mount = $("#personalTaxBreakdown");
         if(!mount) return;
-        if(!countyTax){
-          mount.innerHTML = '<p class="wc-tax-breakdown-loading">Enter a taxable value above to see how your county property tax is allocated.</p>';
+        if(!countyTax && !mosquitoTax){
+          mount.innerHTML = "";
           return;
         }
         mount.innerHTML = '<p class="wc-tax-breakdown-loading">Loading breakdown...</p>';
         getDepartmentAdValoremRows().then(function(departments){
           var grandTotal = departments.reduce(function(sum, d){ return sum + d.amount; }, 0);
           var showPercent = showPercentCheckbox && showPercentCheckbox.checked;
+          var combinedTax = countyTax + mosquitoTax;
           var visible = breakdownShowAll ? departments : departments.slice(0, BREAKDOWN_PREVIEW_COUNT);
           var rowsHtml = visible.map(function(d){
             var share = grandTotal ? d.amount / grandTotal : 0;
             var amount = countyTax * share;
+            var percentShare = combinedTax ? amount / combinedTax : 0;
             return '<div class="wc-tax-breakdown-row">' +
-              '<div class="wc-tax-breakdown-row-head"><span>' + escapeHtml(d.name) + '</span><strong>' + (showPercent ? (share * 100).toFixed(2) + "%" : moneyWithCents(amount)) + '</strong></div>' +
+              '<div class="wc-tax-breakdown-row-head"><span>' + escapeHtml(d.name) + '</span><strong>' + (showPercent ? (percentShare * 100).toFixed(2) + "%" : moneyWithCents(amount)) + '</strong></div>' +
             '</div>';
           }).join("");
+          if(mosquitoTax > 0){
+            var mosquitoShare = combinedTax ? mosquitoTax / combinedTax : 0;
+            rowsHtml += '<div class="wc-tax-breakdown-row">' +
+              '<div class="wc-tax-breakdown-row-head"><span>North Walton Mosquito Control</span><strong>' + (showPercent ? (mosquitoShare * 100).toFixed(2) + "%" : moneyWithCents(mosquitoTax)) + '</strong></div>' +
+            '</div>';
+          }
           var toggleHtml = "";
           if(departments.length > BREAKDOWN_PREVIEW_COUNT){
+            var departmentCount = departments.length + (mosquitoTax > 0 ? 1 : 0);
             toggleHtml = '<button type="button" id="personalBreakdownToggle" class="wc-millage-reset wc-breakdown-toggle">' +
-              (breakdownShowAll ? "Show Fewer" : "View All " + departments.length + " Departments") +
+              (breakdownShowAll ? "Show Fewer" : "View All " + departmentCount + " Departments") +
             "</button>";
           }
           mount.innerHTML = rowsHtml + toggleHtml;
           var toggleButton = $("#personalBreakdownToggle");
           if(toggleButton){
             toggleButton.addEventListener("click", function(){
+              var shouldReturnToTop = breakdownShowAll;
               breakdownShowAll = !breakdownShowAll;
-              renderPersonalBreakdown(lastCountyTax);
+              renderPersonalBreakdown(lastCountyTax, lastMosquitoTax);
+              if(shouldReturnToTop){
+                window.setTimeout(function(){
+                  var section = $("#taxSupportBreakdownSection");
+                  if(section){
+                    section.scrollIntoView({ behavior:"smooth", block:"start" });
+                    section.focus({ preventScroll:true });
+                  }
+                }, 0);
+              }
             });
           }
         }).catch(function(){
@@ -2641,18 +2735,15 @@
         var digits = valueInput.value.replace(/[^0-9]/g, "");
         valueInput.value = digits ? "$" + Number(digits).toLocaleString("en-US") : "";
       }
+      function setManualEstimateVisible(visible){
+        if(manualEstimateField) manualEstimateField.hidden = !visible;
+      }
 
       function render(){
         var taxableValue = parseDollarAmount(valueInput.value);
         var countywideAmount = taxableValue * COUNTYWIDE_MILLAGE / 1000;
-        $("#taxCalcCountywide").textContent = money(countywideAmount);
-
-        var justValueBox = $("#calcJustValueBox");
-        if(selectedParcelMeta && selectedParcelMeta.taxableValue === taxableValue && selectedParcelMeta.justValue){
-          $("#calcJustValue").textContent = money(selectedParcelMeta.justValue);
-          justValueBox.hidden = false;
-        } else {
-          justValueBox.hidden = true;
+        if(selectedParcelMeta && selectedParcelMeta.taxableValue === taxableValue){
+          setManualEstimateVisible(false);
         }
 
         var includeMosquito = mosquitoCheckbox.checked;
@@ -2666,17 +2757,16 @@
         // Homestead exemption scenario stays idle until a taxable value is
         // entered, then only applies when the user opts into one of the
         // proposed exemption scenarios.
-        var exemptionIdle = $("#calcExemptionIdle");
+        var exemptionBlock = $("#calcExemptionBlock");
         var exemptionResults = $("#calcExemptionResults");
         if(!taxableValue){
-          exemptionIdle.hidden = false;
+          exemptionBlock.hidden = true;
           exemptionResults.hidden = true;
         } else {
-          exemptionIdle.hidden = true;
+          exemptionBlock.hidden = false;
           exemptionResults.hidden = false;
-          var isHomestead = !selectedParcelMeta || selectedParcelMeta.taxableValue !== taxableValue || selectedParcelMeta.isHomestead;
           var selectedExemption = use2028Checkbox.checked ? ADDITIONAL_EXEMPTION_2028 : use2027Checkbox.checked ? ADDITIONAL_EXEMPTION : 0;
-          var exemptionAmount = isHomestead ? selectedExemption : 0;
+          var exemptionAmount = selectedExemption;
           var adjustedTaxableValue = Math.max(taxableValue - exemptionAmount, 0);
           var newCountyTax = adjustedTaxableValue * COUNTYWIDE_MILLAGE / 1000;
           var fundingLoss = Math.max(countywideAmount - newCountyTax, 0);
@@ -2690,11 +2780,12 @@
         }
 
         lastCountyTax = countywideAmount;
-        renderPersonalBreakdown(countywideAmount);
+        lastMosquitoTax = mosquitoAmount;
+        renderPersonalBreakdown(countywideAmount, mosquitoAmount);
       }
 
-      valueInput.addEventListener("input", function(){
-        if(!selectedParcelMeta || parseDollarAmount(valueInput.value) !== selectedParcelMeta.taxableValue){
+      valueInput.addEventListener("input", function(event){
+        if(!event.detail || !event.detail.preserveParcelMeta){
           selectedParcelMeta = null;
         }
         formatValueInput();
@@ -2703,7 +2794,25 @@
       mosquitoCheckbox.addEventListener("change", render);
       use2027Checkbox.addEventListener("change", render);
       use2028Checkbox.addEventListener("change", render);
-      showPercentCheckbox.addEventListener("change", function(){ renderPersonalBreakdown(lastCountyTax); });
+      showPercentCheckbox.addEventListener("change", function(){ renderPersonalBreakdown(lastCountyTax, lastMosquitoTax); });
+      if(infoButton && infoDialog){
+        infoButton.addEventListener("click", function(){
+          if(typeof infoDialog.showModal === "function"){
+            infoDialog.showModal();
+          } else {
+            infoDialog.setAttribute("open", "");
+          }
+        });
+      }
+      if(infoCloseButton && infoDialog){
+        infoCloseButton.addEventListener("click", function(){
+          if(typeof infoDialog.close === "function"){
+            infoDialog.close();
+          } else {
+            infoDialog.removeAttribute("open");
+          }
+        });
+      }
       if(resetButton){
         resetButton.addEventListener("click", function(){
           selectedParcelMeta = null;
@@ -2712,8 +2821,10 @@
           use2027Checkbox.checked = false;
           use2028Checkbox.checked = false;
           showPercentCheckbox.checked = false;
+          lastMosquitoTax = 0;
           breakdownShowAll = false;
           if(propertySearchInput) propertySearchInput.value = "";
+          setManualEstimateVisible(true);
           if(propertySearchResults){
             propertySearchResults.hidden = true;
             propertySearchResults.innerHTML = "";
@@ -2738,6 +2849,7 @@
       var resultsBox = $("#propertyAddressResults");
       var statusEl = $("#propertyAddressStatus");
       var valueInput = $("#taxCalcValue");
+      var manualEstimateField = $("#taxManualEstimateField");
       var records = [];
       var loaded = false;
       var loading = false;
@@ -2768,6 +2880,7 @@
         input.value = record.address;
         resultsBox.hidden = true;
         resultsBox.innerHTML = "";
+        if(manualEstimateField) manualEstimateField.hidden = true;
         selectedParcelMeta = {
           taxableValue: record.taxableValue,
           justValue: record.justValue,
@@ -2775,12 +2888,14 @@
         };
         if(valueInput && typeof record.taxableValue === "number"){
           valueInput.value = String(record.taxableValue);
-          valueInput.dispatchEvent(new Event("input"));
+          valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:true } }));
+          if(manualEstimateField) manualEstimateField.hidden = true;
         }
       }
 
       function handleSearchInput(){
         var query = input.value.trim().toLowerCase();
+        if(manualEstimateField) manualEstimateField.hidden = false;
         if(!query || query.length < 3){
           showResults([]);
           return;
