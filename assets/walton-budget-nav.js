@@ -1457,6 +1457,24 @@
     opacity:1 !important;
     transform:translateY(0) !important;
   }
+  html[data-theme="dark"] .wc-budget-line-tooltip-anchor{
+    border-color:rgba(209,190,120,0.7) !important;
+    background:rgba(10,20,16,0.9) !important;
+    color:#f2f8f4 !important;
+    box-shadow:0 1px 5px rgba(0,0,0,0.34) !important;
+  }
+  html[data-theme="dark"] .wc-budget-line-tooltip-anchor:hover,
+  html[data-theme="dark"] .wc-budget-line-tooltip-anchor:focus{
+    background:#d1be78 !important;
+    color:#08130f !important;
+    outline-color:rgba(209,190,120,0.42) !important;
+  }
+  html[data-theme="dark"] .wc-budget-line-tooltip-bubble{
+    border-color:rgba(209,190,120,0.62) !important;
+    background:#08130f !important;
+    color:#f2f8f4 !important;
+    box-shadow:0 14px 30px rgba(0,0,0,0.46) !important;
+  }
   [data-report-table-id] th:first-child,
   [data-report-table-id] td:first-child{
     position:sticky !important;
