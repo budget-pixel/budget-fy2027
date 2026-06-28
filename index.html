@@ -737,6 +737,469 @@
     .wc-section-heading-aside{ flex-wrap:wrap; gap:16px; }
   }
 
+  /* Property Tax & Millage Adjustment section -- see #property-tax. The
+     left panel embeds the separately-hosted property tax breakdown tool;
+     the right panel is a self-contained millage calculator (adapted from
+     https://github.com/budget-pixel/walton-budget-simulation's own
+     "Countywide Millage Adjustment" panel, with its taxable value base
+     and adopted/rollback millage assumptions). */
+  .wc-tax-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+    gap:24px;
+    margin-top:22px;
+  }
+  .wc-tax-panel{
+    border:1px solid var(--wc-line);
+    background:rgba(255,255,255,.86);
+    border-radius:24px;
+    box-shadow:0 14px 34px rgba(23,32,51,.08);
+    padding:26px;
+  }
+  .wc-tax-calc-panel h3{
+    margin:0 0 10px;
+    color:var(--wc-ink);
+    font-size:20px;
+    font-weight:800;
+  }
+  .wc-tax-calc-intro{
+    margin:0 0 18px;
+    color:var(--wc-muted);
+    font-size:14px;
+    line-height:1.55;
+  }
+  .wc-tax-calc-subhead{
+    margin-top:24px;
+    padding-top:22px;
+    border-top:1px solid var(--wc-line);
+  }
+  .wc-tax-breakdown-list{
+    margin-bottom:22px;
+  }
+  .wc-tax-breakdown-loading,
+  .wc-tax-breakdown-error{
+    margin:0;
+    color:var(--wc-muted);
+    font-size:13px;
+  }
+  .wc-tax-breakdown-row{
+    margin-bottom:10px;
+  }
+  .wc-tax-breakdown-row-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:5px;
+  }
+  .wc-tax-breakdown-row-head span{
+    color:var(--wc-ink);
+    font-size:13px;
+    font-weight:700;
+  }
+  .wc-tax-breakdown-row-head strong{
+    flex:0 0 auto;
+    color:var(--wc-green);
+    font-size:13px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+  .wc-tax-breakdown-track{
+    height:7px;
+    border-radius:999px;
+    background:rgba(0,98,49,.1);
+    overflow:hidden;
+  }
+  .wc-tax-breakdown-track i{
+    display:block;
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,var(--wc-green),var(--wc-gold));
+  }
+  .wc-tax-breakdown-pct{
+    display:block;
+    margin-top:3px;
+    color:var(--wc-muted);
+    font-size:11px;
+    font-weight:700;
+  }
+  .wc-tax-calc-field{
+    display:block;
+    margin-bottom:14px;
+  }
+  .wc-tax-calc-field span{
+    display:block;
+    margin-bottom:6px;
+    color:var(--wc-muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .wc-tax-calc-field input{
+    display:block;
+    width:100%;
+    border:1px solid var(--wc-line);
+    border-radius:10px;
+    padding:10px 12px;
+    color:var(--wc-ink);
+    font-size:18px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    background:#fbfdfb;
+  }
+  .wc-tax-calc-field input:focus{
+    outline:3px solid var(--wc-gold);
+    outline-offset:1px;
+  }
+  .wc-property-search-field{
+    position:relative;
+  }
+  .wc-property-search-field input:disabled{
+    cursor:not-allowed;
+    opacity:.6;
+  }
+  .wc-property-search-status{
+    margin:6px 0 0;
+    color:var(--wc-muted);
+    font-size:12px;
+    line-height:1.5;
+  }
+  .wc-property-search-results{
+    position:absolute;
+    z-index:6;
+    top:100%;
+    left:0;
+    right:0;
+    margin-top:4px;
+    border:1px solid var(--wc-line);
+    border-radius:10px;
+    background:#fff;
+    box-shadow:0 10px 26px rgba(23,32,51,.14);
+    max-height:240px;
+    overflow-y:auto;
+  }
+  .wc-property-search-result{
+    display:block;
+    width:100%;
+    text-align:left;
+    border:0;
+    border-bottom:1px solid var(--wc-line);
+    background:none;
+    padding:10px 12px;
+    cursor:pointer;
+    font:inherit;
+  }
+  .wc-property-search-result:last-child{
+    border-bottom:0;
+  }
+  .wc-property-search-result:hover,
+  .wc-property-search-result:focus{
+    background:rgba(0,98,49,.07);
+  }
+  .wc-property-search-result strong{
+    display:block;
+    color:var(--wc-ink);
+    font-size:13px;
+    font-weight:700;
+  }
+  .wc-property-search-result span{
+    display:block;
+    margin-top:2px;
+    color:var(--wc-muted);
+    font-size:11px;
+    text-transform:none;
+    letter-spacing:normal;
+    font-weight:600;
+  }
+  .wc-tax-calc-checkbox{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:18px;
+    color:var(--wc-ink);
+    font-size:14px;
+    line-height:1.4;
+    cursor:pointer;
+  }
+  .wc-tax-calc-checkbox input{
+    margin-top:3px;
+    flex:0 0 auto;
+    width:16px;
+    height:16px;
+    accent-color:var(--wc-green);
+  }
+  .wc-tax-calc-results{
+    border:1px solid var(--wc-line);
+    border-radius:16px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .wc-tax-calc-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--wc-line);
+  }
+  .wc-tax-calc-row span{
+    color:var(--wc-muted);
+    font-size:13px;
+    font-weight:700;
+  }
+  .wc-tax-calc-row strong{
+    color:var(--wc-ink);
+    font-size:16px;
+    font-variant-numeric:tabular-nums;
+  }
+  .wc-tax-calc-row-total{
+    border-bottom:0;
+    background:rgba(0,98,49,.06);
+  }
+  .wc-tax-calc-row-total span,
+  .wc-tax-calc-row-total strong{
+    color:var(--wc-green);
+    font-weight:900;
+  }
+  .wc-tax-calc-row-total strong{
+    font-size:20px;
+  }
+  .wc-tax-calc-note{
+    margin:14px 0 0;
+    color:var(--wc-muted);
+    font-size:12px;
+    line-height:1.5;
+  }
+  .wc-millage-panel{
+    padding:26px;
+  }
+  .wc-millage-panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .wc-millage-panel-head h3{
+    margin:0;
+    color:var(--wc-ink);
+    font-size:20px;
+    font-weight:800;
+  }
+  .wc-millage-reset{
+    border:1px solid var(--wc-line);
+    background:#fff;
+    border-radius:999px;
+    padding:7px 16px;
+    color:var(--wc-green);
+    font-size:13px;
+    font-weight:800;
+    cursor:pointer;
+    transition:background-color .15s ease,color .15s ease;
+  }
+  .wc-millage-reset:hover{
+    background:var(--wc-green);
+    color:#fff;
+  }
+  .wc-millage-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+  }
+  .wc-millage-box{
+    display:block;
+    border:1px solid var(--wc-line);
+    border-radius:16px;
+    background:#fff;
+    padding:14px 16px;
+  }
+  .wc-millage-box.wc-millage-full{
+    grid-column:1 / -1;
+  }
+  .wc-millage-box span{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:var(--wc-muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .wc-millage-box strong{
+    display:block;
+    margin-top:8px;
+    color:var(--wc-green);
+    font-size:22px;
+    font-variant-numeric:tabular-nums;
+  }
+  .wc-millage-box strong.wc-negative-value{ color:#b3261e; }
+  .wc-millage-box strong.wc-positive-value{ color:var(--wc-green); }
+  .wc-millage-editable input{
+    display:block;
+    width:100%;
+    margin-top:8px;
+    border:1px solid var(--wc-line);
+    border-radius:10px;
+    padding:7px 10px;
+    color:var(--wc-ink);
+    font-size:18px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    background:#fbfdfb;
+  }
+  .wc-millage-editable input:focus{
+    outline:3px solid var(--wc-gold);
+    outline-offset:1px;
+  }
+  .wc-info-button{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    border:1px solid var(--wc-muted);
+    background:none;
+    color:var(--wc-muted);
+    font-size:10px;
+    font-style:italic;
+    font-weight:700;
+    line-height:1;
+    cursor:help;
+    padding:0;
+  }
+  .wc-info-button::after{
+    content:attr(data-tip);
+    position:absolute;
+    z-index:5;
+    bottom:calc(100% + 8px);
+    left:0;
+    width:240px;
+    border-radius:10px;
+    background:var(--wc-ink);
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    text-transform:none;
+    letter-spacing:normal;
+    line-height:1.5;
+    padding:10px 12px;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .15s ease;
+    pointer-events:none;
+  }
+  .wc-info-button:hover::after,
+  .wc-info-button:focus::after{
+    opacity:1;
+    visibility:visible;
+  }
+  .wc-taxpayer-impact{
+    margin-top:20px;
+    padding-top:18px;
+    border-top:1px solid var(--wc-line);
+  }
+  .wc-taxpayer-impact-label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin:0 0 12px;
+    color:var(--wc-muted);
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+  .wc-taxpayer-tiers{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+  }
+  .wc-taxpayer-tier{
+    border:1px solid var(--wc-line);
+    border-radius:12px;
+    padding:10px 8px;
+    text-align:center;
+    background:#fff;
+  }
+  .wc-taxpayer-tier span{
+    display:block;
+    color:var(--wc-muted);
+    font-size:10px;
+    font-weight:800;
+  }
+  .wc-taxpayer-tier strong{
+    display:block;
+    margin-top:6px;
+    color:var(--wc-green);
+    font-size:14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .wc-taxpayer-tier strong.wc-negative-value{ color:#b3261e; }
+  html[data-theme="dark"] .wc-tax-panel{
+    background:rgba(14,28,22,.92);
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-millage-box,
+  html[data-theme="dark"] .wc-millage-reset,
+  html[data-theme="dark"] .wc-taxpayer-tier{
+    background:rgba(10,20,16,.7);
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-millage-editable input{
+    background:rgba(10,20,16,.7);
+    color:var(--wc-ink);
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-millage-panel-head h3,
+  html[data-theme="dark"] .wc-tax-calc-panel h3{
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-tax-calc-field input,
+  html[data-theme="dark"] .wc-tax-calc-results,
+  html[data-theme="dark"] .wc-tax-calc-row{
+    background:rgba(10,20,16,.7);
+    border-color:var(--wc-line);
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-tax-calc-row-total{
+    background:rgba(123,211,159,.1);
+  }
+  html[data-theme="dark"] .wc-property-search-results{
+    background:rgba(10,20,16,.96);
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-property-search-result{
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-property-search-result:hover,
+  html[data-theme="dark"] .wc-property-search-result:focus{
+    background:rgba(123,211,159,.12);
+  }
+  html[data-theme="dark"] .wc-property-search-result strong{
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-tax-calc-subhead{
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-tax-breakdown-row-head span{
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-tax-breakdown-track{
+    background:rgba(237,243,239,.13);
+  }
+  @media (max-width:900px){
+    .wc-tax-grid{grid-template-columns:1fr;}
+    .wc-taxpayer-tiers{grid-template-columns:repeat(3,minmax(0,1fr));}
+  }
+  @media (max-width:560px){
+    .wc-millage-grid{grid-template-columns:1fr;}
+    .wc-taxpayer-tiers{grid-template-columns:repeat(2,minmax(0,1fr));}
+  }
+
   .wc-budget-grid{
     display:grid;
     grid-template-columns:repeat(5, minmax(0,1fr));
@@ -1277,6 +1740,94 @@
       </div>
     </section>
 
+    <section class="wc-section wc-reveal" id="property-tax">
+      <div class="wc-section-heading">
+        <div>
+          <span>Property Tax Tools</span>
+          <h2>What your property taxes fund, and what a different millage would mean.</h2>
+        </div>
+      </div>
+      <div class="wc-tax-grid">
+        <article class="wc-tax-panel wc-tax-calc-panel">
+          <h3>What Your Property Taxes Fund</h3>
+          <p class="wc-tax-calc-intro">Ad valorem (property tax) support by department, FY 2027 proposed.</p>
+          <div id="propertyTaxBreakdown" class="wc-tax-breakdown-list">
+            <p class="wc-tax-breakdown-loading">Loading property tax breakdown...</p>
+          </div>
+          <h3 class="wc-tax-calc-subhead">Property Tax Calculator</h3>
+          <p class="wc-tax-calc-intro">Estimate your property tax bill using the countywide millage rate, plus the North Walton Mosquito Control millage if your property is within that district.</p>
+          <div class="wc-tax-calc-field wc-property-search-field">
+            <span>Find Your Property</span>
+            <input id="propertyAddressSearch" type="text" autocomplete="off" placeholder="Search by address" disabled>
+            <div id="propertyAddressResults" class="wc-property-search-results" hidden></div>
+            <p id="propertyAddressStatus" class="wc-property-search-status">Property address search will be available once county parcel data is loaded.</p>
+          </div>
+          <label class="wc-tax-calc-field">
+            <span>Taxable Value</span>
+            <input id="taxCalcValue" type="text" inputmode="numeric" placeholder="$300,000">
+          </label>
+          <label class="wc-tax-calc-checkbox">
+            <input id="taxCalcMosquito" type="checkbox">
+            <span>Located within the North Walton Mosquito Control District</span>
+          </label>
+          <div class="wc-tax-calc-results">
+            <div class="wc-tax-calc-row">
+              <span>Countywide (3.519 mills)</span>
+              <strong id="taxCalcCountywide"></strong>
+            </div>
+            <div class="wc-tax-calc-row wc-tax-calc-row-mosquito" id="taxCalcMosquitoRow" hidden>
+              <span>North Walton Mosquito Control (0.441 mills)</span>
+              <strong id="taxCalcMosquitoAmount"></strong>
+            </div>
+            <div class="wc-tax-calc-row wc-tax-calc-row-total">
+              <span>Estimated Annual Property Tax</span>
+              <strong id="taxCalcTotal"></strong>
+            </div>
+          </div>
+          <p class="wc-tax-calc-note">This is a planning estimate based on the millage rates shown above. It does not include exemptions, assessment limitations, non-ad valorem assessments, or other taxing authorities' rates, and may not match your final tax bill.</p>
+        </article>
+        <article class="wc-tax-panel wc-millage-panel">
+          <div class="wc-millage-panel-head">
+            <h3>Countywide Millage Adjustment</h3>
+            <button type="button" class="wc-millage-reset" id="millageReset">Reset</button>
+          </div>
+          <div class="wc-millage-grid">
+            <div class="wc-millage-box">
+              <span>Current Millage<button type="button" class="wc-info-button" aria-label="Current millage help" data-tip="The millage rate is the property tax rate used to calculate countywide property tax revenue. One mill equals $1 of tax for every $1,000 of taxable value.">i</button></span>
+              <strong id="millageCurrent">3.519</strong>
+            </div>
+            <label class="wc-millage-box wc-millage-editable">
+              <span>Proposed Millage<button type="button" class="wc-info-button" aria-label="Proposed millage help" data-tip="The proposed millage is a planning assumption. Changing it estimates how much revenue a different tax rate would generate using the countywide taxable value base.">i</button></span>
+              <input id="millageProposed" type="text" inputmode="decimal" placeholder="Enter millage">
+            </label>
+            <div class="wc-millage-box">
+              <span>Rollback Rate<button type="button" class="wc-info-button" aria-label="Rollback rate help" data-tip="The rollback rate is the millage rate that would generate the same property tax revenue as the prior year using the current taxable value base.">i</button></span>
+              <strong id="millageRollback">3.3531</strong>
+            </div>
+            <div class="wc-millage-box wc-millage-full">
+              <span>Estimated Revenue<button type="button" class="wc-info-button" aria-label="Estimated revenue help" data-tip="Estimated revenue is calculated as the countywide taxable value base multiplied by the proposed millage, divided by 1,000. This is a planning estimate and may not match final certified tax roll calculations.">i</button></span>
+              <strong id="millageEstimatedRevenue"></strong>
+            </div>
+            <div class="wc-millage-box">
+              <span>Vs Current Millage<button type="button" class="wc-info-button" aria-label="Revenue difference help" data-tip="How much more or less property tax revenue the proposed millage would generate compared with the current adopted millage.">i</button></span>
+              <strong id="millageVsCurrent"></strong>
+            </div>
+            <div class="wc-millage-box">
+              <span>Vs Rollback Revenue<button type="button" class="wc-info-button" aria-label="Revenue difference help" data-tip="How much more or less property tax revenue the proposed millage would generate compared with the rollback rate.">i</button></span>
+              <strong id="millageVsRollback"></strong>
+            </div>
+          </div>
+          <div class="wc-taxpayer-impact">
+            <p class="wc-taxpayer-impact-label">
+              Estimated Annual Savings by Taxable Value
+              <button type="button" class="wc-info-button" aria-label="Annual savings help" data-tip="Estimated annual savings compare the current millage rate with the proposed millage rate applied to the taxable value shown. A negative amount means the proposed millage would cost more, not save. Actual tax bills may vary based on exemptions, assessment limitations, and the final adopted millage rate.">i</button>
+            </p>
+            <div id="millageTaxpayerTiers" class="wc-taxpayer-tiers"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section class="wc-section wc-reveal" id="projects">
       <div class="wc-section-heading">
         <div>
@@ -1690,6 +2241,277 @@
       });
     }
 
+    // Countywide Millage Adjustment calculator -- ported from
+    // https://github.com/budget-pixel/walton-budget-simulation's own
+    // "Countywide Millage Adjustment" panel. ADOPTED_MILLAGE/ROLLBACK_RATE/
+    // TAXABLE_VALUE_BASE are that tool's own fixed planning assumptions
+    // (not derived from this site's own live revenue data), so Estimated
+    // Revenue here is a planning estimate consistent with that tool, not
+    // a recomputation of this page's own Property Taxes card above.
+    function initMillageCalculator(){
+      var proposedInput = $("#millageProposed");
+      if(!proposedInput) return;
+
+      var ADOPTED_MILLAGE = 3.519;
+      var ROLLBACK_RATE = 3.3531;
+      var TAXABLE_VALUE_BASE = 48899400423;
+      var TAXPAYER_TIERS = [100000, 200000, 300000, 400000, 500000];
+
+      function money(value){
+        return "$" + Math.round(Number(value) || 0).toLocaleString("en-US");
+      }
+      function moneyWithCents(value){
+        return "$" + (Number(value) || 0).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 });
+      }
+      function signedMoney(value){
+        var n = Number(value) || 0;
+        return (n < 0 ? "-" : n > 0 ? "+" : "") + money(Math.abs(n));
+      }
+      function toneClass(value){
+        var n = Number(value) || 0;
+        return n < 0 ? "wc-negative-value" : n > 0 ? "wc-positive-value" : "";
+      }
+      function revenueAtMillage(rate){
+        return TAXABLE_VALUE_BASE * rate / 1000;
+      }
+
+      function render(){
+        var proposed = Number(proposedInput.value);
+        if(!isFinite(proposed) || proposed < 0) proposed = ADOPTED_MILLAGE;
+        var estimatedRevenue = revenueAtMillage(proposed);
+        var currentRevenue = revenueAtMillage(ADOPTED_MILLAGE);
+        var rollbackRevenue = revenueAtMillage(ROLLBACK_RATE);
+
+        $("#millageEstimatedRevenue").textContent = money(estimatedRevenue);
+
+        var vsCurrent = estimatedRevenue - currentRevenue;
+        var vsCurrentEl = $("#millageVsCurrent");
+        vsCurrentEl.textContent = signedMoney(vsCurrent);
+        vsCurrentEl.className = toneClass(vsCurrent);
+
+        var vsRollback = estimatedRevenue - rollbackRevenue;
+        var vsRollbackEl = $("#millageVsRollback");
+        vsRollbackEl.textContent = signedMoney(vsRollback);
+        vsRollbackEl.className = toneClass(vsRollback);
+
+        var tiersEl = $("#millageTaxpayerTiers");
+        var millageDifference = ADOPTED_MILLAGE - proposed;
+        tiersEl.innerHTML = TAXPAYER_TIERS.map(function(value){
+          var savings = millageDifference * value / 1000;
+          return '<div class="wc-taxpayer-tier"><span>' + money(value) + '</span><strong class="' + toneClass(savings) + '">' + moneyWithCents(savings) + '</strong></div>';
+        }).join("");
+      }
+
+      proposedInput.value = ADOPTED_MILLAGE.toFixed(4);
+      proposedInput.addEventListener("input", render);
+
+      var resetButton = $("#millageReset");
+      if(resetButton){
+        resetButton.addEventListener("click", function(){
+          proposedInput.value = ADOPTED_MILLAGE.toFixed(4);
+          render();
+        });
+      }
+
+      render();
+    }
+
+    // Minimal quoted-CSV line splitter (handles "$98,004,256.00"-style
+    // quoted fields with embedded commas) -- same algorithm budget-data.js
+    // uses internally, just not exposed on window.WCBudgetData, so it's
+    // duplicated here in compact form rather than reaching into that
+    // file's closure.
+    function parseCsv(text){
+      var rows = [];
+      var row = [];
+      var field = "";
+      var inQuotes = false;
+      var src = String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+      for(var i = 0; i < src.length; i++){
+        var ch = src[i];
+        if(inQuotes){
+          if(ch === '"'){
+            if(src[i + 1] === '"'){ field += '"'; i++; }
+            else { inQuotes = false; }
+          } else {
+            field += ch;
+          }
+          continue;
+        }
+        if(ch === '"'){ inQuotes = true; }
+        else if(ch === ","){ row.push(field); field = ""; }
+        else if(ch === "\n"){ row.push(field); rows.push(row); row = []; field = ""; }
+        else { field += ch; }
+      }
+      if(field !== "" || row.length){ row.push(field); rows.push(row); }
+      return rows;
+    }
+
+    function parseDollarAmount(value){
+      var n = Number(String(value || "").replace(/[$,]/g, ""));
+      return isFinite(n) ? n : 0;
+    }
+
+    // "What Your Property Taxes Fund": live ad valorem support by
+    // department, from the same FY2027 budget Google Sheet workbook this
+    // whole site is built from (a different tab/gid than the others).
+    function initPropertyTaxBreakdown(){
+      var mount = $("#propertyTaxBreakdown");
+      if(!mount) return;
+      var url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1515102230&single=true&output=csv";
+
+      fetch(url).then(function(res){
+        if(!res.ok) throw new Error("Failed to load property tax breakdown");
+        return res.text();
+      }).then(function(text){
+        var rows = parseCsv(text).slice(1); // drop header row
+        var departments = rows
+          .filter(function(r){ return r[0] && r[0].trim() && r[0].trim().toLowerCase().indexOf("total ad valorem") === -1; })
+          .map(function(r){ return { name: r[0].trim(), amount: parseDollarAmount(r[3]) }; })
+          .filter(function(d){ return d.amount > 0; })
+          .sort(function(a, b){ return b.amount - a.amount; });
+
+        var grandTotal = departments.reduce(function(sum, d){ return sum + d.amount; }, 0);
+        var topCount = 8;
+        var top = departments.slice(0, topCount);
+        var rest = departments.slice(topCount);
+        var restTotal = rest.reduce(function(sum, d){ return sum + d.amount; }, 0);
+        if(restTotal > 0) top.push({ name: "All Other Departments", amount: restTotal });
+
+        var maxAmount = top.reduce(function(max, d){ return Math.max(max, d.amount); }, 1);
+        mount.innerHTML = top.map(function(d){
+          var pct = grandTotal ? (d.amount / grandTotal * 100) : 0;
+          var width = Math.max((d.amount / maxAmount) * 100, 2);
+          return '<div class="wc-tax-breakdown-row">' +
+            '<div class="wc-tax-breakdown-row-head"><span>' + escapeHtml(d.name) + '</span><strong>' + formatCurrencyShort(d.amount) + '</strong></div>' +
+            '<div class="wc-tax-breakdown-track"><i style="width:' + width.toFixed(1) + '%"></i></div>' +
+            '<span class="wc-tax-breakdown-pct">' + pct.toFixed(1) + '% of ad valorem revenue</span>' +
+          '</div>';
+        }).join("");
+      }).catch(function(){
+        mount.innerHTML = '<p class="wc-tax-breakdown-error">Property tax breakdown is not available right now.</p>';
+      });
+    }
+
+    // Property Tax Calculator: estimates one taxpayer's own bill using the
+    // same Countywide/North Walton Mosquito Control millage rates shown on
+    // the Property Taxes card above (see wc-budget-card-millage).
+    function initTaxCalculator(){
+      var valueInput = $("#taxCalcValue");
+      if(!valueInput) return;
+      var mosquitoCheckbox = $("#taxCalcMosquito");
+      var COUNTYWIDE_MILLAGE = 3.519;
+      var MOSQUITO_MILLAGE = 0.441;
+
+      function money(value){
+        return "$" + Math.round(Number(value) || 0).toLocaleString("en-US");
+      }
+
+      function render(){
+        var taxableValue = parseDollarAmount(valueInput.value);
+        var countywideAmount = taxableValue * COUNTYWIDE_MILLAGE / 1000;
+        $("#taxCalcCountywide").textContent = money(countywideAmount);
+
+        var includeMosquito = mosquitoCheckbox.checked;
+        var mosquitoAmount = includeMosquito ? taxableValue * MOSQUITO_MILLAGE / 1000 : 0;
+        var mosquitoRow = $("#taxCalcMosquitoRow");
+        mosquitoRow.hidden = !includeMosquito;
+        $("#taxCalcMosquitoAmount").textContent = money(mosquitoAmount);
+
+        $("#taxCalcTotal").textContent = money(countywideAmount + mosquitoAmount);
+      }
+
+      valueInput.addEventListener("input", render);
+      mosquitoCheckbox.addEventListener("change", render);
+      render();
+    }
+
+    // Property address search: looks up data/property-records.json (see
+    // data/README.md for the expected shape) and, on selecting a result,
+    // fills in the Property Tax Calculator above via plain input/change
+    // events rather than calling into initTaxCalculator directly, so
+    // either piece can change independently. The file ships as an empty
+    // array placeholder, so the search box stays disabled with a status
+    // message until real records are added.
+    function initPropertyAddressSearch(){
+      var input = $("#propertyAddressSearch");
+      if(!input) return;
+      var resultsBox = $("#propertyAddressResults");
+      var statusEl = $("#propertyAddressStatus");
+      var valueInput = $("#taxCalcValue");
+      var mosquitoCheckbox = $("#taxCalcMosquito");
+      var records = [];
+
+      function showResults(matches){
+        if(!matches.length){
+          resultsBox.hidden = true;
+          resultsBox.innerHTML = "";
+          return;
+        }
+        resultsBox.innerHTML = matches.slice(0, 8).map(function(record, index){
+          var parcelLine = record.parcelId ? "Parcel " + escapeHtml(String(record.parcelId)) : "";
+          return '<button type="button" class="wc-property-search-result" data-index="' + index + '">' +
+            "<strong>" + escapeHtml(record.address) + "</strong>" +
+            (parcelLine ? "<span>" + parcelLine + "</span>" : "") +
+          "</button>";
+        }).join("");
+        resultsBox.hidden = false;
+
+        Array.prototype.forEach.call(resultsBox.querySelectorAll(".wc-property-search-result"), function(button, index){
+          button.addEventListener("click", function(){
+            selectRecord(matches[index]);
+          });
+        });
+      }
+
+      function selectRecord(record){
+        input.value = record.address;
+        resultsBox.hidden = true;
+        resultsBox.innerHTML = "";
+        if(valueInput && typeof record.taxableValue === "number"){
+          valueInput.value = String(record.taxableValue);
+          valueInput.dispatchEvent(new Event("input"));
+        }
+        if(mosquitoCheckbox && typeof record.inMosquitoControlDistrict === "boolean"){
+          mosquitoCheckbox.checked = record.inMosquitoControlDistrict;
+          mosquitoCheckbox.dispatchEvent(new Event("change"));
+        }
+      }
+
+      function handleSearchInput(){
+        var query = input.value.trim().toLowerCase();
+        if(!query){
+          showResults([]);
+          return;
+        }
+        var matches = records.filter(function(record){
+          return record.address && record.address.toLowerCase().indexOf(query) !== -1;
+        });
+        showResults(matches);
+      }
+
+      fetch("data/property-records.json").then(function(res){
+        if(!res.ok) throw new Error("Failed to load property records");
+        return res.json();
+      }).then(function(data){
+        records = Array.isArray(data) ? data.filter(function(r){ return r && r.address; }) : [];
+        if(!records.length){
+          statusEl.textContent = "Property address search will be available once county parcel data is loaded.";
+          return;
+        }
+        input.disabled = false;
+        statusEl.textContent = "Start typing an address to find your property.";
+        input.addEventListener("input", handleSearchInput);
+        document.addEventListener("click", function(event){
+          if(!resultsBox.contains(event.target) && event.target !== input){
+            resultsBox.hidden = true;
+          }
+        });
+      }).catch(function(){
+        statusEl.textContent = "Property address search will be available once county parcel data is loaded.";
+      });
+    }
+
     function initReveal(){
       var items = document.querySelectorAll(".wc-reveal");
       if(!("IntersectionObserver" in window)){
@@ -1715,6 +2537,10 @@
       updateRevenueCards();
       updateExpenseCards();
       initProjects();
+      initMillageCalculator();
+      initPropertyTaxBreakdown();
+      initTaxCalculator();
+      initPropertyAddressSearch();
       initReveal();
     });
   })();
