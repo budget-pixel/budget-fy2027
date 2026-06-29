@@ -629,7 +629,7 @@
       extraRows.push({
         Dept_Code: targetOrg,
         Dept_Name: deptName,
-        Note: "",
+        Note: needsOwnProjectScope ? "Statutory & Other" : "",
         Project_Code: needsOwnProjectScope ? project : "",
         Project_Name: "",
         Object_Code: object,
