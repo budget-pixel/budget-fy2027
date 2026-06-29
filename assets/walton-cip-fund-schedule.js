@@ -69,8 +69,9 @@ function renderProjectTitle(project, year){
   return `<a class="wc-cip-project-link" href="${escapeHtml(url)}">${title}</a>`;
 }
 
-function renderYearScheduleTable(year, label, projects, totalLabel){
+function renderYearScheduleTable(year, label, projects, totalLabel, options){
   const total = projects.reduce((sum, project) => sum + project.year_amount_value, 0);
+  const showFundingColumn = Boolean(options && options.showFundingColumn);
 
   if(!projects.length){
     return "";
@@ -86,6 +87,7 @@ function renderYearScheduleTable(year, label, projects, totalLabel){
           <thead>
             <tr>
               <th>Project</th>
+              ${showFundingColumn ? "<th>Fund</th>" : ""}
               <th class="wc-num">${escapeHtml(yearLabel)}</th>
             </tr>
           </thead>
@@ -93,11 +95,12 @@ function renderYearScheduleTable(year, label, projects, totalLabel){
             ${projects.map(project => `
               <tr>
                 <td>${renderProjectTitle(project, year)}</td>
+                ${showFundingColumn ? `<td>${escapeHtml(project.funding || "Not listed")}</td>` : ""}
                 <td class="wc-num">${money(project.year_amount_value)}</td>
               </tr>
             `).join("")}
             <tr class="wc-table-total-row">
-              <td>Total ${escapeHtml(yearLabel)} ${escapeHtml(totalLabel || label)}</td>
+              <td${showFundingColumn ? ' colspan="2"' : ""}>Total ${escapeHtml(yearLabel)} ${escapeHtml(totalLabel || label)}</td>
               <td class="wc-num">${money(total)}</td>
             </tr>
           </tbody>
@@ -110,6 +113,9 @@ function renderYearScheduleTable(year, label, projects, totalLabel){
 function renderFundSchedule(config){
   const years = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
   const mount = document.getElementById(config.mountId);
+  const projectFilter = typeof config.projectFilter === "function"
+    ? config.projectFilter
+    : project => String(project.funding || "").toLowerCase() === config.funding;
 
   if(!mount){
     return;
@@ -284,7 +290,7 @@ function renderFundSchedule(config){
 
   ready.then(projectList => {
     const projects = (Array.isArray(projectList) ? projectList : window.wcCipProjects || [])
-      .filter(project => String(project.funding || "").toLowerCase() === config.funding);
+      .filter(projectFilter);
 
     const scheduleProjects = projects.filter(project => !isLegacyInHouseEngineeringRow(project));
     const inHouseProjects = scheduleProjects.filter(project => getInHouseEngineeringAmount(project) > 0);
@@ -346,8 +352,8 @@ function renderFundSchedule(config){
       const data = yearData[activeYear] || yearData.FY2027;
       const yearLabel = displayYear(activeYear);
       const tables = [
-        renderYearScheduleTable(activeYear, config.label + " Schedule", data.projects, config.label),
-        renderYearScheduleTable(activeYear, "In-House Engineering Schedule", data.inHouseProjects, "In-House Engineering")
+        renderYearScheduleTable(activeYear, config.label + " Schedule", data.projects, config.label, config),
+        renderYearScheduleTable(activeYear, "In-House Engineering Schedule", data.inHouseProjects, "In-House Engineering", config)
       ].join("");
 
       mount.innerHTML = `

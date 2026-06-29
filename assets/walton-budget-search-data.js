@@ -82,7 +82,7 @@ var wcCoreBudgetPages = [
   { title:"CIP Project Search", section:"Capital Improvement Plan", href:"search.html" },
   { title:"Capital Projects Fund Schedule", section:"Capital Improvement Plan", href:"cip-capital-projects.html" },
   { title:"Grant Funded Schedule", section:"Capital Improvement Plan", href:"cip-grants.html" },
-  { title:"Sheriff Fund Schedule", section:"Capital Improvement Plan", href:"cip-sheriff.html" },
+  { title:"Sheriff Projects", section:"Capital Improvement Plan", href:"cip-sheriff.html" },
   { title:"Tourist Development Fund Schedule", section:"Capital Improvement Plan", href:"cip-tourist-development.html" },
   { title:"Transportation Fund Schedule", section:"Capital Improvement Plan", href:"cip-transportation.html" },
   { title:"Debt Overview", section:"Debt and Financial Forecast", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd7fa91d193bd3f319" },
@@ -393,8 +393,8 @@ var wcCoreBudgetPages = [
       "grant funded", "grants", "grant schedule", "federal grants", "state grants", "grant projects"
     ],
 
-    "Sheriff Fund Schedule": [
-      "sheriff fund", "fine and forfeiture", "public safety capital", "law enforcement capital"
+    "Sheriff Projects": [
+      "sheriff projects", "sheriff fund", "fine and forfeiture", "public safety capital", "law enforcement capital"
     ],
 
     "Tourist Development Fund Schedule": [
@@ -496,7 +496,7 @@ var wcCoreBudgetPages = [
     "CIP Project Search": "search.html",
     "Capital Projects Fund Schedule": "cip-capital-projects.html",
     "Grant Funded Schedule": "cip-grants.html",
-    "Sheriff Fund Schedule": "cip-sheriff.html",
+    "Sheriff Projects": "cip-sheriff.html",
     "Tourist Development Fund Schedule": "cip-tourist-development.html",
     "Transportation Fund Schedule": "cip-transportation.html",
     "Debt Overview": "debt-overview.html",

@@ -34,8 +34,9 @@
 <script>
   (function(){
     // "funding" matches each fund schedule page's own renderFundSchedule
-    // config (see walton-cip-fund-schedule.js) so the stats shown here are
-    // computed the exact same way as that page's own FY2027 callouts.
+    // config (see walton-cip-fund-schedule.js). Sheriff Projects is a
+    // department-wide view, so it uses departmentFilter instead of adding
+    // another fund bucket that could be mistaken for a separate total.
     var pages = [
       {
         title:"Capital Improvement Plan Overview",
@@ -60,10 +61,10 @@
         funding:"transportation fund"
       },
       {
-        title:"Sheriff Fund Schedule",
+        title:"Sheriff Projects",
         href:"cip-sheriff.html",
-        description:"Review capital projects associated with Sheriff and public safety funding.",
-        funding:"sheriff fund"
+        description:"Review all capital projects associated with the Walton County Sheriff's Office.",
+        departmentFilter:"sheriff"
       },
       {
         title:"Tourist Development Fund Schedule",
@@ -132,14 +133,22 @@
       return '<div class="wc-directory-item-stat ' + modifierClass + '"><strong>' + value + '</strong><span>' + escapeHtml(label) + '</span></div>';
     }
 
-    function fundStatsHtml(funding, allProjects, isLoading){
+    function pageProjectMatches(page, project){
+      if(!project || isLegacyInHouseEngineeringRow(project)) return false;
+      if(page.departmentFilter){
+        return String(project.department_filter || "").toLowerCase() === page.departmentFilter;
+      }
+      return String(project.funding || "").toLowerCase() === page.funding;
+    }
+
+    function projectStatsHtml(page, allProjects, isLoading){
       if(isLoading){
         return statHtml("wc-directory-item-stat--fund-budget", LOADING_DOTS_HTML, "FY 2027 Budget") +
           statHtml("wc-directory-item-stat--fund-projects", LOADING_DOTS_HTML, "Number of Projects") +
           statHtml("wc-directory-item-stat--fund-inhouse", LOADING_DOTS_HTML, "In-House Engineering");
       }
       var matching = allProjects.filter(function(p){
-        return String(p.funding || "").toLowerCase() === funding && !isLegacyInHouseEngineeringRow(p);
+        return pageProjectMatches(page, p);
       });
       var budgetTotal = matching.reduce(function(sum, p){ return sum + getFy2027Amount(p); }, 0);
       var projectCount = matching.filter(function(p){ return getFy2027Amount(p) > 0; }).length;
@@ -155,7 +164,7 @@
       if(!list) return;
 
       list.innerHTML = pages.map(function(page){
-        var statsHtml = page.funding ? '<div class="wc-directory-item-meta">' + fundStatsHtml(page.funding, allProjects, isLoading) + '</div>' : "";
+        var statsHtml = (page.funding || page.departmentFilter) ? '<div class="wc-directory-item-meta">' + projectStatsHtml(page, allProjects, isLoading) + '</div>' : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +

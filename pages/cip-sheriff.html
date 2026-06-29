@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sheriff Fund CIP Schedules — Walton County FY 2027 Budget</title>
+<title>Sheriff Projects — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260627-prior-years-a11y">
 </head>
 <body>
@@ -16,11 +16,11 @@
 <div id="layout">
 <main id="content">
 <div class="page-eyebrow">Capital Improvement Plan</div>
-<h1 class="page-title">Sheriff Fund Schedule</h1>
+<h1 class="page-title">Sheriff Projects</h1>
 
 <section class="statement-of-function content-section">
-  <p>The Fine & Forfeiture Fund within Walton County’s Capital Improvement Plan (CIP) supports critical infrastructure and facility improvements related to public safety and law enforcement. This fund is financed through fines, forfeitures, and ad valorem taxes, ensuring that essential law enforcement services are maintained and enhanced.</p>
-  <p>Projects within this fund focus on law enforcement facilities and emergency response infrastructure, ensuring Walton County continues to provide a safe and secure environment for residents and visitors. Investments in these areas support the operations of the Walton County Sheriff’s Office, funding facility upgrades, technology enhancements, and emergency preparedness initiatives.</p>
+  <p>The Fine &amp; Forfeiture Fund within Walton County’s Capital Improvement Plan (CIP) supports critical infrastructure and facility improvements related to public safety and law enforcement. This fund is financed through fines, forfeitures, and ad valorem taxes, ensuring that essential law enforcement services are maintained and enhanced.</p>
+  <p>Sheriff Projects brings together capital projects associated with the Walton County Sheriff’s Office, including projects shown on related fund schedules. These investments focus on law enforcement facilities, emergency response infrastructure, technology enhancements, facility upgrades, and emergency preparedness initiatives that help Walton County provide a safe and secure environment for residents and visitors.</p>
 </section>
 
 <div id="sheriffTables"></div>
@@ -28,7 +28,14 @@
 <script src="../assets/walton-cip-projects.js"></script>
 <script src="../assets/walton-cip-fund-schedule.js"></script>
 <script>
-  renderFundSchedule({funding:"sheriff fund", mountId:"sheriffTables", label:"Sheriff Fund"});
+  renderFundSchedule({
+    mountId:"sheriffTables",
+    label:"Sheriff Projects",
+    showFundingColumn:true,
+    projectFilter:function(project){
+      return String(project && project.department_filter || "").toLowerCase() === "sheriff";
+    }
+  });
 </script>
 </main>
 </div>
@@ -109,7 +116,7 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"CIP Project Search",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/search.html"},
   {title:"Capital Projects Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-capital-projects.html"},
   {title:"Grant Funded Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-grants.html"},
-  {title:"Sheriff Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-sheriff.html"},
+  {title:"Sheriff Projects",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-sheriff.html"},
   {title:"Tourist Development Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-tourist-development.html"},
   {title:"Transportation Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-transportation.html"},
   {title:"Debt Overview",section:"Debt and Financial Forecast",href:"https://budget-pixel.github.io/budget-fy2027/../pages/debt-overview.html"},
