@@ -2068,6 +2068,10 @@
               <input id="millageProposed" type="text" inputmode="decimal" placeholder="Enter millage">
             </label>
             <div class="wc-millage-box">
+              <span>Two-Thirds Maximum<button type="button" class="wc-info-button" aria-label="Two-thirds maximum millage rate help" data-tip="This threshold is 110% of the rolled-back rate shown here. Under Florida law, a rate above the rolled-back rate and not more than this threshold may be adopted by a two-thirds vote of the governing body. A rate above this threshold requires a unanimous vote, a three-fourths vote or voter approval by referendum.">i</button></span>
+              <strong id="millageMaximum"></strong>
+            </div>
+            <div class="wc-millage-box">
               <span>Rollback Rate<button type="button" class="wc-info-button" aria-label="Rollback rate help" data-tip="The rollback rate is the millage rate that would generate the same property tax revenue as the prior year using the current taxable value base.">i</button></span>
               <strong id="millageRollback">3.4335</strong>
             </div>
@@ -2528,6 +2532,7 @@
 
       var ADOPTED_MILLAGE = 3.519;
       var ROLLBACK_RATE = 3.4335;
+      var MAXIMUM_MILLAGE_RATE = ROLLBACK_RATE * 1.10;
       var TAXABLE_VALUE_BASE = 48899400423;
       var TAXPAYER_TIERS = [100000, 200000, 300000, 400000, 500000];
       // Florida budgets ad valorem revenue at 95% of the gross levy (F.S.
@@ -2558,6 +2563,7 @@
       function revenueAtMillage(rate){
         return TAXABLE_VALUE_BASE * rate / 1000 * COLLECTION_RATE;
       }
+      $("#millageMaximum").textContent = MAXIMUM_MILLAGE_RATE.toFixed(4);
 
       function render(){
         var proposedText = proposedInput.value.trim();
