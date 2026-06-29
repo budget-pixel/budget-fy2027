@@ -947,6 +947,9 @@
     margin-bottom:10px;
   }
   .wc-tax-metric{
+    display:grid;
+    grid-template-rows:minmax(3.2em, auto) auto;
+    align-content:space-between;
     border:1px solid var(--wc-line);
     border-radius:12px;
     background:#fff;
@@ -2066,7 +2069,7 @@
             </label>
             <div class="wc-millage-box">
               <span>Rollback Rate<button type="button" class="wc-info-button" aria-label="Rollback rate help" data-tip="The rollback rate is the millage rate that would generate the same property tax revenue as the prior year using the current taxable value base.">i</button></span>
-              <strong id="millageRollback">3.3531</strong>
+              <strong id="millageRollback">3.4335</strong>
             </div>
             <div class="wc-millage-box wc-millage-full">
               <span>Estimated Revenue (95%)<button type="button" class="wc-info-button" aria-label="Estimated revenue help" data-tip="Estimated revenue is calculated as the countywide taxable value base multiplied by the proposed millage, divided by 1,000, then budgeted at 95% per Florida Statute 200.065 to reserve for discounts and uncollectible taxes. This is a planning estimate and may not match final certified tax roll calculations.">i</button></span>
@@ -2524,7 +2527,7 @@
       if(!proposedInput) return;
 
       var ADOPTED_MILLAGE = 3.519;
-      var ROLLBACK_RATE = 3.3531;
+      var ROLLBACK_RATE = 3.4335;
       var TAXABLE_VALUE_BASE = 48899400423;
       var TAXPAYER_TIERS = [100000, 200000, 300000, 400000, 500000];
       // Florida budgets ad valorem revenue at 95% of the gross levy (F.S.
