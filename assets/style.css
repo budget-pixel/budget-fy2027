@@ -1351,6 +1351,7 @@ body {
 .wc-department-financial-grid #department-expense-table,
 .wc-department-financial-grid #department-revenue-table,
 .wc-department-financial-grid #department-staffing-table,
+.wc-department-financial-grid #department-state-aid-tables,
 .wc-department-financial-grid #department-solid-waste-tables,
 .wc-department-financial-grid #department-building-construction-tables,
 .wc-department-financial-grid #department-bcc-tables {
@@ -1403,6 +1404,20 @@ body {
 }
 .wc-department-financial-grid #department-staffing-table .wc-finance-card {
   height: auto;
+}
+.wc-department-financial-grid #department-state-aid-tables {
+  grid-column: 1 / -1;
+}
+.mosquito-state-aid-tables {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+  margin: 28px 0;
+}
+.mosquito-state-aid-tables .wc-finance-card {
+  height: 100%;
+  margin: 0;
 }
 /* Departments with multiple sub-programs (e.g. Code Compliance Beach /
    Code Compliance Street) render one staffing card per sub-program --
@@ -2427,6 +2442,9 @@ body {
   .wc-filter-bar { flex-direction: column; align-items: stretch; }
   .wc-filter-field { min-width: 0; }
   .wc-department-financial-grid {
+    grid-template-columns: 1fr;
+  }
+  .mosquito-state-aid-tables {
     grid-template-columns: 1fr;
   }
   .wc-data-table th, .wc-data-table td { padding: 7px 8px; font-size: .8rem; }
