@@ -670,6 +670,61 @@ body {
   margin-bottom: 32px;
 }
 
+.mosquito-page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 490px);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.mosquito-tax-card {
+  align-self: start;
+  padding: 14px 16px;
+  border: 1px solid rgba(209,190,120,.62);
+  border-left: 5px solid var(--gold);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #003f28 0%, #005236 100%);
+  box-shadow: 0 14px 34px rgba(0,63,40,.22), 0 5px 12px rgba(36,52,77,.10);
+}
+
+.mosquito-tax-card-title {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mosquito-tax-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.mosquito-tax-card div {
+  min-width: 0;
+}
+
+.mosquito-tax-card dt {
+  margin: 0 0 3px;
+  color: rgba(255,255,255,.76);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.mosquito-tax-card dd {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
 .mosquito-video-frame {
   position: relative;
   width: 100%;
@@ -1771,6 +1826,19 @@ body {
 .wc-table-label-row .wc-table-label {
   margin-bottom: 0;
 }
+.wc-fund-financial-label-row {
+  justify-content: space-between;
+  min-height: 24px;
+}
+.wc-fund-financial-table-title {
+  display: block;
+  color: var(--navy);
+  font-size: .92rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-align: left;
+  text-transform: uppercase;
+}
 .wc-staffing-card:not(.show-prior-years) .wc-staffing-table .wc-prior-year {
   display: none;
 }
@@ -1910,11 +1978,11 @@ body {
   max-width: 980px;
   margin: 0;
   padding: 10px 14px;
-  border: 1px solid #b98b12;
-  border-left: 5px solid #006b3f;
+  border: 1px solid rgba(209,190,120,.62);
+  border-left: 5px solid var(--gold);
   border-radius: 12px;
-  background: #fff7d6;
-  color: #1f3444;
+  background: linear-gradient(135deg, #003f28 0%, #005236 100%);
+  color: #fff;
   font-size: .84rem;
   line-height: 1.45;
   font-style: italic;
@@ -2265,6 +2333,14 @@ body {
     gap: 20px;
   }
 
+  .mosquito-page-header {
+    grid-template-columns: 1fr;
+  }
+
+  .mosquito-tax-card dl {
+    grid-template-columns: 1fr;
+  }
+
   .eagle-springs-statement-media {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -2340,6 +2416,10 @@ body {
     align-items: flex-start;
     flex-direction: column;
     gap: 6px;
+  }
+  .wc-fund-financial-label-row {
+    align-items: flex-start;
+    min-height: 0;
   }
 
   .wc-filter-bar { flex-direction: column; align-items: stretch; }

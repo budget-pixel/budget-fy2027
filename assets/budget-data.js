@@ -1901,6 +1901,8 @@
       "Court Technology - Court Administration",
       "Guardian Ad Litem",
       "Medical Examiner",
+      "Mosquito Control",
+      "Mosquito Control State Aid",
       "Non-Profit Funding Program",
       "Public Defender",
       "South Walton Fire",
@@ -4495,8 +4497,8 @@
     return (
       '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
       '<div class="wc-table-wrap">' +
-      '<div class="wc-table-label-row">' +
-      '<p class="wc-table-label">' + escapeHtml(caption) + "</p>" +
+      '<div class="wc-table-label-row wc-fund-financial-label-row">' +
+      '<p class="wc-table-label wc-fund-financial-table-title">' + escapeHtml(caption) + "</p>" +
       priorYearsToggleHtml(showPrior) +
       "</div>" +
       '<div class="wc-data-table-scroll wc-fund-financial-schedule-scroll">' +
