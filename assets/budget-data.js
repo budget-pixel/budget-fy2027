@@ -504,6 +504,20 @@
   // Revenues and a glossary mention), so relabeling it is safe everywhere.
   const REVENUE_NAME_OVERRIDES = new Map([["102389|389001", "Ad Valorem Taxes"]]);
 
+  const REVENUE_FY2026_PLUG_OVERRIDES = new Map([
+    ["001329|board of county commissioners|329004|10647", 1530000]
+  ]);
+
+  function revenueFy2026PlugOverride(row) {
+    const key = [
+      String((row && row.Dept_Code) || "").trim(),
+      normalizeDeptName(row && row.Dept_Name),
+      String((row && row.Revenue_Code) || "").trim(),
+      String((row && row.Project_Code) || "").trim()
+    ].join("|");
+    return REVENUE_FY2026_PLUG_OVERRIDES.get(key) || 0;
+  }
+
   function applyRevenueNameOverrides(rows) {
     return (rows || []).map((row) => {
       const key = String((row && row.Dept_Code) || "").trim() + "|" + String((row && row.Revenue_Code) || "").trim();
@@ -1369,6 +1383,7 @@
       FY2024_Actual: toNumber(row.FY2024_Actual),
       FY2025_Actual: toNumber(row.FY2025_Actual),
       FY2026_Budget: toNumber(row.FY2026_Budget),
+      FY2026_Plug: revenueFy2026PlugOverride(row) || toNumber(row.FY2026_Plug || row.FY2026_Department_Plug || row.FY2026_Revenue_Plug),
       FY2027_Proposed: toNumber(row.FY2027_Proposed)
     };
   }
@@ -1996,25 +2011,42 @@
     // See PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES. Guarded to
     // combineByName === false since this should only apply to the
     // department's own single-page breakdown, not a county-wide summary
-    // (those keep the toggle -- see isRevenueContextNoteSuppressed below,
-    // which removes just the disclaimer for them, not the toggle itself).
+    // (those keep the toggle because they intentionally combine rows).
     // forceDisablePriorYears additionally covers secondary sub-program
     // expense cards (e.g. Code Compliance Beach) whose FY2026 figures
     // aren't reliable on their own -- see renderTypeSummaryTable's
     // showChange.
     const isPriorYearsDisabled = !!forceDisablePriorYears || (!isExpense && !combineByName && rows.length &&
       PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(rows[0].Dept_Name)));
-    // The "View Prior Years" preference is a single, page-wide localStorage
-    // value shared by every table (see getShowPriorYears), so it isn't
-    // enough to just hide this table's own checkbox -- showPrior has to be
-    // forced false here too, or toggling it on anywhere else on the page
-    // would still expand this table's prior-year columns.
-    const showPrior = isPriorYearsDisabled ? false : getShowPriorYears();
     const codeField = isExpense ? "Object_Code" : "Revenue_Code";
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
     const descField = descriptionField || "Note";
     const priorYearColumns = budgetLinePriorYearColumns(isExpense);
+    const priorYearActualFields = new Set(priorYearColumns.filter((c) => c.actual).map((c) => c.field));
+
+    function revenueActualsAreDedicatedToRow(row) {
+      if (isExpense || combineByName) return true;
+      const code = String((row && row[codeField]) || "").trim();
+      if (!code) return true;
+      const fundCode = fundCodeForRow(row);
+      const departmentNames = new Set();
+      (cache.revenues || []).forEach((candidate) => {
+        if (String(candidate[codeField] || "").trim() !== code) return;
+        if (fundCodeForRow(candidate) !== fundCode) return;
+        const name = normalizeDeptName(candidate.Dept_Name);
+        if (name) departmentNames.add(name);
+      });
+      return departmentNames.size <= 1;
+    }
+
+    const priorYearsToggleDisabled = isPriorYearsDisabled;
+    // The "View Prior Years" preference is a single, page-wide localStorage
+    // value shared by every table (see getShowPriorYears), so it isn't
+    // enough to just hide this table's own checkbox -- showPrior has to be
+    // forced false here too, or toggling it on anywhere else on the page
+    // would still expand this table's prior-year columns.
+    const showPrior = priorYearsToggleDisabled ? false : getShowPriorYears();
 
     // On consolidated/county-wide summaries, combine rows that share the
     // same name (e.g. the same revenue source collected under several
@@ -2069,6 +2101,63 @@
       });
     }
 
+    const fy2026BudgetColumn = priorYearColumns.find((c) => c.field === "FY2026_Original_Budget");
+    const revenueFy2026PlugByKey = new Map();
+    function revenuePlugKey(row) {
+      return [
+        normalizeDeptName(row && row.Dept_Name),
+        String((row && row.Dept_Code) || "").trim(),
+        String((row && row[codeField]) || "").trim(),
+        String((row && row[nameField]) || "").trim(),
+        String((row && row.Project_Code) || "").trim()
+      ].join("|");
+    }
+    if (!isExpense && !combineByName && fy2026BudgetColumn) {
+      const revenueDeptNames = new Set(rows.map((row) => normalizeDeptName(row.Dept_Name)).filter(Boolean));
+      const revenueDeptCodes = new Set(rows.map((row) => String(row.Dept_Code || "").trim()).filter(Boolean));
+      const expenseRowsByName = (cache.expenditures || []).filter((row) => revenueDeptNames.has(normalizeDeptName(row.Dept_Name)));
+      const expenseRowsForPlug = expenseRowsByName.length
+        ? expenseRowsByName
+        : (cache.expenditures || []).filter((row) => revenueDeptCodes.has(String(row.Dept_Code || "").trim()));
+      const expenseTargetTotal = expenseRowsForPlug.reduce((sum, row) => {
+        return sum + (row.FY2026_Original_Budget || row.FY2026_Budget || 0);
+      }, 0);
+      const sheetTargetTotal = rows.reduce((sum, row) => {
+        return sum + revenueDisplayAmount(row.FY2026_Plug || row.FY2026_Budget || 0);
+      }, 0);
+      const targetTotal = expenseTargetTotal || sheetTargetTotal;
+      const dedicatedTotal = mergedRows.reduce((sum, row) => {
+        return revenueActualsAreDedicatedToRow(row) ? sum + budgetLineColumnAmount(row, fy2026BudgetColumn, false) : sum;
+      }, 0);
+      const plugRows = mergedRows.filter((row) => !revenueActualsAreDedicatedToRow(row) && (row.FY2027_Proposed || 0) > 0);
+      const plugTotal = targetTotal - dedicatedTotal;
+      if (plugRows.length && Math.abs(plugTotal) > 0.005) {
+        const proposedTotal = plugRows.reduce((sum, row) => sum + (row.FY2027_Proposed || 0), 0);
+        let assigned = 0;
+        plugRows.forEach((row, index) => {
+          const amount = index === plugRows.length - 1
+            ? plugTotal - assigned
+            : (proposedTotal ? plugTotal * ((row.FY2027_Proposed || 0) / proposedTotal) : 0);
+          assigned += amount;
+          revenueFy2026PlugByKey.set(revenuePlugKey(row), amount);
+        });
+      }
+    }
+
+    function budgetLineVisibleColumnAmount(row, column) {
+      if (!isExpense && priorYearActualFields.has(column.field) && !revenueActualsAreDedicatedToRow(row)) {
+        return null;
+      }
+      const plugKey = revenuePlugKey(row);
+      if (!isExpense && column.field === "FY2026_Original_Budget" && revenueFy2026PlugByKey.has(plugKey)) {
+        return revenueDisplayAmount(revenueFy2026PlugByKey.get(plugKey));
+      }
+      if (!isExpense && column.field === "FY2026_Original_Budget" && !revenueActualsAreDedicatedToRow(row)) {
+        return revenueDisplayAmount(row.FY2026_Plug || row.FY2026_Budget || 0);
+      }
+      return budgetLineColumnAmount(row, column, isExpense);
+    }
+
     function groupedPriorYearRows() {
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
@@ -2097,11 +2186,13 @@
             Dept_Name: r.Dept_Name || "",
             Dept_Code: r.Dept_Code || ""
           };
-          sumFields.forEach((f) => { row[f] = r[f] || 0; });
+          sumFields.forEach((f) => { row[f] = (!isExpense && priorYearActualFields.has(f) && !revenueActualsAreDedicatedToRow(r)) ? 0 : (r[f] || 0); });
           grouped.set(key, row);
           return;
         }
-        sumFields.forEach((f) => { existing[f] += r[f] || 0; });
+        sumFields.forEach((f) => {
+          existing[f] += (!isExpense && priorYearActualFields.has(f) && !revenueActualsAreDedicatedToRow(r)) ? 0 : (r[f] || 0);
+        });
       });
       // Project_Code is set on a merged row only when every row folded into
       // it shares the exact same project scope (e.g. Health Department,
@@ -2133,11 +2224,12 @@
         '<td class="wc-itemized-description-column">' + escapeHtml(suppressDescription ? "" : itemizedDescriptionForBudgetLine(r, descriptionField, isExpense)) + "</td>" +
         priorYearColumns.map((c) => {
           const href = transactionHrefForBudgetLine(r, c, drilldownFields);
-          const value = formatCurrency(budgetLineColumnAmount(r, c, isExpense));
+          const amount = budgetLineVisibleColumnAmount(r, c);
+          const value = amount === null ? "—" : formatCurrency(amount);
           const drilldownLabel = "View " + c.label + " transaction detail for " +
             (r[nameField] || r[codeField] || "this budget line") + " actual amount " + value;
           return '<td class="wc-num wc-prior-year">' +
-            (href ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(drilldownLabel) + '">' + value + "</a>" : value) +
+            (href && amount !== null ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(drilldownLabel) + '">' + value + "</a>" : value) +
             "</td>";
         }).join("") +
         '<td class="wc-num">' + formatCurrency(r.FY2027_Proposed || 0) + "</td></tr>"
@@ -2153,7 +2245,7 @@
       return (
         '<tr class="' + rowClass + ' wc-table-subtotal-row">' + labelCells +
           priorYearColumns.map((c) =>
-            '<td class="wc-num wc-prior-year">' + formatCurrency(budgetLineColumnTotal(categoryRows, c, isExpense)) + "</td>"
+            '<td class="wc-num wc-prior-year">' + formatCurrency(categoryRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
           ).join("") +
           '<td class="wc-num">' + formatCurrency(categoryRows.reduce((sum, r) => sum + (r.FY2027_Proposed || 0), 0)) + "</td></tr>"
       );
@@ -2212,7 +2304,7 @@
     bodyRows.push(
       '<tr class="wc-table-total-row">' + totalLabelCells +
         priorYearColumns.map((c) =>
-          '<td class="wc-num wc-prior-year">' + formatCurrency(budgetLineColumnTotal(mergedRows, c, isExpense)) + "</td>"
+          '<td class="wc-num wc-prior-year">' + formatCurrency(mergedRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
         ).join("") +
         '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
     );
@@ -2231,26 +2323,16 @@
       bodyRows: bodyRows
     });
 
-    const toggleHeader = isPriorYearsDisabled ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
+    const toggleHeader = priorYearsToggleDisabled ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
     const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
-      : "";
-    // A combineByName revenue table (e.g. Summary of Revenues) keeps the
-    // "View Prior Years" toggle -- it's a legitimate, intentional view of
-    // every department combined -- but the disclaimer itself doesn't apply:
-    // "shows only what is budgeted for this specific department or
-    // program" is never true here, since every row already is the whole
-    // organization combined by design.
-    const isRevenueContextNoteSuppressed = isPriorYearsDisabled || combineByName;
-    const revenueContextNote = (!isExpense && !isRevenueContextNoteSuppressed && mergedRows.length && fundHasMultipleDepartments(fundCodeForRow(mergedRows[0])))
-      ? '<p class="wc-revenue-actuals-note">Past-year actuals may include total collections for this revenue source across the organization. Current budget amounts show only what is budgeted for this specific department or program.</p>'
       : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
     const departmentDataNote = departmentDataNoteText
       ? '<p class="wc-revenue-actuals-note">' + escapeHtml(departmentDataNoteText) + "</p>"
       : "";
-    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + revenueContextNote + departmentDataNote + toggleHeader + transactionHelper + "</div>";
+    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + departmentDataNote + toggleHeader + transactionHelper + "</div>";
 
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
