@@ -1901,6 +1901,9 @@
   // classifies under Tourism Administration, not Autonomous Entities, and
   // belongs to the separate Tourism Lifeguard Services and Beach Safety
   // page instead).
+  // Set to true to re-enable transaction links from budget/revenue line tables.
+  const TRANSACTION_DRILLDOWN_ENABLED = false;
+
   const TRANSACTION_DRILLDOWN_DEPT_NAMES = new Set(
     [
       "Clerk of Court",
@@ -1928,6 +1931,9 @@
   );
 
   function transactionDrilldownEnabledForRow(row, fields) {
+    if (!TRANSACTION_DRILLDOWN_ENABLED) {
+      return false;
+    }
     if ((fields && fields.kind) === "revenue") {
       return !!(
         row &&
