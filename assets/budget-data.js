@@ -1903,8 +1903,6 @@
   // page instead).
   const TRANSACTION_DRILLDOWN_DEPT_NAMES = new Set(
     [
-      "Office of Management and Budget",
-      "Building Construction and Maintenance",
       "Clerk of Court",
       "Property Appraiser",
       "Supervisor of Elections",
