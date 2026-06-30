@@ -2396,10 +2396,11 @@ body {
 .wc-performance-header{ margin:0 0 18px 0; }
 .wc-performance-header h1{ margin:0 0 8px 0; color:#172033; font-size:1.5rem; line-height:1.2; font-weight:600; }
 .wc-performance-header p{ margin:0; max-width:900px; color:#475467; font-size:14px; line-height:1.5; }
-.wc-performance-card{ width:100%; border:0; border-radius:0; background:#fff; box-shadow:none; position:relative; padding-top:60px; }
+.wc-performance-card{ width:100%; border:0; border-radius:0; background:transparent; box-shadow:none; position:relative; padding-top:60px; }
 .wc-performance-card::before{
   content:"Departmental Goal, Objective, and Performance Measures"; position:absolute; top:18px; left:50%; transform:translateX(-50%);
-  width:min(100% - 180px, 760px); color:#172033; font-size:1rem; line-height:1.25; font-weight:600; text-align:center; white-space:normal;
+  color:var(--navy); font-size:.92rem; line-height:1.25; font-weight:800; text-align:left; white-space:normal; text-transform:uppercase; letter-spacing:.05em;
+  border-left:4px solid var(--gold); padding-left:10px;
 }
 .wc-performance-card-header{ display:none; }
 .wc-performance-goal-block{ margin:0; padding:0; }
@@ -2415,7 +2416,7 @@ body {
 .wc-performance-objective, .wc-performance-code, .wc-performance-goal{ color:#172033; font-size:14px; font-weight:400; text-align:center; vertical-align:middle !important; background:#fff; }
 .wc-performance-measure{ color:#344054; text-align:left; background:#fff; }
 .wc-performance-value{ color:#344054; text-align:center; white-space:nowrap; background:#fff; }
-.wc-performance-note{ display:block; width:100%; padding:12px 2px 0; background:#fff; color:#667085; font-size:12px; line-height:1.5; font-style:italic; }
+.wc-performance-note{ display:block; width:100%; padding:12px 2px 0; background:transparent; color:#667085; font-size:12px; line-height:1.5; font-style:italic; text-align:center; }
 .wc-performance-note a{ color:#003f28; font-weight:700; text-decoration:none; } .wc-performance-note a:hover{ text-decoration:underline; }
 .wc-performance-empty{ padding:18px; background:#fff; border:1px solid #d0d5dd; border-radius:18px; color:#475467; font-size:14px; text-align:center; }
 .wc-fy-column-toggle-wrap{ display:flex !important; justify-content:center !important; align-items:center !important; width:114px !important; height:18px !important; padding:0 6px !important; margin:0 !important; background:#fff !important; border:1px solid rgba(209,190,120,0.55) !important; border-radius:999px !important; color:#24344d !important; font-family:Arial, Helvetica, sans-serif !important; font-size:10px !important; font-weight:600 !important; position:absolute !important; right:12px !important; top:12px !important; }
@@ -2431,7 +2432,7 @@ body {
 @media(max-width:900px){
   .wc-performance-page{ padding:24px 12px 36px; } .wc-performance-page.is-embedded{ padding:0; }
   .wc-performance-header h1{ font-size:1.25rem; } .wc-performance-header p{ font-size:13px; }
-  .wc-performance-card::before{ width:100%; max-width:26rem; font-size:1rem; margin-bottom:0; top:0; padding:0 12px; box-sizing:border-box; }
+  .wc-performance-card::before{ width:max-content; max-width:calc(100% - 24px); font-size:.92rem; margin-bottom:0; top:0; padding:0 0 0 10px; box-sizing:border-box; }
   .wc-performance-card{ padding-top:86px; }
   .wc-performance-table-wrap{ border-radius:18px; } .wc-performance-table th, .wc-performance-table td{ padding:7px 6px; }
   .wc-performance-table thead th{ font-size:12px; } .wc-performance-table td{ font-size:12px; line-height:1.35; }
