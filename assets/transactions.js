@@ -280,7 +280,7 @@
 
         const warning = hasSelectedActual && !withinTolerance
           ? '<p class="wc-transaction-summary-note">The transaction total does not match the selected actual amount. ' +
-            "This may happen if some activity is filtered out for public display, recorded centrally, " +
+            "This may happen if some activity is recorded centrally, " +
             "summarized differently in the actuals view, or unavailable at the transaction level.</p>"
           : "";
         status.innerHTML = lines.map((line) => "<p>" + escapeHtml(line) + "</p>").join("") + warning;

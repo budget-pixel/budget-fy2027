@@ -102,7 +102,7 @@
     },
     {
       question: "Why might totals differ?",
-      answer: "Transaction totals may differ from budget summary amounts if activity is filtered for public display, summarized differently, recorded centrally, or unavailable at the transaction level."
+      answer: "Transaction totals may differ from budget summary amounts if activity is summarized differently, recorded centrally, or unavailable at the transaction level."
     },
     {
       question: "Where should I start?",

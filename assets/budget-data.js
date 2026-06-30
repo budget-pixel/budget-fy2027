@@ -1929,7 +1929,16 @@
     ].map(normalizeDeptName)
   );
 
-  function transactionDrilldownEnabledForRow(row) {
+  function transactionDrilldownEnabledForRow(row, fields) {
+    if ((fields && fields.kind) === "revenue") {
+      return !!(
+        row &&
+        row.Dept_Code &&
+        row.Revenue_Code &&
+        splitBudgetLineCodes(row.Revenue_Code).length === 1 &&
+        !(fields && fields.combineByName)
+      );
+    }
     return TRANSACTION_DRILLDOWN_DEPT_NAMES.has(normalizeDeptName(row && row.Dept_Name));
   }
 
@@ -1946,7 +1955,7 @@
   }
 
   function transactionHrefForBudgetLine(row, column, fields) {
-    if (!column.actual || !transactionDrilldownEnabledForRow(row)) return "";
+    if (!column.actual || !transactionDrilldownEnabledForRow(row, fields)) return "";
     // Must match what the cell actually displays (budgetLineColumnAmount),
     // not row[column.field] directly: for revenue, the displayed actual is
     // a county-wide lookup by Revenue_Code, independent of which row in an
@@ -1965,6 +1974,7 @@
     const projectCode = row.Project_Code || "";
     const projectName = row.Project_Name || "";
     const deptCode = row.Dept_Code || "";
+    if (!objectCode || !deptCode) return "";
     // Some departments' transaction history is split across legacy org
     // codes (see DEPT_CODE_ACTUALS_ALIASES); pass all of them so the
     // transaction detail page's query isn't limited to the current code
@@ -2008,16 +2018,11 @@
     if (!rows.length) return { button: "", detail: "" };
     budgetLinesDetailCounter += 1;
     const detailId = "wc-budget-lines-" + budgetLinesDetailCounter;
-    // See PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES. Guarded to
-    // combineByName === false since this should only apply to the
-    // department's own single-page breakdown, not a county-wide summary
-    // (those keep the toggle because they intentionally combine rows).
-    // forceDisablePriorYears additionally covers secondary sub-program
+    // forceDisablePriorYears covers secondary sub-program
     // expense cards (e.g. Code Compliance Beach) whose FY2026 figures
     // aren't reliable on their own -- see renderTypeSummaryTable's
     // showChange.
-    const isPriorYearsDisabled = !!forceDisablePriorYears || (!isExpense && !combineByName && rows.length &&
-      PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(rows[0].Dept_Name)));
+    const isPriorYearsDisabled = !!forceDisablePriorYears;
     const codeField = isExpense ? "Object_Code" : "Revenue_Code";
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
@@ -2215,7 +2220,7 @@
 
     function budgetLineRowHtml(r, rowClass, suppressDescription) {
       const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
-      const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue", detailId };
+      const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue", combineByName, detailId };
       return (
         '<tr class="' + rowClass + (isZeroCurrent ? " wc-budget-line-zero-current" : "") + '">' +
         "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
@@ -2324,7 +2329,8 @@
     });
 
     const toggleHeader = priorYearsToggleDisabled ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
-    const hasTransactionDrilldown = mergedRows.some(transactionDrilldownEnabledForRow);
+    const transactionDrilldownFields = { kind: isExpense ? "expense" : "revenue", combineByName };
+    const hasTransactionDrilldown = mergedRows.some((row) => transactionDrilldownEnabledForRow(row, transactionDrilldownFields));
     const transactionHelper = hasTransactionDrilldown
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
