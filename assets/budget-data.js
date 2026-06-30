@@ -2260,6 +2260,43 @@
   }
 
   let activeBudgetDetailToggle = null;
+  let budgetDetailScrollLock = null;
+
+  function lockBudgetDetailBackgroundScroll() {
+    if (budgetDetailScrollLock) return;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    budgetDetailScrollLock = {
+      scrollY,
+      bodyPosition: document.body.style.position,
+      bodyTop: document.body.style.top,
+      bodyLeft: document.body.style.left,
+      bodyRight: document.body.style.right,
+      bodyWidth: document.body.style.width,
+      bodyOverflow: document.body.style.overflow,
+      htmlOverflow: document.documentElement.style.overflow
+    };
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = "-" + scrollY + "px";
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+  }
+
+  function unlockBudgetDetailBackgroundScroll() {
+    if (!budgetDetailScrollLock) return;
+    const scrollY = budgetDetailScrollLock.scrollY || 0;
+    document.documentElement.style.overflow = budgetDetailScrollLock.htmlOverflow;
+    document.body.style.position = budgetDetailScrollLock.bodyPosition;
+    document.body.style.top = budgetDetailScrollLock.bodyTop;
+    document.body.style.left = budgetDetailScrollLock.bodyLeft;
+    document.body.style.right = budgetDetailScrollLock.bodyRight;
+    document.body.style.width = budgetDetailScrollLock.bodyWidth;
+    document.body.style.overflow = budgetDetailScrollLock.bodyOverflow;
+    budgetDetailScrollLock = null;
+    window.scrollTo(0, scrollY);
+  }
 
   function ensureBudgetDetailModal() {
     let modal = document.querySelector(".wc-budget-detail-modal");
@@ -2294,7 +2331,7 @@
     modal.hidden = true;
     modal.classList.remove("is-open");
     document.body.classList.remove("wc-budget-detail-open");
-    document.body.style.overflow = "";
+    unlockBudgetDetailBackgroundScroll();
     const body = modal.querySelector(".wc-budget-detail-body");
     if (body) {
       body.innerHTML = "";
@@ -2343,7 +2380,7 @@
     modal.hidden = false;
     requestAnimationFrame(() => modal.classList.add("is-open"));
     document.body.classList.add("wc-budget-detail-open");
-    document.body.style.overflow = "hidden";
+    lockBudgetDetailBackgroundScroll();
     const closeButton = modal.querySelector(".wc-budget-detail-close");
     if (closeButton) closeButton.focus({ preventScroll: true });
   }

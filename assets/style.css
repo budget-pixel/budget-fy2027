@@ -1636,6 +1636,7 @@ body {
   align-items: flex-start;
   justify-content: center;
   padding: 72px 18px 24px;
+  overscroll-behavior: contain;
 }
 .wc-budget-detail-backdrop {
   position: absolute;
@@ -1707,6 +1708,7 @@ body {
 .wc-budget-detail-body {
   max-height: calc(min(86vh, 960px) - 92px);
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 18px 20px 22px;
   scrollbar-width: none;
 }
