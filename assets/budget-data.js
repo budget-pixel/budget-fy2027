@@ -2642,7 +2642,9 @@
     const columns = options.columns || [];
     const bodyRows = options.bodyRows || [];
     if (!bodyRows.length) return "";
-    const captionHtml = options.caption ? '<p class="wc-table-label">' + escapeHtml(options.caption) + "</p>" : "";
+    const captionHtml = options.caption && !options.hideVisualCaption
+      ? '<p class="wc-table-label">' + escapeHtml(options.caption) + "</p>"
+      : "";
     const tableCaptionHtml = options.caption ? '<caption class="wc-sr-only">' + escapeHtml(options.caption) + "</caption>" : "";
     const headerHtml = options.toggleHtml
       ? '<div class="wc-table-label-row">' + captionHtml + options.toggleHtml + "</div>"
@@ -4242,6 +4244,7 @@
     ));
     return renderTable({
       caption: item.fund.code + " " + item.fund.label,
+      hideVisualCaption: true,
       columns: [{ label: "Line" }].concat(FINANCIAL_FORECAST_YEARS.map((year) => ({ label: "FY " + year + (year === 2027 ? " Baseline" : " Forecast"), num: true }))),
       bodyRows: rows
     });
@@ -4391,8 +4394,14 @@
       '</section>' +
       '<section class="wc-forecast-section">' +
         '<h2 class="wc-fund-section-heading">Assumptions</h2>' +
-        renderForecastAssumptionsDetailTable(model, "revenue") +
-        renderForecastAssumptionsDetailTable(model, "expense") +
+        '<details class="wc-forecast-detail wc-forecast-assumptions-detail">' +
+          '<summary>Revenue Assumptions</summary>' +
+          renderForecastAssumptionsDetailTable(model, "revenue") +
+        '</details>' +
+        '<details class="wc-forecast-detail wc-forecast-assumptions-detail">' +
+          '<summary>Expenditure Assumptions</summary>' +
+          renderForecastAssumptionsDetailTable(model, "expense") +
+        '</details>' +
       '</section>' +
       lastUpdatedNoteHtml()
     );
