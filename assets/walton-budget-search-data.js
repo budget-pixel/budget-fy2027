@@ -47,6 +47,10 @@ var wcCoreBudgetPages = [
   { title:"South Walton Fire & State Control", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd799cff81b62a9d04" },
   { title:"State Attorney", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfba867c19eddf0d3" },
   { title:"Statutory & Other Agency Funding", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdd8b75e8172b9646a" },
+  { title:"E911 Fund", section:"Autonomous Entities", href:"e911-fund.html" },
+  { title:"Municipal Service Benefit Unit Fund", section:"Autonomous Entities", href:"municipal-service-benefit-unit-fund.html" },
+  { title:"Recreation Plat Fee Fund", section:"Autonomous Entities", href:"recreation-plat-fee-fund.html" },
+  { title:"Sidewalk Fund", section:"Autonomous Entities", href:"sidewalk-fund.html" },
   { title:"Walton County Health Department", section:"Autonomous Entities", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd55c6cf9367a9f70d" },
   { title:"Building Construction and Maintenance", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbe4a1b46dae2cd66cc" },
   { title:"Building Department", section:"Departments", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd8e620c6522929798" },
@@ -251,6 +255,22 @@ var wcCoreBudgetPages = [
 
     "Statutory & Other Agency Funding": [
       "statutory funding", "agency funding", "outside agencies", "mandated funding", "state required", "other agencies", "intergovernmental"
+    ],
+
+    "E911 Fund": [
+      "e911", "e 911", "911", "emergency communications", "emergency dispatch", "public safety communications", "non-major fund"
+    ],
+
+    "Municipal Service Benefit Unit Fund": [
+      "municipal service benefit unit", "msbu", "assessment", "special assessment", "benefit unit", "non-major fund"
+    ],
+
+    "Recreation Plat Fee Fund": [
+      "recreation plat fee", "plat fee", "recreation fee", "parks", "recreation improvements", "non-major fund"
+    ],
+
+    "Sidewalk Fund": [
+      "sidewalk", "pedestrian", "walkability", "connectivity", "transportation improvements", "non-major fund"
     ],
 
     "Walton County Health Department": [
@@ -461,6 +481,10 @@ var wcCoreBudgetPages = [
     "South Walton Fire & State Control": "south-walton-fire-and-state-control.html",
     "State Attorney": "state-attorney.html",
     "Statutory & Other Agency Funding": "statutory-and-other-agency-funding.html",
+    "E911 Fund": "e911-fund.html",
+    "Municipal Service Benefit Unit Fund": "municipal-service-benefit-unit-fund.html",
+    "Recreation Plat Fee Fund": "recreation-plat-fee-fund.html",
+    "Sidewalk Fund": "sidewalk-fund.html",
     "Walton County Health Department": "walton-county-health-department.html",
     "Building Construction and Maintenance": "building-construction-and-maintenance.html",
     "Building Department": "building-department.html",

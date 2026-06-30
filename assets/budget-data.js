@@ -41,6 +41,10 @@
     "environmental resources": ["environmental services"],
     "probation": ["probation services"],
     "purchasing": ["procurement"],
+    "e911 fund": ["e911", "e 911"],
+    "municipal service benefit unit fund": ["municipal service benefit unit", "msbu", "msbu fund"],
+    "recreation plat fee fund": ["recreation plat fee"],
+    "sidewalk fund": ["sidewalk"],
     // "Court Innovations" is deliberately NOT an alias here -- its rows
     // (Dept_Code 001348/00101000) get their own dedicated card via
     // renderCourtInnovationsSupplementalTables instead of the generic
@@ -102,6 +106,79 @@
   // Friendlier display captions for sub-group tables whose raw Dept_Name
   // in the sheet reads awkwardly on its own.
   const DEPT_NAME_DISPLAY_OVERRIDES = {};
+  const DEPARTMENT_PAGE_TITLE_ALIASES = new Map([
+    ["bcc other uses contingency", "Board of County Commissioners"],
+    ["clerk of court", "Clerk of Courts & County Comptroller"],
+    ["procurement", "Purchasing"],
+    ["probation services", "Probation"],
+    ["environmental services", "Environmental Resources"],
+    ["engineering services", "Engineering Department"],
+    ["e911", "E911 Fund"],
+    ["e 911", "E911 Fund"],
+    ["e911 fund", "E911 Fund"],
+    ["municipal service benefit unit", "Municipal Service Benefit Unit Fund"],
+    ["municipal service benefit unit fund", "Municipal Service Benefit Unit Fund"],
+    ["msbu", "Municipal Service Benefit Unit Fund"],
+    ["msbu fund", "Municipal Service Benefit Unit Fund"],
+    ["recreation plat fee", "Recreation Plat Fee Fund"],
+    ["recreation plat fee fund", "Recreation Plat Fee Fund"],
+    ["sidewalk", "Sidewalk Fund"],
+    ["sidewalk fund", "Sidewalk Fund"],
+    ["statutory and other", "Statutory & Other Agency Funding"],
+    ["culture and recreation senior centers", "Statutory & Other Agency Funding"],
+    ["culture and recreation senior centers and mainstreet", "Statutory & Other Agency Funding"],
+    ["senior centers", "Statutory & Other Agency Funding"],
+    ["senior centers and mainstreet", "Statutory & Other Agency Funding"],
+    ["walton county sheriff's office", "Sheriff's Office"],
+    ["walton county sheriffs office", "Sheriff's Office"],
+    ["south walton fire", "South Walton Fire & State Control"],
+    ["state fire", "South Walton Fire & State Control"],
+    ["volunteer fire", "South Walton Fire & State Control"],
+    ["court innovations", "Court Technology & Innovations"],
+    ["court technology - court administration", "Court Technology & Innovations"],
+    ["court technology court administration", "Court Technology & Innovations"],
+    ["sales and visitor center", "Tourism Administration"],
+    ["sales and visitors center", "Tourism Administration"],
+    ["communications", "Tourism Administration"],
+    ["marketing", "Tourism Administration"],
+    ["north walton tourist development tax", "Tourism Administration"],
+    ["beach operations", "Tourism Beach Operations"],
+    ["beach code enforcement", "Tourism Beach Operations"],
+    ["beach renourishment", "Tourism Beach Operations"],
+    ["beach tram", "Tourism Beach Operations"],
+    ["tourism beach tram", "Tourism Beach Operations"],
+    ["tourism public safety", "Tourism Lifeguard Services and Beach Safety"],
+    ["public safety", "Tourism Lifeguard Services and Beach Safety"],
+    ["mosquito control state aid", "Mosquito Control"],
+    ["south walton fire lifeguard services", "Tourism Lifeguard Services and Beach Safety"],
+    ["sheriff beach safety", "Tourism Lifeguard Services and Beach Safety"]
+  ]);
+
+  const DEPARTMENT_PAGE_FALLBACK_HREFS = new Map([
+    ["E911 Fund", "e911-fund.html"],
+    ["Municipal Service Benefit Unit Fund", "municipal-service-benefit-unit-fund.html"],
+    ["Recreation Plat Fee Fund", "recreation-plat-fee-fund.html"],
+    ["Sidewalk Fund", "sidewalk-fund.html"]
+  ]);
+
+  function localPageHref(filename) {
+    if (!filename) return "";
+    return window.location.pathname.indexOf("/pages/") !== -1 ? filename : "pages/" + filename;
+  }
+
+  function departmentPageHref(deptName) {
+    const norm = normalizeDeptName(deptName);
+    if (!norm || norm === "unclassified") return "";
+    const pages = window.wcBudgetPages || [];
+    const title = DEPARTMENT_PAGE_TITLE_ALIASES.get(norm) || deptName;
+    const exact = pages.find((p) => normalizeDeptName(p.title) === normalizeDeptName(title));
+    if (exact && exact.href) return exact.href;
+    const departmentMatch = pages.find((p) =>
+      p.section === "Departments" && normalizeDeptName(p.title) === norm
+    );
+    if (departmentMatch && departmentMatch.href) return departmentMatch.href;
+    return localPageHref(DEPARTMENT_PAGE_FALLBACK_HREFS.get(title));
+  }
 
   // Explanatory notes shown under a sub-group's Expenditure Summary table,
   // in the same italic callout style as the staffing notes.
@@ -1225,6 +1302,11 @@
   function getDeptCodeFromPage() {
     const el = document.querySelector("[data-dept-code]");
     return el && el.dataset.deptCode ? el.dataset.deptCode.trim() : "";
+  }
+
+  function getFundCodeFromPage() {
+    const el = document.querySelector("[data-fund-code]");
+    return el && el.dataset.fundCode ? el.dataset.fundCode.trim() : "";
   }
 
   function getDepartmentExpenses(deptName, deptCode) {
@@ -4866,10 +4948,12 @@
 
     const bodyRows = deptRows.map((d) => {
       const isZeroCurrent = (d.FY2027_Proposed || 0) === 0;
+      const deptHref = departmentPageHref(d.Dept_Name);
+      const deptLabel = escapeHtml(d.Dept_Name);
       return (
         "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
         "<td>" + escapeHtml(activityLabel(d.activity)) + "</td>" +
-        "<td>" + escapeHtml(d.Dept_Name) + "</td>" +
+        "<td>" + (deptHref ? '<a class="wc-department-row-link" href="' + escapeHtml(deptHref) + '">' + deptLabel + "</a>" : deptLabel) + "</td>" +
         BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
           '<td class="wc-num wc-prior-year">' + formatCurrency(d[c.field] || 0) + "</td>"
         ).join("") +
@@ -5955,6 +6039,15 @@
       "<h3>Highlights</h3>" +
       TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
       "</section>";
+    const tourismAdminSpec = TOURISM_ADMIN_SECTIONS.find((spec) => spec.label === "Tourism Administration");
+    const tourismAdminRevenue = tourismAdminSpec
+      ? renderTypeSummaryTable(
+          rowsForExactNames(cache.revenues, tourismAdminSpec.revenueNames),
+          "revenue",
+          "Revenue Summary",
+          tourismAdminSpec.label
+        )
+      : "";
 
     // Rendered inside the "Tourism Administration" division's own section,
     // right after its statement-of-function narrative but before its
@@ -5977,7 +6070,7 @@
         narrativeHtml,
         spec.label === "Tourism Administration" ? performanceHtml : "",
         renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
-        renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
+        spec.label === "Tourism Administration" ? "" : renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
         renderStaffingTable(staffingRows)
       ].filter(Boolean).join("");
 
@@ -5990,7 +6083,7 @@
       );
     }).filter(Boolean).join("");
 
-    return overview + sections;
+    return overview + tourismAdminRevenue + sections;
   }
 
   // Tourism Beach Operations' page combines three separately budgeted
@@ -6483,7 +6576,8 @@
       "department-solid-waste-tables",
       "department-building-construction-tables",
       "department-bcc-tables",
-      "department-court-innovations-tables"
+      "department-court-innovations-tables",
+      "department-fund-schedule"
     ];
     const containers = ids.map((id) => document.getElementById(id));
     if (!containers.some(Boolean)) return;
@@ -6501,7 +6595,7 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl, courtInnovationsEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl, courtInnovationsEl, fundScheduleEl] = containers;
 
         // Some pages combine several separately budgeted divisions; for
         // those, narrative/expenditures/revenue/staffing/machinery (and,
@@ -6530,6 +6624,7 @@
           mountOrHide(buildingConstructionEl, "");
           mountOrHide(bccEl, "");
           mountOrHide(courtInnovationsEl, "");
+          mountOrHide(fundScheduleEl, "");
           return;
         }
 
@@ -6550,6 +6645,7 @@
           mountOrHide(buildingConstructionEl, "");
           mountOrHide(bccEl, "");
           mountOrHide(courtInnovationsEl, "");
+          mountOrHide(fundScheduleEl, "");
           return;
         }
 
@@ -6637,6 +6733,13 @@
         );
         bindTooltipAnchors(courtInnovationsEl);
         bindPriorYearsToggle(courtInnovationsEl);
+
+        const fundCode = getFundCodeFromPage();
+        mountOrHide(
+          fundScheduleEl,
+          fundCode ? buildFundFinancialSchedule([fundCode], deptName) : ""
+        );
+        bindPriorYearsToggle(fundScheduleEl);
 
         arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl, [
           solidWasteEl,

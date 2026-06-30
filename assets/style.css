@@ -1713,6 +1713,17 @@ body {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
   color: var(--navy); font-weight: 800; border-bottom: 0;
 }
+.wc-department-row-link {
+  color: var(--green);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.wc-department-row-link:hover,
+.wc-department-row-link:focus {
+  color: var(--navy);
+}
 
 /* Fund Financial Schedule: collapsible Revenues/Expenditures activity rows
    (see buildFundFinancialSchedule/closeFundActivityDetail in budget-data.js). */
@@ -1898,14 +1909,16 @@ body {
   flex: 1 1 auto;
   max-width: 980px;
   margin: 0;
-  padding: 8px 12px;
-  border: 1px solid rgba(209,190,120,.38);
-  border-radius: 14px;
-  background: rgba(209,190,120,.10);
-  color: #526577;
-  font-size: .82rem;
+  padding: 10px 14px;
+  border: 1px solid #b98b12;
+  border-left: 5px solid #006b3f;
+  border-radius: 12px;
+  background: #fff7d6;
+  color: #1f3444;
+  font-size: .84rem;
   line-height: 1.45;
   font-style: italic;
+  font-weight: 600;
 }
 .wc-transaction-drilldown-helper {
   flex: 1 1 auto;
@@ -2669,8 +2682,10 @@ body {
 }
 
 :root[data-theme="dark"] .wc-revenue-actuals-note {
-  background: rgba(216,199,126,.10) !important;
-  border-color: rgba(216,199,126,.34) !important;
+  background: rgba(216,199,126,.22) !important;
+  border-color: #d8c77e !important;
+  border-left-color: #4fd08d !important;
+  color: #f6efd0 !important;
 }
 
 :root[data-theme="dark"] .wc-transaction-panel {
