@@ -1918,6 +1918,18 @@
     return TRANSACTION_DRILLDOWN_DEPT_NAMES.has(normalizeDeptName(row && row.Dept_Name));
   }
 
+  function currentBudgetLinesReturnUrl(detailId) {
+    if (!detailId || !window || !window.location) return "";
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("openBudgetLines", detailId);
+      url.searchParams.set("priorYears", getShowPriorYears("budget") ? "1" : "0");
+      return url.href;
+    } catch (e) {
+      return "";
+    }
+  }
+
   function transactionHrefForBudgetLine(row, column, fields) {
     if (!column.actual || !transactionDrilldownEnabledForRow(row)) return "";
     // Must match what the cell actually displays (budgetLineColumnAmount),
@@ -1956,6 +1968,8 @@
     params.set("departmentCode", deptCode);
     params.set("departmentName", row.Dept_Name || "");
     params.set("fundCode", fundCodeForRow(row));
+    const returnTo = currentBudgetLinesReturnUrl(fields && fields.detailId);
+    if (returnTo) params.set("returnTo", returnTo);
     if (projectCode) params.set("projectCode", projectCode);
     if (projectName) params.set("program", projectName);
 
@@ -2110,7 +2124,7 @@
 
     function budgetLineRowHtml(r, rowClass, suppressDescription) {
       const isZeroCurrent = (r.FY2027_Proposed || 0) === 0;
-      const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue" };
+      const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue", detailId };
       return (
         '<tr class="' + rowClass + (isZeroCurrent ? " wc-budget-line-zero-current" : "") + '">' +
         "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
@@ -2322,8 +2336,7 @@
         button.removeAttribute("data-wc-prior-years-bound");
       });
       bindPriorYearsToggle(body);
-      applyPriorYearsState(false, body);
-      body.classList.remove("show-prior-years");
+      applyPriorYearsState(getShowPriorYears("budget"), body);
     }
     activeBudgetDetailToggle = toggle;
     toggle.setAttribute("aria-expanded", "true");
@@ -2335,6 +2348,25 @@
     if (closeButton) closeButton.focus({ preventScroll: true });
   }
 
+  function refreshTransactionDrilldownReturnState(link) {
+    if (!link || !link.href) return;
+    try {
+      const href = new URL(link.href, window.location.href);
+      const returnTo = href.searchParams.get("returnTo");
+      if (!returnTo) return;
+      const returnUrl = new URL(returnTo, window.location.href);
+      returnUrl.searchParams.set("priorYears", getShowPriorYears("budget") ? "1" : "0");
+      href.searchParams.set("returnTo", returnUrl.href);
+      link.href = href.href;
+    } catch (e) {
+      /* Leave the original link intact if URL parsing is unavailable. */
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    refreshTransactionDrilldownReturnState(event.target.closest(".wc-actual-drilldown-link"));
+  }, true);
+
   // Single delegated listener handles every detail button on the page,
   // regardless of which function rendered the card or table it belongs to.
   document.addEventListener("click", (event) => {
@@ -2343,6 +2375,49 @@
     const detail = document.getElementById(toggle.dataset.target);
     if (!detail) return;
     openBudgetDetailModal(toggle, detail);
+  });
+
+  let requestedBudgetLinesOpened = false;
+
+  function requestedBudgetLinesTarget() {
+    try {
+      return new URLSearchParams(window.location.search).get("openBudgetLines") || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function restoreRequestedPriorYearsState() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (!params.has("priorYears")) return;
+      setShowPriorYears(params.get("priorYears") === "1", "budget");
+    } catch (e) {
+      /* URLSearchParams unavailable; keep the existing stored preference. */
+    }
+  }
+
+  function openRequestedBudgetLinesFromUrl() {
+    if (requestedBudgetLinesOpened) return true;
+    const target = requestedBudgetLinesTarget();
+    if (!target) return true;
+    const toggles = Array.from(document.querySelectorAll(".wc-view-budget-lines-toggle[data-target]"));
+    const toggle = toggles.find((candidate) => candidate.dataset.target === target);
+    if (!toggle) return false;
+    requestedBudgetLinesOpened = true;
+    toggle.click();
+    return true;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    restoreRequestedPriorYearsState();
+    if (!requestedBudgetLinesTarget()) return;
+    if (openRequestedBudgetLinesFromUrl()) return;
+    const observer = new MutationObserver(() => {
+      if (openRequestedBudgetLinesFromUrl()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => observer.disconnect(), 10000);
   });
 
   // Fund Financial Schedule activity rows (see buildFundFinancialSchedule):

@@ -117,6 +117,17 @@
       .trim();
   }
 
+  function safeReturnHref(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(value, window.location.href);
+      if (url.origin !== window.location.origin) return "";
+      return url.pathname + url.search + url.hash;
+    } catch (e) {
+      return "";
+    }
+  }
+
   function initBackLink(context) {
     const link = document.querySelector("[data-transaction-back]");
     if (!link) return;
@@ -124,11 +135,16 @@
     // Fix the static "always goes to OMB" href before wiring up the
     // history.back() enhancement, so the link is correct even if history
     // isn't usable (e.g. opened in a new tab) and not just when it is.
+    const returnHref = safeReturnHref(param("returnTo"));
     const page = DEPARTMENT_BACK_LINK_PAGES[normalizeDeptNameForBackLink(context && context.departmentName)];
-    if (page) link.setAttribute("href", page);
+    if (returnHref) {
+      link.setAttribute("href", returnHref);
+    } else if (page) {
+      link.setAttribute("href", page);
+    }
 
     link.addEventListener("click", function (event) {
-      if (window.history.length > 1) {
+      if (!returnHref && window.history.length > 1) {
         event.preventDefault();
         window.history.back();
       }
