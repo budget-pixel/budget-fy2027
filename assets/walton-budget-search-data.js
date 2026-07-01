@@ -31,6 +31,7 @@ var wcCoreBudgetPages = [
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
   { title:"Summary of Machinery, Vehicles & Equipment", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfdb1a2c2915743e4" },
   { title:"Financials", section:"Financials", href:"financials.html" },
+  { title:"Supporting Budget Documentation", section:"Financials", href:"supporting-budget-documentation.html" },
   { title:"Board of County Commissioners", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc6947be859271a418" },
   { title:"Clerk of Courts & County Comptroller", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbcc965cb8dc61a1909" },
   { title:"Property Appraiser", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc872420fe4b9ad729" },
@@ -196,6 +197,10 @@ var wcHiddenBudgetPageTitles = new Set([
 
     "Financials": [
       "financials", "financial hub", "financial summaries", "revenues", "expenses", "fund schedules", "debt", "forecast", "transfers", "personnel", "equipment", "supplemental"
+    ],
+
+    "Supporting Budget Documentation": [
+      "supporting budget documentation", "budget documentation", "supporting documents", "budget documents", "budget requests", "budget certification", "certifications", "financial policies", "policy documents", "ordinances", "fee schedules", "reference workbooks", "trim workbook", "clerk budget", "sheriff budget certification", "agency requests"
     ],
 
     "Board of County Commissioners": [
@@ -470,6 +475,7 @@ var wcHiddenBudgetPageTitles = new Set([
     "Summary of Personnel": "summary-of-personnel.html",
     "Summary of Machinery, Vehicles & Equipment": "summary-of-machinery-vehicles-and-equipment.html",
     "Financials": "financials.html",
+    "Supporting Budget Documentation": "supporting-budget-documentation.html",
     "Board of County Commissioners": "board-of-county-commissioners.html",
     "Clerk of Courts & County Comptroller": "clerk-of-courts-and-county-comptroller.html",
     "Property Appraiser": "property-appraiser.html",
