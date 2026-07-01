@@ -2237,7 +2237,7 @@
           const value = amount === null ? "—" : formatCurrency(amount);
           const drilldownLabel = "View " + c.label + " transaction detail for " +
             (r[nameField] || r[codeField] || "this budget line") + " actual amount " + value;
-          return '<td class="wc-num wc-prior-year">' +
+          return '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' +
             (href && amount !== null ? '<a class="wc-actual-drilldown-link" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(drilldownLabel) + '">' + value + "</a>" : value) +
             "</td>";
         }).join("") +
@@ -2254,7 +2254,7 @@
       return (
         '<tr class="' + rowClass + ' wc-table-subtotal-row">' + labelCells +
           priorYearColumns.map((c) =>
-            '<td class="wc-num wc-prior-year">' + formatCurrency(categoryRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
+            '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(categoryRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
           ).join("") +
           '<td class="wc-num">' + formatCurrency(categoryRows.reduce((sum, r) => sum + (r.FY2027_Proposed || 0), 0)) + "</td></tr>"
       );
@@ -2313,7 +2313,7 @@
     bodyRows.push(
       '<tr class="wc-table-total-row">' + totalLabelCells +
         priorYearColumns.map((c) =>
-          '<td class="wc-num wc-prior-year">' + formatCurrency(mergedRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
+          '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(mergedRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
         ).join("") +
         '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
     );
@@ -2326,10 +2326,83 @@
           { label: "Itemized Description", classes: ["wc-itemized-description-column"] }
         ])
         .concat(
-          priorYearColumns.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
+          priorYearColumns.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year", "wc-fy-" + c.year] })),
           [{ label: "FY 2027 Proposed", num: true }]
         ),
       bodyRows: bodyRows
+    });
+
+    const printYearColumns = priorYearColumns.filter((c) => c.year !== 2020 && c.year !== 2021);
+    const printRows = summaryRows
+      .slice()
+      .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")));
+
+    function printBudgetLineRowHtml(row, label, rowClass) {
+      return (
+        '<tr class="' + rowClass + '">' +
+        "<td>" + escapeHtml(label || row[nameField] || "") + "</td>" +
+        printYearColumns.map((c) =>
+          '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(budgetLineVisibleColumnAmount(row, c) || 0) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(row.FY2027_Proposed || 0) + "</td>" +
+        "</tr>"
+      );
+    }
+
+    function printSubtotalRowHtml(category, categoryRows) {
+      return (
+        '<tr class="wc-table-subtotal-row">' +
+        "<td>" + escapeHtml(category) + " Subtotal</td>" +
+        printYearColumns.map((c) =>
+          '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(categoryRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(categoryRows.reduce((sum, row) => sum + (row.FY2027_Proposed || 0), 0)) + "</td>" +
+        "</tr>"
+      );
+    }
+
+    const printBodyRows = [];
+    if (isExpense) {
+      const categoryOrder = [];
+      const rowsByCategory = new Map();
+      printRows.forEach((row) => {
+        const category = row[categoryField] || "Other";
+        if (!rowsByCategory.has(category)) {
+          categoryOrder.push(category);
+          rowsByCategory.set(category, []);
+        }
+        rowsByCategory.get(category).push(row);
+      });
+      categoryOrder.forEach((category) => {
+        const categoryRows = rowsByCategory.get(category);
+        categoryRows.forEach((row) => printBodyRows.push(printBudgetLineRowHtml(row, "", "wc-print-budget-line-row")));
+        if (categoryOrder.length > 1) {
+          printBodyRows.push(printSubtotalRowHtml(category, categoryRows));
+        }
+      });
+    } else {
+      printRows.forEach((row) => printBodyRows.push(printBudgetLineRowHtml(row, "", "wc-print-budget-line-row")));
+    }
+    printBodyRows.push(
+      '<tr class="wc-table-total-row">' +
+      "<td>Total</td>" +
+      printYearColumns.map((c) =>
+        '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(mergedRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
+      ).join("") +
+      '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td>" +
+      "</tr>"
+    );
+
+    function printColumnLabel(label) {
+      return String(label || "").replace(/^(FY \d{4})\s+(.+)$/, "$1\n$2");
+    }
+
+    const printDetailTable = renderTable({
+      columns: [{ label: isExpense ? "Object Name" : "Revenue Name" }]
+        .concat(printYearColumns.map((c) => ({ label: printColumnLabel(c.label), num: true, classes: ["wc-prior-year", "wc-fy-" + c.year] })))
+        .concat([{ label: "FY 2027\nProposed", num: true }]),
+      bodyRows: printBodyRows,
+      hideVisualCaption: true
     });
 
     const toggleHeader = priorYearsToggleDisabled ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
@@ -2346,8 +2419,8 @@
 
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
-      detail: '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
-        budgetLinesTools + detailTable + "</div>"
+      detail: '<div class="wc-budget-lines-detail wc-budget-lines-card wc-has-print-budget-table' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+        budgetLinesTools + detailTable + '<div class="wc-print-budget-table-wrap">' + printDetailTable + "</div></div>"
     };
   }
 
@@ -2849,7 +2922,7 @@
     }).join("");
 
     return (
-      '<section class="wc-finance-card wc-budget-lines-card' + rowCountClass + zeroClass + (showPrior ? " show-prior-years" : "") + '">' +
+      '<section class="wc-finance-card wc-budget-lines-card wc-print-kind-' + escapeHtml(kind) + rowCountClass + zeroClass + (showPrior ? " show-prior-years" : "") + '" data-print-title="' + escapeHtml(caption) + '">' +
         '<div class="wc-finance-card-head">' +
           '<div>' +
             '<p class="wc-finance-card-kicker">' + escapeHtml(caption) + '</p>' +
@@ -5974,7 +6047,7 @@
         return (
           "<tr" + rowClass + "><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
           years.map((y) => {
-            const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
+            const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year", "wc-fy-" + y] : []);
             return '<td class="' + classes.join(" ") + '">' + formatNumber(r[y] || 0) + "</td>";
           }).join("") +
           "</tr>"
@@ -5983,7 +6056,7 @@
     bodyRows.push(
       '<tr class="wc-table-total-row"><td>Total FTE</td>' +
         years.map((y) => {
-          const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year"] : []);
+          const classes = ["wc-num"].concat(y < 2027 ? ["wc-prior-year", "wc-fy-" + y] : []);
           return '<td class="' + classes.join(" ") + '">' + formatNumber(totals[y]) + "</td>";
         }).join("") +
         "</tr>"
@@ -6040,7 +6113,7 @@
         );
       }).join("");
     return (
-      '<section class="wc-finance-card wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '">' +
+      '<section class="wc-finance-card wc-staffing-card' + (showPrior ? " show-prior-years" : "") + '" data-print-title="' + escapeHtml(label) + '">' +
         '<div class="wc-finance-card-head">' +
           '<div>' +
             '<p class="wc-finance-card-kicker">' + escapeHtml(label) + '</p>' +
@@ -6060,7 +6133,7 @@
           '<table class="wc-data-table wc-staffing-table">' +
           "<thead><tr>" +
           "<th>Position Name</th>" +
-          priorYears.map((y) => '<th class="wc-num wc-prior-year">FY ' + y + "</th>").join("") +
+          priorYears.map((y) => '<th class="wc-num wc-prior-year wc-fy-' + y + '">FY ' + y + "</th>").join("") +
           '<th class="wc-num">FY 2027</th>' +
           "</tr></thead>" +
           "<tbody>" + bodyRows.join("") + "</tbody>" +
@@ -6498,13 +6571,13 @@
     if (!rows.length) return "";
     const showPrior = getShowPriorYears("performance");
     const yearCols = [
-      { key: "Actual_2022", label: "Actual 2022" },
-      { key: "Actual_2023", label: "Actual 2023" },
-      { key: "Actual_2024", label: "Actual 2024" },
-      { key: "Actual_2025", label: "Actual 2025" },
-      { key: "Projected_2026", label: "Projected 2026" }
+      { key: "Actual_2022", label: "Actual 2022", year: 2022 },
+      { key: "Actual_2023", label: "Actual 2023", year: 2023 },
+      { key: "Actual_2024", label: "Actual 2024", year: 2024 },
+      { key: "Actual_2025", label: "Actual 2025", year: 2025 },
+      { key: "Projected_2026", label: "Projected 2026", year: 2026 }
     ];
-    const finalCol = { key: "Projected_2027", label: "Projected 2027" };
+    const finalCol = { key: "Projected_2027", label: "Projected 2027", year: 2027 };
 
     const bodyRows = rows.map((r, index) => {
       const isFirstGoalRow = index === 0 || rows[index - 1].Goal !== r.Goal;
@@ -6527,8 +6600,8 @@
             escapeHtml(r.Objective || "") + "</td>"
           : "") +
         '<td class="wc-performance-measure">' + escapeHtml(r.Measure || "") + "</td>" +
-        yearCols.map((c) => '<td class="wc-performance-value wc-prior-year">' + escapeHtml(r[c.key] || "") + "</td>").join("") +
-        '<td class="wc-performance-value">' + escapeHtml(r[finalCol.key] || "") + "</td>" +
+        yearCols.map((c) => '<td class="wc-performance-value wc-prior-year wc-fy-' + c.year + '">' + escapeHtml(r[c.key] || "") + "</td>").join("") +
+        '<td class="wc-performance-value wc-fy-' + finalCol.year + '">' + escapeHtml(r[finalCol.key] || "") + "</td>" +
         "</tr>"
       );
     });
@@ -6545,8 +6618,8 @@
       '<table class="wc-performance-table">' +
       "<thead><tr>" +
       '<th>Code Link</th><th>Departmental Goal</th><th>Objective</th><th>Performance Measure</th>' +
-      yearCols.map((c) => '<th class="wc-prior-year">' + escapeHtml(c.label) + "</th>").join("") +
-      "<th>" + escapeHtml(finalCol.label) + "</th>" +
+      yearCols.map((c) => '<th class="wc-prior-year wc-fy-' + c.year + '">' + escapeHtml(c.label) + "</th>").join("") +
+      '<th class="wc-fy-' + finalCol.year + '">' + escapeHtml(finalCol.label) + "</th>" +
       "</tr></thead>" +
       "<tbody>" + bodyRows.join("") + "</tbody>" +
       "</table>" +

@@ -506,6 +506,34 @@
       wcBudgetAssetBaseUrl + "walton-performance-mobile.js?v=2"
     );
   }
+  var WC_PDF_EXCLUDED_PAGE_NAMES = {
+    "": true,
+    "index.html": true,
+    "our-county.html": true,
+    "budget-overview.html": true,
+    "departments.html": true,
+    "capital-projects.html": true,
+    "financials.html": true,
+    "constitutional-officers.html": true,
+    "autonomous-entities.html": true,
+    "search.html": true
+  };
+  function shouldLoadWaltonBudgetPdf(){
+    var pageName = (window.location.pathname.split("/").pop() || "").toLowerCase();
+    if(WC_PDF_EXCLUDED_PAGE_NAMES[pageName]){
+      return false;
+    }
+    return Boolean(document.querySelector("main#content, main#main-content, main"));
+  }
+  function loadWaltonBudgetPdfPrintHelper(){
+    if(!shouldLoadWaltonBudgetPdf()){
+      return;
+    }
+    loadWcScriptOnce(
+      "wc-budget-pdf-script",
+      wcBudgetAssetBaseUrl + "walton-budget-pdf.js?v=20260630-print"
+    );
+  }
   var css = `
   *,
   *::before,
@@ -2321,6 +2349,7 @@
         initWcNavSearch();
       });
       loadWaltonPerformanceMobile();
+      loadWaltonBudgetPdfPrintHelper();
       ensureWcNavChrome();
       ensureWcBreadcrumb();
       setTimeout(initWcNavSearch, 800);
@@ -2337,6 +2366,7 @@
     }
     renderStandaloneBudgetNav();
     loadWaltonPerformanceMobile();
+    loadWaltonBudgetPdfPrintHelper();
     ensureWcBreadcrumb();
     setTimeout(ensureWcBreadcrumb, 800);
     setTimeout(ensureWcBreadcrumb, 2000);
