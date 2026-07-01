@@ -4219,7 +4219,7 @@
         const beginningBalance = index === 0 ? fundBalanceForYear(fund.code, beginningBalanceSourceYear) : annual[year - 1].endingBalance;
         const revenues = sumForecastCategories(revenueCategories, year);
         const expenditures = sumForecastCategories(expenseCategories, year);
-        const netChange = revenues - expenditures;
+        const netChange = Math.max(0, revenues - expenditures);
         annual[year] = {
           year,
           beginningBalance,
@@ -4319,7 +4319,7 @@
       '</tr>'
     ));
     return renderTable({
-      caption: item.fund.code + " " + item.fund.label,
+      caption: item.fund.label,
       hideVisualCaption: true,
       columns: [{ label: "Line" }].concat(FINANCIAL_FORECAST_YEARS.map((year) => ({ label: "FY " + year + (year === 2027 ? " Baseline" : " Forecast"), num: true }))),
       bodyRows: rows
@@ -4418,7 +4418,6 @@
       // .wc-forecast-sort-button.
       return (
         '<tr data-sort-value="' + (detail.values[2027] || 0) + '" data-sort-name="' + escapeHtml(detail.name.toLowerCase()) + '">' +
-        '<td>' + escapeHtml(fund.code) + '</td>' +
         '<td>' + escapeHtml(fund.label) + '</td>' +
         '<td>' + escapeHtml(detail.name) + '</td>' +
         FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => '<td class="wc-num">' + forecastMoney(detail.values[year] || 0) + '</td>').join("") +
@@ -4437,7 +4436,6 @@
       caption: lineType === "revenue" ? "Revenue Forecast Assumptions" : "Expense Forecast Assumptions",
       toggleHtml: sortToggleHtml,
       columns: [
-        { label: "Fund" },
         { label: "Fund Name" },
         { label: nameLabel },
         { label: "FY 2020 Actual", num: true },
@@ -4459,7 +4457,7 @@
         '<h2 class="wc-fund-section-heading">Major Fund Detail</h2>' +
         model.funds.map((item) => (
           '<article class="wc-forecast-fund">' +
-            '<h3>' + escapeHtml(item.fund.code + " " + item.fund.label) + '</h3>' +
+            '<h3>' + escapeHtml(item.fund.label) + '</h3>' +
             renderForecastDetailTable(item) +
             '<details class="wc-forecast-detail"><summary>Category Forecast Detail</summary>' +
               renderForecastDetailBreakdownTable(item, "revenue", item.revenueDetails) +
