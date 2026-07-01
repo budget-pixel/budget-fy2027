@@ -1197,6 +1197,11 @@ var PRINT_CSS = `
     visibility:hidden !important;
   }
 
+  .wc-table-unclassified-row{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
   .wc-print-kind-expense .wc-budget-lines-detail > .wc-data-table-wrap table th:nth-child(1),
   .wc-print-kind-expense .wc-budget-lines-detail > .wc-data-table-wrap table td:nth-child(1),
   .wc-print-kind-expense .wc-budget-lines-detail > .wc-data-table-wrap table th:nth-child(2),

@@ -2338,9 +2338,12 @@
       .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")));
 
     function printBudgetLineRowHtml(row, label, rowClass) {
+      const rowLabel = label || row[nameField] || "";
+      const classes = [rowClass];
+      if (/^unclassified/i.test(String(rowLabel).trim())) classes.push("wc-table-unclassified-row");
       return (
-        '<tr class="' + rowClass + '">' +
-        "<td>" + escapeHtml(label || row[nameField] || "") + "</td>" +
+        '<tr class="' + classes.filter(Boolean).join(" ") + '">' +
+        "<td>" + escapeHtml(rowLabel) + "</td>" +
         printYearColumns.map((c) =>
           '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(budgetLineVisibleColumnAmount(row, c) || 0) + "</td>"
         ).join("") +
@@ -4586,8 +4589,11 @@
 
     function rowHtml(label, values, rowClass) {
       const labelClass = rowClass && rowClass.indexOf("wc-table-total-row") !== -1 ? ' class="wc-fund-total-label-cell"' : "";
+      const rowClasses = [];
+      if (rowClass) rowClasses.push(rowClass);
+      if (/^unclassified/i.test(String(label || "").trim())) rowClasses.push("wc-table-unclassified-row");
       return (
-        "<tr" + (rowClass ? ' class="' + rowClass + '"' : "") + "><td" + labelClass + ">" + escapeHtml(label) + "</td>" +
+        "<tr" + (rowClasses.length ? ' class="' + rowClasses.join(" ") + '"' : "") + "><td" + labelClass + ">" + escapeHtml(label) + "</td>" +
         values.map((v, i) =>
           '<td class="wc-num' + (i < values.length - 1 ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>"
         ).join("") +
@@ -5007,7 +5013,7 @@
     // table that has nothing unclassified.
     if (unclassifiedRevenueValues.some((v) => v !== 0)) {
       bodyRows.push(
-        "<tr><td>Unclassified</td>" +
+        '<tr class="wc-table-unclassified-row"><td>Unclassified</td>' +
         unclassifiedRevenueValues.map((v, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>").join("") +
         "</tr>"
       );
@@ -5129,7 +5135,7 @@
     // table that has nothing unclassified.
     if (unclassifiedExpenseValues.some((v) => v !== 0)) {
       bodyRows.push(
-        "<tr><td>Unclassified</td>" +
+        '<tr class="wc-table-unclassified-row"><td>Unclassified</td>' +
         unclassifiedExpenseValues.map((v, i) => '<td class="wc-num' + (i < lastIndex ? " wc-prior-year" : "") + '">' + formatCurrency(v) + "</td>").join("") +
         "</tr>"
       );
