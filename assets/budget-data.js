@@ -4770,10 +4770,10 @@
     bodyRows.push(rowHtml("Total Expenditures and Other Financial Uses", expenseTotalValues, "wc-table-subtotal-row"));
 
     const changeValues = revenueTotalValues.map((v, i) => v - expenseTotalValues[i]);
-    bodyRows.push(rowHtml("Change in Fund Balance", changeValues, "wc-table-subtotal-row"));
+    bodyRows.push(rowHtml("Change in Fund Balance", changeValues));
 
     const endingValues = changeValues.map((v, i) => v + beginningValues[i]);
-    bodyRows.push(rowHtml("Estimated Ending Fund Balance", endingValues, "wc-table-total-row"));
+    bodyRows.push(rowHtml("Estimated Ending Fund Balance", endingValues, "wc-table-subtotal-row"));
 
     const showPrior = getShowPriorYears();
     const headerCells = ["ROW LABELS"].concat(
