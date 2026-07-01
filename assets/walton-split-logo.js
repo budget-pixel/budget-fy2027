@@ -111,16 +111,16 @@
     if(!top || !bottom){
       return;
     }
-    bottom.style.removeProperty("letter-spacing");
+    top.style.removeProperty("letter-spacing");
     var topWidth = top.getBoundingClientRect().width;
     var bottomWidth = bottom.getBoundingClientRect().width;
     if(!topWidth || !bottomWidth){
       return;
     }
-    var gaps = Math.max((bottom.textContent || "").length - 1, 1);
-    var baseSpacing = parseFloat(getComputedStyle(bottom).letterSpacing) || 0;
-    var nextSpacing = baseSpacing + (topWidth - bottomWidth) / gaps;
-    bottom.style.setProperty("letter-spacing", nextSpacing + "px");
+    var gaps = Math.max((top.textContent || "").length - 1, 1);
+    var baseSpacing = parseFloat(getComputedStyle(top).letterSpacing) || 0;
+    var nextSpacing = baseSpacing + (bottomWidth - topWidth) / gaps;
+    top.style.setProperty("letter-spacing", nextSpacing + "px", "important");
   }
 
   function equalizeAll(root){
