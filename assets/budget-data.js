@@ -239,6 +239,14 @@
     ]
   };
 
+  // Inter-department FTE transfers for FY 2027. When a position reduction in
+  // one dept is matched by an equal increase in another dept with the same
+  // position name, both changes are surfaced as a single "Transferred" note
+  // rather than separate "Requested" / "Reduced" notes.
+  const STAFFING_TRANSFERS = [
+    { from: "county administration", to: "veteran services", fromLabel: "County Administration", toLabel: "Veteran Services" }
+  ];
+
   // Hover-tip copy for each budget category, shown via the same
   // "i" bubble treatment used on the site's static FY-history tables.
   const TYPE_TOOLTIPS = {
@@ -6189,7 +6197,13 @@
   // Flags any position whose FTE changed between the prior adopted year
   // (2026) and the proposed year (2027), so the table can call out
   // staffing changes without someone having to write them up by hand.
+  // Known inter-department transfers (see STAFFING_TRANSFERS) are shown as
+  // "Transferred" rather than "Requested" / "Reduced".
   function buildStaffingNotes(rows) {
+    if (!rows.length) return [];
+    const deptNorm = normalizeDeptName(rows[0].Dept_Name || "");
+    const asFrom = STAFFING_TRANSFERS.find((t) => t.from === deptNorm);
+    const asTo = STAFFING_TRANSFERS.find((t) => t.to === deptNorm);
     return rows
       .slice()
       .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""))
@@ -6198,6 +6212,22 @@
         const after = r[2027] || 0;
         const delta = after - before;
         if (Math.abs(delta) < 1e-9) return notes;
+        if (delta < 0 && asFrom) {
+          notes.push(
+            "Transferred " + formatNumber(Math.abs(delta)) + " FTE (" +
+            escapeHtml(r.Position_Name || "") + ") to " +
+            escapeHtml(asFrom.toLabel) + " in Fiscal Year 2027."
+          );
+          return notes;
+        }
+        if (delta > 0 && asTo) {
+          notes.push(
+            "Transferred " + formatNumber(delta) + " FTE (" +
+            escapeHtml(r.Position_Name || "") + ") from " +
+            escapeHtml(asTo.fromLabel) + " in Fiscal Year 2027."
+          );
+          return notes;
+        }
         const verb = delta > 0 ? "Requested" : "Reduced";
         notes.push(
           verb + " " + formatNumber(Math.abs(delta)) + " FTE (" +
@@ -7558,7 +7588,7 @@
     );
   }
 
-  function renderPersonnelSummary(container) {
+  function renderPersonnelSummary(container, notesContainer) {
     if (!container) return;
     const rows = cache.staffing || [];
     if (!rows.length) {
@@ -7604,12 +7634,14 @@
       if (!filtered.length) {
         tableEl.hidden = false;
         tableEl.innerHTML = '<div class="wc-data-empty">No positions match the current filters.</div>';
+        mountOrHide(notesContainer, "");
         return;
       }
 
       if (deptName) {
         mountOrHide(tableEl, renderStaffingTable(filtered));
         bindPriorYearsToggle(tableEl);
+        mountOrHide(notesContainer, buildPersonnelSummaryFteNotes(filtered));
         return;
       }
 
@@ -7667,6 +7699,7 @@
           bodyRows: bodyRows
         }) + detailMarkup.join("")
       );
+      mountOrHide(notesContainer, buildPersonnelSummaryFteNotes(filtered));
     }
 
     deptSelect.addEventListener("change", applyFilters);
@@ -7716,6 +7749,76 @@
   // from the Narratives sheet's "Summary of Personnel Note" Dept_Name row
   // (same sheet/column used for department narratives elsewhere) rather
   // than hardcoded on the page.
+  function buildPersonnelSummaryFteNotes(rows) {
+    // Collect every FTE change with dept context.
+    const changes = rows
+      .slice()
+      .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""))
+      .reduce((acc, r) => {
+        const before = r[2026] || 0;
+        const after = r[2027] || 0;
+        const delta = after - before;
+        if (Math.abs(delta) >= 1e-9) {
+          acc.push({
+            deptLabel: personnelDeptDisplayName(r.Dept_Name),
+            deptNorm: normalizeDeptName(r.Dept_Name),
+            position: r.Position_Name || "",
+            delta
+          });
+        }
+        return acc;
+      }, []);
+
+    if (!changes.length) return "";
+
+    const used = new Set();
+    const noteLines = [];
+
+    // First pass: pair up known inter-department transfers.
+    STAFFING_TRANSFERS.forEach((t) => {
+      changes.forEach((reduction, i) => {
+        if (used.has(i) || reduction.deptNorm !== t.from || reduction.delta >= 0) return;
+        const matchIdx = changes.findIndex((increase, j) =>
+          !used.has(j) &&
+          increase.deptNorm === t.to &&
+          increase.delta > 0 &&
+          increase.position === reduction.position &&
+          Math.abs(increase.delta - Math.abs(reduction.delta)) < 1e-9
+        );
+        if (matchIdx === -1) return;
+        used.add(i);
+        used.add(matchIdx);
+        noteLines.push({
+          sortKey: t.fromLabel,
+          html: "Transferred " + formatNumber(Math.abs(reduction.delta)) + " FTE (" +
+            escapeHtml(reduction.position) + ") from " +
+            escapeHtml(t.fromLabel) + " to " + escapeHtml(t.toLabel) + " in Fiscal Year 2027."
+        });
+      });
+    });
+
+    // Second pass: remaining unmatched changes get the standard note.
+    changes.forEach((c, i) => {
+      if (used.has(i)) return;
+      const verb = c.delta > 0 ? "Requested" : "Reduced";
+      noteLines.push({
+        sortKey: c.deptLabel,
+        html: "<strong>" + escapeHtml(c.deptLabel) + "</strong> — " +
+          verb + " " + formatNumber(Math.abs(c.delta)) + " FTE (" +
+          escapeHtml(c.position) + ") in Fiscal Year 2027."
+      });
+    });
+
+    if (!noteLines.length) return "";
+    noteLines.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    return (
+      '<div class="wc-staffing-notes">' +
+      '<p class="wc-staffing-notes-title">Staffing Notes:</p>' +
+      noteLines.map((n) => "<p>" + n.html + "</p>").join("") +
+      "</div>"
+    );
+  }
+
   function renderPersonnelSummaryNote() {
     const narrativeRows = cache.departmentNarratives || [];
     const row = narrativeRows.find((r) => normalizeDeptName(r.Dept_Name) === normalizeDeptName("Summary of Personnel Note"));
@@ -7740,8 +7843,7 @@
           container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
           return;
         }
-        renderPersonnelSummary(container);
-        mountOrHide(notesContainer, renderPersonnelSummaryNote());
+        renderPersonnelSummary(container, notesContainer);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load personnel summary", err);
