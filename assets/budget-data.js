@@ -6958,7 +6958,7 @@
         remainingParagraphs.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
         "</div>" +
         '<div class="libraries-video-frame">' +
-        '<iframe src="https://www.youtube.com/embed/gJ7QNzqj8ks?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Libraries budget video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
+        '<iframe src="https://www.youtube.com/embed/gJ7QNzqj8ks?autoplay=1&amp;mute=1&amp;controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Libraries budget video" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
         "</div>" +
         "</div>" +
         "</section>";

@@ -1447,6 +1447,7 @@
     font-size:clamp(28px, 3vw, 42px);
     line-height:1;
   }
+  .wc-budget-card p,
   .wc-investment-card p{
     margin:16px 0 0;
     color:var(--wc-muted);
@@ -1687,6 +1688,7 @@
   }
   html[data-theme="dark"] .wc-budget-card small,
   html[data-theme="dark"] .wc-investment-card small,
+  html[data-theme="dark"] .wc-budget-card p,
   html[data-theme="dark"] .wc-investment-card p,
   html[data-theme="dark"] .wc-budget-card-millage,
   html[data-theme="dark"] .wc-project-card p,
@@ -1931,11 +1933,11 @@
         <a class="wc-section-link" href="pages/summary-of-revenues.html">View Summary of Revenues &rarr;</a>
       </div>
       <div class="wc-budget-grid">
-        <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong>$163.4M</strong><span class="wc-budget-card-millage"><span class="wc-budget-card-millage-label">Millage</span>Countywide 3.519<br>North Walton Mosquito Control 0.441</span></div>
-        <div class="wc-budget-card" data-revenue-card="tdt"><small>Tourist Development Tax</small><strong>$58.8M</strong></div>
-        <div class="wc-budget-card" data-revenue-card="surtax"><small>Local Discretionary Sales Surtax</small><strong>$40.0M</strong></div>
-        <div class="wc-budget-card" data-revenue-card="halfcent"><small>Local Government Half-Cent Sales Tax</small><strong>$17.9M</strong></div>
-        <div class="wc-budget-card" data-revenue-card="other"><small>All Other Revenues</small><strong>$57.9M</strong></div>
+        <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong>$163.4M</strong><p>Supports core county services, public safety, facilities, and general operations.</p><span class="wc-budget-card-millage"><span class="wc-budget-card-millage-label">Millage</span>Countywide 3.519<br>North Walton Mosquito Control 0.441</span></div>
+        <div class="wc-budget-card" data-revenue-card="tdt"><small>Tourist Development Tax</small><strong>$58.8M</strong><p>Visitor lodging taxes restricted to tourism, beaches, facilities, and eligible visitor impacts.</p></div>
+        <div class="wc-budget-card" data-revenue-card="surtax"><small>Local Discretionary Sales Surtax</small><strong>$40.0M</strong><p>Supports solid waste, transportation, road maintenance, capital, infrastructure, and other general governmental operations.</p></div>
+        <div class="wc-budget-card" data-revenue-card="halfcent"><small>Local Government Half-Cent Sales Tax</small><strong>$17.9M</strong><p>State-shared sales tax used for county purposes, debt service, and public improvements.</p></div>
+        <div class="wc-budget-card" data-revenue-card="other"><small>All Other Revenues</small><strong>$57.9M</strong><p>Fees, permits, interest, intergovernmental revenues, and other program support.</p></div>
       </div>
       <div class="wc-section-heading wc-investment-heading">
         <div>

@@ -56,6 +56,7 @@
     <p>The annual budget supports this broad service landscape by funding public safety, transportation, parks, libraries, environmental resources, constitutional offices, and countywide operations.</p>
   </div>
   <blockquote class="wc-overview-quote">
+    <p class="wc-overview-quote-lead">This balance of rivers, inland communities, and Gulf shoreline has long shaped how Walton County tells its story:</p>
     <p>Lying here, as it were, in the protecting arms of her bounding rivers, with these loving daughters keeping faithful watch, with her head resting in the lap of Alabama that says, ‘Here let us rest,’ while the great Mexican Gulf, at one time, humbly washes her feet with its gentle waves to make them pure and white like snow.</p>
     <cite>John L. McKinnon, <em>History of Walton County</em></cite>
   </blockquote>
@@ -375,11 +376,15 @@
   }
 
   .wc-overview-quote{
+    align-self:end;
+    position:relative;
     margin:0;
-    padding:28px;
-    border-left:5px solid #d1be78;
-    border-radius:0 18px 18px 0;
+    padding:28px 30px 30px 34px;
+    border:1px solid rgba(23,32,51,.08);
+    border-radius:18px;
     background:#f7fbf7;
+    box-shadow:0 14px 34px rgba(23,32,51,.06);
+    transform:translateY(34px);
   }
 
   .wc-overview-quote p{
@@ -389,6 +394,21 @@
     font-size:1.35rem;
     font-style:italic;
     line-height:1.45;
+  }
+
+  .wc-overview-quote p:not(.wc-overview-quote-lead){
+    padding-left:20px;
+    border-left:5px solid #d1be78;
+  }
+
+  .wc-overview-quote .wc-overview-quote-lead{
+    margin:0 0 14px;
+    color:#607184;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:.88rem;
+    font-style:normal;
+    font-weight:600;
+    line-height:1.55;
   }
 
   .wc-overview-quote cite{
@@ -650,6 +670,11 @@
     .wc-overview-video-section,
     .wc-overview-government-grid{
       grid-template-columns:1fr;
+    }
+
+    .wc-overview-quote{
+      align-self:auto;
+      transform:none;
     }
 
     .wc-overview-hero{

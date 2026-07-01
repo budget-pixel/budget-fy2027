@@ -379,7 +379,7 @@ var wcHiddenBudgetPageTitles = new Set([
     ],
 
     "Solid Waste": [
-      "solid waste", "trash", "garbage", "landfill", "recycling", "waste disposal", "transfer station", "sanitation", "tipping fees"
+      "solid waste", "trash", "garbage", "waste management", "waste managment", "waste collection", "landfill", "recycling", "waste disposal", "transfer station", "sanitation", "tipping fees"
     ],
 
     "Tourism Administration": [

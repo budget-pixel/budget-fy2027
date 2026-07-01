@@ -90,7 +90,7 @@ function getCipOverviewStats(projects){
       href: "cip-grants.html"
     },
     {
-      label: "Sheriff Fund",
+      label: "Sheriff Projects",
       value: fundTotal(["sheriff", "fine", "forfeiture"]),
       text: "Public safety facilities, equipment, and law enforcement capital needs.",
       href: "cip-sheriff.html"
@@ -313,7 +313,7 @@ function renderProjects(){
     "Transportation Fund",
     "Tourist Development Fund",
     "Grant Funded",
-    "Sheriff Fund",
+    "Sheriff Projects",
     "General Fund"
   ]);
   const rows = [];
@@ -2206,10 +2206,10 @@ function renderProjects(){
           <div class="wc-cip-gfoa-section">
             <div class="wc-cip-gfoa-media">
               <div class="wc-cip-gfoa-video">
-                <iframe src="https://www.youtube-nocookie.com/embed/2ha4PCBgw2Y?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Capital Improvement Plan Elements" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                <iframe src="https://www.youtube-nocookie.com/embed/2ha4PCBgw2Y?autoplay=1&amp;mute=1&amp;controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Capital Improvement Plan Elements" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
               </div>
               <div class="wc-cip-gfoa-video">
-                <iframe src="https://www.youtube.com/embed/UI4QSqOn7o0?controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Sources of Financing" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/UI4QSqOn7o0?autoplay=1&amp;mute=1&amp;controls=1&amp;modestbranding=1&amp;rel=0&amp;playsinline=1" title="Sources of Financing" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
               </div>
             </div>
 
