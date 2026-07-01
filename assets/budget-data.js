@@ -2709,6 +2709,26 @@
     });
   });
 
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".wc-forecast-fund-filter-button");
+    if (!button) return;
+    const tableWrap = button.closest(".wc-data-table-wrap");
+    const tbody = tableWrap && tableWrap.querySelector("table tbody");
+    const filterGroup = button.closest(".wc-forecast-fund-filter");
+    if (!tbody || !filterGroup) return;
+
+    const selectedFund = button.dataset.fundFilter || "all";
+    tbody.querySelectorAll("tr[data-fund-name]").forEach((row) => {
+      row.hidden = selectedFund !== "all" && row.dataset.fundName !== selectedFund;
+    });
+
+    filterGroup.querySelectorAll(".wc-forecast-fund-filter-button").forEach((other) => {
+      other.classList.toggle("is-active", other === button);
+      other.setAttribute("aria-pressed", String(other === button));
+    });
+  });
+
+
   function lastUpdatedNoteHtml() {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
     return '<p class="wc-data-updated-note"><em>Last Updated: ' + escapeHtml(stamp) + "</em></p>";
@@ -3663,7 +3683,7 @@
   const FUND_SCHEDULE_MAJOR_FUNDS = [
     { code: "001", label: "General Fund" },
     { code: "101", label: "Transportation Fund" },
-    { code: "107", label: "Fine & Forfeiture Fund" },
+    { code: "107", label: "Fine & Forfeiture / Sheriff Fund" },
     { code: "111", label: "Tourist Development Fund" },
     { code: "112", label: "Solid Waste Fund" },
     { code: "300", label: "Capital Projects Fund" }
@@ -4123,6 +4143,130 @@
     return total;
   }
 
+  function capCapitalProjectsFinancingRevenue(revenueCategories, revenueDetails, expenseCategories) {
+    const financingCategory = "Other Sources";
+    const transferDetailName = "Interfund Group Transfer In";
+    const financingValues = revenueCategories.get(financingCategory);
+    if (!financingValues) return;
+
+    FINANCIAL_FORECAST_YEARS.forEach((year) => {
+      const projectExpense = sumForecastCategories(expenseCategories, year);
+      let nonFinancingRevenue = 0;
+      revenueCategories.forEach((values, category) => {
+        if (category !== financingCategory) nonFinancingRevenue += values[year] || 0;
+      });
+
+      const currentFinancingRevenue = financingValues[year] || 0;
+      const cappedFinancingRevenue = Math.min(currentFinancingRevenue, Math.max(0, projectExpense - nonFinancingRevenue));
+      financingValues[year] = cappedFinancingRevenue;
+
+      if (!revenueDetails || !revenueDetails.has(transferDetailName)) return;
+      const transferDetail = revenueDetails.get(transferDetailName);
+      let otherFinancingDetails = 0;
+      revenueDetails.forEach((entry, name) => {
+        if (name !== transferDetailName && entry.category === financingCategory) {
+          otherFinancingDetails += entry.values[year] || 0;
+        }
+      });
+      transferDetail.values[year] = Math.min(
+        transferDetail.values[year] || 0,
+        Math.max(0, cappedFinancingRevenue - otherFinancingDetails)
+      );
+    });
+  }
+
+  function reduceForecastDetailsForCategory(details, category, year, reduction, preferredNames) {
+    if (!details || reduction <= 0) return;
+    const preferred = (preferredNames || []).map((name) => String(name || "").toLowerCase());
+    const entries = Array.from(details.entries())
+      .filter(([, entry]) => entry.category === category)
+      .sort((a, b) => {
+        const aPreferred = preferred.indexOf(String(a[0]).toLowerCase());
+        const bPreferred = preferred.indexOf(String(b[0]).toLowerCase());
+        if (aPreferred !== -1 || bPreferred !== -1) {
+          if (aPreferred === -1) return 1;
+          if (bPreferred === -1) return -1;
+          return aPreferred - bPreferred;
+        }
+        return (b[1].values[year] || 0) - (a[1].values[year] || 0);
+      });
+
+    let remaining = reduction;
+    entries.forEach(([, entry]) => {
+      if (remaining <= 0) return;
+      const current = entry.values[year] || 0;
+      const adjustment = Math.min(current, remaining);
+      entry.values[year] = current - adjustment;
+      remaining -= adjustment;
+    });
+  }
+
+  function capGeneralFundRevenueGrowth(revenueCategories, revenueDetails, expenseCategories) {
+    const maxAnnualFundBalanceGrowth = 250000;
+    const targetGrowthShareOfExpenditures = 0.001;
+    const balancingCategory = "General Government Taxes";
+    const balancingValues = revenueCategories.get(balancingCategory);
+    if (!balancingValues) return;
+
+    FINANCIAL_FORECAST_YEARS.forEach((year) => {
+      const revenues = sumForecastCategories(revenueCategories, year);
+      const expenditures = sumForecastCategories(expenseCategories, year);
+      const targetGrowth = Math.min(maxAnnualFundBalanceGrowth, Math.round(expenditures * targetGrowthShareOfExpenditures));
+      const excessRevenue = revenues - expenditures;
+      if (excessRevenue <= targetGrowth) return;
+
+      const currentBalancingValue = balancingValues[year] || 0;
+      const reduction = Math.min(currentBalancingValue, excessRevenue - targetGrowth);
+      balancingValues[year] = currentBalancingValue - reduction;
+      reduceForecastDetailsForCategory(revenueDetails, balancingCategory, year, reduction, ["Ad Valorem Taxes"]);
+    });
+  }
+
+  function balanceTransportationTransfersIn(revenueCategories, revenueDetails, expenseCategories) {
+    const financingCategory = "Other Sources";
+    const transferDetailName = "Interfund Group Transfer In";
+    if (!revenueCategories.has(financingCategory)) revenueCategories.set(financingCategory, {});
+    const financingValues = revenueCategories.get(financingCategory);
+
+    if (revenueDetails && !revenueDetails.has(transferDetailName)) {
+      revenueDetails.set(transferDetailName, { category: financingCategory, values: {} });
+    }
+    const transferDetail = revenueDetails ? revenueDetails.get(transferDetailName) : null;
+
+    FINANCIAL_FORECAST_YEARS.forEach((year) => {
+      const revenues = sumForecastCategories(revenueCategories, year);
+      const expenditures = sumForecastCategories(expenseCategories, year);
+      const shortfall = expenditures - revenues;
+      if (shortfall <= 0) return;
+
+      financingValues[year] = (financingValues[year] || 0) + shortfall;
+      if (transferDetail) {
+        transferDetail.values[year] = (transferDetail.values[year] || 0) + shortfall;
+      }
+    });
+  }
+
+  function balanceTouristDevelopmentBeachRenourishment(revenueCategories, expenseCategories, expenseDetails) {
+    const balancingDetailName = "Beach Renourishment";
+    if (!expenseDetails || !expenseDetails.has(balancingDetailName)) return;
+    const beachRenourishment = expenseDetails.get(balancingDetailName);
+    const balancingCategory = beachRenourishment.category;
+    const categoryValues = balancingCategory ? expenseCategories.get(balancingCategory) : null;
+    if (!categoryValues) return;
+
+    FINANCIAL_FORECAST_YEARS.forEach((year) => {
+      const revenues = sumForecastCategories(revenueCategories, year);
+      const expenditures = sumForecastCategories(expenseCategories, year);
+      const shortfall = expenditures - revenues;
+      if (shortfall <= 0) return;
+
+      const currentDetailValue = beachRenourishment.values[year] || 0;
+      const reduction = Math.min(currentDetailValue, shortfall);
+      beachRenourishment.values[year] = currentDetailValue - reduction;
+      categoryValues[year] = Math.max(0, (categoryValues[year] || 0) - reduction);
+    });
+  }
+
   function getCipProjectYearAmount(project, year) {
     const key = "FY" + year;
     return (project.funding_by_year || [])
@@ -4210,6 +4354,20 @@
         FINANCIAL_FORECAST_YEARS.forEach((year) => {
           expenseDetails.get("CIP Project Schedule").values[year] = cipForecast.byYear[year] ? cipForecast.byYear[year].total : 0;
         });
+
+        capCapitalProjectsFinancingRevenue(revenueCategories, revenueDetails, expenseCategories);
+      }
+
+      if (fund.code === "001") {
+        capGeneralFundRevenueGrowth(revenueCategories, revenueDetails, expenseCategories);
+      }
+
+      if (fund.code === "101" || fund.code === "107") {
+        balanceTransportationTransfersIn(revenueCategories, revenueDetails, expenseCategories);
+      }
+
+      if (fund.code === "111") {
+        balanceTouristDevelopmentBeachRenourishment(revenueCategories, expenseCategories, expenseDetails);
       }
 
       const beginningBalanceSourceYear = 2026;
@@ -4417,7 +4575,7 @@
       // forecast model -- see the delegated click handler for
       // .wc-forecast-sort-button.
       return (
-        '<tr data-sort-value="' + (detail.values[2027] || 0) + '" data-sort-name="' + escapeHtml(detail.name.toLowerCase()) + '">' +
+        '<tr data-fund-name="' + escapeHtml(fund.label) + '" data-sort-value="' + (detail.values[2027] || 0) + '" data-sort-name="' + escapeHtml(detail.name.toLowerCase()) + '">' +
         '<td>' + escapeHtml(fund.label) + '</td>' +
         '<td>' + escapeHtml(detail.name) + '</td>' +
         FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => '<td class="wc-num">' + forecastMoney(detail.values[year] || 0) + '</td>').join("") +
@@ -4426,11 +4584,27 @@
       );
     });
 
+    const availableFundNames = new Set(rowData.map(({ fund }) => fund.label));
+    const fundFilterOptions = FINANCIAL_FORECAST_FUNDS
+      .map((fund) => fund.label)
+      .filter((fundName) => availableFundNames.has(fundName));
+    const fundFilterHtml =
+      '<div class="wc-forecast-fund-filter" role="group" aria-label="Filter ' + escapeHtml(nameLabel.toLowerCase()) + ' rows by fund">' +
+        '<span class="wc-forecast-filter-label">Fund</span>' +
+        '<button type="button" class="wc-forecast-fund-filter-button is-active" data-fund-filter="all" aria-pressed="true">All</button>' +
+        fundFilterOptions.map((fundName) =>
+          '<button type="button" class="wc-forecast-fund-filter-button" data-fund-filter="' + escapeHtml(fundName) + '" aria-pressed="false">' + escapeHtml(fundName) + "</button>"
+        ).join("") +
+      '</div>';
     const sortToggleHtml =
-      '<div class="wc-forecast-sort-toggle" role="group" aria-label="Sort ' + escapeHtml(nameLabel.toLowerCase()) + ' rows">' +
-        '<button type="button" class="wc-forecast-sort-button is-active" data-sort-mode="largest" aria-pressed="true">Largest First</button>' +
-        '<button type="button" class="wc-forecast-sort-button" data-sort-mode="smallest" aria-pressed="false">Smallest First</button>' +
-        '<button type="button" class="wc-forecast-sort-button" data-sort-mode="abc" aria-pressed="false">A-Z</button>' +
+      '<div class="wc-forecast-assumptions-controls">' +
+        fundFilterHtml +
+        '<div class="wc-forecast-sort-toggle" role="group" aria-label="Sort ' + escapeHtml(nameLabel.toLowerCase()) + ' rows">' +
+          '<span class="wc-forecast-filter-label">Sort</span>' +
+          '<button type="button" class="wc-forecast-sort-button is-active" data-sort-mode="largest" aria-pressed="true">Largest First</button>' +
+          '<button type="button" class="wc-forecast-sort-button" data-sort-mode="smallest" aria-pressed="false">Smallest First</button>' +
+          '<button type="button" class="wc-forecast-sort-button" data-sort-mode="abc" aria-pressed="false">A-Z</button>' +
+        '</div>' +
       '</div>';
     return renderTable({
       caption: lineType === "revenue" ? "Revenue Forecast Assumptions" : "Expense Forecast Assumptions",
