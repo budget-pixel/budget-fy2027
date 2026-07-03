@@ -3741,7 +3741,7 @@
   // own Other Uses line; other 599000 rows keep their regular activity.
   function isBccOtherUsesContingencyRow(r) {
     return (
-      normalizeDeptName(r && r.Dept_Name) === "bcc other uses contingency" &&
+      String((r && r.Dept_Code) || "").trim() === "00101001" &&
       String((r && r.Object_Code) || "").trim() === "599000"
     );
   }
@@ -7191,7 +7191,7 @@
     {
       label: "Public Safety",
       narrativeNames: ["Public Safety"],
-      expenseNames: ["Public Safety"],
+      expenseNames: ["Public Safety", "Tourism Public Safety"],
       revenueNames: [],
       staffingNames: [],
       machineryNames: []
