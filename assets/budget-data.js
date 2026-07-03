@@ -100,7 +100,9 @@
   const EXPENSE_OBJECT_CODES_BROKEN_OUT = {
     "solid waste": ["534000"],
     "building construction and maintenance": ["543000"],
-    "board of county commissioners": ["531001", "531002", "531003", "531004"]
+    "board of county commissioners": ["531001", "531002", "531003", "531004"],
+    "office of the county attorney": ["531000"],
+    "office of county attorney": ["531000"]
   };
 
   // Friendlier display captions for sub-group tables whose raw Dept_Name
@@ -203,6 +205,9 @@
     ],
     "supervisor of elections": [
       "Contact the Supervisor of Elections' office directly for additional budget line detail."
+    ],
+    "non profit funding program": [
+      "Please contact the Office of Management and Budget for a list of agencies that received funding through this program in prior years."
     ]
   };
 
@@ -394,11 +399,12 @@
   // not scoping at all, needed for org+account combinations that mix one
   // blank-project recipient with other recipients under real Project_Codes
   // (see STATUTORY_EXPENSE_OVERRIDES).
-  function sumRawActualsForAccount(rawRows, org, code, year, projectCode) {
+  function sumRawActualsForAccount(rawRows, org, code, year, projectCode, excludedProjects) {
     const orgNorm = String(org || "").trim();
     const codeNorm = String(code || "").trim();
     const hasProjectScope = projectCode !== undefined && projectCode !== null;
     const projectNorm = hasProjectScope ? String(projectCode).trim() : "";
+    const excludedProjectSet = new Set((excludedProjects || []).map((p) => String(p || "").trim()).filter(Boolean));
     const orgNorms = orgNorm ? [orgNorm].concat(DEPT_CODE_ACTUALS_ALIASES[orgNorm] || []) : [];
     let matched = false;
     let total = 0;
@@ -408,6 +414,7 @@
         if (!orgNorms.includes(String(row.org || "").trim())) return;
         if (String(row.object || "").trim() !== codeNorm) return;
         if (hasProjectScope && String(row.project || "").trim() !== projectNorm) return;
+        if (excludedProjectSet.has(String(row.project || "").trim())) return;
         matched = true;
         total += Number(row.amount) || 0;
       });
@@ -441,7 +448,10 @@
   // rather than share one fixed scope. So instead of a single fixed
   // Project_Code, each row is scoped to whatever its own Project_Code
   // already is (including blank, for the recipients recorded without one).
-  const PROJECT_SCOPED_BY_OWN_ROW_DEPT_NAMES = new Set(["statutory and other"]);
+  const PROJECT_SCOPED_BY_OWN_ROW_DEPT_NAMES = new Set([
+    "statutory and other",
+    "planning short term rental"
+  ]);
 
   // projectScopeForRow returns undefined when no row needs project-level
   // scoping at all (the default, "sum every project" rule applies), so
@@ -841,7 +851,24 @@
 
   function supabaseLookupsForRow(row, org, codeValue) {
     const key = String((row && row.Dept_Code) || "").trim() + "|" + String(codeValue || "").trim();
-    return SUPABASE_LOOKUP_OVERRIDES.get(key) || [{ org: org, object: codeValue }];
+    const deptNorm = normalizeDeptName(row && row.Dept_Name);
+    const lookups = SUPABASE_LOOKUP_OVERRIDES.get(key) || [{ org: org, object: codeValue }];
+    if (
+      deptNorm === "code compliance" &&
+      String(codeValue || "").trim() === "329004"
+    ) {
+      return lookups.map((lookup) => ({ ...lookup, excludedProjects: ["10647"] }));
+    }
+    if (deptNorm === "planning" && row && row.Object_Code !== undefined) {
+      return lookups.map((lookup) => ({ ...lookup, excludedProjects: ["10639"] }));
+    }
+    if (
+      deptNorm === "libraries" &&
+      String(codeValue || "").trim() === "334700"
+    ) {
+      return lookups.map((lookup) => ({ ...lookup, projectScope: "10029" }));
+    }
+    return lookups;
   }
 
   // The Ad Valorem 5% statutory reduction's one sheet row (Dept_Code
@@ -875,15 +902,18 @@
   // override above applies), matched if any of them found data.
   function sumRawActualsForLookups(rawRows, lookups, year, projectScope) {
     let matched = false;
+    let forceMatchedScope = false;
     let total = 0;
     (lookups || []).forEach((lookup) => {
-      const result = sumRawActualsForAccount(rawRows, lookup.org, lookup.object, year, projectScope);
+      const lookupProjectScope = lookup.projectScope !== undefined ? lookup.projectScope : projectScope;
+      if (lookup.projectScope !== undefined) forceMatchedScope = true;
+      const result = sumRawActualsForAccount(rawRows, lookup.org, lookup.object, year, lookupProjectScope, lookup.excludedProjects);
       if (result.matched) {
         matched = true;
         total += result.total;
       }
     });
-    return { matched, total };
+    return { matched: matched || forceMatchedScope, total };
   }
 
   // Departments whose own revenue row is really just the shared General
@@ -899,7 +929,10 @@
     "clerk of court",
     "tax collector",
     "supervisor of elections",
-    "property appraiser"
+    "property appraiser",
+    "engineering department",
+    "public works engineering services",
+    "engineering services"
   ]);
 
   // Department-specific data-limitation notices shown alongside a
@@ -913,6 +946,22 @@
     [
       "statutory and other",
       "Due to an accounting change actuals for 2020, 2021, and 2022 are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
+    ],
+    [
+      "public defender",
+      "Prior years do not include funding for court technology needs for the Public Defender. Those years are smaller because future years now capture this accounting change for transparency and accurate reporting."
+    ],
+    [
+      "court technology public defender",
+      "Prior years do not include funding for court technology needs for the Public Defender. Those years are smaller because future years now capture this accounting change for transparency and accurate reporting."
+    ],
+    [
+      "state attorney",
+      "Prior years do not include funding for court technology needs for the State Attorney. Those years are smaller because future years now capture this accounting change for transparency and accurate reporting."
+    ],
+    [
+      "court technology state attorney",
+      "Prior years do not include funding for court technology needs for the State Attorney. Those years are smaller because future years now capture this accounting change for transparency and accurate reporting."
     ]
   ]);
 
@@ -954,6 +1003,7 @@
         HISTORICAL_ACTUAL_YEARS.forEach((year) => {
           next["FY" + year + "_Actual"] = 0;
         });
+        next._actualsDeduped = true;
         return next;
       }
 
@@ -963,6 +1013,12 @@
         const result = sumRawActualsForLookups(rawActualRows, lookups, year, projectScope);
         next[field] = result.matched ? result.total : (row[field] || 0);
       });
+      if (
+        normalizeDeptName(next.Dept_Name) === "recreation" &&
+        String(next.Object_Code || "").trim() === "563000"
+      ) {
+        next.FY2020_Actual = 0;
+      }
       return next;
     });
   }
@@ -986,7 +1042,7 @@
       seenGroups.add(groupKey);
 
       if (!isFirstInGroup) {
-        return { ...row, FY2026_Original_Budget: 0 };
+        return { ...row, FY2026_Original_Budget: 0, _originalBudgetDeduped: true };
       }
 
       const lookups = supabaseLookupsForRow(row, org, codeValue);
@@ -1111,6 +1167,15 @@
         escapeHtml(label) + ' information" data-wc-tooltip="' + escapeHtml(message) + '">i</button>'
       : "";
     return '<td class="wc-budget-line-tooltip-cell">' + escapeHtml(label || "Other") + anchor + "</td>";
+  }
+
+  function categoryLabelHtml(label, showTooltip) {
+    const message = showTooltip === false ? null : TYPE_TOOLTIPS[label];
+    const anchor = message
+      ? '<button type="button" class="wc-budget-line-tooltip-anchor" aria-label="' +
+        escapeHtml(label) + ' information" data-wc-tooltip="' + escapeHtml(message) + '">i</button>'
+      : "";
+    return '<span class="wc-budget-line-tooltip-label">' + escapeHtml(label || "Other") + anchor + "</span>";
   }
 
   function toNumber(value) {
@@ -1334,8 +1399,274 @@
   function getDepartmentExpenses(deptName, deptCode) {
     return rowsForDepartment(cache.expenditures, deptName, deptCode);
   }
+
+  function combineEagleSpringsProShopSalesRows(rows, deptName) {
+    if (normalizeDeptName(deptName) !== "eagle springs golf and recreation center") return rows;
+
+    const amountFields = HISTORICAL_ACTUAL_YEARS.map((year) => "FY" + year + "_Actual")
+      .concat(["FY2026_Original_Budget", "FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+    const combined = [];
+    let proShopRow = null;
+
+    (rows || []).forEach((row) => {
+      const revenueName = normalizeDeptName(row && row.Revenue_Name);
+      const isProShopSales = revenueName.includes("pro shop") && revenueName.includes("sales");
+      if (!isProShopSales) {
+        combined.push(row);
+        return;
+      }
+
+      if (!proShopRow) {
+        proShopRow = Object.assign({}, row, {
+          Revenue_Code: String(row.Revenue_Code || "").trim(),
+          Revenue_Name: "Pro Shop Sales"
+        });
+        combined.push(proShopRow);
+        return;
+      }
+
+      const code = String(row.Revenue_Code || "").trim();
+      if (code && !splitBudgetLineCodes(proShopRow.Revenue_Code).includes(code)) {
+        proShopRow.Revenue_Code = [proShopRow.Revenue_Code, code].filter(Boolean).join(", ");
+      }
+      amountFields.forEach((field) => {
+        proShopRow[field] = (proShopRow[field] || 0) + (row[field] || 0);
+      });
+    });
+
+    return combined;
+  }
+
+  function isMossyHeadWastewaterDept(deptName) {
+    return normalizeDeptName(deptName) === "mossy head wastewater treatment facility";
+  }
+
+  function isTransferInRevenueRow(row) {
+    const name = normalizeDeptName(row && row.Revenue_Name);
+    const type = normalizeDeptName(row && row.Revenue_Type);
+    return (
+      name === "interfund group transfer in" ||
+      name.includes("transfer in") ||
+      (type.includes("transfer") && type.includes("in"))
+    );
+  }
+
+  function suppressMossyHeadTransferInPriorYears(rows, deptName) {
+    if (!isMossyHeadWastewaterDept(deptName)) return rows;
+    return (rows || []).map((row) => {
+      if (!isTransferInRevenueRow(row)) return row;
+      const next = Object.assign({}, row);
+      HISTORICAL_ACTUAL_YEARS.forEach((year) => {
+        next["FY" + year + "_Actual"] = 0;
+      });
+      next.FY2026_Original_Budget = next.FY2026_Budget || next.FY2026_Plug || 0;
+      next._actualsSuppressed = true;
+      next._suppressRevenueBudgetFallback = true;
+      return next;
+    });
+  }
+
   function getDepartmentRevenues(deptName, deptCode) {
-    return rowsForDepartment(cache.revenues, deptName, deptCode);
+    return suppressMossyHeadTransferInPriorYears(
+      combineEagleSpringsProShopSalesRows(rowsForDepartment(cache.revenues, deptName, deptCode), deptName),
+      deptName
+    );
+  }
+
+  const ZERO_ROW_FILTER_DEPT_NAMES = new Set([
+    "mosquito control",
+    "mosquito control state aid",
+    "mossy head wastewater treatment facility"
+  ]);
+
+  const ZERO_ROW_VISIBLE_AMOUNT_FIELDS = HISTORICAL_ACTUAL_YEARS.map((year) => "FY" + year + "_Actual")
+    .concat(["FY2026_Original_Budget", "FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+
+  function filterAllZeroRowsForSelectedDepartments(rows, deptName) {
+    if (!ZERO_ROW_FILTER_DEPT_NAMES.has(normalizeDeptName(deptName))) return rows;
+    return (rows || []).filter((row) =>
+      ZERO_ROW_VISIBLE_AMOUNT_FIELDS.some((field) => Math.abs(toNumber(row && row[field])) > 0.005)
+    );
+  }
+
+  // For department-page revenue cards only: when one or more revenue rows have
+  // no historical actuals at all (every FY 2020–2025 field is $0) — typical
+  // for ad valorem / General Fund lines whose tax revenue isn't tracked at the
+  // department level — backfill those rows so the card shows what was actually
+  // needed each year.
+  //
+  // The fill value for year Y is:  expense total − sum of actuals on the rows
+  // that DO have real data.  That makes the grand revenue total equal the
+  // actual expense for that year, which is exactly "what revenue was needed."
+  // When there are multiple zero-actual rows they share the gap proportionally
+  // to their FY 2027 Proposed budget weights (or equally if all are $0).
+  //
+  // The underlying cache.revenues data is never modified, so Summary of
+  // Revenue and every other aggregate table are unaffected.
+  function revenueActualsAreDedicatedToDepartmentRow(row, codeField) {
+    codeField = codeField || "Revenue_Code";
+    const code = String((row && row[codeField]) || "").trim();
+    if (!code) return true;
+    const fundCode = fundCodeForRow(row);
+    const departmentNames = new Set();
+    (cache.revenues || []).forEach((candidate) => {
+      if (String(candidate[codeField] || "").trim() !== code) return;
+      if (fundCodeForRow(candidate) !== fundCode) return;
+      const name = normalizeDeptName(candidate.Dept_Name);
+      if (name) departmentNames.add(name);
+    });
+    return departmentNames.size <= 1;
+  }
+
+  function isGeneralFundRevenuePlugRow(row) {
+    const code = String((row && row.Revenue_Code) || "").trim();
+    return (
+      code === "311000" ||
+      code === "335180" ||
+      normalizeDeptName(row && row.Revenue_Name) === "ad valorem taxes" ||
+      normalizeDeptName(row && row.Revenue_Name) === "local government 1 2 cent sales tax"
+    );
+  }
+
+  function isRevenueGapFillRow(row) {
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    const code = String((row && row.Revenue_Code) || "").trim();
+    const name = normalizeDeptName(row && row.Revenue_Name);
+    if (dept === "building construction and maintenance") {
+      return code === "335180" || name === "local government 1 2 cent sales tax";
+    }
+    return isGeneralFundRevenuePlugRow(row);
+  }
+
+  const INDIRECT_ADMIN_PRIOR_YEAR_SUPPRESSED_DEPTS = new Set([
+    "building construction and maintenance",
+    "county administration",
+    "office of management and budget",
+    "purchasing",
+    "procurement",
+    "geographic info systems",
+    "geographic information systems",
+    "human resources",
+    "office of the county attorney",
+    "office of county attorney"
+  ]);
+
+  const STATE_REVENUE_SHARE_PRIOR_YEAR_SUPPRESSED_DEPTS = new Set([
+    "building construction and maintenance",
+    "office of the county attorney",
+    "office of county attorney"
+  ]);
+
+  function isRevenueGapExcludedRow(row) {
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    const code = String((row && row.Revenue_Code) || "").trim();
+    const name = normalizeDeptName(row && row.Revenue_Name);
+    return (
+      isGeneralFundRevenuePlugRow(row) ||
+      (
+        dept === "building construction and maintenance" &&
+        (
+          code === "335121" ||
+          name === "indirect administrative fees"
+        )
+      ) ||
+      (
+        STATE_REVENUE_SHARE_PRIOR_YEAR_SUPPRESSED_DEPTS.has(dept) &&
+        (
+          code === "335121" ||
+          name === "state revenue share proceeds"
+        )
+      ) ||
+      (
+        INDIRECT_ADMIN_PRIOR_YEAR_SUPPRESSED_DEPTS.has(dept) &&
+        name === "indirect administrative fees"
+      )
+    );
+  }
+
+  function isSheriffRevenueDept(row) {
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    return dept === "sheriff" || dept === "walton county sheriff s office" || dept === "walton county sheriffs office";
+  }
+
+  function shouldSuppressRevenuePlugActual(row, year) {
+    return (
+      isSheriffRevenueDept(row) &&
+      String((row && row.Revenue_Code) || "").trim() === "311000" &&
+      (year === 2024 || year === 2025)
+    );
+  }
+
+  function suppressExcludedRevenuePriorYearRows(revenueRows) {
+    return (revenueRows || []).map((row) => {
+      if (!isRevenueGapExcludedRow(row) || isRevenueGapFillRow(row)) return row;
+      const cloned = Object.assign({}, row);
+      HISTORICAL_ACTUAL_YEARS.forEach((y) => {
+        cloned["FY" + y + "_Actual"] = 0;
+      });
+      if (["office of the county attorney", "office of county attorney"].includes(normalizeDeptName(row && row.Dept_Name))) {
+        cloned.FY2026_Original_Budget = cloned.FY2026_Budget || cloned.FY2026_Plug || 0;
+        cloned._suppressRevenueBudgetFallback = true;
+      }
+      cloned._actualsSuppressed = true;
+      return cloned;
+    });
+  }
+
+  function fillRevenueActualsFromExpenses(revenueRows, expenseRows) {
+    const baseRevenueRows = suppressExcludedRevenuePriorYearRows(revenueRows);
+    if (!baseRevenueRows.length || !expenseRows.length) return baseRevenueRows;
+
+    // Only the shared Ad Valorem / General Fund revenue line is a plug
+    // candidate here. Other revenue codes can be reused across departments
+    // but still represent real direct revenue for this department (permits,
+    // fees, reimbursements, fines, etc.) and must be subtracted first.
+    const gapRows = baseRevenueRows.filter(isRevenueGapFillRow);
+    const knownRows = baseRevenueRows.filter((row) => !isRevenueGapExcludedRow(row));
+
+    if (!gapRows.length) return baseRevenueRows;
+
+    // Expense totals per year.
+    const expenseTotals = {};
+    HISTORICAL_ACTUAL_YEARS.forEach((y) => {
+      const field = "FY" + y + "_Actual";
+      expenseTotals[y] = expenseRows.reduce((sum, r) => sum + (r[field] || 0), 0);
+    });
+
+    // For each year the gap = expense total minus what known rows already cover.
+    const gapTotals = {};
+    HISTORICAL_ACTUAL_YEARS.forEach((y) => {
+      const field = "FY" + y + "_Actual";
+      const knownTotal = knownRows.reduce((sum, r) => sum + revenueDisplayAmount(r[field] || 0), 0);
+      gapTotals[y] = Math.max(0, expenseTotals[y] - knownTotal);
+    });
+
+    // If there's nothing to fill in any year, leave rows as-is.
+    if (!HISTORICAL_ACTUAL_YEARS.some((y) => gapTotals[y] > 0)) return baseRevenueRows;
+
+    // Distribute gap across gapRows proportionally to FY2027 Proposed weight.
+    const gapWeights = gapRows.map((r) => r.FY2027_Proposed || 0);
+    const totalWeight = gapWeights.reduce((s, w) => s + w, 0);
+    const weights = totalWeight > 0
+      ? gapWeights.map((w) => w / totalWeight)
+      : gapRows.map(() => 1 / gapRows.length);
+
+    // Clone all rows; overwrite actuals only on gap rows.
+    // _actualsBackfilled flags these rows so renderBudgetLinesToggle's
+    // revenueActualsAreDedicatedToRow suppression is bypassed for shared
+    // revenue codes (e.g. Ad Valorem) that normally return null for actuals.
+    const gapSet = new Set(gapRows);
+    let gapIndex = 0;
+    return baseRevenueRows.map((row) => {
+      if (!gapSet.has(row)) return row;
+      const cloned = Object.assign({}, row);
+      cloned._actualsBackfilled = true;
+      const weight = weights[gapIndex++];
+      HISTORICAL_ACTUAL_YEARS.forEach((y) => {
+        cloned["FY" + y + "_Actual"] = shouldSuppressRevenuePlugActual(row, y) ? 0 : gapTotals[y] * weight;
+      });
+      return cloned;
+    });
   }
   function getDepartmentStaffing(deptName, deptCode) {
     return rowsForDepartment(cache.staffing, deptName, deptCode);
@@ -1374,7 +1705,50 @@
 
   // ---- normalization of raw CSV rows into typed records ----
 
+  const TOURISM_ADMINISTRATIVE_FEE_OBJECT_CODE = "549009";
+  const TOURISM_ADMINISTRATIVE_FEE_DEPT_NAMES = new Set([
+    "tourism administration",
+    "sales and visitor center",
+    "sales and visitors center",
+    "tourism sales and visitor center",
+    "tourism sales and visitors center",
+    "communications",
+    "tourism communications",
+    "marketing",
+    "tourism marketing",
+    "north walton",
+    "north walton tourist development tax",
+    "tourism beach operations",
+    "beach operations",
+    "beach renourishment",
+    "beach tram",
+    "tourism beach tram",
+    "tourism lifeguard services and beach safety",
+    "south walton fire lifeguard services",
+    "public safety"
+  ]);
+
+  function isTourismAdministrativeFeeExpense(row) {
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    return (
+      String((row && row.Object_Code) || "").trim() === TOURISM_ADMINISTRATIVE_FEE_OBJECT_CODE &&
+      (dept.startsWith("tourism ") || TOURISM_ADMINISTRATIVE_FEE_DEPT_NAMES.has(dept))
+    );
+  }
+
+  function applyTourismAdministrativeFeeOverrides(rows) {
+    return (rows || []).map((row) => {
+      if (!isTourismAdministrativeFeeExpense(row)) return row;
+      return {
+        ...row,
+        Object_Name: "Administrative Fee",
+        Object_Type: "Operating Expenditures"
+      };
+    });
+  }
+
   function normalizeExpenditureRow(row) {
+    const isTourismAdminFee = isTourismAdministrativeFeeExpense(row);
     return {
       Dept_Code: (row.Dept_Code || "").trim(),
       Dept_Name: (row.Dept_Name || "").trim(),
@@ -1382,8 +1756,8 @@
       Project_Code: (row.Project_Code || "").trim(),
       Project_Name: (row.Project_Name || "").trim(),
       Object_Code: (row.Object_Code || "").trim(),
-      Object_Name: (row.Object_Name || "").trim(),
-      Object_Type: (row.Object_Type || "").trim(),
+      Object_Name: isTourismAdminFee ? "Administrative Fee" : (row.Object_Name || "").trim(),
+      Object_Type: isTourismAdminFee ? "Operating Expenditures" : (row.Object_Type || "").trim(),
       FY2020_Actual: toNumber(row.FY2020_Actual),
       FY2021_Actual: toNumber(row.FY2021_Actual),
       FY2022_Actual: toNumber(row.FY2022_Actual),
@@ -1635,6 +2009,7 @@
           cache.expenditures, actuals.originalBudgetRows, actuals.expenseRows,
           cache.activities, expenseObjectCatalog, knownDeptNames, excludedKeys
         );
+        cache.expenditures = applyTourismAdministrativeFeeOverrides(cache.expenditures);
         cache.revenues = synthesizeMissingRevenueRows(
           cache.revenues, actuals.originalBudgetRows, actuals.revenueRows,
           cache.activities, revenueCodeCatalog, knownDeptNames, excludedKeys, excludedOrgs
@@ -1785,6 +2160,12 @@
 
   function budgetLineColumnAmount(row, column, isExpense) {
     if (!isExpense && column.actual) {
+      // Rows backfilled by fillRevenueActualsFromExpenses already carry the
+      // correct actual in row[column.field]; skip the Supabase lookup so that
+      // value is used directly.
+      if (row._actualsBackfilled) return revenueDisplayAmount(row[column.field] || 0);
+      if (row._actualsSuppressed) return revenueDisplayAmount(row[column.field] || 0);
+      if (row._actualsDeduped) return revenueDisplayAmount(row[column.field] || 0);
       // Many revenue codes (Ad Valorem Taxes, Interfund Group Transfer In,
       // etc.) are reused across many different departments/funds, each with
       // its own distinct historical amount -- they aren't one pooled,
@@ -1793,7 +2174,12 @@
       // Supabase has it, and only fall back to the unscoped county-wide
       // lookup when there's genuinely no department-level data to scope to
       // (e.g. a revenue source that really was only ever tracked centrally).
-      const scoped = sumRawActualsForAccount(cache.revenueActualRows, row.Dept_Code, row.Revenue_Code, column.year);
+      const scoped = sumRawActualsForLookups(
+        cache.revenueActualRows,
+        supabaseLookupsForRow(row, row.Dept_Code, row.Revenue_Code),
+        column.year,
+        projectScopeForRow(row)
+      );
       if (scoped.matched) return revenueDisplayAmount(scoped.total);
       return revenueDisplayAmount(
         revenueActualAmountForCodes(splitBudgetLineCodes(row.Revenue_Code), column.year, fundCodeForRow(row))
@@ -1803,6 +2189,8 @@
       const codes = splitBudgetLineCodes(row.Revenue_Code);
       const fundCode = fundCodeForRow(row);
       const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
+      if (row._suppressRevenueBudgetFallback) return revenueDisplayAmount(rowAmount);
+      if (row._originalBudgetDeduped) return revenueDisplayAmount(rowAmount);
       return revenueDisplayAmount(rowAmount ||
         revenueBudgetAmountForCodes(codes, "FY2026_Original_Budget", fundCode) ||
         revenueBudgetAmountForCodes(codes, "FY2026_Budget", fundCode));
@@ -1817,16 +2205,30 @@
       // department+code pair, and only fold a code into the unscoped
       // county-wide lookup when no row in this table has department-level
       // data for it at all.
+      // Backfilled rows (fillRevenueActualsFromExpenses) use their row field
+      // value directly and are excluded from the Supabase lookup path.
+      let backfilledTotal = 0;
       const codes = [];
       const scopedPairsSeen = new Set();
       let scopedTotal = 0;
       let fundCode = "";
       (rows || []).forEach((row) => {
         if (!fundCode) fundCode = fundCodeForRow(row);
+        if (row._actualsBackfilled) {
+          backfilledTotal += revenueDisplayAmount(row[column.field] || 0);
+          return;
+        }
+        if (row._actualsSuppressed) return;
+        if (row._actualsDeduped) return;
         splitBudgetLineCodes(row.Revenue_Code).forEach((code) => {
           const pairKey = String(row.Dept_Code || "").trim() + "|" + code;
           if (scopedPairsSeen.has(pairKey)) return;
-          const scoped = sumRawActualsForAccount(cache.revenueActualRows, row.Dept_Code, code, column.year);
+          const scoped = sumRawActualsForLookups(
+            cache.revenueActualRows,
+            supabaseLookupsForRow(row, row.Dept_Code, code),
+            column.year,
+            projectScopeForRow(row)
+          );
           if (scoped.matched) {
             scopedPairsSeen.add(pairKey);
             scopedTotal += scoped.total;
@@ -1835,7 +2237,7 @@
           if (!codes.includes(code)) codes.push(code);
         });
       });
-      return revenueDisplayAmount(revenueActualAmountForCodes(codes, column.year, fundCode) + scopedTotal);
+      return backfilledTotal + revenueDisplayAmount(revenueActualAmountForCodes(codes, column.year, fundCode) + scopedTotal);
     }
     if (!isExpense && column.field === "FY2026_Original_Budget") {
       // A zero rowAmount is ambiguous: it can mean "no data for this row,
@@ -1852,6 +2254,7 @@
       let fundCode = "";
       (rows || []).forEach((row) => {
         if (!fundCode) fundCode = fundCodeForRow(row);
+        if (row._originalBudgetDeduped) return;
         const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
         const codes = splitBudgetLineCodes(row.Revenue_Code);
         if (rowAmount) {
@@ -2044,17 +2447,7 @@
 
     function revenueActualsAreDedicatedToRow(row) {
       if (isExpense || combineByName) return true;
-      const code = String((row && row[codeField]) || "").trim();
-      if (!code) return true;
-      const fundCode = fundCodeForRow(row);
-      const departmentNames = new Set();
-      (cache.revenues || []).forEach((candidate) => {
-        if (String(candidate[codeField] || "").trim() !== code) return;
-        if (fundCodeForRow(candidate) !== fundCode) return;
-        const name = normalizeDeptName(candidate.Dept_Name);
-        if (name) departmentNames.add(name);
-      });
-      return departmentNames.size <= 1;
+      return revenueActualsAreDedicatedToDepartmentRow(row, codeField);
     }
 
     const priorYearsToggleDisabled = isPriorYearsDisabled;
@@ -2163,9 +2556,15 @@
 
     function budgetLineVisibleColumnAmount(row, column) {
       if (!isExpense && priorYearActualFields.has(column.field) && !revenueActualsAreDedicatedToRow(row)) {
-        return null;
+        if (!row._actualsBackfilled) {
+          if (isGeneralFundRevenuePlugRow(row)) return null;
+          return revenueDisplayAmount(row[column.field] || 0);
+        }
       }
       const plugKey = revenuePlugKey(row);
+      if (!isExpense && column.field === "FY2026_Original_Budget" && row._groupedBudgetLineSummary) {
+        return revenueDisplayAmount(row.FY2026_Original_Budget || row.FY2026_Budget || 0);
+      }
       if (!isExpense && column.field === "FY2026_Original_Budget" && revenueFy2026PlugByKey.has(plugKey)) {
         return revenueDisplayAmount(revenueFy2026PlugByKey.get(plugKey));
       }
@@ -2201,14 +2600,27 @@
             // Dept_Name/Dept_Code are identical across every row here (mergedRows is
             // already scoped to one department), so the first row's value is safe.
             Dept_Name: r.Dept_Name || "",
-            Dept_Code: r.Dept_Code || ""
+            Dept_Code: r.Dept_Code || "",
+            _actualsBackfilled: r._actualsBackfilled || false,
+            _actualsSuppressed: r._actualsSuppressed || false,
+            _suppressRevenueBudgetFallback: r._suppressRevenueBudgetFallback || false,
+            _groupedBudgetLineSummary: true
           };
-          sumFields.forEach((f) => { row[f] = (!isExpense && priorYearActualFields.has(f) && !revenueActualsAreDedicatedToRow(r)) ? 0 : (r[f] || 0); });
+          sumFields.forEach((f) => {
+            row[f] = (!isExpense && f === "FY2026_Original_Budget")
+              ? budgetLineVisibleColumnAmount(r, fy2026BudgetColumn)
+              : ((!isExpense && priorYearActualFields.has(f) && !revenueActualsAreDedicatedToRow(r) && !r._actualsBackfilled && isGeneralFundRevenuePlugRow(r)) ? 0 : (r[f] || 0));
+          });
           grouped.set(key, row);
           return;
         }
+        if (r._actualsBackfilled) existing._actualsBackfilled = true;
+        if (r._actualsSuppressed) existing._actualsSuppressed = true;
+        if (r._suppressRevenueBudgetFallback) existing._suppressRevenueBudgetFallback = true;
         sumFields.forEach((f) => {
-          existing[f] += (!isExpense && priorYearActualFields.has(f) && !revenueActualsAreDedicatedToRow(r)) ? 0 : (r[f] || 0);
+          existing[f] += (!isExpense && f === "FY2026_Original_Budget")
+            ? budgetLineVisibleColumnAmount(r, fy2026BudgetColumn)
+            : ((!isExpense && priorYearActualFields.has(f) && !revenueActualsAreDedicatedToRow(r) && !r._actualsBackfilled && isGeneralFundRevenuePlugRow(r)) ? 0 : (r[f] || 0));
         });
       });
       // Project_Code is set on a merged row only when every row folded into
@@ -2937,7 +3349,7 @@
       return (
         '<div class="wc-finance-card-row' + (isZero ? " is-zero" : "") + '">' +
           '<div class="wc-finance-card-row-head">' +
-            '<strong>' + escapeHtml(row.label || "Other") + '</strong>' +
+            '<strong>' + categoryLabelHtml(row.label || "Other", kind === "expense") + '</strong>' +
             '<span>' + escapeHtml(percent.toFixed(percent >= 10 ? 0 : 1)) + '%</span>' +
           '</div>' +
           '<div class="wc-finance-card-track" aria-hidden="true">' +
@@ -3000,7 +3412,10 @@
     // their FY2026 figures share the same per-account dedup unreliability
     // that already keeps them from showing a YoY change (see
     // renderTypeSummaryTable).
-    const forceDisablePriorYears = showChange === false;
+    const forceDisablePriorYears = showChange === false || (
+      !isExpense &&
+      rows.some((r) => PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(r.Dept_Name)))
+    );
     const showPrior = forceDisablePriorYears ? false : getShowPriorYears();
     const detail = renderBudgetLinesToggle(rows, descriptionField, kind, false, forceDisablePriorYears);
     if (detail.button && !isExpense) {
@@ -3210,19 +3625,26 @@
       .map((name) => {
         const nameNorm = normalizeDeptName(name);
         const isPrimary = nameNorm === norm;
+        const groupRows = rows.filter((r) => (r.Dept_Name || "") === name);
+        const canShowOwnChange = kind === "expense" && (
+          groupRows.some((r) => projectScopeForRow(r) !== undefined) ||
+          (isPrimary && norm === "planning")
+        );
         const groupCaption = isPrimary ? caption : (DEPT_NAME_DISPLAY_OVERRIDES[nameNorm] || name);
         const notes = isPrimary ? null : EXPENSE_GROUP_NOTES[nameNorm];
         // Secondary sub-program cards (e.g. Code Compliance Beach) get no
         // YoY change or "View Prior Years" toggle at all -- that
-        // comparison lives on the primary card, combined, instead.
+        // comparison lives on the primary card, combined, instead. Project-
+        // scoped sub-programs can safely show their own change because their
+        // prior-year actuals/budget are filtered to their own Project_Code.
         return renderTypeSummaryGroup(
-          rows.filter((r) => (r.Dept_Name || "") === name),
+          groupRows,
           kind,
           groupCaption,
           notes,
           undefined,
-          isPrimary,
-          isPrimary ? combinedChangeByType : null
+          isPrimary || canShowOwnChange,
+          isPrimary && !canShowOwnChange ? combinedChangeByType : null
         );
       })
       .join("");
@@ -6423,6 +6845,14 @@
     return '<section class="bcc-supplemental-tables">' + piece + "</section>";
   }
 
+  function renderCountyAttorneySupplementalTables(deptName, deptCode) {
+    const rows = getDepartmentExpenses(deptName, deptCode)
+      .filter((r) => String(r.Object_Code || "").trim() === "531000");
+    const piece = renderTypeSummaryTable(rows, "expense", "County Attorney Legal Services", deptName);
+    if (!piece) return "";
+    return '<section class="county-attorney-supplemental-tables">' + piece + "</section>";
+  }
+
   // The Court Innovation FTE (Project 1040) is budgeted under the Board of
   // County Commissioners' Dept_Code rather than its own Dept_Name, and the
   // court-ordinance distributions (Law Library, Juvenile Justice, Legal
@@ -6507,7 +6937,7 @@
       label: "North Walton",
       narrativeNames: ["North Walton"],
       expenseNames: ["North Walton Tourist Development Tax"],
-      revenueNames: [],
+      revenueNames: ["Tourism North Walton", "North Walton Tourist Development Tax", "North Walton"],
       staffingNames: [],
       machineryNames: []
     }
@@ -6562,11 +6992,15 @@
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
       const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
+      const expenseCardHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label);
+      const revenueCardHtml = spec.label === "Tourism Administration" ? "" : renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label);
+      const financialCardsHtml = expenseCardHtml && revenueCardHtml
+        ? '<div class="tourism-admin-financial-pair">' + expenseCardHtml + revenueCardHtml + "</div>"
+        : expenseCardHtml + revenueCardHtml;
       const body = [
         narrativeHtml,
         spec.label === "Tourism Administration" ? performanceHtml : "",
-        renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
-        spec.label === "Tourism Administration" ? "" : renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
+        financialCardsHtml,
         renderStaffingTable(staffingRows)
       ].filter(Boolean).join("");
 
@@ -6731,8 +7165,14 @@
   const DEPTS_WITH_PERFORMANCE_FOLDED_IN = new Set(["tourism beach operations", "tourism administration"]);
 
   function renderMosquitoStateAidTables() {
-    const expenseRows = rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid");
-    const revenueRows = rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid");
+    const expenseRows = filterAllZeroRowsForSelectedDepartments(
+      rowsForExactDepartment(cache.expenditures, "Mosquito Control State Aid"),
+      "Mosquito Control State Aid"
+    );
+    const revenueRows = filterAllZeroRowsForSelectedDepartments(
+      rowsForExactDepartment(cache.revenues, "Mosquito Control State Aid"),
+      "Mosquito Control State Aid"
+    );
     const pieces = [
       renderTypeSummaryTable(expenseRows, "expense", "Mosquito Control State Aid Expenditure Summary", "Mosquito Control State Aid"),
       renderTypeSummaryTable(revenueRows, "revenue", "Mosquito Control State Aid Revenue Summary", "Mosquito Control State Aid")
@@ -7050,6 +7490,16 @@
     const revenueCardCount = revenueEl ? revenueEl.querySelectorAll(".wc-finance-card").length : 0;
     if (expenseEl) expenseEl.classList.toggle("wc-financial-mount-natural-height", expenseCardCount !== revenueCardCount);
     if (revenueEl) revenueEl.classList.toggle("wc-financial-mount-natural-height", expenseCardCount !== revenueCardCount);
+
+    // Some pages have two expense cards that should sit side by side, with
+    // the single revenue card spanning full width below them.
+    if (["south walton fire and state control", "building construction and maintenance", "office of the county attorney", "planning"].includes(normalizeDeptName(deptName || ""))) {
+      if (expenseEl) expenseEl.classList.add("wc-financial-mount-cards-as-row");
+      if (revenueEl) {
+        revenueEl.classList.add("wc-financial-mount-full-width");
+        revenueEl.classList.remove("wc-financial-mount-natural-height");
+      }
+    }
   }
 
   // Object_Type (case/whitespace normalized) is how a expense category
@@ -7072,6 +7522,7 @@
       "department-solid-waste-tables",
       "department-building-construction-tables",
       "department-bcc-tables",
+      "department-county-attorney-tables",
       "department-court-innovations-tables",
       "department-fund-schedule"
     ];
@@ -7091,7 +7542,7 @@
           showErrorState(containers);
           return;
         }
-        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl, courtInnovationsEl, fundScheduleEl] = containers;
+        const [narrativeEl, performanceEl, expenseEl, revenueEl, staffingEl, machineryEl, stateAidEl, solidWasteEl, buildingConstructionEl, bccEl, countyAttorneyEl, courtInnovationsEl, fundScheduleEl] = containers;
 
         // Some pages combine several separately budgeted divisions; for
         // those, narrative/expenditures/revenue/staffing/machinery (and,
@@ -7119,6 +7570,7 @@
           mountOrHide(solidWasteEl, "");
           mountOrHide(buildingConstructionEl, "");
           mountOrHide(bccEl, "");
+          mountOrHide(countyAttorneyEl, "");
           mountOrHide(courtInnovationsEl, "");
           mountOrHide(fundScheduleEl, "");
           return;
@@ -7140,6 +7592,7 @@
           mountOrHide(solidWasteEl, "");
           mountOrHide(buildingConstructionEl, "");
           mountOrHide(bccEl, "");
+          mountOrHide(countyAttorneyEl, "");
           mountOrHide(courtInnovationsEl, "");
           mountOrHide(fundScheduleEl, "");
           return;
@@ -7156,8 +7609,10 @@
         // "Itemized Description" in the budget lines detail instead of
         // the Note column (which is just "Statutory & Other" on every row).
         let expenseHtml;
+        let expenseRowsForRevenuePlug;
         if (normalizeDeptName(deptName) === "statutory and other agency funding") {
           const statutoryRows = (cache.expenditures || []).filter((r) => (r.Note || "").trim() === "Statutory & Other");
+          expenseRowsForRevenuePlug = statutoryRows;
           expenseHtml = renderTypeSummaryGroup(statutoryRows, "expense", "Expenditure Summary", null, "Project_Name");
         } else {
           // Some departments break specific object codes out into their own
@@ -7169,20 +7624,24 @@
           // the Court Innovations rollup instead, so it's excluded here to
           // avoid double-counting it on the BCC page.
           const isBcc = normalizeDeptName(deptName) === "board of county commissioners";
-          const expenseRows = getDepartmentExpenses(deptName, deptCode).filter(
+          const expenseRows = filterAllZeroRowsForSelectedDepartments(getDepartmentExpenses(deptName, deptCode).filter(
             (r) =>
               !excludedObjectCodes.includes(String(r.Object_Code || "").trim()) &&
               !(isBcc && String(r.Project_Code || "").trim() === "1040")
-          );
+          ), deptName);
+          expenseRowsForRevenuePlug = expenseRows;
           expenseHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName);
         }
         mountOrHide(expenseEl, expenseHtml);
         bindTooltipAnchors(expenseEl);
         bindPriorYearsToggle(expenseEl);
 
+        const rawRevenueRows = getDepartmentRevenues(deptName, deptCode);
+        const deptExpenseRows = dedupBudgetLinesAcrossDeptNames(expenseRowsForRevenuePlug || getDepartmentExpenses(deptName, deptCode));
+        const revenueRows = filterAllZeroRowsForSelectedDepartments(fillRevenueActualsFromExpenses(rawRevenueRows, deptExpenseRows), deptName);
         mountOrHide(
           revenueEl,
-          renderTypeSummaryTable(getDepartmentRevenues(deptName, deptCode), "revenue", "Revenue Summary", deptName)
+          renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", deptName)
         );
         bindTooltipAnchors(revenueEl);
         bindPriorYearsToggle(revenueEl);
@@ -7222,6 +7681,15 @@
         bindPriorYearsToggle(bccEl);
 
         mountOrHide(
+          countyAttorneyEl,
+          normalizeDeptName(deptName) === "office of the county attorney"
+            ? renderCountyAttorneySupplementalTables(deptName, deptCode)
+            : ""
+        );
+        bindTooltipAnchors(countyAttorneyEl);
+        bindPriorYearsToggle(countyAttorneyEl);
+
+        mountOrHide(
           courtInnovationsEl,
           normalizeDeptName(deptName) === "court technology and innovations"
             ? renderCourtInnovationsSupplementalTables()
@@ -7240,7 +7708,8 @@
         arrangeDepartmentFinancialDashboard(expenseEl, revenueEl, staffingEl, [
           solidWasteEl,
           buildingConstructionEl,
-          bccEl
+          bccEl,
+          countyAttorneyEl
         ], deptName);
       })
       .catch((err) => {
@@ -7466,13 +7935,13 @@
   // own staffing rows carry the same blank Dept_Code the officers' do, so
   // without a named group they'd otherwise have nowhere distinct to land.
   const PERSONNEL_NAMED_CALLOUT_GROUPS = [
-    { label: "Board of County Commissioners", match: (r) => normalizeDeptName(r.Dept_Name) === "board of county commissioners" },
-    { label: "Circuit Court", match: (r) => normalizeDeptName(r.Dept_Name) === "circuit court" },
-    { label: "Clerk of Court", match: (r) => normalizeDeptName(r.Dept_Name) === "clerk of circuit court" },
-    { label: "Tax Collector", match: (r) => normalizeDeptName(r.Dept_Name) === "tax collector" },
-    { label: "Property Appraiser", match: (r) => normalizeDeptName(r.Dept_Name) === "property appraiser" },
-    { label: "Supervisor of Elections", match: (r) => normalizeDeptName(r.Dept_Name) === "supervisor of elections" },
-    { label: "Sheriff Fund", match: (r) => normalizeDeptName(r.Dept_Name) === "sheriff" }
+    { label: "Board of County Commissioners", filterLabel: "General Fund (Board of County Commissioners)", match: (r) => normalizeDeptName(r.Dept_Name) === "board of county commissioners" },
+    { label: "Circuit Court", filterLabel: "General Fund (Circuit Court)", match: (r) => normalizeDeptName(r.Dept_Name) === "circuit court" },
+    { label: "Clerk of Court", filterLabel: "General Fund (Clerk of Court)", match: (r) => normalizeDeptName(r.Dept_Name) === "clerk of circuit court" },
+    { label: "Tax Collector", filterLabel: "General Fund (Tax Collector)", match: (r) => normalizeDeptName(r.Dept_Name) === "tax collector" },
+    { label: "Property Appraiser", filterLabel: "General Fund (Property Appraiser)", match: (r) => normalizeDeptName(r.Dept_Name) === "property appraiser" },
+    { label: "Supervisor of Elections", filterLabel: "General Fund (Supervisor of Elections)", match: (r) => normalizeDeptName(r.Dept_Name) === "supervisor of elections" },
+    { label: "Sheriff Fund", filterLabel: "Sheriff Fund", match: (r) => normalizeDeptName(r.Dept_Name) === "sheriff" }
   ];
 
   // Code Compliance's two sub-programs read fine as their own staffing
@@ -7498,6 +7967,13 @@
     // "General Fund" fund-name match here is exclusively the rest of the
     // Board Departments -- relabeled to match departments.html's own
     // "General Fund (Board Departments)" card.
+    return fundName === "General Fund" ? "General Fund (Board Departments)" : fundName;
+  }
+
+  function personnelFundFilterLabelForRow(row) {
+    const group = PERSONNEL_NAMED_CALLOUT_GROUPS.find((g) => g.match(row));
+    if (group) return group.filterLabel;
+    const fundName = fundNameForStaffingRow(row);
     return fundName === "General Fund" ? "General Fund (Board Departments)" : fundName;
   }
 
@@ -7598,9 +8074,7 @@
 
     const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
     // Matches the callout cards above one-for-one -- see
-    // personnelFundLabelForRow -- so every card is also a selectable Fund
-    // filter option, not just a static display.
-    const fundNames = uniqueSorted(rows.map((r) => personnelFundLabelForRow(r)));
+    const fundFilterNames = uniqueSorted(rows.map((r) => personnelFundFilterLabelForRow(r)));
     const years = [2024, 2025, 2026, 2027];
 
     container.innerHTML =
@@ -7612,10 +8086,11 @@
       "</select></label>" +
       '<label class="wc-filter-field"><span>Fund</span>' +
       '<select id="wcPersonnelFundSelect"><option value="">All</option>' +
-      fundNames.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
+      fundFilterNames.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
       "</select></label>" +
       '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelSortToggle" aria-pressed="false">Sort: Largest to Smallest</button>' +
       "</div>" +
+      '<p class="wc-personnel-table-hint">Click on a department name to view individual position detail.</p>' +
       '<div class="wc-financial-summary-table"></div>';
 
     const deptSelect = container.querySelector("#wcPersonnelDeptSelect");
@@ -7628,7 +8103,7 @@
       const deptName = deptSelect.value;
       const fundName = fundSelect.value;
       const filtered = rows.filter((r) =>
-        (!deptName || r.Dept_Name === deptName) && (!fundName || personnelFundLabelForRow(r) === fundName)
+        (!deptName || r.Dept_Name === deptName) && (!fundName || personnelFundFilterLabelForRow(r) === fundName)
       );
 
       if (!filtered.length) {

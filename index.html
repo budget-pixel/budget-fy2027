@@ -2293,7 +2293,11 @@
         });
       }
       document.querySelectorAll(".wc-footer-search-button").forEach(function(button){
-        button.addEventListener("click", openSearch);
+        button.addEventListener("click", function(event){
+          event.preventDefault();
+          event.stopPropagation();
+          openSearch();
+        });
       });
       window.addEventListener("resize", function(){
         if(nav.classList.contains("is-search-open")) syncHeaderMetrics();

@@ -1460,7 +1460,7 @@ function renderProjects(){
 
       .wc-project-card{
         cursor:pointer;
-        flex:1 1 0 !important;
+        flex:0 0 calc((100% - 28px) / 3) !important;
         width:calc((100% - 28px) / 3) !important;
         max-width:calc((100% - 28px) / 3) !important;
         min-width:0 !important;
@@ -1738,7 +1738,7 @@ function renderProjects(){
         }
 
         .wc-project-card{
-          flex:0 1 calc((100% - 24px) / 2) !important;
+          flex:0 0 calc((100% - 24px) / 2) !important;
           width:calc((100% - 24px) / 2) !important;
           max-width:calc((100% - 24px) / 2) !important;
         }

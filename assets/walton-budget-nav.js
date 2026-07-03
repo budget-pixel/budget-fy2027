@@ -2035,6 +2035,9 @@
           closeNavSearch();
           return;
         }
+        if(e.target.closest && e.target.closest(".wc-search-footer")){
+          return;
+        }
         if(!nav.contains(e.target)){
           closeNavSearch();
           nav.classList.remove("is-menu-open");
@@ -2263,6 +2266,63 @@
       crumb.innerHTML = html;
     }
   }
+  function openWaltonBudgetFooterSearch(){
+    var nav = document.querySelector("nav#nav-menu.nav-menu");
+    function searchPageHref(){
+      return /\/pages\//.test(window.location.pathname) ? "search.html" : "pages/search.html";
+    }
+    function syncNavSearchTop(){
+      var navRect = nav.getBoundingClientRect();
+      document.documentElement.style.setProperty("--wc-nav-search-top", navRect.height + "px");
+      var logo = nav.querySelector(".logo-container");
+      if(logo){
+        var logoRect = logo.getBoundingClientRect();
+        document.documentElement.style.setProperty("--wc-search-left", Math.max(0, logoRect.right - navRect.left + 24) + "px");
+      }
+    }
+    function openCurrentSearch(){
+      if(!nav){
+        window.location.href = searchPageHref();
+        return;
+      }
+      syncNavSearchTop();
+      if(window.WaltonBudgetGlobalSearch && window.WaltonBudgetGlobalSearch.nav === nav && typeof window.WaltonBudgetGlobalSearch.open === "function"){
+        window.WaltonBudgetGlobalSearch.open();
+        return;
+      }
+      nav.classList.add("is-search-open");
+      document.body.classList.add("wc-global-search-open");
+      document.body.style.overflow = "hidden";
+      setTimeout(function(){
+        var input = nav.querySelector("#wcTocSearch");
+        if(input){
+          input.focus();
+        }
+      }, 60);
+    }
+    if(!nav){
+      window.location.href = searchPageHref();
+      return;
+    }
+    if(window.WaltonBudgetGlobalSearch && window.WaltonBudgetGlobalSearch.nav === nav && typeof window.WaltonBudgetGlobalSearch.open === "function"){
+      openCurrentSearch();
+      return;
+    }
+    if(typeof window.initWaltonBudgetSearch === "function"){
+      window.initWaltonBudgetSearch({
+        nav:nav,
+        getWaltonSplitBrandHtml:getWaltonSplitBrandHtml
+      });
+      openCurrentSearch();
+      return;
+    }
+    initWcNavSearch();
+    openCurrentSearch();
+    loadWaltonBudgetSearchModules(function(){
+      initWcNavSearch();
+      openCurrentSearch();
+    });
+  }
   function renderWaltonBudgetFooter(){
     if(!document.body){
       return;
@@ -2325,10 +2385,10 @@
         return;
       }
       button.setAttribute("data-wc-search-bound", "true");
-      button.addEventListener("click", function(){
-        if(window.WaltonBudgetGlobalSearch && typeof window.WaltonBudgetGlobalSearch.open === "function"){
-          window.WaltonBudgetGlobalSearch.open();
-        }
+      button.addEventListener("click", function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        openWaltonBudgetFooterSearch();
       });
     });
   }

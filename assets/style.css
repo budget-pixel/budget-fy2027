@@ -599,6 +599,19 @@ body {
   padding-left: 14px;
 }
 
+.tourism-admin-financial-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+  margin: 28px 0;
+}
+
+.tourism-admin-financial-pair .wc-finance-card {
+  height: 100%;
+  margin: 0;
+}
+
 .extension-video-frame {
   position: relative;
   width: 100%;
@@ -1354,16 +1367,19 @@ body {
 .wc-department-financial-grid #department-state-aid-tables,
 .wc-department-financial-grid #department-solid-waste-tables,
 .wc-department-financial-grid #department-building-construction-tables,
-.wc-department-financial-grid #department-bcc-tables {
+.wc-department-financial-grid #department-bcc-tables,
+.wc-department-financial-grid #department-county-attorney-tables {
   min-width: 0;
   margin: 0;
 }
 .wc-department-financial-grid #department-solid-waste-tables,
 .wc-department-financial-grid #department-building-construction-tables,
 .wc-department-financial-grid #department-bcc-tables,
+.wc-department-financial-grid #department-county-attorney-tables,
 .wc-department-financial-grid .solid-waste-supplemental-tables,
 .wc-department-financial-grid .building-construction-supplemental-tables,
-.wc-department-financial-grid .bcc-supplemental-tables {
+.wc-department-financial-grid .bcc-supplemental-tables,
+.wc-department-financial-grid .county-attorney-supplemental-tables {
   display: contents;
 }
 .wc-department-financial-grid .wc-finance-card {
@@ -1376,7 +1392,8 @@ body {
    wrapper. */
 .wc-department-financial-grid .solid-waste-supplemental-tables .wc-finance-card,
 .wc-department-financial-grid .building-construction-supplemental-tables .wc-finance-card,
-.wc-department-financial-grid .bcc-supplemental-tables .wc-finance-card {
+.wc-department-financial-grid .bcc-supplemental-tables .wc-finance-card,
+.wc-department-financial-grid .county-attorney-supplemental-tables .wc-finance-card {
   height: 100%;
 }
 /* #department-expense-table / #department-revenue-table are different:
@@ -1554,6 +1571,55 @@ body {
   line-height: 1.25;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+.wc-finance-card-row-head strong:has(.wc-budget-line-tooltip-anchor) {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+.wc-budget-line-tooltip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.wc-budget-line-tooltip-anchor {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  align-self: center;
+  border: 1px solid rgba(0,63,40,.34);
+  border-radius: 999px;
+  background: #fff;
+  color: #003f28;
+  font-size: .68rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: help;
+}
+.wc-budget-line-tooltip-anchor:focus-visible {
+  outline: 3px solid rgba(209,190,120,.55);
+  outline-offset: 2px;
+}
+.wc-budget-line-tooltip-bubble {
+  position: fixed;
+  z-index: 9999;
+  display: none;
+  padding: 10px 12px;
+  border: 1px solid rgba(0,63,40,.2);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 14px 32px rgba(23,32,51,.18);
+  color: #172033;
+  font-size: .82rem;
+  line-height: 1.45;
+}
+.wc-budget-line-tooltip-bubble.is-visible {
+  display: block;
 }
 .wc-finance-card-row-head span {
   flex: 0 0 auto;
@@ -2163,6 +2229,7 @@ body {
 @media (max-width: 560px) {
   .wc-personnel-fund-stats--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.wc-personnel-table-hint { font-size: .8rem; color: var(--text-muted, #666); margin: 6px 0 10px; font-style: italic; }
 
 .wc-forecast-intro,
 .wc-forecast-note {
@@ -2461,6 +2528,9 @@ body {
   .wc-department-financial-grid {
     grid-template-columns: 1fr;
   }
+  .tourism-admin-financial-pair {
+    grid-template-columns: 1fr;
+  }
   .mosquito-state-aid-tables {
     grid-template-columns: 1fr;
   }
@@ -2678,6 +2748,19 @@ body {
   background: rgba(14,28,22,.92) !important;
   border-color: var(--border) !important;
   box-shadow: 0 18px 46px rgba(0,0,0,.28) !important;
+}
+
+:root[data-theme="dark"] .wc-budget-line-tooltip-anchor {
+  border-color: rgba(209,190,120,.55);
+  background: #172033;
+  color: #f8fafc;
+}
+
+:root[data-theme="dark"] .wc-budget-line-tooltip-bubble {
+  border-color: rgba(209,190,120,.35);
+  background: #172033;
+  color: #f8fafc;
+  box-shadow: 0 14px 32px rgba(0,0,0,.38);
 }
 
 :root[data-theme="dark"] .wc-directory-item:hover,
