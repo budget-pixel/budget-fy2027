@@ -1347,6 +1347,12 @@
   function expenseDisplayDeptName(repByCodeAndName, r) {
     const name = representativeDeptName(repByCodeAndName, r);
     if (normalizeDeptName(name) === "unclassified") {
+      if (
+        String((r && r.Dept_Code) || "").trim() === "00102012" &&
+        normalizeDeptName(expenseActivityForRow(r)) === "human services"
+      ) {
+        return "Statutory & Other";
+      }
       return fundNameForRow(r);
     }
     return name;
@@ -3724,6 +3730,12 @@
     ["113", "Culture and Recreation"]
   ]);
 
+  const EXPENSE_ACTIVITY_OVERRIDE_BY_DEPT_NAME = new Map([
+    ["engineering department", "Transportation"],
+    ["public works engineering services", "Transportation"],
+    ["engineering services", "Transportation"]
+  ]);
+
   // BCC Other Uses Contingency is budgeted appropriation authority, not a
   // transfer or financing item. Show only that specific org/object as its
   // own Other Uses line; other 599000 rows keep their regular activity.
@@ -3736,6 +3748,8 @@
 
   function expenseActivityForRow(r) {
     if (isBccOtherUsesContingencyRow(r)) return "Other Uses";
+    const deptOverride = EXPENSE_ACTIVITY_OVERRIDE_BY_DEPT_NAME.get(normalizeDeptName(r && r.Dept_Name));
+    if (deptOverride) return deptOverride;
     return activityForDeptCode(r.Dept_Code) || EXPENSE_ACTIVITY_FALLBACK_BY_FUND.get(fundCodeForRow(r)) || "";
   }
 
