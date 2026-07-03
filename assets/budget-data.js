@@ -823,7 +823,7 @@
   // negative outright rather than trusting the source sign, per its
   // definition as a reduction.
   function revenueBudgetMergeContribution(row) {
-    const raw = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
+    const raw = row.FY2026_Original_Budget || row.FY2026_Budget || row.FY2026_Plug || 0;
     return isSubtractiveRevenueRow(row) ? -Math.abs(raw) : revenueDisplayAmount(raw);
   }
 
@@ -1047,7 +1047,7 @@
 
       const lookups = supabaseLookupsForRow(row, org, codeValue);
       const result = sumRawActualsForLookups(rawBudgetRows, lookups, 2026, projectScope);
-      return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || 0) };
+      return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || revenueFy2026PlugOverride(row) || 0) };
     });
   }
 
@@ -1539,6 +1539,7 @@
   }
 
   const INDIRECT_ADMIN_PRIOR_YEAR_SUPPRESSED_DEPTS = new Set([
+    "board of county commissioners",
     "building construction and maintenance",
     "county administration",
     "office of management and budget",
@@ -2418,7 +2419,7 @@
   // whatever totals already sum over cache.expenditures.
   const HIDDEN_BUDGET_LINE_OBJECT_CODES = new Set(["500000", "523004"]);
 
-  function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName, forceDisablePriorYears) {
+  function renderBudgetLinesToggle(rows, descriptionField, kind, combineByName, forceDisablePriorYears, currentBudgetOnly) {
     if (!rows || !rows.length) return { button: "", detail: "" };
     const isExpense = kind !== "revenue";
     const codeFieldForFilter = isExpense ? "Object_Code" : "Revenue_Code";
@@ -2435,7 +2436,9 @@
     const nameField = isExpense ? "Object_Name" : "Revenue_Name";
     const categoryField = isExpense ? "Object_Type" : "Revenue_Type";
     const descField = descriptionField || "Note";
-    const priorYearColumns = budgetLinePriorYearColumns(isExpense);
+    const priorYearColumns = currentBudgetOnly
+      ? budgetLinePriorYearColumns(isExpense).filter((c) => c.field === "FY2026_Original_Budget")
+      : budgetLinePriorYearColumns(isExpense);
     const priorYearActualFields = new Set(priorYearColumns.filter((c) => c.actual).map((c) => c.field));
 
     function revenueActualsAreDedicatedToRow(row) {
@@ -2449,7 +2452,7 @@
     // enough to just hide this table's own checkbox -- showPrior has to be
     // forced false here too, or toggling it on anywhere else on the page
     // would still expand this table's prior-year columns.
-    const showPrior = priorYearsToggleDisabled ? false : getShowPriorYears();
+    const showPrior = currentBudgetOnly ? true : (priorYearsToggleDisabled ? false : getShowPriorYears());
 
     // On consolidated/county-wide summaries, combine rows that share the
     // same name (e.g. the same revenue source collected under several
@@ -2835,7 +2838,7 @@
 
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
-      detail: '<div class="wc-budget-lines-detail wc-budget-lines-card wc-has-print-budget-table' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+      detail: '<div class="wc-budget-lines-detail wc-budget-lines-card wc-has-print-budget-table' + (showPrior ? " show-prior-years" : "") + '" id="' + detailId + '"' + (isPriorYearsDisabled ? ' data-prior-years-disabled="true"' : '') + ' hidden>' +
         budgetLinesTools + detailTable + '<div class="wc-print-budget-table-wrap">' + printDetailTable + "</div></div>"
     };
   }
@@ -3405,12 +3408,14 @@
     // their FY2026 figures share the same per-account dedup unreliability
     // that already keeps them from showing a YoY change (see
     // renderTypeSummaryTable).
+    const currentBudgetOnly = isExpense &&
+      rows.every((r) => normalizeDeptName(r.Dept_Name) === "bcc other uses contingency");
     const forceDisablePriorYears = showChange === false || (
       !isExpense &&
       rows.some((r) => PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(r.Dept_Name)))
-    );
+    ) || currentBudgetOnly;
     const showPrior = forceDisablePriorYears ? false : getShowPriorYears();
-    const detail = renderBudgetLinesToggle(rows, descriptionField, kind, false, forceDisablePriorYears);
+    const detail = renderBudgetLinesToggle(rows, descriptionField, kind, false, forceDisablePriorYears, currentBudgetOnly);
     if (detail.button && !isExpense) {
       detail.button = detail.button
         .replace('data-closed-label="View Budget Lines"', 'data-closed-label="View Revenue Lines"')
@@ -5552,18 +5557,44 @@
     const allMatchingRows = [];
     const revenueActualFields = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
+    function rawRevenueActualSummarySum(rowsToSum, field) {
+      const yearMatch = /^FY(\d{4})_Actual$/.exec(field);
+      if (!yearMatch || !(cache.revenueActualRows || []).length) {
+        return rowsToSum.reduce((sum, r) => sum + revenueDisplayAmount(r[field] || 0), 0);
+      }
+
+      const year = Number(yearMatch[1]);
+      const codes = new Set(rowsToSum.map((r) => String((r && r.Revenue_Code) || "").trim()).filter(Boolean));
+      const fundCodes = new Set(rowsToSum.map((r) => fundCodeForRow(r)).filter(Boolean));
+      if (!codes.size) return 0;
+
+      const rawTotal = (cache.revenueActualRows || []).reduce((sum, row) => {
+        if (Number(row.year) !== year) return sum;
+        if (!codes.has(String(row.object || "").trim())) return sum;
+        const rowFundCode = String(row.org || "").trim().slice(0, 3);
+        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return sum;
+        if (fundCodes.size && !fundCodes.has(rowFundCode)) return sum;
+        return sum + (Number(row.amount) || 0);
+      }, 0);
+
+      return revenueDisplayAmount(rawTotal);
+    }
+
     function dedupedRevenueSum(rowsToSum, field) {
-      const shouldDedupe = revenueActualFields.has(field) || field === "FY2026_Original_Budget";
-      const seen = shouldDedupe ? new Set() : null;
-      return rowsToSum.reduce((sum, r) => {
-        if (seen) {
+      if (revenueActualFields.has(field)) {
+        return rawRevenueActualSummarySum(rowsToSum, field);
+      }
+
+      if (field === "FY2026_Original_Budget") {
+        const bestByKey = new Map();
+        rowsToSum.forEach((r) => {
           const key = revenueBudgetUniqueKey(r);
-          if (seen.has(key)) return sum;
-          seen.add(key);
-        }
-        if (field === "FY2026_Original_Budget") {
-          return sum + revenueBudgetMergeContribution(r);
-        }
+          const val = revenueBudgetMergeContribution(r);
+          if (!bestByKey.has(key) || val > bestByKey.get(key)) bestByKey.set(key, val);
+        });
+        return Array.from(bestByKey.values()).reduce((sum, val) => sum + val, 0);
+      }
+      return rowsToSum.reduce((sum, r) => {
         return sum + (r[field] || 0);
       }, 0);
     }
@@ -6287,7 +6318,14 @@
     const halfCent = { title: "Local Government Half-Cent Sales Tax", narrativeKey: "Local Government Half-Cent Sales Tax", matches: byRevenueCodes(["335180"]) };
     const stateFuel = { title: "State Fuel Taxes", narrativeKey: "State Fuel Taxes", matches: byRevenueCodes(["335420", "335421", "335422", "335490"]) };
     const stateRevenueShare = { title: "State Revenue Share Proceeds", narrativeKey: "State Revenue Share Proceeds", matches: byRevenueCodes(["335121"]) };
-    const section8 = { title: "Section 8 Housing Choice Voucher Program", narrativeKey: "Section 8 Housing Choice Voucher Program", matches: byRevenueCodes(["331500"]) };
+    const section8 = {
+      title: "Section 8 Housing Choice Voucher Program",
+      narrativeKey: "Section 8 Housing Choice Voucher Program",
+      matches: (r) =>
+        String(r.Revenue_Code || "").trim() === "331500" &&
+        normalizeDeptName(r.Dept_Name) === "housing and urban development",
+      useRowScopedActuals: true
+    };
     const resourceOfficers = { title: "Sheriff Resource Officers", narrativeKey: "Sheriff Resource Officers", matches: byRevenueCodes(["337200"]) };
     const siblings = [halfCent, stateFuel, stateRevenueShare, section8, resourceOfficers].map((t) => t.matches);
     const remainderType = remainderOfType("Intergovernmental Revenues", siblings);
@@ -6305,7 +6343,7 @@
   }
 
   function buildChargesForServicesTopics() {
-    const planningFees = { title: "Planning Fees", narrativeKey: "Planning Fees", matches: byRevenueCodes(["341201"]) };
+    const planningFees = { title: "Planning Fees", narrativeKey: "Planning Fees", matches: byRevenueCodes(["341201", "341202", "341205"]) };
     const eagleSprings = {
       title: "Eagle Springs Golf and Recreation Center Revenue",
       narrativeKey: "Eagle Springs Golf and Recreation Center Revenue",
@@ -6403,38 +6441,46 @@
 
   const REVENUE_ACTUAL_FIELD_NAMES = new Set(BUDGET_LINE_PRIOR_YEAR_COLUMNS.filter((c) => c.actual).map((c) => c.field));
 
-  function sumRevenueRowsForField(rows, field) {
+  function sumRevenueRowsForField(rows, field, options) {
+    if (options && options.useRowScopedActuals && REVENUE_ACTUAL_FIELD_NAMES.has(field)) {
+      const bestByKey = new Map();
+      (rows || []).forEach((row) => {
+        if (row._actualsDeduped || row._actualsSuppressed) return;
+        const key = revenueBudgetUniqueKey(row);
+        const val = revenueDisplayAmount(row[field] || 0);
+        if (!bestByKey.has(key) || val > bestByKey.get(key)) bestByKey.set(key, val);
+      });
+      return Array.from(bestByKey.values()).reduce((s, v) => s + v, 0);
+    }
     if (REVENUE_ACTUAL_FIELD_NAMES.has(field) && (cache.revenueActualRows || []).length) {
       const year = Number(field.slice(2, 6));
       const codes = new Set(rows.map((row) => String((row && row.Revenue_Code) || "").trim()).filter(Boolean));
+      const fundCodes = new Set(rows.map((row) => fundCodeForRow(row)).filter(Boolean));
       return (cache.revenueActualRows || []).reduce((sum, row) => {
         if (Number(row.year) !== year) return sum;
         if (!codes.has(String(row.object || "").trim())) return sum;
-        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(String(row.org || "").trim().slice(0, 3))) return sum;
+        const rowFundCode = String(row.org || "").trim().slice(0, 3);
+        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return sum;
+        if (fundCodes.size && !fundCodes.has(rowFundCode)) return sum;
         return sum + (Number(row.amount) || 0);
       }, 0);
     }
 
     if (field === "FY2026_Original_Budget") {
-      // Same dedup as the Consolidated Revenue Summary's dedupedRevenueSum
-      // (revenueBudgetUniqueKey: fund+Dept_Code+Revenue_Code+Project_Code)
-      // -- a shared GL code (e.g. the General Fund's Ad Valorem Taxes line)
-      // can be referenced by many departments' own rows under the same
-      // Dept_Code, each carrying the *same* full account total rather than
-      // its own share, so summing every row directly would multiply it by
-      // however many departments reference it. Unlike budgetLineColumnTotal
-      // (scoped to one department's own rows, where a code-level fallback
-      // is needed for a row the dedup zeroed out), a chart topic's rows
-      // already span every department county-wide, so deduping by key and
-      // summing each one once is sufficient -- the real amount lives on
-      // whichever row in the group happens to be first.
-      const seen = new Set();
-      return (rows || []).reduce((sum, row) => {
+      // Group by revenueBudgetUniqueKey (Fund+Dept_Code+Revenue_Code+Project_Code)
+      // to prevent double-counting when many Dept_Name rows share the same GL
+      // account and each carries the full county-wide BUC total. Within each
+      // group take the MAX contribution so that a $0 row (e.g. Code Compliance
+      // whose BUC lookup excludes project 10647) never shadows a non-zero row
+      // for the same key (e.g. the BCC beach vending row that includes it).
+      const bestByKey = new Map();
+      (rows || []).forEach((row) => {
+        if (row._originalBudgetDeduped) return;
         const key = revenueBudgetUniqueKey(row);
-        if (seen.has(key)) return sum;
-        seen.add(key);
-        return sum + revenueBudgetMergeContribution(row);
-      }, 0);
+        const val = revenueBudgetMergeContribution(row);
+        if (!bestByKey.has(key) || val > bestByKey.get(key)) bestByKey.set(key, val);
+      });
+      return Array.from(bestByKey.values()).reduce((s, v) => s + v, 0);
     }
 
     return rows.reduce((sum, row) => {
@@ -6498,7 +6544,7 @@
       const baseColors = Array.from(byName.keys()).map((_, i) => REVENUE_TOPIC_CHART_COLORS[i % REVENUE_TOPIC_CHART_COLORS.length]);
       const datasets = Array.from(byName.entries()).map(([name, rowsForName], i) => ({
         label: name,
-        data: REVENUE_TOPIC_CHART_YEARS.map((y) => sumRevenueRowsForField(rowsForName, y.field)),
+        data: REVENUE_TOPIC_CHART_YEARS.map((y) => sumRevenueRowsForField(rowsForName, y.field, topic)),
         // Scriptable so it re-resolves (via registerWcThemedChart's
         // chart.update() on theme change) to a dark-mode-legible variant
         // instead of staying fixed at the light-mode hex forever -- see
@@ -7303,10 +7349,11 @@
     const root = container || document;
     const priorScope = scope || "budget";
     const cardSelector = priorScope === "performance" ? ".wc-performance-card" : ".wc-staffing-card, .wc-budget-lines-card";
-    if (root.classList && root.matches(cardSelector)) {
+    if (root.classList && root.matches(cardSelector) && !root.dataset.priorYearsDisabled) {
       root.classList.toggle("show-prior-years", checked);
     }
     root.querySelectorAll(cardSelector).forEach((card) => {
+      if (card.dataset.priorYearsDisabled) return;
       card.classList.toggle("show-prior-years", checked);
     });
     root.querySelectorAll('.wc-fy-column-toggle-checkbox[data-wc-prior-years-scope="' + priorScope + '"]').forEach((cb) => {
@@ -7486,7 +7533,13 @@
 
     // Some pages have two expense cards that should sit side by side, with
     // the single revenue card spanning full width below them.
-    if (["south walton fire and state control", "building construction and maintenance", "office of the county attorney", "planning"].includes(normalizeDeptName(deptName || ""))) {
+    if ([
+      "south walton fire and state control",
+      "building construction and maintenance",
+      "office of the county attorney",
+      "planning",
+      "board of county commissioners"
+    ].includes(normalizeDeptName(deptName || ""))) {
       if (expenseEl) expenseEl.classList.add("wc-financial-mount-cards-as-row");
       if (revenueEl) {
         revenueEl.classList.add("wc-financial-mount-full-width");
