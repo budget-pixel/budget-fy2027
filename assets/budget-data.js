@@ -1344,6 +1344,14 @@
     return (repMap && repMap.get(r.Dept_Name)) || r.Dept_Name || "Unknown";
   }
 
+  function expenseDisplayDeptName(repByCodeAndName, r) {
+    const name = representativeDeptName(repByCodeAndName, r);
+    if (normalizeDeptName(name) === "unclassified") {
+      return fundNameForRow(r);
+    }
+    return name;
+  }
+
   function matchNames(deptName) {
     const norm = normalizeDeptName(deptName);
     const set = new Set([norm]);
@@ -3691,7 +3699,8 @@
     "Economic Environment",
     "Human Services",
     "Culture and Recreation",
-    "Court Related Cost"
+    "Court Related Cost",
+    "Other Uses"
   ];
 
   // Activities that represent financing items (transfers, debt proceeds,
@@ -3705,24 +3714,33 @@
     return match ? match.Activity : "";
   }
 
-  // Object_Code 599000 (Other Uses Contingency / reserve for contingency) is
-  // budgeted appropriation authority, not a transfer or financing item. Some
-  // departments exist solely to hold a contingency line (e.g. "BCC Other
-  // Uses Contingency") and are mapped to an Other Sources/Interfund
-  // Transfers activity in the activities sheet for unrelated reasons, which
-  // would otherwise misroute their dollars into Other Financial Uses instead
-  // of the regular Expenditures Total. These two helpers keep that override
-  // consistent everywhere expenditure rows are classified by activity.
-  function isObjectCode599000(r) {
-    return String(r.Object_Code || "").trim() === "599000";
+  const EXPENSE_ACTIVITY_FALLBACK_BY_FUND = new Map([
+    ["101", "Transportation"],
+    ["102", "Physical Environment"],
+    ["104", "Economic Environment"],
+    ["107", "Public Safety"],
+    ["108", "Public Safety"],
+    ["109", "Public Safety"],
+    ["113", "Culture and Recreation"]
+  ]);
+
+  // BCC Other Uses Contingency is budgeted appropriation authority, not a
+  // transfer or financing item. Show only that specific org/object as its
+  // own Other Uses line; other 599000 rows keep their regular activity.
+  function isBccOtherUsesContingencyRow(r) {
+    return (
+      normalizeDeptName(r && r.Dept_Name) === "bcc other uses contingency" &&
+      String((r && r.Object_Code) || "").trim() === "599000"
+    );
   }
 
   function expenseActivityForRow(r) {
-    return isObjectCode599000(r) ? "General Government" : activityForDeptCode(r.Dept_Code);
+    if (isBccOtherUsesContingencyRow(r)) return "Other Uses";
+    return activityForDeptCode(r.Dept_Code) || EXPENSE_ACTIVITY_FALLBACK_BY_FUND.get(fundCodeForRow(r)) || "";
   }
 
   function isOtherFinancingExpenseRow(r) {
-    return !isObjectCode599000(r) && OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase());
+    return !isBccOtherUsesContingencyRow(r) && OTHER_FINANCING_ACTIVITIES.has(activityForDeptCode(r.Dept_Code).toLowerCase());
   }
 
   // ---- shared deduped historical expense layer ----
@@ -5163,6 +5181,18 @@
       // Object_Code (what they key off) are preserved on every deduped row.
       const isHistoricalExpenseField = rows === expenseRows && HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(field);
       const sourceRows = isHistoricalExpenseField ? (cache.dedupedExpenseRows || []) : rows;
+
+      if (rows === revenueRows && field === "FY2026_Original_Budget") {
+        const bestByKey = new Map();
+        sourceRows.forEach((r) => {
+          if (!inFund(r) || !predicate(r)) return;
+          const key = revenueBudgetUniqueKey(r);
+          const val = revenueBudgetMergeContribution(r);
+          if (!bestByKey.has(key) || val > bestByKey.get(key)) bestByKey.set(key, val);
+        });
+        return Array.from(bestByKey.values()).reduce((sum, val) => sum + val, 0);
+      }
+
       const seenAmounts = shouldDedupeRevenue ? new Set() : null;
       return sourceRows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
@@ -5202,6 +5232,8 @@
     }
 
     const isOtherFinancingRevenue = (r) => String(r.Revenue_Code || "").trim() === "381000";
+    const isBuildingFundBalanceBroughtForwardRevenue = (r) =>
+      fundCodeForRow(r) === "103" && String(r.Revenue_Code || "").trim() === "389000";
     const isOtherFinancingExpense = isOtherFinancingExpenseRow;
 
     // Each activity/type row's own breakdown -- by revenue source for a
@@ -5307,8 +5339,14 @@
     const revenueTypeRows = CONSOLIDATED_REVENUE_TYPE_ROWS
       .map((spec) => ({
         label: spec.label,
-        predicate: (r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r),
-        values: rowValues((r) => r.Revenue_Type === spec.key && !isOtherFinancingRevenue(r), revenueRows)
+        predicate: (r) =>
+          r.Revenue_Type === spec.key &&
+          !isOtherFinancingRevenue(r) &&
+          !isBuildingFundBalanceBroughtForwardRevenue(r),
+        values: rowValues((r) =>
+          r.Revenue_Type === spec.key &&
+          !isOtherFinancingRevenue(r) &&
+          !isBuildingFundBalanceBroughtForwardRevenue(r), revenueRows)
       }));
     const generalGovTaxesRow = revenueTypeRows.find((row) => row.label === "General Government Taxes");
     if (generalGovTaxesRow) {
@@ -5693,7 +5731,8 @@
     { containerId: "expense-activity-economic-environment", activity: "Economic Environment" },
     { containerId: "expense-activity-human-services", activity: "Human Services" },
     { containerId: "expense-activity-culture-and-recreation", activity: "Culture and Recreation" },
-    { containerId: "expense-activity-court-related-cost", activity: "Court Related Cost", title: "Court-Related Cost" }
+    { containerId: "expense-activity-court-related-cost", activity: "Court Related Cost", title: "Court-Related Cost" },
+    { containerId: "expense-activity-other-uses", activity: "Other Uses" }
   ];
 
   function renderConsolidatedExpenseSummaryTable() {
@@ -5834,7 +5873,7 @@
 
     const repByCodeAndName = clusterDeptNamesByCode(rows.concat(dedupedRows || []));
     function representativeName(r) {
-      return representativeDeptName(repByCodeAndName, r);
+      return expenseDisplayDeptName(repByCodeAndName, r);
     }
     function groupKeyFor(r) {
       const code = String(r.Dept_Code || "").trim();
@@ -6170,15 +6209,20 @@
 
     if (typeof Chart === "undefined") return;
 
+    const repByCodeAndName = clusterDeptNamesByCode(expenseRows.concat(dedupedRows || []));
+    function chartDeptName(r) {
+      return expenseDisplayDeptName(repByCodeAndName, r);
+    }
+
     const byDept = new Map();
     expenseRows.forEach((r) => {
-      const name = r.Dept_Name || "Unknown";
+      const name = chartDeptName(r);
       if (!byDept.has(name)) byDept.set(name, []);
       byDept.get(name).push(r);
     });
     const dedupedByDept = new Map();
     dedupedRows.forEach((r) => {
-      const name = r.Dept_Name || "Unknown";
+      const name = chartDeptName(r);
       if (!dedupedByDept.has(name)) dedupedByDept.set(name, []);
       dedupedByDept.get(name).push(r);
     });
