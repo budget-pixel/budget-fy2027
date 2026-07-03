@@ -540,8 +540,8 @@
     return (rows || []).map((row) => {
       const key = String((row && row.Dept_Code) || "").trim() + "|" + String((row && row.Revenue_Code) || "").trim();
       const override = REVENUE_NAME_OVERRIDES.get(key);
-      if (!override) return row;
-      return { ...row, Revenue_Name: override };
+      if (override) return { ...row, Revenue_Name: override };
+      return row;
     });
   }
 
@@ -1589,13 +1589,6 @@
     return dept === "sheriff" || dept === "walton county sheriff s office" || dept === "walton county sheriffs office";
   }
 
-  function shouldSuppressRevenuePlugActual(row, year) {
-    return (
-      isSheriffRevenueDept(row) &&
-      String((row && row.Revenue_Code) || "").trim() === "311000" &&
-      (year === 2024 || year === 2025)
-    );
-  }
 
   function suppressExcludedRevenuePriorYearRows(revenueRows) {
     return (revenueRows || []).map((row) => {
@@ -1663,7 +1656,7 @@
       cloned._actualsBackfilled = true;
       const weight = weights[gapIndex++];
       HISTORICAL_ACTUAL_YEARS.forEach((y) => {
-        cloned["FY" + y + "_Actual"] = shouldSuppressRevenuePlugActual(row, y) ? 0 : gapTotals[y] * weight;
+        cloned["FY" + y + "_Actual"] = gapTotals[y] * weight;
       });
       return cloned;
     });
@@ -7638,7 +7631,49 @@
 
         const rawRevenueRows = getDepartmentRevenues(deptName, deptCode);
         const deptExpenseRows = dedupBudgetLinesAcrossDeptNames(expenseRowsForRevenuePlug || getDepartmentExpenses(deptName, deptCode));
-        const revenueRows = filterAllZeroRowsForSelectedDepartments(fillRevenueActualsFromExpenses(rawRevenueRows, deptExpenseRows), deptName);
+        let filledRevenueRows = fillRevenueActualsFromExpenses(rawRevenueRows, deptExpenseRows);
+        if (filledRevenueRows.some((r) => isSheriffRevenueDept(r))) {
+          const all381 = filledRevenueRows.filter((r) => String((r && r.Revenue_Code) || "").trim() === "381000");
+          const src311 = filledRevenueRows.find((r) => String((r && r.Revenue_Code) || "").trim() === "311000");
+          if (all381.length && src311) {
+            const sum381fy2024 = all381.reduce((s, r) => s + (r.FY2024_Actual || 0), 0);
+            const sum381fy2025 = all381.reduce((s, r) => s + (r.FY2025_Actual || 0), 0);
+            const sum381fy2026 = all381.reduce((s, r) => s + (r.FY2026_Original_Budget || r.FY2026_Budget || 0), 0);
+            const total2027 = [src311, ...all381].reduce((s, r) => s + (r.FY2027_Proposed || 0), 0);
+            const fy2027AdValorem = Math.max(0, total2027 - 480000);
+            let interfundAssigned = false;
+            filledRevenueRows = filledRevenueRows.map((r) => {
+              const code = String((r && r.Revenue_Code) || "").trim();
+              if (code === "311000") {
+                return {
+                  ...r,
+                  _actualsBackfilled: true,
+                  FY2024_Actual: sum381fy2024,
+                  FY2025_Actual: sum381fy2025,
+                  FY2026_Original_Budget: sum381fy2026,
+                  FY2026_Budget: sum381fy2026,
+                  FY2027_Proposed: fy2027AdValorem,
+                };
+              }
+              if (code === "381000") {
+                const fy2027 = !interfundAssigned ? 480000 : 0;
+                interfundAssigned = true;
+                return {
+                  ...r,
+                  _actualsBackfilled: true,
+                  _originalBudgetDeduped: true,
+                  FY2024_Actual: 0,
+                  FY2025_Actual: 0,
+                  FY2026_Original_Budget: 0,
+                  FY2026_Budget: 0,
+                  FY2027_Proposed: fy2027,
+                };
+              }
+              return r;
+            });
+          }
+        }
+        const revenueRows = filterAllZeroRowsForSelectedDepartments(filledRevenueRows, deptName);
         mountOrHide(
           revenueEl,
           renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", deptName)
