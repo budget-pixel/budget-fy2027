@@ -1479,14 +1479,30 @@
     });
   }
 
+  function suppressMsbuAdValoremRows(rows, deptName) {
+    if (normalizeDeptName(deptName) !== "municipal service benefit unit fund") return rows;
+    return (rows || []).filter((row) => {
+      const code = String((row && row.Revenue_Code) || "").trim();
+      const name = normalizeDeptName(row && row.Revenue_Name);
+      return code !== "311000" &&
+        code !== "311001" &&
+        !isAdValoremFivePercentRow(row) &&
+        name !== "ad valorem taxes";
+    });
+  }
+
   function getDepartmentRevenues(deptName, deptCode) {
-    return suppressMossyHeadTransferInPriorYears(
-      combineEagleSpringsProShopSalesRows(rowsForDepartment(cache.revenues, deptName, deptCode), deptName),
+    return suppressMsbuAdValoremRows(
+      suppressMossyHeadTransferInPriorYears(
+        combineEagleSpringsProShopSalesRows(rowsForDepartment(cache.revenues, deptName, deptCode), deptName),
+        deptName
+      ),
       deptName
     );
   }
 
   const ZERO_ROW_FILTER_DEPT_NAMES = new Set([
+    "municipal service benefit unit fund",
     "mosquito control",
     "mosquito control state aid",
     "mossy head wastewater treatment facility"
