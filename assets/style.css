@@ -34,6 +34,14 @@ body {
   /* nav#nav-menu is sticky so no padding-top needed */
 }
 
+a {
+  color: var(--green);
+}
+
+a:where(:visited) {
+  color: var(--green);
+}
+
 :root[data-theme="dark"] body {
   background:
     radial-gradient(circle at top left, rgba(123,211,159,.12), transparent 32rem),
