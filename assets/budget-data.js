@@ -1672,8 +1672,34 @@
     });
   }
 
+  function departmentRevenueFy2026PlugOverrideForRows(rows) {
+    const names = new Set((rows || []).map((row) => normalizeDeptName(row && row.Dept_Name)).filter(Boolean));
+    if (names.has("public defender") || names.has("court technology public defender")) return 152439;
+    return 0;
+  }
+
+  function departmentRevenueFy2026PlugOverrideForRow(row) {
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    if (dept !== "public defender" && dept !== "court technology public defender") return 0;
+    return isRevenueGapFillRow(row) ? 152439 : 0;
+  }
+
+  function applyDepartmentRevenueFy2026PlugOverrides(rows) {
+    const override = departmentRevenueFy2026PlugOverrideForRows(rows);
+    if (!override) return rows;
+    return (rows || []).map((row) => {
+      if (!departmentRevenueFy2026PlugOverrideForRow(row)) return row;
+      return {
+        ...row,
+        FY2026_Original_Budget: override,
+        FY2026_Budget: override,
+        _suppressRevenueBudgetFallback: true
+      };
+    });
+  }
+
   function fillRevenueActualsFromExpenses(revenueRows, expenseRows) {
-    const baseRevenueRows = suppressExcludedRevenuePriorYearRows(revenueRows);
+    const baseRevenueRows = applyDepartmentRevenueFy2026PlugOverrides(suppressExcludedRevenuePriorYearRows(revenueRows));
     if (!baseRevenueRows.length || !expenseRows.length) return baseRevenueRows;
 
     // Only the shared Ad Valorem / General Fund revenue line is a plug
@@ -1699,9 +1725,17 @@
       const knownTotal = knownRows.reduce((sum, r) => sum + revenueDisplayAmount(r[field] || 0), 0);
       gapTotals[y] = Math.max(0, expenseTotals[y] - knownTotal);
     });
+    const fy2026ExpenseTotal = expenseRows.reduce((sum, r) => {
+      return sum + (r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+    }, 0);
+    const fy2026PlugOverride = departmentRevenueFy2026PlugOverrideForRows(baseRevenueRows);
+    const fy2026KnownTotal = knownRows.reduce((sum, r) => {
+      return sum + revenueDisplayAmount(r.FY2026_Original_Budget || r.FY2026_Budget || 0);
+    }, 0);
+    const fy2026GapTotal = fy2026PlugOverride || Math.max(0, fy2026ExpenseTotal - fy2026KnownTotal);
 
     // If there's nothing to fill in any year, leave rows as-is.
-    if (!HISTORICAL_ACTUAL_YEARS.some((y) => gapTotals[y] > 0)) return baseRevenueRows;
+    if (!HISTORICAL_ACTUAL_YEARS.some((y) => gapTotals[y] > 0) && fy2026GapTotal <= 0) return baseRevenueRows;
 
     // Distribute gap across gapRows proportionally to FY2027 Proposed weight.
     const gapWeights = gapRows.map((r) => r.FY2027_Proposed || 0);
@@ -1724,6 +1758,7 @@
       HISTORICAL_ACTUAL_YEARS.forEach((y) => {
         cloned["FY" + y + "_Actual"] = gapTotals[y] * weight;
       });
+      cloned.FY2026_Original_Budget = fy2026GapTotal * weight;
       return cloned;
     });
   }
@@ -2245,6 +2280,8 @@
       );
     }
     if (!isExpense && column.field === "FY2026_Original_Budget") {
+      const rowOverride = departmentRevenueFy2026PlugOverrideForRow(row);
+      if (rowOverride) return rowOverride;
       const codes = splitBudgetLineCodes(row.Revenue_Code);
       const fundCode = fundCodeForRow(row);
       const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
@@ -2314,6 +2351,12 @@
       (rows || []).forEach((row) => {
         if (!fundCode) fundCode = fundCodeForRow(row);
         if (row._originalBudgetDeduped) return;
+        const rowOverride = departmentRevenueFy2026PlugOverrideForRow(row);
+        if (rowOverride) {
+          rowTotal += rowOverride;
+          splitBudgetLineCodes(row.Revenue_Code).forEach((code) => codesWithRowAmount.add(code));
+          return;
+        }
         const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
         const codes = splitBudgetLineCodes(row.Revenue_Code);
         if (rowAmount) {
@@ -2596,10 +2639,11 @@
       const sheetTargetTotal = rows.reduce((sum, row) => {
         return sum + revenueDisplayAmount(row.FY2026_Plug || row.FY2026_Budget || 0);
       }, 0);
-      const targetTotal = expenseTargetTotal || sheetTargetTotal;
       const dedicatedTotal = mergedRows.reduce((sum, row) => {
         return revenueActualsAreDedicatedToRow(row) ? sum + budgetLineColumnAmount(row, fy2026BudgetColumn, false) : sum;
       }, 0);
+      const plugOverride = departmentRevenueFy2026PlugOverrideForRows(rows);
+      const targetTotal = plugOverride ? plugOverride + dedicatedTotal : (expenseTargetTotal || sheetTargetTotal);
       const plugRows = mergedRows.filter((row) => !revenueActualsAreDedicatedToRow(row) && (row.FY2027_Proposed || 0) > 0);
       const plugTotal = targetTotal - dedicatedTotal;
       if (plugRows.length && Math.abs(plugTotal) > 0.005) {
@@ -2624,6 +2668,8 @@
       }
       const plugKey = revenuePlugKey(row);
       if (!isExpense && column.field === "FY2026_Original_Budget" && row._groupedBudgetLineSummary) {
+        const rowOverride = departmentRevenueFy2026PlugOverrideForRow(row);
+        if (rowOverride) return rowOverride;
         return revenueDisplayAmount(row.FY2026_Original_Budget || row.FY2026_Budget || 0);
       }
       if (!isExpense && column.field === "FY2026_Original_Budget" && revenueFy2026PlugByKey.has(plugKey)) {
@@ -2781,6 +2827,9 @@
     const summaryRows = groupedPriorYearRows();
     const bodyRows = budgetLineRowsHtml(mergedRows, "wc-budget-line-detail-row", false)
       .concat(budgetLineRowsHtml(summaryRows, "wc-budget-line-summary-row", true));
+    function visiblePriorYearTotal(rowsToTotal, column) {
+      return (rowsToTotal || []).reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, column) || 0), 0);
+    }
     const totalFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
     const totals = {};
     totalFields.forEach((field) => {
@@ -2794,7 +2843,7 @@
     bodyRows.push(
       '<tr class="wc-table-total-row">' + totalLabelCells +
         priorYearColumns.map((c) =>
-          '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(mergedRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
+          '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(visiblePriorYearTotal(summaryRows, c)) + "</td>"
         ).join("") +
         '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td></tr>"
     );
@@ -2871,7 +2920,7 @@
       '<tr class="wc-table-total-row">' +
       "<td>Total</td>" +
       printYearColumns.map((c) =>
-        '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(mergedRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
+        '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(visiblePriorYearTotal(printRows, c)) + "</td>"
       ).join("") +
       '<td class="wc-num">' + formatCurrency(totals.FY2027_Proposed || 0) + "</td>" +
       "</tr>"
@@ -3461,7 +3510,9 @@
       const type = r[typeField] || "Other";
       const totals = totalsByType.get(type) || {};
       yearFields.forEach((f) => {
-        const amt = r[f] || 0;
+        const amt = (!isExpense && f === "FY2026_Original_Budget")
+          ? (departmentRevenueFy2026PlugOverrideForRow(r) || r[f] || 0)
+          : (r[f] || 0);
         totals[f] = (totals[f] || 0) + amt;
         grandTotals[f] += amt;
       });
