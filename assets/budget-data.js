@@ -927,7 +927,6 @@
     "statutory and other",
     "non profit funding program",
     "clerk of court",
-    "tax collector",
     "supervisor of elections",
     "property appraiser",
     "engineering department",
