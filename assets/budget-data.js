@@ -1491,10 +1491,50 @@
     });
   }
 
+  function combineStateAttorneyAdValoremRows(rows, deptName) {
+    if (normalizeDeptName(deptName) !== "state attorney") return rows;
+    const amountFields = HISTORICAL_ACTUAL_YEARS.map((year) => "FY" + year + "_Actual")
+      .concat(["FY2026_Original_Budget", "FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+    const combined = [];
+    let adValoremRow = null;
+
+    (rows || []).forEach((row) => {
+      const code = String((row && row.Revenue_Code) || "").trim();
+      const name = normalizeDeptName(row && row.Revenue_Name);
+      const isAdValorem = code === "311000" || code === "311001" || name === "ad valorem taxes";
+      if (!isAdValorem) {
+        combined.push(row);
+        return;
+      }
+
+      if (!adValoremRow) {
+        adValoremRow = Object.assign({}, row, {
+          Revenue_Code: code,
+          Revenue_Name: "Ad Valorem Taxes"
+        });
+        combined.push(adValoremRow);
+        return;
+      }
+
+      if (code && !splitBudgetLineCodes(adValoremRow.Revenue_Code).includes(code)) {
+        adValoremRow.Revenue_Code = [adValoremRow.Revenue_Code, code].filter(Boolean).join(", ");
+      }
+      amountFields.forEach((field) => {
+        adValoremRow[field] = (adValoremRow[field] || 0) + (row[field] || 0);
+      });
+      if (!adValoremRow.Note && row.Note) adValoremRow.Note = row.Note;
+    });
+
+    return combined;
+  }
+
   function getDepartmentRevenues(deptName, deptCode) {
     return suppressMsbuAdValoremRows(
       suppressMossyHeadTransferInPriorYears(
-        combineEagleSpringsProShopSalesRows(rowsForDepartment(cache.revenues, deptName, deptCode), deptName),
+        combineStateAttorneyAdValoremRows(
+          combineEagleSpringsProShopSalesRows(rowsForDepartment(cache.revenues, deptName, deptCode), deptName),
+          deptName
+        ),
         deptName
       ),
       deptName
