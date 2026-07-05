@@ -183,7 +183,7 @@
     var FUND_SUMMARY_GROUPS = [
       { code:"001", label:"General Fund (Board Departments)" },
       { code:"101", label:"Transportation Fund" },
-      { code:"111", label:"Tourist Development Fund" },
+      { code:"111", label:"Tourist Development Fund", fullFund:true },
       { code:"112", label:"Solid Waste Fund" },
       { code:"105", label:"Mosquito Control Fund" },
       { code:"103", label:"Building Fund" },
@@ -239,16 +239,21 @@
       }
 
       return FUND_SUMMARY_GROUPS.map(function(group){
-        var budget = listedExpenditures.reduce(function(sum, row){
+        var expenseRows = group.fullFund ? expenditures : listedExpenditures;
+        var priorExpenseRows = group.fullFund ? dedupedExpenditures : listedDedupedExpenditures;
+        var staffingRows = group.fullFund ? staffing : listedStaffing;
+        var revenueRows = group.fullFund ? revenues : listedRevenues;
+
+        var budget = expenseRows.reduce(function(sum, row){
           return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
         }, 0);
-        var priorBudget = listedDedupedExpenditures.reduce(function(sum, row){
+        var priorBudget = priorExpenseRows.reduce(function(sum, row){
           return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2026_Original_Budget) || 0) : sum;
         }, 0);
-        var fte = listedStaffing.reduce(function(sum, row){
+        var fte = staffingRows.reduce(function(sum, row){
           return fundCodeForStaffingRow(row, true) === group.code ? sum + (Number(row["2027"]) || 0) : sum;
         }, 0);
-        var priorFte = listedStaffing.reduce(function(sum, row){
+        var priorFte = staffingRows.reduce(function(sum, row){
           return fundCodeForStaffingRow(row, false) === group.code ? sum + (Number(row["2026"]) || 0) : sum;
         }, 0);
         // The YoY FTE chip only -- priorFte above (this fund's real,
@@ -258,7 +263,7 @@
         // fund it now belongs to (same attribution fte above already
         // uses), the same way the actual move means neither fund hired or
         // lost anyone because of it.
-        var trendPriorFte = listedStaffing.reduce(function(sum, row){
+        var trendPriorFte = staffingRows.reduce(function(sum, row){
           return fundCodeForStaffingRow(row, true) === group.code ? sum + (Number(row["2026"]) || 0) : sum;
         }, 0);
 
@@ -270,7 +275,7 @@
         // Funds without any department-level 311000 rows (Transportation,
         // Tourist Development, Solid Waste, Building, Housing & Urban
         // Development) simply total $0 here, same as before.
-        var propertyTaxShare = listedRevenues.reduce(function(sum, row){
+        var propertyTaxShare = revenueRows.reduce(function(sum, row){
           if(String(row.Revenue_Code || "").trim() !== "311000") return sum;
           return fundCodeForRow(row) === group.code ? sum + (Number(row.FY2027_Proposed) || 0) : sum;
         }, 0);
