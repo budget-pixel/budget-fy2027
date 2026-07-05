@@ -916,24 +916,6 @@
     return { matched: matched || forceMatchedScope, total };
   }
 
-  // Departments whose own revenue row is really just the shared General
-  // Fund Ad Valorem line (Dept_Code 001311, Revenue_Code 311000) referenced
-  // by two dozen other departments -- its prior-year actuals/budget can't be
-  // meaningfully attributed to this one department specifically, so the
-  // "View Prior Years" option and its disclaimer are removed entirely for
-  // their revenue tables rather than shown with a caveat (see
-  // renderBudgetLinesToggle's isPriorYearsDisabledRevenue).
-  const PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES = new Set([
-    "statutory and other",
-    "non profit funding program",
-    "clerk of court",
-    "supervisor of elections",
-    "property appraiser",
-    "engineering department",
-    "public works engineering services",
-    "engineering services"
-  ]);
-
   // Department-specific data-limitation notices shown alongside a
   // department's budget lines (see renderBudgetLinesToggle's
   // departmentDataNote), keyed by normalized Dept_Name.
@@ -3526,10 +3508,7 @@
     // renderTypeSummaryTable).
     const currentBudgetOnly = isExpense &&
       rows.every((r) => normalizeDeptName(r.Dept_Name) === "bcc other uses contingency");
-    const forceDisablePriorYears = showChange === false || (
-      !isExpense &&
-      rows.some((r) => PRIOR_YEARS_DISABLED_REVENUE_DEPT_NAMES.has(normalizeDeptName(r.Dept_Name)))
-    ) || currentBudgetOnly;
+    const forceDisablePriorYears = showChange === false || currentBudgetOnly;
     const showPrior = forceDisablePriorYears ? false : getShowPriorYears();
     const detail = renderBudgetLinesToggle(rows, descriptionField, kind, false, forceDisablePriorYears, currentBudgetOnly);
     if (detail.button && !isExpense) {
