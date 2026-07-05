@@ -832,6 +832,59 @@ a:where(:visited) {
   display: block;
 }
 
+.engineering-page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.wc-savings-card {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 14px 16px;
+  border: 1px solid rgba(209,190,120,.62);
+  border-left: 5px solid var(--gold);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #003f28 0%, #005236 100%);
+  box-shadow: 0 14px 34px rgba(0,63,40,.22), 0 5px 12px rgba(36,52,77,.10);
+}
+
+.wc-savings-card-kicker {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.wc-savings-card-value {
+  margin: 0;
+  color: #fff;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.wc-savings-card-label {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.76);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: justify;
+}
+
+@media (max-width: 640px) {
+  .engineering-page-header {
+    grid-template-columns: 1fr;
+  }
+}
+
 .recreation-parks-section {
   max-width: 1280px;
   margin: 40px auto;
