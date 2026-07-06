@@ -2040,6 +2040,7 @@ a:where(:visited) {
 .wc-staffing-notes p { margin: 0 0 4px; }
 .wc-staffing-notes p:last-child { margin-bottom: 0; }
 .wc-staffing-notes-title { font-weight: 700; }
+.wc-staffing-notes-group + .wc-staffing-notes-group { margin-top: 10px; }
 
 .wc-table-footer-row {
   display: flex;

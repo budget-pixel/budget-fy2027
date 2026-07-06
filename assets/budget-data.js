@@ -9035,6 +9035,7 @@
         used.add(i);
         used.add(matchIdx);
         noteLines.push({
+          kind: "transfer",
           sortKey: t.fromLabel,
           html: "Transferred " + formatNumber(Math.abs(reduction.delta)) + " FTE (" +
             escapeHtml(reduction.position) + ") from " +
@@ -9048,6 +9049,7 @@
       if (used.has(i)) return;
       const verb = c.delta > 0 ? "Requested" : "Reduced";
       noteLines.push({
+        kind: c.delta > 0 ? "requested" : "reduced",
         sortKey: c.deptLabel,
         html: "<strong>" + escapeHtml(c.deptLabel) + "</strong> — " +
           verb + " " + formatNumber(Math.abs(c.delta)) + " FTE (" +
@@ -9057,10 +9059,22 @@
 
     if (!noteLines.length) return "";
     noteLines.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    // Requested (added) FTEs are listed first, then a visual gap, then
+    // reduced FTEs, then any inter-department transfers -- rather than one
+    // alphabetically-sorted mixed list -- so a reader can scan "what's
+    // growing" separately from "what's shrinking" instead of hunting for
+    // Requested/Reduced line by line.
+    const groups = ["requested", "reduced", "transfer"]
+      .map((kind) => noteLines.filter((n) => n.kind === kind))
+      .filter((group) => group.length);
     return (
       '<div class="wc-staffing-notes">' +
       '<p class="wc-staffing-notes-title">Staffing Notes:</p>' +
-      noteLines.map((n) => "<p>" + n.html + "</p>").join("") +
+      groups.map((group) =>
+        '<div class="wc-staffing-notes-group">' +
+        group.map((n) => "<p>" + n.html + "</p>").join("") +
+        "</div>"
+      ).join("") +
       "</div>"
     );
   }
