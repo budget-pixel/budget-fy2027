@@ -68,8 +68,16 @@
         .range(from, to);
 
       if (error) {
+        // Returning whatever rows were fetched so far (instead of failing
+        // loudly) would let a transient mid-pagination network error pass
+        // as a complete dataset -- every computation reading this data
+        // would then silently operate on a partial actuals set with no
+        // indication anything was missing. Throwing instead propagates the
+        // failure up through loadSupabaseActualLookups' Promise.all/catch,
+        // which falls back to the Google Sheets-only figures rather than a
+        // silently wrong, undercounted blend.
         console.error("Failed to load " + viewName + " actuals from Supabase:", error);
-        return rows;
+        throw new Error("Failed to load " + viewName + " actuals from Supabase: " + (error.message || error));
       }
 
       const page = Array.isArray(data) ? data : [];

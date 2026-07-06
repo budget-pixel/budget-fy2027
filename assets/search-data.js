@@ -216,7 +216,8 @@ var wcHiddenBudgetPageTitles = new Set([
     ],
 
     "Sheriff's Office": [
-      "sheriff", "law enforcement", "public safety", "deputies", "jail", "corrections", "detention", "patrol", "sheriff office", "constitutional officer", "fine and forfeiture"
+      "sheriff", "law enforcement", "public safety", "deputies", "jail", "corrections", "detention", "patrol", "sheriff office", "constitutional officer", "fine and forfeiture",
+      "animal control", "fire rescue", "jail operations", "911 dispatch", "911 distribution", "emergency dispatch"
     ],
 
     "Supervisor of Elections": [

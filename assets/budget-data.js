@@ -27,7 +27,7 @@
 
   const currentScriptSrc = document.currentScript && document.currentScript.src;
   const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
-  const supabaseDataScript = assetBaseUrl + "supabase-data.js?v=20260620-2";
+  const supabaseDataScript = assetBaseUrl + "supabase-data.js?v=20260706-1";
 
   // The published sheets use department names that differ slightly between
   // tabs (and from this site's page titles). These aliases map a page's
@@ -717,6 +717,45 @@
     }
 
     const deptByCode = new Map((coaDepartments || []).map((d) => [String(d.Dept_Code || "").trim(), d]));
+    // A synthesized row's Dept_Code can already be used by *other* object
+    // codes under this exact same department elsewhere in the sheet (e.g.
+    // 11141010 is "Beach Operations" for its Personnel Services/Operating
+    // rows) -- this is a far more reliable name than the separate Chart of
+    // Accounts departments sheet (coaDepartments/deptByCode above), which
+    // can be missing an entry, or list a name that doesn't match
+    // knownDeptNames, for a department the expenditure sheet itself
+    // already names correctly. Checked first, below, so a new object code
+    // under an already-known department never falls through to
+    // "Unclassified" just because the separate COA sheet didn't confirm it.
+    const knownDeptNameByCode = new Map();
+    rows.forEach((r) => {
+      const org = String(r.Dept_Code || "").trim();
+      const name = String(r.Dept_Name || "").trim();
+      if (!org || !name || name === UNCLASSIFIED_DEPT_NAME) return;
+      if (!knownDeptNameByCode.has(org)) knownDeptNameByCode.set(org, name);
+    });
+    // A synthesized row's own exact Dept_Code might be brand new (no sheet
+    // row shares it at all), but a *different* Dept_Code under the exact
+    // same fund often already has a real name -- e.g. 10225000/10225020
+    // have no sheet row of their own, but 10225010 (same fund, 102/MSBU)
+    // is already named "MSBU". Only trusted when the fund has exactly one
+    // distinct known department name -- a fund shared by many departments
+    // (e.g. 001, the General Fund) has no single "dominant" name to borrow,
+    // so it's left to the fund-name fallback in resolveSynthesizedDeptName.
+    const deptNamesByFund = new Map();
+    rows.forEach((r) => {
+      const name = String(r.Dept_Name || "").trim();
+      if (!name || name === UNCLASSIFIED_DEPT_NAME) return;
+      const fund = fundCodeForRow(r);
+      if (!fund) return;
+      const set = deptNamesByFund.get(fund) || new Set();
+      set.add(name);
+      deptNamesByFund.set(fund, set);
+    });
+    const dominantDeptNameByFund = new Map();
+    deptNamesByFund.forEach((names, fund) => {
+      if (names.size === 1) dominantDeptNameByFund.set(fund, Array.from(names)[0]);
+    });
     const seenNewKeys = new Set();
     const extraRows = [];
 
@@ -744,7 +783,10 @@
       const dept = deptByCode.get(targetOrg);
       const deptName = needsOwnProjectScope
         ? "Statutory & Other"
-        : DEPT_CODE_NAME_OVERRIDES.get(targetOrg) || resolveSynthesizedDeptName(dept, knownDeptNames);
+        : DEPT_CODE_NAME_OVERRIDES.get(targetOrg) ||
+          knownDeptNameByCode.get(targetOrg) ||
+          dominantDeptNameByFund.get(fundCodeForRow({ Dept_Code: targetOrg })) ||
+          resolveSynthesizedDeptName(dept, knownDeptNames, targetOrg);
       const expense = coaExpenses.get(object);
 
       extraRows.push({
@@ -779,6 +821,36 @@
       (revenueRows || []).map((r) => String(r.Dept_Code || "").trim() + "|" + String(r.Revenue_Code || "").trim())
     );
     const deptByCode = new Map((coaDepartments || []).map((d) => [String(d.Dept_Code || "").trim(), d]));
+    // Same fix as synthesizeMissingExpenseRows' own knownDeptNameByCode: a
+    // synthesized row's Dept_Code can already have a real name elsewhere in
+    // the revenue sheet (a different Revenue_Code under the same
+    // department), which is more reliable than the separate Chart of
+    // Accounts departments sheet.
+    const knownDeptNameByCode = new Map();
+    (revenueRows || []).forEach((r) => {
+      const org = String(r.Dept_Code || "").trim();
+      const name = String(r.Dept_Name || "").trim();
+      if (!org || !name || name === UNCLASSIFIED_DEPT_NAME) return;
+      if (!knownDeptNameByCode.has(org)) knownDeptNameByCode.set(org, name);
+    });
+    // Same fix as synthesizeMissingExpenseRows' own dominantDeptNameByFund:
+    // a different Dept_Code under the exact same fund can already have a
+    // real name (e.g. Sheriff Fund's own "Walton County Sheriff's Office"),
+    // trusted only when the fund has exactly one distinct known name.
+    const deptNamesByFund = new Map();
+    (revenueRows || []).forEach((r) => {
+      const name = String(r.Dept_Name || "").trim();
+      if (!name || name === UNCLASSIFIED_DEPT_NAME) return;
+      const fund = fundCodeForRow(r);
+      if (!fund) return;
+      const set = deptNamesByFund.get(fund) || new Set();
+      set.add(name);
+      deptNamesByFund.set(fund, set);
+    });
+    const dominantDeptNameByFund = new Map();
+    deptNamesByFund.forEach((names, fund) => {
+      if (names.size === 1) dominantDeptNameByFund.set(fund, Array.from(names)[0]);
+    });
     const seenNewKeys = new Set();
     const extraRows = [];
 
@@ -789,7 +861,10 @@
       seenNewKeys.add(key);
 
       const dept = deptByCode.get(org);
-      const deptName = DEPT_CODE_NAME_OVERRIDES.get(org) || resolveSynthesizedDeptName(dept, knownDeptNames);
+      const deptName = DEPT_CODE_NAME_OVERRIDES.get(org) ||
+        knownDeptNameByCode.get(org) ||
+        dominantDeptNameByFund.get(fundCodeForRow({ Dept_Code: org })) ||
+        resolveSynthesizedDeptName(dept, knownDeptNames, org);
       const revenue = coaRevenueCodes.get(object);
       const revenueOverride = REVENUE_CODE_OVERRIDES.get(object);
 
@@ -829,6 +904,30 @@
     return SUBTRACTIVE_REVENUE_KEYS.has(key);
   }
 
+  // Shared by the Summary of Revenues' county-wide "View Budget Lines"
+  // merge (collapsedBudgetLineName) and the Fund Financial Schedule's own
+  // per-activity revenue breakdown, so a reader sees the same combined
+  // "Interest"/"Contributions and Donations" line on both pages instead
+  // of one page splitting them out by department-scoped account and the
+  // other combining them. Several distinct interest-bearing accounts
+  // (Interest (Beach Management), Interest (Sheriff), Constitutional
+  // Officer Interest, Interest and Other Earnings, etc.) and several
+  // distinct contributions/donations accounts (Private Sources, Other)
+  // are each their own line for department-scoped tracking, but most
+  // readers of a combined, county-wide or fund-wide view just want the
+  // one combined figure.
+  function collapsedRevenueSourceName(rawName) {
+    const name = String(rawName || "");
+    // The many individual "State Grant (X)"/"Federal Grant (X)" lines
+    // (one per activity, see REVENUE_CODE_OVERRIDES) are still one
+    // program-level source of money as far as most readers care.
+    if (/^Federal Grant\b/.test(name)) return "Federal Grants";
+    if (/^State Grant\b/.test(name)) return "State Grants";
+    if (/interest/i.test(name)) return "Interest";
+    if (/^Contributions and Donations\b/.test(name)) return "Contributions and Donations";
+    return rawName;
+  }
+
   // FY2026 budget contribution for one row being folded into a
   // combineByName merge: a normal revenue row's raw value is sign-flipped
   // by revenueDisplayAmount (Supabase stores revenue as a credit/negative
@@ -837,6 +936,17 @@
   // definition as a reduction.
   function revenueBudgetMergeContribution(row) {
     const raw = row.FY2026_Original_Budget || row.FY2026_Budget || row.FY2026_Plug || 0;
+    return isSubtractiveRevenueRow(row) ? -Math.abs(raw) : revenueDisplayAmount(raw);
+  }
+
+  // Same sign-flip rule as revenueBudgetMergeContribution, generalized to
+  // any prior-year field -- a normal revenue row's raw value needs
+  // Math.abs() (Supabase/the sheet stores some revenue, like Interest, as
+  // a credit/negative amount), while a subtractive row (e.g. the Ad
+  // Valorem 5% reduction) must stay negative, forced outright rather than
+  // trusting the source sign.
+  function revenueRowFieldContribution(row, field) {
+    const raw = (row && row[field]) || 0;
     return isSubtractiveRevenueRow(row) ? -Math.abs(raw) : revenueDisplayAmount(raw);
   }
 
@@ -2094,9 +2204,21 @@
   // itself is a real, known department name, so a financial/category
   // Dept_Group (e.g. "Ad Valorem Taxes", "Debt Service") never leaks in as
   // a fake department.
-  function resolveSynthesizedDeptName(dept, knownDeptNames) {
+  function resolveSynthesizedDeptName(dept, knownDeptNames, orgCode) {
     if (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Name))) return dept.Dept_Name;
     if (dept && knownDeptNames.has(normalizeDeptName(dept.Dept_Group))) return dept.Dept_Group;
+    // Last resort before the generic "Unclassified": a handful of orphaned
+    // accounts (see synthesizeMissingExpenseRows' knownDeptNameByCode) have
+    // no department name anywhere in the sheet or the Chart of Accounts --
+    // but every Dept_Code still belongs to a real, known fund (cache.funds).
+    // Naming the row after its fund ("Preservation Fund", "State Housing
+    // Initiative Program Fund") is truthful and far more useful on a chart
+    // or table than a bare "Unclassified" label with no context at all.
+    if (orgCode) {
+      const fundCode = fundCodeForRow({ Dept_Code: orgCode });
+      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+      if (fund && fund.Fund_Name) return fund.Fund_Name;
+    }
     return UNCLASSIFIED_DEPT_NAME;
   }
 
@@ -2279,19 +2401,38 @@
   function revenueActualAmountForCodes(codes, year, fundCode) {
     const codeSet = new Set((codes || []).filter(Boolean));
     if (!codeSet.size || !(cache.revenueActualRows || []).length) return 0;
-    return (cache.revenueActualRows || []).reduce((sum, row) => {
-      if (Number(row.year) !== Number(year)) return sum;
-      if (!codeSet.has(String(row.object || "").trim())) return sum;
+    // Grouped by code (not summed as one flat total) so each account's own
+    // raw ledger subtotal gets its own Math.abs() below -- some revenue
+    // codes (Interest, Interest (Beach Management), etc.) are booked as
+    // credits/negative amounts, a per-account display convention, while
+    // others under the same combined name (e.g. Constitutional Officer
+    // Interest) are already positive. Summing every code's raw, unflipped
+    // amount together first and taking Math.abs() once would let
+    // oppositely-signed accounts partially cancel each other out instead
+    // of each contributing its own correctly-flipped positive value (see
+    // the same fix in rawRevenueActualSummarySum for the category-level
+    // version of this bug).
+    const totalsByCode = new Map();
+    (cache.revenueActualRows || []).forEach((row) => {
+      if (Number(row.year) !== Number(year)) return;
+      const code = String(row.object || "").trim();
+      if (!codeSet.has(code)) return;
       const rowFundCode = String(row.org || "").trim().slice(0, 3);
-      if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return sum;
+      if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return;
       // See revenueBudgetAmountForCodes: a single-department fund (e.g.
       // 107, the Sheriff Fund) should never borrow another fund's actuals
       // for a code it has no organization-scoped data of its own for.
       // Shared funds (e.g. 001) still aggregate across every org in that
       // fund, since they're all genuinely in the same fund.
-      if (fundCode && rowFundCode !== fundCode) return sum;
-      return sum + (Number(row.amount) || 0);
-    }, 0);
+      if (fundCode && rowFundCode !== fundCode) return;
+      totalsByCode.set(code, (totalsByCode.get(code) || 0) + (Number(row.amount) || 0));
+    });
+
+    let total = 0;
+    totalsByCode.forEach((codeTotal) => {
+      total += revenueDisplayAmount(codeTotal);
+    });
+    return total;
   }
 
   function revenueBudgetAmountForCodes(codes, field, fundCode) {
@@ -2666,17 +2807,27 @@
     // Grants"/"Federal Grants" row each, same mechanism as the by-name
     // merge below.
     function collapsedBudgetLineName(rawName) {
-      if (isExpense) return rawName;
-      if (/^Federal Grant\b/.test(rawName)) return "Federal Grants";
-      if (/^State Grant\b/.test(rawName)) return "State Grants";
-      return rawName;
+      return isExpense ? rawName : collapsedRevenueSourceName(rawName);
     }
 
     let mergedRows = rows;
     if (combineByName) {
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
-      const seenRevenueOriginalBudget = new Map();
+      // Several Dept_Name rows can share the same revenueBudgetUniqueKey
+      // (fund+Dept_Code+Revenue_Code+Project_Code) -- e.g. Beach Vending
+      // Permits has both a "Code Compliance" and a "Board of County
+      // Commissioners" row under the same Dept_Code, where only the BCC
+      // row's BUC lookup happens to include the Managed Vendor Program
+      // project. Keeping whichever same-key row is encountered *first*
+      // and zeroing every later one (the previous behavior) meant array
+      // order alone decided whether the smaller, incomplete figure or the
+      // larger, correct one survived -- silently dropping real budget
+      // dollars whenever the incomplete row happened to come first. Like
+      // dedupedRevenueSum's own FY2026 handling on the Consolidated
+      // Revenue Summary, this now keeps the larger (MAX) contribution per
+      // key so the two tables agree regardless of row order.
+      const bestByKeyPerName = new Map();
       rows.forEach((r) => {
         const name = collapsedBudgetLineName(r[nameField] || "");
         const existing = grouped.get(name);
@@ -2686,10 +2837,11 @@
           sumFields.forEach((f) => {
             if (!isExpense && f === "FY2026_Original_Budget") {
               const key = revenueBudgetUniqueKey(r);
-              const seen = seenRevenueOriginalBudget.get(name) || new Set();
-              merged[f] = seen.has(key) ? 0 : revenueBudgetMergeContribution(r);
-              seen.add(key);
-              seenRevenueOriginalBudget.set(name, seen);
+              const bestByKey = bestByKeyPerName.get(name) || new Map();
+              const contribution = revenueBudgetMergeContribution(r);
+              bestByKey.set(key, contribution);
+              bestByKeyPerName.set(name, bestByKey);
+              merged[f] = contribution;
             } else {
               merged[f] = r[f] || 0;
             }
@@ -2702,12 +2854,17 @@
         sumFields.forEach((f) => {
           if (!isExpense && f === "FY2026_Original_Budget") {
             const key = revenueBudgetUniqueKey(r);
-            const seen = seenRevenueOriginalBudget.get(name) || new Set();
-            if (!seen.has(key)) {
-              existing[f] += revenueBudgetMergeContribution(r);
-              seen.add(key);
-              seenRevenueOriginalBudget.set(name, seen);
+            const bestByKey = bestByKeyPerName.get(name) || new Map();
+            const contribution = revenueBudgetMergeContribution(r);
+            const previousBest = bestByKey.has(key) ? bestByKey.get(key) : null;
+            if (previousBest === null) {
+              existing[f] += contribution;
+              bestByKey.set(key, contribution);
+            } else if (contribution > previousBest) {
+              existing[f] += contribution - previousBest;
+              bestByKey.set(key, contribution);
             }
+            bestByKeyPerName.set(name, bestByKey);
           } else {
             existing[f] += r[f] || 0;
           }
@@ -3006,7 +3163,7 @@
     function printSubtotalRowHtml(category, categoryRows) {
       return (
         '<tr class="wc-table-subtotal-row">' +
-        "<td>" + escapeHtml(category) + " Subtotal</td>" +
+        "<td>" + escapeHtml(category) + "</td>" +
         printYearColumns.map((c) =>
           '<td class="wc-num wc-prior-year wc-fy-' + c.year + '">' + formatCurrency(categoryRows.reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, c) || 0), 0)) + "</td>"
         ).join("") +
@@ -3016,7 +3173,7 @@
     }
 
     const printBodyRows = [];
-    if (isExpense) {
+    {
       const categoryOrder = [];
       const rowsByCategory = new Map();
       printRows.forEach((row) => {
@@ -3034,8 +3191,6 @@
           printBodyRows.push(printSubtotalRowHtml(category, categoryRows));
         }
       });
-    } else {
-      printRows.forEach((row) => printBodyRows.push(printBudgetLineRowHtml(row, "", "wc-print-budget-line-row")));
     }
     printBodyRows.push(
       '<tr class="wc-table-total-row">' +
@@ -5427,6 +5582,42 @@
         return Array.from(bestByKey.values()).reduce((sum, val) => sum + val, 0);
       }
 
+      // Revenue actual-year totals are re-derived straight from the raw
+      // Supabase ledger, grouped by revenue code with Math.abs() applied
+      // per code (same method as rawRevenueActualSummarySum on the
+      // Consolidated Revenue Summary), rather than summing each sheet
+      // row's own r[field] -- a handful of accounts (e.g. Interest) can
+      // have a scoped per-department Supabase lookup that doesn't quite
+      // match the sheet's own historical figure, which left this
+      // schedule's revenue totals a few thousand dollars off from the
+      // Summary of Revenues even after sign-correcting r[field] directly.
+      // Querying the ledger the same way both pages do guarantees they
+      // agree exactly. (The only subtractive revenue row, the Ad Valorem
+      // 5% reduction, is excluded from `inFund` already, so every code
+      // reaching this branch is safe to flip positive outright.)
+      if (rows === revenueRows && revenueActualFields.has(field) && (cache.revenueActualRows || []).length) {
+        const year = Number(field.slice(2, 6));
+        const codes = new Set(
+          sourceRows.filter((r) => inFund(r) && predicate(r)).map((r) => String(r.Revenue_Code || "").trim()).filter(Boolean)
+        );
+        if (!codes.size) return 0;
+        const rawTotalsByCode = new Map();
+        (cache.revenueActualRows || []).forEach((row) => {
+          if (Number(row.year) !== year) return;
+          const code = String(row.object || "").trim();
+          if (!codes.has(code)) return;
+          const rowFundCode = String(row.org || "").trim().slice(0, 3);
+          if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return;
+          if (!fundCodes.includes(rowFundCode)) return;
+          rawTotalsByCode.set(code, (rawTotalsByCode.get(code) || 0) + (Number(row.amount) || 0));
+        });
+        let total = 0;
+        rawTotalsByCode.forEach((codeTotal) => {
+          total += revenueDisplayAmount(codeTotal);
+        });
+        return total;
+      }
+
       const seenAmounts = shouldDedupeRevenue ? new Set() : null;
       return sourceRows.reduce((sum, r) => {
         if (!inFund(r) || !predicate(r)) return sum;
@@ -5442,6 +5633,19 @@
           // rows (e.g. the Ad Valorem 5% reduction) that must subtract from
           // their category instead of being sign-flipped positive.
           return sum + (rows === revenueRows ? revenueBudgetMergeContribution(r) : (r.FY2026_Original_Budget || r.FY2026_Budget || 0));
+        }
+        // Revenue actual-year fields need the same sign-flip
+        // revenueBudgetMergeContribution already applies for FY2026 above
+        // -- some revenue codes (Interest, etc.) are booked as credits/
+        // negative amounts, a per-account display convention, not a
+        // genuine shortfall. Summing r[field] raw here (the previous
+        // behavior) silently subtracted those accounts instead of adding
+        // their flipped positive value, which is why this schedule's
+        // revenue totals didn't match the Summary of Revenues table (see
+        // rawRevenueActualSummarySum/revenueActualAmountForCodes, fixed
+        // the same way, for that page's own version of this bug).
+        if (rows === revenueRows && revenueActualFields.has(field)) {
+          return sum + revenueRowFieldContribution(r, field);
         }
         return sum + (r[field] || 0);
       }, 0);
@@ -5499,7 +5703,7 @@
         labelFor = (r) => representativeDeptName(repByCodeAndName, r);
         names = uniqueSorted(matchingRaw.concat(matchingDeduped).map(labelFor));
       } else {
-        labelFor = (r) => r.Revenue_Name || r.Dept_Name || "Unknown";
+        labelFor = (r) => collapsedRevenueSourceName(r.Revenue_Name || r.Dept_Name || "Unknown");
         names = uniqueSorted(matchingRaw.map(labelFor));
       }
 
@@ -5849,16 +6053,38 @@
       const fundCodes = new Set(rowsToSum.map((r) => fundCodeForRow(r)).filter(Boolean));
       if (!codes.size) return 0;
 
-      const rawTotal = (cache.revenueActualRows || []).reduce((sum, row) => {
-        if (Number(row.year) !== year) return sum;
-        if (!codes.has(String(row.object || "").trim())) return sum;
+      // Grouped by individual revenue code (not summed as one flat
+      // category -- or even one flat named-account -- total) so each
+      // code's own raw ledger subtotal gets its own Math.abs(). Some
+      // revenue codes (Interest, Interest (Beach Management), etc.) are
+      // booked as credits/negative amounts in the raw ledger -- a
+      // per-account display convention, not a genuine shortfall -- while
+      // others are already positive, sometimes even under the same
+      // combined name (e.g. Sale of Fixed Assets' two codes, or every
+      // "Interest"-named account once collapsedBudgetLineName combines
+      // them into one row). Applying Math.abs() once to a coarser total
+      // that mixes oppositely-signed codes together first would let them
+      // partially cancel instead of each contributing its own correctly
+      // flipped positive value -- matching the same per-code granularity
+      // revenueActualAmountForCodes now uses for the "View Budget Lines"
+      // detail table (see the Summary of Revenues vs. its own detail
+      // total mismatches this was fixed for).
+      const rawTotalsByCode = new Map();
+      (cache.revenueActualRows || []).forEach((row) => {
+        if (Number(row.year) !== year) return;
+        const code = String(row.object || "").trim();
+        if (!codes.has(code)) return;
         const rowFundCode = String(row.org || "").trim().slice(0, 3);
-        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return sum;
-        if (fundCodes.size && !fundCodes.has(rowFundCode)) return sum;
-        return sum + (Number(row.amount) || 0);
-      }, 0);
+        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return;
+        if (fundCodes.size && !fundCodes.has(rowFundCode)) return;
+        rawTotalsByCode.set(code, (rawTotalsByCode.get(code) || 0) + (Number(row.amount) || 0));
+      });
 
-      return revenueDisplayAmount(rawTotal);
+      let total = 0;
+      rawTotalsByCode.forEach((codeTotal) => {
+        total += revenueDisplayAmount(codeTotal);
+      });
+      return total;
     }
 
     function dedupedRevenueSum(rowsToSum, field) {
@@ -6190,7 +6416,7 @@
       .filter((c) => c.year !== 2020 && c.year !== 2021)
       .map((c) => c.field)
       .concat(["FY2027_Proposed"]);
-    const bodyRows = deptRows.map((d) => {
+    function deptRowHtml(d) {
       const isZeroCurrent = (d.FY2027_Proposed || 0) === 0;
       const isZeroRecent = recentFields.every((f) => (d[f] || 0) === 0);
       const rowClasses = [isZeroCurrent && "wc-budget-line-zero-current", isZeroRecent && "wc-print-zero-recent"].filter(Boolean);
@@ -6205,13 +6431,54 @@
         ).join("") +
         '<td class="wc-num">' + formatCurrency(d.FY2027_Proposed || 0) + "</td></tr>"
       );
+    }
+    function activitySubtotalRowHtml(activity, activityRows) {
+      // Two separate <td> cells (not one colspan="2" cell) to match every
+      // other row's column count exactly -- the print CSS hides the
+      // Category column and un-hides FY2020/2021 by nth-child position
+      // (see budget-pdf.js); a single spanning cell here would count as
+      // one column instead of two, both swallowing this label under the
+      // Category-hiding rule and shifting every later nth-child rule onto
+      // the wrong year column.
+      return (
+        '<tr class="wc-table-subtotal-row"><td></td><td>' + escapeHtml(activity) + "</td>" +
+        BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
+          '<td class="wc-num wc-prior-year">' + formatCurrency(activityRows.reduce((sum, row) => sum + (row[c.field] || 0), 0)) + "</td>"
+        ).join("") +
+        '<td class="wc-num">' + formatCurrency(activityRows.reduce((sum, row) => sum + (row.FY2027_Proposed || 0), 0)) + "</td></tr>"
+      );
+    }
+    // Grouped by activity/source (same layout as the Summary of Revenues'
+    // own print table -- one subtotal row per category, right after that
+    // category's own department rows) instead of a flat department list
+    // with no rollup between activities.
+    const activityOrder = [];
+    const rowsByActivity = new Map();
+    deptRows.forEach((d) => {
+      const activity = activityLabel(d.activity);
+      if (!rowsByActivity.has(activity)) {
+        activityOrder.push(activity);
+        rowsByActivity.set(activity, []);
+      }
+      rowsByActivity.get(activity).push(d);
+    });
+    const bodyRows = [];
+    activityOrder.forEach((activity) => {
+      const activityRows = rowsByActivity.get(activity);
+      activityRows.forEach((d) => bodyRows.push(deptRowHtml(d)));
+      if (activityOrder.length > 1) {
+        bodyRows.push(activitySubtotalRowHtml(activity, activityRows));
+      }
     });
     const totals = {};
     historicalFields.concat([currentYearField]).forEach((field) => {
       totals[field] = deptRows.reduce((sum, row) => sum + (row[field] || 0), 0);
     });
     bodyRows.push(
-      '<tr class="wc-table-total-row"><td colspan="2">Total</td>' +
+      // Two separate <td> cells, not colspan="2" -- see
+      // activitySubtotalRowHtml's own comment on why a single spanning
+      // label cell breaks this table's print column hiding/alignment.
+      '<tr class="wc-table-total-row"><td></td><td>Total</td>' +
         BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
           '<td class="wc-num wc-prior-year">' + formatCurrency(totals[c.field] || 0) + "</td>"
         ).join("") +
@@ -6703,7 +6970,17 @@
   function buildMiscellaneousRevenueTopics() {
     return [
       { title: "Recreation Plat Fee", narrativeKey: "Recreation Plat Fee", matches: byRevenueCodes(["369902"]) },
-      { title: "Interest", narrativeKey: "Interest", matches: byRevenueCodes(["361100", "361102", "361103", "361105", "361106", "361107", "361108", "361111"]) }
+      // Same set of revenue codes now combined into the single "Interest"
+      // row on the Summary of Revenues detail table (any Revenue_Name
+      // containing "Interest" -- see collapsedBudgetLineName): Interest,
+      // Interest (Beach Management), Interest (New Product Development),
+      // Interest (Landfill Escrow), Interest (Sheriff), Interest and Other
+      // Earnings (four codes), and Constitutional Officer Interest.
+      // Investments (Florida Local Government Investment Trust)/(SBA
+      // Florida Prime) are a distinct account type, not an "Interest"
+      // name, so they're excluded here the same way they're excluded from
+      // that merged row.
+      { title: "Interest", narrativeKey: "Interest", matches: byRevenueCodes(["361100", "361102", "361103", "361104", "361107", "361108", "361109", "361110", "361111", "361112"]) }
     ];
   }
 
@@ -6787,14 +7064,27 @@
       const year = Number(field.slice(2, 6));
       const codes = new Set(rows.map((row) => String((row && row.Revenue_Code) || "").trim()).filter(Boolean));
       const fundCodes = new Set(rows.map((row) => fundCodeForRow(row)).filter(Boolean));
-      return (cache.revenueActualRows || []).reduce((sum, row) => {
-        if (Number(row.year) !== year) return sum;
-        if (!codes.has(String(row.object || "").trim())) return sum;
+      // Grouped by individual revenue code, each with its own Math.abs(),
+      // same as rawRevenueActualSummarySum/revenueActualAmountForCodes --
+      // a topic bar spanning several codes (e.g. Interest and Other
+      // Earnings' four codes) would otherwise let a negative-convention
+      // code and a positive one partially cancel instead of both counting
+      // as positive revenue.
+      const rawTotalsByCode = new Map();
+      (cache.revenueActualRows || []).forEach((row) => {
+        if (Number(row.year) !== year) return;
+        const code = String(row.object || "").trim();
+        if (!codes.has(code)) return;
         const rowFundCode = String(row.org || "").trim().slice(0, 3);
-        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return sum;
-        if (fundCodes.size && !fundCodes.has(rowFundCode)) return sum;
-        return sum + (Number(row.amount) || 0);
-      }, 0);
+        if (CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(rowFundCode)) return;
+        if (fundCodes.size && !fundCodes.has(rowFundCode)) return;
+        rawTotalsByCode.set(code, (rawTotalsByCode.get(code) || 0) + (Number(row.amount) || 0));
+      });
+      let total = 0;
+      rawTotalsByCode.forEach((codeTotal) => {
+        total += revenueDisplayAmount(codeTotal);
+      });
+      return total;
     }
 
     if (field === "FY2026_Original_Budget") {
