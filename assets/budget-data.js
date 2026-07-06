@@ -1115,7 +1115,7 @@
 
   function positionTooltip(anchor, bubble) {
     const rect = anchor.getBoundingClientRect();
-    const width = Math.min(300, Math.max(220, window.innerWidth - 32));
+    const width = window.innerWidth <= 600 ? Math.max(220, window.innerWidth - 32) : Math.min(320, window.innerWidth - 32);
     let left = rect.left + rect.width / 2 - width / 2;
     left = Math.max(16, Math.min(left, window.innerWidth - width - 16));
     let top = rect.bottom + 8;

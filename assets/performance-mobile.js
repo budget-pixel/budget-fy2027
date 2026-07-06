@@ -95,9 +95,13 @@
         const measure = cells[index] ? cells[index].innerText.trim() : "";
         index++;
 
+        const metricCount = cells.length - index;
+        const headerStart = headers.length - metricCount;
+
         const metrics = [];
         for(let metricIndex = index; metricIndex < cells.length; metricIndex++){
-          const label = headers[metricIndex] || "";
+          const headerIndex = headerStart + (metricIndex - index);
+          const label = headers[headerIndex] || "";
           if(!label){
             continue;
           }

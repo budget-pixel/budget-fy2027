@@ -238,7 +238,7 @@
   }
   function positionBudgetLineTooltip(anchor, bubble){
     var rect = anchor.getBoundingClientRect();
-    var width = Math.min(300, Math.max(220, window.innerWidth - 32));
+    var width = window.innerWidth <= 600 ? Math.max(220, window.innerWidth - 32) : Math.min(320, window.innerWidth - 32);
     var left = rect.left + (rect.width / 2) - (width / 2);
     left = Math.max(16, Math.min(left, window.innerWidth - width - 16));
     var top = rect.bottom + 8;
@@ -1465,6 +1465,7 @@
     visibility:hidden !important;
     opacity:0 !important;
     pointer-events:none !important;
+    box-sizing:border-box !important;
     max-width:calc(100vw - 32px) !important;
     padding:10px 12px !important;
     border:1px solid #d1be78 !important;
