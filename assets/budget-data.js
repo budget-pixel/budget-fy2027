@@ -522,6 +522,17 @@
   // Revenues and a glossary mention), so relabeling it is safe everywhere.
   const REVENUE_NAME_OVERRIDES = new Map([["102389|389001", "Ad Valorem Taxes"]]);
 
+  // Ad Valorem Taxes Delinquent (Revenue_Code 311001) always accompanies
+  // the current-year Ad Valorem Taxes line (311000) for whichever fund
+  // levies it -- delinquent collections are the same underlying tax, just
+  // collected late, so every summary/breakdown that groups revenue rows by
+  // name should show one combined "Ad Valorem Taxes" line rather than
+  // splitting out a separate, easy-to-miss "Delinquent" row. Keyed by
+  // Revenue_Code alone (not Dept_Code+Revenue_Code like REVENUE_NAME_
+  // OVERRIDES above) since it holds for every department that reports it
+  // (001311, 101311, 105311, 107311, 300311, and any future fund).
+  const REVENUE_CODE_NAME_OVERRIDES = new Map([["311001", "Ad Valorem Taxes"]]);
+
   const REVENUE_FY2026_PLUG_OVERRIDES = new Map([
     ["001329|board of county commissioners|329004|10647", 1530000]
   ]);
@@ -538,8 +549,9 @@
 
   function applyRevenueNameOverrides(rows) {
     return (rows || []).map((row) => {
-      const key = String((row && row.Dept_Code) || "").trim() + "|" + String((row && row.Revenue_Code) || "").trim();
-      const override = REVENUE_NAME_OVERRIDES.get(key);
+      const revenueCode = String((row && row.Revenue_Code) || "").trim();
+      const key = String((row && row.Dept_Code) || "").trim() + "|" + revenueCode;
+      const override = REVENUE_NAME_OVERRIDES.get(key) || REVENUE_CODE_NAME_OVERRIDES.get(revenueCode);
       if (override) return { ...row, Revenue_Name: override };
       return row;
     });
@@ -5357,8 +5369,17 @@
     }
 
     const isOtherFinancingRevenue = (r) => String(r.Revenue_Code || "").trim() === "381000";
+    // Only excluded from the Building Fund's own single-fund schedule (see
+    // that predicate's use below) -- there, Revenue_Code 389000 would
+    // double-count the balance already shown on the Beginning Fund Balance
+    // row above. But a multi-fund call (the Consolidated Fund Financial
+    // Schedule's allKnownFundCodes(), or any other combined view) needs
+    // every fund's real revenue included, so the exclusion must not apply
+    // there -- otherwise Consolidated's Total Revenues comes up short by
+    // this amount (caught as a FY2026 Budget mismatch of $4,126,388).
+    const isBuildingFundOnlyView = fundCodes.length === 1 && fundCodes[0] === "103";
     const isBuildingFundBalanceBroughtForwardRevenue = (r) =>
-      fundCodeForRow(r) === "103" && String(r.Revenue_Code || "").trim() === "389000";
+      isBuildingFundOnlyView && fundCodeForRow(r) === "103" && String(r.Revenue_Code || "").trim() === "389000";
     const isOtherFinancingExpense = isOtherFinancingExpenseRow;
 
     // Each activity/type row's own breakdown -- by revenue source for a
