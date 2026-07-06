@@ -1,0 +1,1775 @@
+{
+  "description": "Entity relationship graph for Walton County's FY 2027 Budget AI Knowledge Layer. Each entity includes parent/child relationships, aliases, and links to related funds, departments, statutes, services, common questions, misconceptions, and source documents.",
+  "generated_from": "Walton County FY 2027 Budget official data (department narratives, fund schedule, glossary, financial policies, debt overview)",
+  "entity_count": 54,
+  "entities": [
+    {
+      "id": "walton-county",
+      "name": "Walton County",
+      "description": "A coastal county in the Florida Panhandle, governed by a five-member Board of County Commissioners under a commission-administrator form of government, with five independently elected Constitutional Officers.",
+      "aliases": [
+        "Walton County, Florida",
+        "Walton County Government",
+        "the County"
+      ],
+      "parent_entities": [],
+      "child_entities": [
+        "board-of-county-commissioners",
+        "general-fund",
+        "transportation-fund",
+        "sheriff-fund",
+        "tourist-development-fund",
+        "solid-waste-fund",
+        "capital-projects-fund",
+        "constitutional-officers-group"
+      ],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund",
+        "transportation-fund",
+        "sheriff-fund",
+        "tourist-development-fund",
+        "solid-waste-fund",
+        "capital-projects-fund"
+      ],
+      "related_statutes": [
+        "Chapters 125, 129, 200, 218, Florida Statutes"
+      ],
+      "related_services": [
+        "all County services"
+      ],
+      "common_questions": [
+        "What does Walton County government actually do?",
+        "How is Walton County governed?"
+      ],
+      "misconceptions": [
+        "Walton County is just its beaches."
+      ],
+      "documents": [
+        "/ai/overview.md",
+        "/ai/county-profile.md",
+        "/ai/mission.md"
+      ]
+    },
+    {
+      "id": "board-of-county-commissioners",
+      "name": "Board of County Commissioners (BCC)",
+      "description": "The five-member elected legislative and policy-making body of Walton County government; adopts the annual budget and appropriates funds to departments, divisions, and Constitutional Officers.",
+      "aliases": [
+        "BCC",
+        "the Board",
+        "County Commission"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [
+        "office-of-management-and-budget",
+        "county-administrator"
+      ],
+      "related_entities": [
+        "county-administrator",
+        "constitutional-officers-group"
+      ],
+      "related_departments": [
+        "Office of Management and Budget",
+        "Office of the County Attorney"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [
+        "Chapters 125, 129, 200, 218, Florida Statutes"
+      ],
+      "related_services": [
+        "policy-making",
+        "budget adoption",
+        "millage rate adoption"
+      ],
+      "common_questions": [
+        "How is the budget approved?",
+        "How are Commissioners involved in the budget?",
+        "Why do Commissioners sometimes disagree?"
+      ],
+      "misconceptions": [
+        "The Board controls how Constitutional Officers spend their appropriated budgets."
+      ],
+      "documents": [
+        "/ai/mission.md",
+        "/ai/budget-process.md",
+        "/ai/controversies.md"
+      ]
+    },
+    {
+      "id": "county-administrator",
+      "name": "County Administrator",
+      "description": "Appointed by the Board of County Commissioners to oversee day-to-day County operations and implement Board policy across Board-governed departments.",
+      "aliases": [],
+      "parent_entities": [
+        "board-of-county-commissioners"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "board-of-county-commissioners"
+      ],
+      "related_departments": [
+        "County Administration"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "administration"
+      ],
+      "common_questions": [
+        "Does the County Administrator supervise the Sheriff?"
+      ],
+      "misconceptions": [
+        "The County Administrator supervises Constitutional Officers."
+      ],
+      "documents": [
+        "/ai/mission.md",
+        "/ai/departments.md"
+      ]
+    },
+    {
+      "id": "constitutional-officers-group",
+      "name": "Constitutional Officers",
+      "description": "Five separately elected offices under the Florida Constitution -- Clerk of Courts & County Comptroller, Property Appraiser, Sheriff, Supervisor of Elections, Tax Collector -- legally independent of the Board once budgeted.",
+      "aliases": [
+        "Constitutional Officer offices"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [
+        "sheriff",
+        "property-appraiser",
+        "tax-collector",
+        "clerk-of-courts",
+        "supervisor-of-elections"
+      ],
+      "related_entities": [
+        "board-of-county-commissioners"
+      ],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund",
+        "sheriff-fund"
+      ],
+      "related_statutes": [
+        "Florida Constitution"
+      ],
+      "related_services": [],
+      "common_questions": [
+        "What do Constitutional Officers do?",
+        "Why are Constitutional Officers shown separately?"
+      ],
+      "misconceptions": [
+        "Constitutional Officers are County departments.",
+        "The Board controls Constitutional Officer spending."
+      ],
+      "documents": [
+        "/ai/constitutional-officers.md",
+        "/ai/intents/what-constitutional-officers-do.md"
+      ]
+    },
+    {
+      "id": "sheriff",
+      "name": "Sheriff's Office",
+      "description": "An independently elected Constitutional Officer responsible in Walton County for law enforcement, corrections, court services, animal control, fire rescue, and 911 dispatch.",
+      "aliases": [
+        "Walton County Sheriff's Office",
+        "WCSO",
+        "the Sheriff"
+      ],
+      "parent_entities": [
+        "constitutional-officers-group"
+      ],
+      "child_entities": [
+        "law-enforcement",
+        "corrections",
+        "animal-control",
+        "fire-rescue",
+        "e911-communications"
+      ],
+      "related_entities": [
+        "sheriff-fund",
+        "law-enforcement-trust-fund",
+        "e911-fund",
+        "emergency-management"
+      ],
+      "related_departments": [
+        "Sheriff's Office"
+      ],
+      "related_funds": [
+        "sheriff-fund",
+        "e911-fund",
+        "law-enforcement-trust-fund",
+        "general-fund"
+      ],
+      "related_statutes": [
+        "Florida Statutes governing Sheriff operations"
+      ],
+      "related_services": [
+        "law enforcement",
+        "corrections",
+        "court security",
+        "animal control",
+        "fire rescue",
+        "911 dispatch"
+      ],
+      "common_questions": [
+        "Why is the Sheriff's budget so large?",
+        "Does the Sheriff's Office run animal control and fire rescue?",
+        "How is public safety funded?"
+      ],
+      "misconceptions": [
+        "The Sheriff's Office only does law enforcement.",
+        "The County Administrator supervises the Sheriff."
+      ],
+      "documents": [
+        "/ai/constitutional-officers.md",
+        "/ai/public-safety.md",
+        "/ai/intents/how-public-safety-is-funded.md"
+      ]
+    },
+    {
+      "id": "e911-communications",
+      "name": "E911 Communications Center",
+      "description": "The 911 dispatch operation run by the Sheriff's Office, funded by a dedicated phone-service charge deposited into the E911 Fund.",
+      "aliases": [
+        "911 dispatch",
+        "Emergency Communications"
+      ],
+      "parent_entities": [
+        "sheriff"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "e911-fund",
+        "emergency-management"
+      ],
+      "related_departments": [
+        "Sheriff's Office"
+      ],
+      "related_funds": [
+        "e911-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "911 dispatch"
+      ],
+      "common_questions": [
+        "Who pays for 911 dispatch?"
+      ],
+      "misconceptions": [
+        "911 dispatch is a separate agency from the Sheriff's Office."
+      ],
+      "documents": [
+        "/ai/public-safety.md",
+        "/ai/fund-descriptions.md"
+      ]
+    },
+    {
+      "id": "fire-rescue",
+      "name": "Walton County Fire Rescue Services",
+      "description": "Fire rescue operations run by the Sheriff's Office in Walton County, distinct from the separate South Walton Fire District.",
+      "aliases": [],
+      "parent_entities": [
+        "sheriff"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "south-walton-fire",
+        "emergency-management"
+      ],
+      "related_departments": [
+        "Sheriff's Office"
+      ],
+      "related_funds": [
+        "sheriff-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "fire rescue"
+      ],
+      "common_questions": [
+        "Is the Sheriff's Office responsible for fire rescue?"
+      ],
+      "misconceptions": [
+        "All fire service in Walton County is provided by South Walton Fire District."
+      ],
+      "documents": [
+        "/ai/public-safety.md",
+        "/ai/departments.md"
+      ]
+    },
+    {
+      "id": "emergency-management",
+      "name": "Emergency Management",
+      "description": "The Board-governed department responsible for all aspects of disaster management 24/7, using a Whole Community Approach and operating the Emergency Operations Center (EOC).",
+      "aliases": [
+        "EOC",
+        "Emergency Operations Center"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [
+        "disaster-response",
+        "hurricane-recovery"
+      ],
+      "related_entities": [
+        "sheriff",
+        "reserves"
+      ],
+      "related_departments": [
+        "Emergency Management"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [
+        "Florida statewide emergency management framework"
+      ],
+      "related_services": [
+        "disaster management",
+        "emergency response coordination"
+      ],
+      "common_questions": [
+        "How do hurricanes affect the budget?",
+        "What happens during hurricanes?"
+      ],
+      "misconceptions": [
+        "Reserves are unrelated to hurricane preparedness."
+      ],
+      "documents": [
+        "/ai/intents/how-hurricanes-affect-the-budget.md",
+        "/ai/public-safety.md"
+      ]
+    },
+    {
+      "id": "disaster-response",
+      "name": "Disaster Response",
+      "description": "Immediate emergency response activity coordinated through the Emergency Operations Center during a disaster event.",
+      "aliases": [],
+      "parent_entities": [
+        "emergency-management"
+      ],
+      "child_entities": [
+        "hurricane-recovery"
+      ],
+      "related_entities": [
+        "reserves"
+      ],
+      "related_departments": [
+        "Emergency Management"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [],
+      "misconceptions": [],
+      "documents": [
+        "/ai/intents/how-hurricanes-affect-the-budget.md"
+      ]
+    },
+    {
+      "id": "hurricane-recovery",
+      "name": "Hurricane Recovery",
+      "description": "Post-disaster recovery costs and reimbursement processes (including FEMA Public Assistance) following a hurricane or federally declared disaster.",
+      "aliases": [
+        "FEMA reimbursement",
+        "disaster recovery"
+      ],
+      "parent_entities": [
+        "disaster-response"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "reserves"
+      ],
+      "related_departments": [
+        "Emergency Management"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [
+        "FEMA Public Assistance program rules"
+      ],
+      "related_services": [],
+      "common_questions": [
+        "Does the County get reimbursed for hurricane response costs?"
+      ],
+      "misconceptions": [
+        "Federal disaster reimbursement arrives before the County spends its own money."
+      ],
+      "documents": [
+        "/ai/intents/how-hurricanes-affect-the-budget.md"
+      ]
+    },
+    {
+      "id": "reserves",
+      "name": "Reserves (Fund Balance)",
+      "description": "Fund balance maintained under the County's Fund Balance Policy for liquidity, emergency preparedness, credit rating maintenance, and long-term fiscal sustainability.",
+      "aliases": [
+        "fund balance",
+        "rainy day fund"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "debt",
+        "hurricane-recovery",
+        "financial-policies"
+      ],
+      "related_departments": [
+        "Office of Management and Budget"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "Why does the County maintain reserves?",
+        "Why doesn't the County spend all its reserve money?"
+      ],
+      "misconceptions": [
+        "Reserves are unused money the County is sitting on."
+      ],
+      "documents": [
+        "/ai/reserves.md",
+        "/ai/intents/why-the-county-maintains-reserves.md"
+      ]
+    },
+    {
+      "id": "debt",
+      "name": "Debt",
+      "description": "Borrowing (bonds, notes, leases) Walton County uses selectively to fund large, long-lived capital projects, secured mainly by dedicated non-ad valorem revenue rather than general obligation pledges.",
+      "aliases": [
+        "bonds",
+        "notes payable"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "reserves",
+        "capital-improvements"
+      ],
+      "related_departments": [
+        "Office of Management and Budget"
+      ],
+      "related_funds": [
+        "debt-service-fund",
+        "capital-projects-fund"
+      ],
+      "related_statutes": [
+        "Florida Statute 200.181"
+      ],
+      "related_services": [],
+      "common_questions": [
+        "Why does government use debt?",
+        "What is Walton County's credit rating?"
+      ],
+      "misconceptions": [
+        "The County is in debt like a household with credit card debt."
+      ],
+      "documents": [
+        "/ai/debt.md",
+        "/ai/intents/why-government-uses-debt.md"
+      ]
+    },
+    {
+      "id": "capital-improvements",
+      "name": "Capital Improvements",
+      "description": "Physical assets constructed or purchased with a minimum useful life of five years -- buildings, roads, drainage, water/wastewater structures, and equipment -- planned through the multi-year Capital Improvement Plan.",
+      "aliases": [
+        "Capital Improvement Plan",
+        "CIP"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [
+        "road-maintenance"
+      ],
+      "related_entities": [
+        "debt",
+        "capital-projects-fund",
+        "impact-fees"
+      ],
+      "related_departments": [
+        "Engineering Department",
+        "Public Works"
+      ],
+      "related_funds": [
+        "capital-projects-fund",
+        "transportation-fund"
+      ],
+      "related_statutes": [
+        "Chapters 129 and 200, Florida Statutes"
+      ],
+      "related_services": [],
+      "common_questions": [
+        "How are capital projects selected?",
+        "Why is infrastructure expensive?"
+      ],
+      "misconceptions": [
+        "Capital spending is wasteful because it's a big number in one year."
+      ],
+      "documents": [
+        "/ai/capital-projects.md",
+        "/ai/intents/how-capital-projects-are-selected.md"
+      ]
+    },
+    {
+      "id": "road-maintenance",
+      "name": "Road Maintenance",
+      "description": "Ongoing maintenance, repair, and construction of County roads, drainage, and related infrastructure, delivered by Public Works and Engineering and funded mainly by restricted fuel tax revenue.",
+      "aliases": [
+        "roads",
+        "transportation infrastructure"
+      ],
+      "parent_entities": [
+        "capital-improvements",
+        "transportation-fund"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "fuel-taxes",
+        "impact-fees",
+        "public-works",
+        "engineering-department"
+      ],
+      "related_departments": [
+        "Public Works",
+        "Engineering Department"
+      ],
+      "related_funds": [
+        "transportation-fund",
+        "mobility-fee-fund",
+        "sidewalk-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "road maintenance",
+        "drainage",
+        "traffic operations"
+      ],
+      "common_questions": [
+        "How are roads funded?",
+        "Why are roads under construction?",
+        "Why is infrastructure expensive?"
+      ],
+      "misconceptions": [
+        "All road funding comes from property taxes."
+      ],
+      "documents": [
+        "/ai/transportation.md",
+        "/ai/fuel-taxes.md",
+        "/ai/intents/how-roads-are-funded.md"
+      ]
+    },
+    {
+      "id": "public-works",
+      "name": "Public Works",
+      "description": "Board-governed department providing infrastructure maintenance, repair, and construction services.",
+      "aliases": [],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "road-maintenance",
+        "engineering-department"
+      ],
+      "related_departments": [
+        "Public Works"
+      ],
+      "related_funds": [
+        "transportation-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "infrastructure maintenance"
+      ],
+      "common_questions": [
+        "Which department maintains roads?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/transportation.md",
+        "/ai/departments.md"
+      ]
+    },
+    {
+      "id": "engineering-department",
+      "name": "Engineering Department",
+      "description": "Board-governed department managing capital improvement design and construction, traffic operations, right-of-way permitting, and infrastructure grant administration.",
+      "aliases": [],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "road-maintenance",
+        "public-works",
+        "capital-improvements"
+      ],
+      "related_departments": [
+        "Engineering Department"
+      ],
+      "related_funds": [
+        "transportation-fund",
+        "capital-projects-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "capital project design",
+        "construction management"
+      ],
+      "common_questions": [],
+      "misconceptions": [],
+      "documents": [
+        "/ai/transportation.md",
+        "/ai/departments.md"
+      ]
+    },
+    {
+      "id": "planning",
+      "name": "Planning",
+      "description": "Board-governed department providing land use planning advice, implementing the Comprehensive Plan and Land Development Code, concurrency management, and development review.",
+      "aliases": [
+        "Planning & Development Services"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "impact-fees",
+        "capital-improvements"
+      ],
+      "related_departments": [
+        "Planning"
+      ],
+      "related_funds": [
+        "mobility-fee-fund",
+        "recreation-plat-fee-fund"
+      ],
+      "related_statutes": [
+        "Florida growth management statutes"
+      ],
+      "related_services": [
+        "development review",
+        "concurrency management",
+        "comprehensive planning"
+      ],
+      "common_questions": [
+        "How does growth affect the budget?",
+        "Why is Walton County growing?"
+      ],
+      "misconceptions": [
+        "New development doesn't pay for its own infrastructure impact."
+      ],
+      "documents": [
+        "/ai/intents/how-growth-affects-the-budget.md",
+        "/ai/departments.md"
+      ]
+    },
+    {
+      "id": "libraries",
+      "name": "Libraries",
+      "description": "Public Library System providing free library services through facilities in Flowersview, DeFuniak Springs, Freeport, and Santa Rosa Beach, plus a bookmobile.",
+      "aliases": [
+        "Public Library System"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "parks"
+      ],
+      "related_departments": [
+        "Libraries"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "library services",
+        "bookmobile"
+      ],
+      "common_questions": [
+        "How are libraries funded?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/departments.md",
+        "/ai/faq.md"
+      ]
+    },
+    {
+      "id": "parks",
+      "name": "Parks and Recreation",
+      "description": "Recreation programming and facilities, including County-owned parks and the Eagle Springs Golf and Recreation Center, supporting resident quality of life.",
+      "aliases": [
+        "Recreation"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "libraries",
+        "recreation-plat-fee-fund"
+      ],
+      "related_departments": [
+        "Recreation",
+        "Eagle Springs Golf and Recreation Center"
+      ],
+      "related_funds": [
+        "general-fund",
+        "recreation-plat-fee-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "recreation programming"
+      ],
+      "common_questions": [
+        "Why are parks funded?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/departments.md",
+        "/ai/faq.md"
+      ]
+    },
+    {
+      "id": "property-tax",
+      "name": "Property Tax (Ad Valorem Tax)",
+      "description": "A tax levied on the assessed value of real or personal property, net of exemptions; the largest revenue source for the General Fund.",
+      "aliases": [
+        "Ad Valorem Tax",
+        "millage"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "general-fund",
+        "property-appraiser",
+        "tax-collector"
+      ],
+      "related_departments": [
+        "Property Appraiser",
+        "Tax Collector"
+      ],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [
+        "Florida TRIM law",
+        "Chapter 200, Florida Statutes"
+      ],
+      "related_services": [],
+      "common_questions": [
+        "Why are my property taxes increasing?",
+        "What is a mill of tax?"
+      ],
+      "misconceptions": [
+        "Ad valorem tax and property tax are different taxes.",
+        "The Board decides my property's value."
+      ],
+      "documents": [
+        "/ai/property-tax.md",
+        "/ai/intents/why-property-taxes-increase.md"
+      ]
+    },
+    {
+      "id": "tourist-development-tax",
+      "name": "Tourist Development Tax",
+      "description": "A local option tax on short-term lodging, established by Florida Statute 125.0104, restricted to tourism-related purposes and deposited into the Tourist Development Fund.",
+      "aliases": [
+        "TDT",
+        "bed tax"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "tourist-development-fund",
+        "tourism"
+      ],
+      "related_departments": [
+        "Tourism Administration"
+      ],
+      "related_funds": [
+        "tourist-development-fund"
+      ],
+      "related_statutes": [
+        "Section 125.0104, Florida Statutes"
+      ],
+      "related_services": [
+        "tourism promotion",
+        "beach management"
+      ],
+      "common_questions": [
+        "Why can't tourist tax money pay for roads?",
+        "Who pays the Tourist Development Tax?"
+      ],
+      "misconceptions": [
+        "Tourist tax money is just sitting unused.",
+        "Residents pay the Tourist Development Tax on their property."
+      ],
+      "documents": [
+        "/ai/tourist-development-tax.md",
+        "/ai/intents/why-tourist-tax-is-restricted.md"
+      ]
+    },
+    {
+      "id": "tourism",
+      "name": "Tourism",
+      "description": "Tourism promotion, beach operations, and visitor-serving services funded primarily by the Tourist Development Tax.",
+      "aliases": [],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "tourist-development-tax",
+        "tourist-development-fund"
+      ],
+      "related_departments": [
+        "Tourism Administration"
+      ],
+      "related_funds": [
+        "tourist-development-fund"
+      ],
+      "related_statutes": [
+        "Section 125.0104, Florida Statutes"
+      ],
+      "related_services": [
+        "tourism promotion",
+        "beach renourishment",
+        "lifeguard services"
+      ],
+      "common_questions": [
+        "How are beaches maintained?"
+      ],
+      "misconceptions": [
+        "Tourism only benefits visitors."
+      ],
+      "documents": [
+        "/ai/tourism.md"
+      ]
+    },
+    {
+      "id": "impact-fees",
+      "name": "Impact Fees",
+      "description": "One-time fees charged to developers at the time of development to fund infrastructure needed to serve that development, restricted by Florida's rational nexus requirement.",
+      "aliases": [
+        "Mobility Fee"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "road-maintenance",
+        "planning",
+        "mobility-fee-fund"
+      ],
+      "related_departments": [
+        "Planning",
+        "Engineering Department"
+      ],
+      "related_funds": [
+        "mobility-fee-fund",
+        "recreation-plat-fee-fund"
+      ],
+      "related_statutes": [
+        "Florida impact fee rational nexus framework"
+      ],
+      "related_services": [],
+      "common_questions": [
+        "How do impact fees work?",
+        "Do existing residents pay impact fees?"
+      ],
+      "misconceptions": [
+        "Impact fees can be spent anywhere the County needs money."
+      ],
+      "documents": [
+        "/ai/impact-fees.md",
+        "/ai/intents/how-impact-fees-work.md"
+      ]
+    },
+    {
+      "id": "fuel-taxes",
+      "name": "Fuel Taxes",
+      "description": "Local option and state-shared taxes on motor fuel, restricted to transportation purposes and funding the Transportation Fund.",
+      "aliases": [
+        "gas tax"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "transportation-fund",
+        "road-maintenance"
+      ],
+      "related_departments": [
+        "Public Works",
+        "Engineering Department"
+      ],
+      "related_funds": [
+        "transportation-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "Can gas tax revenue be used for anything other than roads?"
+      ],
+      "misconceptions": [
+        "Gas tax revenue is just general county revenue."
+      ],
+      "documents": [
+        "/ai/fuel-taxes.md"
+      ]
+    },
+    {
+      "id": "grants",
+      "name": "Grants",
+      "description": "Contributions from government or other organizations supporting a particular function, budgeted only after the grant agreement is executed.",
+      "aliases": [],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "financial-policies"
+      ],
+      "related_departments": [
+        "Office of Management and Budget"
+      ],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "How are grants managed?",
+        "Why are grants listed as revenue?"
+      ],
+      "misconceptions": [
+        "Grant money is free money with no strings attached."
+      ],
+      "documents": [
+        "/ai/grants.md"
+      ]
+    },
+    {
+      "id": "personnel",
+      "name": "Personnel",
+      "description": "County workforce compensation and benefits, the largest expenditure category for most service-delivery departments.",
+      "aliases": [
+        "Personnel Services"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [
+        "Human Resources"
+      ],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "How are salaries determined?"
+      ],
+      "misconceptions": [
+        "Personnel Services costs are just salaries."
+      ],
+      "documents": [
+        "/ai/personnel.md",
+        "/ai/salary-guide.md"
+      ]
+    },
+    {
+      "id": "financial-policies",
+      "name": "Financial Policies",
+      "description": "The Board's adopted policies governing reserves, budgeting, cash handling, grants administration, capital assets, investments, anti-fraud/whistleblower protections, and indirect cost allocation.",
+      "aliases": [],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [
+        "reserves"
+      ],
+      "related_entities": [
+        "reserves",
+        "debt",
+        "grants"
+      ],
+      "related_departments": [
+        "Office of Management and Budget"
+      ],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [],
+      "misconceptions": [],
+      "documents": [
+        "/ai/financial-policies.md"
+      ]
+    },
+    {
+      "id": "property-appraiser",
+      "name": "Property Appraiser",
+      "description": "Independently elected Constitutional Officer determining the value of all property in the County; budget approved by the Florida Department of Revenue.",
+      "aliases": [],
+      "parent_entities": [
+        "constitutional-officers-group"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "property-tax",
+        "tax-collector"
+      ],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "property valuation",
+        "TRIM notices"
+      ],
+      "common_questions": [
+        "Who decides my property's value?"
+      ],
+      "misconceptions": [
+        "The Board of County Commissioners decides property values."
+      ],
+      "documents": [
+        "/ai/constitutional-officers.md",
+        "/ai/property-tax.md"
+      ]
+    },
+    {
+      "id": "tax-collector",
+      "name": "Tax Collector",
+      "description": "Independently elected Constitutional Officer acting mainly as a state government agent for vehicle titling, licenses, and property tax collection; budget approved by the Florida Department of Revenue.",
+      "aliases": [],
+      "parent_entities": [
+        "constitutional-officers-group"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "property-tax",
+        "property-appraiser"
+      ],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "tax collection",
+        "vehicle titling",
+        "hunting/fishing licenses"
+      ],
+      "common_questions": [
+        "Who approves the Tax Collector's budget?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/constitutional-officers.md"
+      ]
+    },
+    {
+      "id": "clerk-of-courts",
+      "name": "Clerk of Courts & County Comptroller",
+      "description": "Independently elected Constitutional Officer supporting judicial functions and, as Clerk to the Board, providing finance, information systems, and recording services.",
+      "aliases": [
+        "Clerk of Court"
+      ],
+      "parent_entities": [
+        "constitutional-officers-group"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "court records",
+        "finance",
+        "official records"
+      ],
+      "common_questions": [
+        "Does the Clerk work for the courts or the County?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/constitutional-officers.md"
+      ]
+    },
+    {
+      "id": "supervisor-of-elections",
+      "name": "Supervisor of Elections",
+      "description": "Independently elected Constitutional Officer administering elections and voter registration in compliance with the federal National Voter Registration Act.",
+      "aliases": [],
+      "parent_entities": [
+        "constitutional-officers-group"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [
+        "National Voter Registration Act"
+      ],
+      "related_services": [
+        "elections administration",
+        "voter registration"
+      ],
+      "common_questions": [],
+      "misconceptions": [],
+      "documents": [
+        "/ai/constitutional-officers.md"
+      ]
+    },
+    {
+      "id": "general-fund",
+      "name": "General Fund (Fund 001)",
+      "description": "The County's primary operating fund, funded mainly by ad valorem taxes; accounts for resources not required to be reported in another fund.",
+      "aliases": [
+        "Fund 001"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the General Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "transportation-fund",
+      "name": "Transportation Fund (Fund 101)",
+      "description": "Accounts for motor fuel taxes, local option gas taxes, state revenue sharing, and grants supporting roadway construction, maintenance, drainage, and infrastructure.",
+      "aliases": [
+        "Fund 101"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Transportation Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "sheriff-fund",
+      "name": "Sheriff Fund (Fund 107)",
+      "description": "Accounts for fines, forfeitures, grants, and transfers supporting Sheriff's Office operations.",
+      "aliases": [
+        "Fund 107"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Sheriff Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "tourist-development-fund",
+      "name": "Tourist Development Fund (Fund 111)",
+      "description": "Supports tourism promotion, beach renourishment, and visitor-serving infrastructure, funded primarily by the Tourist Development Tax.",
+      "aliases": [
+        "Fund 111"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Tourist Development Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "solid-waste-fund",
+      "name": "Solid Waste Fund (Fund 112)",
+      "description": "Accounts for landfill operations, funded through surtaxes, state grants, landfill fees, and scrap sales.",
+      "aliases": [
+        "Fund 112"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Solid Waste Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "capital-projects-fund",
+      "name": "Capital Projects Fund (Fund 300)",
+      "description": "Accounts for resources designated for acquiring, constructing, and improving major capital facilities and infrastructure.",
+      "aliases": [
+        "Fund 300"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Capital Projects Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "debt-service-fund",
+      "name": "Debt Service Fund (Fund 201)",
+      "description": "Accounts for the accumulation of resources for, and payment of, long-term debt principal and interest.",
+      "aliases": [
+        "Fund 201"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Debt Service Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "msbu-fund",
+      "name": "MSBU Fund (Fund 102)",
+      "description": "Special assessments for infrastructure improvements within a Municipal Service Benefit Unit.",
+      "aliases": [
+        "Fund 102"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the MSBU Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "e911-fund",
+      "name": "E911 Fund (Fund 109)",
+      "description": "Phone charges assessed for emergency assistance (911) communications services.",
+      "aliases": [
+        "Fund 109"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the E911 Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "law-enforcement-trust-fund",
+      "name": "Law Enforcement Trust Fund (Fund 108)",
+      "description": "Forfeiture proceeds restricted under Florida Statutes to law enforcement purposes.",
+      "aliases": [
+        "Fund 108"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Law Enforcement Trust Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "mobility-fee-fund",
+      "name": "Mobility Fee Fund (Fund 116)",
+      "description": "Fees supporting multi-modal transportation infrastructure tied to new development.",
+      "aliases": [
+        "Fund 116"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Mobility Fee Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "recreation-plat-fee-fund",
+      "name": "Recreation Plat Fee Fund (Fund 114)",
+      "description": "Developer assessments supporting recreational facilities.",
+      "aliases": [
+        "Fund 114"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Recreation Plat Fee Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "sidewalk-fund",
+      "name": "Sidewalk Fund (Fund 115)",
+      "description": "Assessments paid in lieu of constructing required sidewalks.",
+      "aliases": [
+        "Fund 115"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Sidewalk Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "building-fund",
+      "name": "Building Fund (Fund 103)",
+      "description": "Fees and assessments supporting building compliance activities.",
+      "aliases": [
+        "Fund 103"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Building Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "ship-fund",
+      "name": "State Housing Initiative Program Fund (Fund 104)",
+      "description": "State Housing Initiatives Partnership Program grant resources supporting affordable housing.",
+      "aliases": [
+        "Fund 104"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the State Housing Initiative Program Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "hud-fund",
+      "name": "Housing & Urban Development Fund (Fund 110)",
+      "description": "Federal Department of Housing and Urban Development grant resources.",
+      "aliases": [
+        "Fund 110"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Housing & Urban Development Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "preservation-fund",
+      "name": "Preservation Fund (Fund 113)",
+      "description": "Fees paid in lieu of reserved land, used for restoration of native vegetation on public lands.",
+      "aliases": [
+        "Fund 113"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Preservation Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "self-insurance-fund",
+      "name": "Self-Insurance Fund (Fund 503)",
+      "description": "Internal Service Fund financing self-insurance activities on a cost-reimbursement basis.",
+      "aliases": [
+        "Fund 503"
+      ],
+      "parent_entities": [
+        "walton-county"
+      ],
+      "child_entities": [],
+      "related_entities": [],
+      "related_departments": [],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [],
+      "common_questions": [
+        "What is the Self-Insurance Fund?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ]
+    },
+    {
+      "id": "office-of-management-and-budget",
+      "name": "Office of Management and Budget (OMB)",
+      "description": "Board-governed department providing financial and administrative support to the Board of County Commissioners, overseeing fund utilization and advising department/division heads through the budget process.",
+      "aliases": [
+        "OMB"
+      ],
+      "parent_entities": [
+        "board-of-county-commissioners"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "board-of-county-commissioners"
+      ],
+      "related_departments": [
+        "Office of Management and Budget"
+      ],
+      "related_funds": [],
+      "related_statutes": [],
+      "related_services": [
+        "budget preparation",
+        "budget monitoring"
+      ],
+      "common_questions": [
+        "How is the budget created?"
+      ],
+      "misconceptions": [],
+      "documents": [
+        "/ai/budget-process.md",
+        "/ai/departments.md"
+      ]
+    },
+    {
+      "id": "law-enforcement",
+      "name": "Law Enforcement",
+      "description": "Uniformed road patrol, criminal investigations, crime scene investigation, and K-9 units operated by the Sheriff's Office.",
+      "aliases": [],
+      "parent_entities": [
+        "sheriff"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "sheriff-fund"
+      ],
+      "related_departments": [
+        "Sheriff's Office"
+      ],
+      "related_funds": [
+        "sheriff-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "patrol",
+        "investigations"
+      ],
+      "common_questions": [],
+      "misconceptions": [],
+      "documents": [
+        "/ai/public-safety.md",
+        "/ai/constitutional-officers.md"
+      ]
+    },
+    {
+      "id": "corrections",
+      "name": "Corrections",
+      "description": "Detention facility operations run by the Sheriff's Office, including inmate housing, medical services, food services, and prisoner transportation.",
+      "aliases": [
+        "Jail Operations"
+      ],
+      "parent_entities": [
+        "sheriff"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "sheriff-fund"
+      ],
+      "related_departments": [
+        "Sheriff's Office"
+      ],
+      "related_funds": [
+        "sheriff-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "detention",
+        "inmate housing"
+      ],
+      "common_questions": [],
+      "misconceptions": [],
+      "documents": [
+        "/ai/public-safety.md",
+        "/ai/constitutional-officers.md"
+      ]
+    },
+    {
+      "id": "animal-control",
+      "name": "Animal Control",
+      "description": "Animal control facility and units operated by the Sheriff's Office in Walton County.",
+      "aliases": [
+        "Animal Services"
+      ],
+      "parent_entities": [
+        "sheriff"
+      ],
+      "child_entities": [],
+      "related_entities": [
+        "sheriff-fund"
+      ],
+      "related_departments": [
+        "Sheriff's Office"
+      ],
+      "related_funds": [
+        "sheriff-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "animal control"
+      ],
+      "common_questions": [
+        "Does the Sheriff's Office run animal control?"
+      ],
+      "misconceptions": [
+        "Animal control is a separate agency from the Sheriff's Office."
+      ],
+      "documents": [
+        "/ai/public-safety.md",
+        "/ai/constitutional-officers.md"
+      ]
+    },
+    {
+      "id": "south-walton-fire",
+      "name": "South Walton Fire",
+      "description": "A separate fire district providing emergency medical services (EMS) and medical transport in southern Walton County under an interlocal agreement with the County.",
+      "aliases": [
+        "South Walton Fire District",
+        "SWFD"
+      ],
+      "parent_entities": [],
+      "child_entities": [],
+      "related_entities": [
+        "fire-rescue",
+        "emergency-management"
+      ],
+      "related_departments": [],
+      "related_funds": [
+        "general-fund"
+      ],
+      "related_statutes": [],
+      "related_services": [
+        "emergency medical services"
+      ],
+      "common_questions": [
+        "Is South Walton Fire a County department?"
+      ],
+      "misconceptions": [
+        "South Walton Fire is a County department."
+      ],
+      "documents": [
+        "/ai/departments.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2826 @@
+{
+  "generated_from": "Walton County FY 2027 Budget official data (department narratives, fund schedule, glossary, financial policies)",
+  "intent_count": 125,
+  "intents": [
+    {
+      "intent": "where-county-money-comes-from",
+      "summary": "Explains Walton County's major revenue sources and why most are not interchangeable.",
+      "recommended_documents": [
+        "/ai/intents/where-county-money-comes-from.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Summary of Revenues",
+        "Fund Financial Schedules"
+      ],
+      "keywords": [
+        "revenue",
+        "taxes",
+        "where does money come from",
+        "county funding sources"
+      ],
+      "common_follow_up_questions": [
+        "How much comes from property taxes?",
+        "How much comes from tourism?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues",
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "why-property-taxes-increase",
+      "summary": "Explains why a property tax bill can rise even when the millage rate stays constant.",
+      "recommended_documents": [
+        "/ai/intents/why-property-taxes-increase.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Summary of Revenues"
+      ],
+      "keywords": [
+        "property tax increase",
+        "millage rate",
+        "taxable value",
+        "TRIM"
+      ],
+      "common_follow_up_questions": [
+        "Who decides my property's value?",
+        "What is the rolled-back rate?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "why-tourist-tax-is-restricted",
+      "summary": "Explains why Tourist Development Tax revenue can only fund tourism-related purposes.",
+      "recommended_documents": [
+        "/ai/intents/why-tourist-tax-is-restricted.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Fund Financial Schedules",
+        "Summary of Revenues"
+      ],
+      "keywords": [
+        "tourist development tax",
+        "bed tax",
+        "TDT restrictions"
+      ],
+      "common_follow_up_questions": [
+        "Who pays the Tourist Development Tax?",
+        "Does it fund public safety?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules",
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "how-roads-are-funded",
+      "summary": "Explains how road construction, maintenance, and drainage are funded.",
+      "recommended_documents": [
+        "/ai/intents/how-roads-are-funded.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Fund Financial Schedules",
+        "Summary of Expenses"
+      ],
+      "keywords": [
+        "road funding",
+        "transportation fund",
+        "gas tax",
+        "fuel tax"
+      ],
+      "common_follow_up_questions": [
+        "Can gas tax revenue be used for anything else?",
+        "How are major road projects funded?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "how-public-safety-is-funded",
+      "summary": "Explains how the Sheriff's Office and related public safety functions are funded.",
+      "recommended_documents": [
+        "/ai/intents/how-public-safety-is-funded.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Summary of Expenses",
+        "Fund Financial Schedules"
+      ],
+      "keywords": [
+        "sheriff budget",
+        "public safety funding",
+        "911 funding",
+        "law enforcement trust fund"
+      ],
+      "common_follow_up_questions": [
+        "Does the Sheriff's Office run animal control?",
+        "Who pays for 911 dispatch?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses",
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "why-the-county-maintains-reserves",
+      "summary": "Explains why Walton County keeps fund balance reserves instead of spending all revenue.",
+      "recommended_documents": [
+        "/ai/intents/why-the-county-maintains-reserves.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Financial Policies",
+        "Fund Financial Schedules"
+      ],
+      "keywords": [
+        "reserves",
+        "fund balance",
+        "why keep reserves",
+        "rainy day fund"
+      ],
+      "common_follow_up_questions": [
+        "Could the County cut taxes if it spent reserves?",
+        "What happens to reserves during a hurricane?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies",
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "why-government-uses-debt",
+      "summary": "Explains why and how Walton County borrows money for capital projects.",
+      "recommended_documents": [
+        "/ai/intents/why-government-uses-debt.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Debt Overview"
+      ],
+      "keywords": [
+        "county debt",
+        "bonds",
+        "why borrow money",
+        "credit rating"
+      ],
+      "common_follow_up_questions": [
+        "Has Walton County had general obligation debt?",
+        "What is Walton County's credit rating?"
+      ],
+      "primary_budget_sections": [
+        "Debt Overview"
+      ]
+    },
+    {
+      "intent": "how-capital-projects-are-selected",
+      "summary": "Explains how capital/infrastructure projects are planned and funded.",
+      "recommended_documents": [
+        "/ai/intents/how-capital-projects-are-selected.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Capital Improvement Plan Overview",
+        "CIP Project Search"
+      ],
+      "keywords": [
+        "capital improvement plan",
+        "CIP",
+        "how projects are chosen"
+      ],
+      "common_follow_up_questions": [
+        "Why does a project take multiple years?",
+        "Can I search for a specific project?"
+      ],
+      "primary_budget_sections": [
+        "Capital Improvement Plan Overview",
+        "CIP Project Search"
+      ]
+    },
+    {
+      "intent": "how-the-budget-is-created",
+      "summary": "Explains the four-phase annual budget process from preparation to adoption.",
+      "recommended_documents": [
+        "/ai/intents/how-the-budget-is-created.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Budget Process & Calendar"
+      ],
+      "keywords": [
+        "budget process",
+        "budget calendar",
+        "how budget is made"
+      ],
+      "common_follow_up_questions": [
+        "When does the budget process start and end?",
+        "Can the public comment before adoption?"
+      ],
+      "primary_budget_sections": [
+        "Budget Process & Calendar"
+      ]
+    },
+    {
+      "intent": "how-growth-affects-the-budget",
+      "summary": "Explains how population and development growth affects revenue and service demand.",
+      "recommended_documents": [
+        "/ai/intents/how-growth-affects-the-budget.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Financial Forecast",
+        "Capital Improvement Plan"
+      ],
+      "keywords": [
+        "growth",
+        "development impact",
+        "concurrency management"
+      ],
+      "common_follow_up_questions": [
+        "Does new development pay for its own infrastructure?",
+        "What is concurrency management?"
+      ],
+      "primary_budget_sections": [
+        "Financial Forecast",
+        "Capital Improvement Plan"
+      ]
+    },
+    {
+      "intent": "what-the-county-actually-does",
+      "summary": "Summarizes the full range of services Walton County government provides.",
+      "recommended_documents": [
+        "/ai/intents/what-the-county-actually-does.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Departments",
+        "Constitutional Officers & Other Agencies"
+      ],
+      "keywords": [
+        "what does the county do",
+        "county services list"
+      ],
+      "common_follow_up_questions": [
+        "Does the County run schools?",
+        "Does the County maintain city streets?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Constitutional Officers & Other Agencies"
+      ]
+    },
+    {
+      "intent": "what-constitutional-officers-do",
+      "summary": "Explains the role of each of Walton County's five Constitutional Officers.",
+      "recommended_documents": [
+        "/ai/intents/what-constitutional-officers-do.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Constitutional Officers & Other Agencies"
+      ],
+      "keywords": [
+        "constitutional officers",
+        "sheriff",
+        "tax collector",
+        "property appraiser",
+        "clerk of courts",
+        "supervisor of elections"
+      ],
+      "common_follow_up_questions": [
+        "Who approves the Property Appraiser's budget?",
+        "Does the Clerk work for the courts or the County?"
+      ],
+      "primary_budget_sections": [
+        "Constitutional Officers & Other Agencies"
+      ]
+    },
+    {
+      "intent": "how-impact-fees-work",
+      "summary": "Explains how impact fees charge new development for the infrastructure it requires.",
+      "recommended_documents": [
+        "/ai/intents/how-impact-fees-work.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Summary of Revenues"
+      ],
+      "keywords": [
+        "impact fees",
+        "mobility fee",
+        "growth pays for growth"
+      ],
+      "common_follow_up_questions": [
+        "Do existing residents pay impact fees?",
+        "What is the difference between an impact fee and an MSBU?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "why-budget-amounts-change",
+      "summary": "Explains why budget figures change year to year or between proposed and adopted.",
+      "recommended_documents": [
+        "/ai/intents/why-budget-amounts-change.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "How to Read the Budget"
+      ],
+      "keywords": [
+        "budget changed",
+        "why did the budget go up",
+        "budget amendment"
+      ],
+      "common_follow_up_questions": [
+        "Does a large increase always mean new spending?",
+        "Can I trace a line item change?"
+      ],
+      "primary_budget_sections": [
+        "How to Read the Budget"
+      ]
+    },
+    {
+      "intent": "how-hurricanes-affect-the-budget",
+      "summary": "Explains how hurricane/disaster preparedness shapes reserves and emergency spending.",
+      "recommended_documents": [
+        "/ai/intents/how-hurricanes-affect-the-budget.md",
+        "/ai/ai-answer-guidelines.md"
+      ],
+      "related_topics": [
+        "Financial Policies",
+        "Emergency Management"
+      ],
+      "keywords": [
+        "hurricane budget",
+        "disaster response funding",
+        "emergency management"
+      ],
+      "common_follow_up_questions": [
+        "Does the County get reimbursed for hurricane costs?",
+        "Can reserves run out after a bad storm season?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies",
+        "Emergency Management"
+      ]
+    },
+    {
+      "intent": "what-is-general-government-taxes",
+      "summary": "Explains the General Government Taxes revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "general government taxes",
+        "ad valorem tax",
+        "property tax",
+        "tourist development tax",
+        "sales surtax",
+        "fuel tax revenue"
+      ],
+      "common_follow_up_questions": [
+        "What does General Government Taxes typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-permits-fees-special-assessments",
+      "summary": "Explains the Permits, Fees, and Special Assessments revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "permits, fees, and special assessments",
+        "building permits",
+        "MSBU assessment",
+        "beach permits"
+      ],
+      "common_follow_up_questions": [
+        "What does Permits, Fees, and Special Assessments typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-intergovernmental-revenues",
+      "summary": "Explains the Intergovernmental Revenues revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "intergovernmental revenues",
+        "state shared revenue",
+        "federal grants",
+        "state grants"
+      ],
+      "common_follow_up_questions": [
+        "What does Intergovernmental Revenues typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-charges-for-services",
+      "summary": "Explains the Charges for Services revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "charges for services",
+        "ambulance fees",
+        "planning fees",
+        "recreation fees"
+      ],
+      "common_follow_up_questions": [
+        "What does Charges for Services typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-judgments-fines-forfeits",
+      "summary": "Explains the Judgments, Fines and Forfeits revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "judgments, fines and forfeits",
+        "court fines",
+        "ordinance fines"
+      ],
+      "common_follow_up_questions": [
+        "What does Judgments, Fines and Forfeits typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-miscellaneous-revenue",
+      "summary": "Explains the Miscellaneous Revenue revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "miscellaneous revenue",
+        "interest income",
+        "indirect administrative fees",
+        "surplus asset sales"
+      ],
+      "common_follow_up_questions": [
+        "What does Miscellaneous Revenue typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-other-sources",
+      "summary": "Explains the Other Sources revenue category: what it includes, who pays it, and what it funds.",
+      "recommended_documents": [
+        "/ai/revenue-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Revenue Guide",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "other sources",
+        "interfund transfers",
+        "debt proceeds",
+        "beginning fund balance"
+      ],
+      "common_follow_up_questions": [
+        "What does Other Sources typically fund?",
+        "Is this revenue restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Revenues"
+      ]
+    },
+    {
+      "intent": "what-is-personnel-services",
+      "summary": "Explains the Personnel Services expenditure category: what it covers and why it exists.",
+      "recommended_documents": [
+        "/ai/expenditure-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Expenditure Guide"
+      ],
+      "keywords": [
+        "personnel services",
+        "salaries",
+        "benefits",
+        "FRS contributions",
+        "overtime"
+      ],
+      "common_follow_up_questions": [
+        "What does Personnel Services typically fund?",
+        "Is this a recurring or one-time cost category?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-operating-expenditures",
+      "summary": "Explains the Operating Expenditures expenditure category: what it covers and why it exists.",
+      "recommended_documents": [
+        "/ai/expenditure-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Expenditure Guide"
+      ],
+      "keywords": [
+        "operating expenditures",
+        "utilities",
+        "professional services",
+        "maintenance costs"
+      ],
+      "common_follow_up_questions": [
+        "What does Operating Expenditures typically fund?",
+        "Is this a recurring or one-time cost category?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-capital-outlay",
+      "summary": "Explains the Capital Outlay expenditure category: what it covers and why it exists.",
+      "recommended_documents": [
+        "/ai/expenditure-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Expenditure Guide"
+      ],
+      "keywords": [
+        "capital outlay",
+        "vehicles",
+        "equipment",
+        "buildings"
+      ],
+      "common_follow_up_questions": [
+        "What does Capital Outlay typically fund?",
+        "Is this a recurring or one-time cost category?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-debt-service",
+      "summary": "Explains the Debt Service expenditure category: what it covers and why it exists.",
+      "recommended_documents": [
+        "/ai/expenditure-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Expenditure Guide"
+      ],
+      "keywords": [
+        "debt service",
+        "bond payments",
+        "principal and interest"
+      ],
+      "common_follow_up_questions": [
+        "What does Debt Service typically fund?",
+        "Is this a recurring or one-time cost category?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-grants-and-aid",
+      "summary": "Explains the Grants and Aid expenditure category: what it covers and why it exists.",
+      "recommended_documents": [
+        "/ai/expenditure-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Expenditure Guide"
+      ],
+      "keywords": [
+        "grants and aid",
+        "non-profit funding",
+        "statutory aid"
+      ],
+      "common_follow_up_questions": [
+        "What does Grants and Aid typically fund?",
+        "Is this a recurring or one-time cost category?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-other-uses",
+      "summary": "Explains the Other Uses expenditure category: what it covers and why it exists.",
+      "recommended_documents": [
+        "/ai/expenditure-guide.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "related_topics": [
+        "Expenditure Guide"
+      ],
+      "keywords": [
+        "other uses",
+        "transfers",
+        "contingency reserve"
+      ],
+      "common_follow_up_questions": [
+        "What does Other Uses typically fund?",
+        "Is this a recurring or one-time cost category?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-the-general-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the General Fund (Fund 001).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "general fund",
+        "fund 001"
+      ],
+      "common_follow_up_questions": [
+        "What does the General Fund pay for?",
+        "Is the General Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-transportation-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Transportation Fund (Fund 101).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "transportation fund",
+        "fund 101"
+      ],
+      "common_follow_up_questions": [
+        "What does the Transportation Fund pay for?",
+        "Is the Transportation Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-sheriff-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Sheriff Fund (Fund 107).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "sheriff fund",
+        "fund 107"
+      ],
+      "common_follow_up_questions": [
+        "What does the Sheriff Fund pay for?",
+        "Is the Sheriff Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-tourist-development-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Tourist Development Fund (Fund 111).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "tourist development fund",
+        "fund 111"
+      ],
+      "common_follow_up_questions": [
+        "What does the Tourist Development Fund pay for?",
+        "Is the Tourist Development Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-solid-waste-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Solid Waste Fund (Fund 112).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "solid waste fund",
+        "fund 112"
+      ],
+      "common_follow_up_questions": [
+        "What does the Solid Waste Fund pay for?",
+        "Is the Solid Waste Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-capital-projects-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Capital Projects Fund (Fund 300).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "capital projects fund",
+        "fund 300"
+      ],
+      "common_follow_up_questions": [
+        "What does the Capital Projects Fund pay for?",
+        "Is the Capital Projects Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-debt-service-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Debt Service Fund (Fund 201).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "debt service fund",
+        "fund 201"
+      ],
+      "common_follow_up_questions": [
+        "What does the Debt Service Fund pay for?",
+        "Is the Debt Service Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-building-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Building Fund (Fund 103).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "building fund",
+        "fund 103"
+      ],
+      "common_follow_up_questions": [
+        "What does the Building Fund pay for?",
+        "Is the Building Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-e911-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the E911 Fund (Fund 109).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "e911 fund",
+        "fund 109"
+      ],
+      "common_follow_up_questions": [
+        "What does the E911 Fund pay for?",
+        "Is the E911 Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-housing-urban-development-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Housing & Urban Development Fund (Fund 110).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "housing & urban development fund",
+        "fund 110"
+      ],
+      "common_follow_up_questions": [
+        "What does the Housing & Urban Development Fund pay for?",
+        "Is the Housing & Urban Development Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-law-enforcement-trust-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Law Enforcement Trust Fund (Fund 108).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "law enforcement trust fund",
+        "fund 108"
+      ],
+      "common_follow_up_questions": [
+        "What does the Law Enforcement Trust Fund pay for?",
+        "Is the Law Enforcement Trust Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-mobility-fee-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Mobility Fee Fund (Fund 116).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "mobility fee fund",
+        "fund 116"
+      ],
+      "common_follow_up_questions": [
+        "What does the Mobility Fee Fund pay for?",
+        "Is the Mobility Fee Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-mosquito-control-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Mosquito Control Fund (Fund 105).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "mosquito control fund",
+        "fund 105"
+      ],
+      "common_follow_up_questions": [
+        "What does the Mosquito Control Fund pay for?",
+        "Is the Mosquito Control Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-mosquito-control-state-aid-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Mosquito Control State Aid Fund (Fund 106).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "mosquito control state aid fund",
+        "fund 106"
+      ],
+      "common_follow_up_questions": [
+        "What does the Mosquito Control State Aid Fund pay for?",
+        "Is the Mosquito Control State Aid Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-msbu-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the MSBU Fund (Fund 102).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "msbu fund",
+        "fund 102"
+      ],
+      "common_follow_up_questions": [
+        "What does the MSBU Fund pay for?",
+        "Is the MSBU Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-preservation-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Preservation Fund (Fund 113).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "preservation fund",
+        "fund 113"
+      ],
+      "common_follow_up_questions": [
+        "What does the Preservation Fund pay for?",
+        "Is the Preservation Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-recreation-plat-fee-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Recreation Plat Fee Fund (Fund 114).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "recreation plat fee fund",
+        "fund 114"
+      ],
+      "common_follow_up_questions": [
+        "What does the Recreation Plat Fee Fund pay for?",
+        "Is the Recreation Plat Fee Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-sidewalk-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Sidewalk Fund (Fund 115).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "sidewalk fund",
+        "fund 115"
+      ],
+      "common_follow_up_questions": [
+        "What does the Sidewalk Fund pay for?",
+        "Is the Sidewalk Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-state-housing-initiative-program-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the State Housing Initiative Program Fund (Fund 104).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "state housing initiative program fund",
+        "fund 104"
+      ],
+      "common_follow_up_questions": [
+        "What does the State Housing Initiative Program Fund pay for?",
+        "Is the State Housing Initiative Program Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-is-the-self-insurance-fund",
+      "summary": "Explains the purpose, revenue sources, and typical uses of the Self-Insurance Fund (Fund 503).",
+      "recommended_documents": [
+        "/ai/fund-descriptions.md",
+        "/ai/fund-structure.md"
+      ],
+      "related_topics": [
+        "Fund Descriptions",
+        "Fund Structure"
+      ],
+      "keywords": [
+        "self-insurance fund",
+        "fund 503"
+      ],
+      "common_follow_up_questions": [
+        "What does the Self-Insurance Fund pay for?",
+        "Is the Self-Insurance Fund restricted to a specific purpose?"
+      ],
+      "primary_budget_sections": [
+        "Fund Financial Schedules"
+      ]
+    },
+    {
+      "intent": "what-does-board-of-county-commissioners-do",
+      "summary": "Explains what the Board of County Commissioners does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "board of county commissioners"
+      ],
+      "common_follow_up_questions": [
+        "What services does Board of County Commissioners provide?",
+        "How is Board of County Commissioners funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-clerk-of-courts-county-comptroller-do",
+      "summary": "Explains what the Clerk of Courts & County Comptroller does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "clerk of courts & county comptroller"
+      ],
+      "common_follow_up_questions": [
+        "What services does Clerk of Courts & County Comptroller provide?",
+        "How is Clerk of Courts & County Comptroller funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-property-appraiser-do",
+      "summary": "Explains what the Property Appraiser does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "property appraiser"
+      ],
+      "common_follow_up_questions": [
+        "What services does Property Appraiser provide?",
+        "How is Property Appraiser funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-sheriff-s-office-do",
+      "summary": "Explains what the Sheriff's Office does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "sheriff's office"
+      ],
+      "common_follow_up_questions": [
+        "What services does Sheriff's Office provide?",
+        "How is Sheriff's Office funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-supervisor-of-elections-do",
+      "summary": "Explains what the Supervisor of Elections does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "supervisor of elections"
+      ],
+      "common_follow_up_questions": [
+        "What services does Supervisor of Elections provide?",
+        "How is Supervisor of Elections funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-tax-collector-do",
+      "summary": "Explains what the Tax Collector does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "tax collector"
+      ],
+      "common_follow_up_questions": [
+        "What services does Tax Collector provide?",
+        "How is Tax Collector funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-county-administration-do",
+      "summary": "Explains what the County Administration does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "county administration"
+      ],
+      "common_follow_up_questions": [
+        "What services does County Administration provide?",
+        "How is County Administration funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-office-of-management-and-budget-do",
+      "summary": "Explains what the Office of Management and Budget does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "office of management and budget"
+      ],
+      "common_follow_up_questions": [
+        "What services does Office of Management and Budget provide?",
+        "How is Office of Management and Budget funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-office-of-the-county-attorney-do",
+      "summary": "Explains what the Office of the County Attorney does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "office of the county attorney"
+      ],
+      "common_follow_up_questions": [
+        "What services does Office of the County Attorney provide?",
+        "How is Office of the County Attorney funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-human-resources-do",
+      "summary": "Explains what the Human Resources does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "human resources"
+      ],
+      "common_follow_up_questions": [
+        "What services does Human Resources provide?",
+        "How is Human Resources funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-purchasing-do",
+      "summary": "Explains what the Purchasing does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "purchasing"
+      ],
+      "common_follow_up_questions": [
+        "What services does Purchasing provide?",
+        "How is Purchasing funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-geographic-info-systems-do",
+      "summary": "Explains what the Geographic Info Systems does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "geographic info systems"
+      ],
+      "common_follow_up_questions": [
+        "What services does Geographic Info Systems provide?",
+        "How is Geographic Info Systems funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-emergency-management-do",
+      "summary": "Explains what the Emergency Management does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "emergency management"
+      ],
+      "common_follow_up_questions": [
+        "What services does Emergency Management provide?",
+        "How is Emergency Management funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-code-compliance-do",
+      "summary": "Explains what the Code Compliance does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "code compliance"
+      ],
+      "common_follow_up_questions": [
+        "What services does Code Compliance provide?",
+        "How is Code Compliance funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-building-department-do",
+      "summary": "Explains what the Building Department does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "building department"
+      ],
+      "common_follow_up_questions": [
+        "What services does Building Department provide?",
+        "How is Building Department funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-medical-examiner-do",
+      "summary": "Explains what the Medical Examiner does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "medical examiner"
+      ],
+      "common_follow_up_questions": [
+        "What services does Medical Examiner provide?",
+        "How is Medical Examiner funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-probation-do",
+      "summary": "Explains what the Probation does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "probation"
+      ],
+      "common_follow_up_questions": [
+        "What services does Probation provide?",
+        "How is Probation funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-environmental-resources-do",
+      "summary": "Explains what the Environmental Resources does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "environmental resources"
+      ],
+      "common_follow_up_questions": [
+        "What services does Environmental Resources provide?",
+        "How is Environmental Resources funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-extension-office-do",
+      "summary": "Explains what the Extension Office does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "extension office"
+      ],
+      "common_follow_up_questions": [
+        "What services does Extension Office provide?",
+        "How is Extension Office funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-soil-conservation-do",
+      "summary": "Explains what the Soil Conservation does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "soil conservation"
+      ],
+      "common_follow_up_questions": [
+        "What services does Soil Conservation provide?",
+        "How is Soil Conservation funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-solid-waste-do",
+      "summary": "Explains what the Solid Waste does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "solid waste"
+      ],
+      "common_follow_up_questions": [
+        "What services does Solid Waste provide?",
+        "How is Solid Waste funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-mossy-head-wastewater-treatment-facility-do",
+      "summary": "Explains what the Mossy Head Wastewater Treatment Facility does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "mossy head wastewater treatment facility"
+      ],
+      "common_follow_up_questions": [
+        "What services does Mossy Head Wastewater Treatment Facility provide?",
+        "How is Mossy Head Wastewater Treatment Facility funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-public-works-do",
+      "summary": "Explains what the Public Works does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "public works"
+      ],
+      "common_follow_up_questions": [
+        "What services does Public Works provide?",
+        "How is Public Works funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-engineering-department-do",
+      "summary": "Explains what the Engineering Department does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "engineering department"
+      ],
+      "common_follow_up_questions": [
+        "What services does Engineering Department provide?",
+        "How is Engineering Department funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-tourism-administration-do",
+      "summary": "Explains what the Tourism Administration does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "tourism administration"
+      ],
+      "common_follow_up_questions": [
+        "What services does Tourism Administration provide?",
+        "How is Tourism Administration funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-housing-urban-development-do",
+      "summary": "Explains what the Housing & Urban Development does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "housing & urban development"
+      ],
+      "common_follow_up_questions": [
+        "What services does Housing & Urban Development provide?",
+        "How is Housing & Urban Development funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-veteran-services-do",
+      "summary": "Explains what the Veteran Services does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "veteran services"
+      ],
+      "common_follow_up_questions": [
+        "What services does Veteran Services provide?",
+        "How is Veteran Services funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-eagle-springs-golf-and-recreation-center-do",
+      "summary": "Explains what the Eagle Springs Golf and Recreation Center does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "eagle springs golf and recreation center"
+      ],
+      "common_follow_up_questions": [
+        "What services does Eagle Springs Golf and Recreation Center provide?",
+        "How is Eagle Springs Golf and Recreation Center funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-mosquito-control-do",
+      "summary": "Explains what the Mosquito Control does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "mosquito control"
+      ],
+      "common_follow_up_questions": [
+        "What services does Mosquito Control provide?",
+        "How is Mosquito Control funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-non-profit-funding-program-do",
+      "summary": "Explains what the Non-Profit Funding Program does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "non-profit funding program"
+      ],
+      "common_follow_up_questions": [
+        "What services does Non-Profit Funding Program provide?",
+        "How is Non-Profit Funding Program funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-walton-county-health-department-do",
+      "summary": "Explains what the Walton County Health Department does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "walton county health department"
+      ],
+      "common_follow_up_questions": [
+        "What services does Walton County Health Department provide?",
+        "How is Walton County Health Department funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-libraries-do",
+      "summary": "Explains what the Libraries does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "libraries"
+      ],
+      "common_follow_up_questions": [
+        "What services does Libraries provide?",
+        "How is Libraries funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-recreation-do",
+      "summary": "Explains what the Recreation does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "recreation"
+      ],
+      "common_follow_up_questions": [
+        "What services does Recreation provide?",
+        "How is Recreation funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-building-construction-and-maintenance-do",
+      "summary": "Explains what the Building Construction and Maintenance does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "building construction and maintenance"
+      ],
+      "common_follow_up_questions": [
+        "What services does Building Construction and Maintenance provide?",
+        "How is Building Construction and Maintenance funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-planning-do",
+      "summary": "Explains what the Planning does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "planning"
+      ],
+      "common_follow_up_questions": [
+        "What services does Planning provide?",
+        "How is Planning funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-circuit-court-do",
+      "summary": "Explains what the Circuit Court does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "circuit court"
+      ],
+      "common_follow_up_questions": [
+        "What services does Circuit Court provide?",
+        "How is Circuit Court funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-county-court-do",
+      "summary": "Explains what the County Court does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "county court"
+      ],
+      "common_follow_up_questions": [
+        "What services does County Court provide?",
+        "How is County Court funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-guardian-ad-litem-do",
+      "summary": "Explains what the Guardian Ad Litem does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "guardian ad litem"
+      ],
+      "common_follow_up_questions": [
+        "What services does Guardian Ad Litem provide?",
+        "How is Guardian Ad Litem funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-public-defender-do",
+      "summary": "Explains what the Public Defender does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "public defender"
+      ],
+      "common_follow_up_questions": [
+        "What services does Public Defender provide?",
+        "How is Public Defender funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-state-attorney-do",
+      "summary": "Explains what the State Attorney does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "state attorney"
+      ],
+      "common_follow_up_questions": [
+        "What services does State Attorney provide?",
+        "How is State Attorney funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-south-walton-fire-do",
+      "summary": "Explains what the South Walton Fire does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "south walton fire"
+      ],
+      "common_follow_up_questions": [
+        "What services does South Walton Fire provide?",
+        "How is South Walton Fire funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-does-walton-county-sheriff-s-office-do",
+      "summary": "Explains what the Walton County Sheriff's Office does and how it is funded.",
+      "recommended_documents": [
+        "/ai/departments.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "related_topics": [
+        "Departments Overview"
+      ],
+      "keywords": [
+        "walton county sheriff's office"
+      ],
+      "common_follow_up_questions": [
+        "What services does Walton County Sheriff's Office provide?",
+        "How is Walton County Sheriff's Office funded?"
+      ],
+      "primary_budget_sections": [
+        "Departments",
+        "Summary of Expenses"
+      ]
+    },
+    {
+      "intent": "what-is-the-fund-balance-policy",
+      "summary": "Explains Walton County's adopted Fund Balance Policy and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "fund balance policy",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Fund Balance Policy require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-budget-policy",
+      "summary": "Explains Walton County's adopted Budget Policy and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "budget policy",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Budget Policy require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-cash-handling-policy",
+      "summary": "Explains Walton County's adopted Cash Handling Policy and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "cash handling policy",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Cash Handling Policy require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-grants-administration",
+      "summary": "Explains Walton County's adopted Grants Administration and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "grants administration",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Grants Administration require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-budget-transfers-and-amendments",
+      "summary": "Explains Walton County's adopted Budget Transfers and Amendments and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "budget transfers and amendments",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Budget Transfers and Amendments require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-capital-asset-policy",
+      "summary": "Explains Walton County's adopted Capital Asset Policy and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "capital asset policy",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Capital Asset Policy require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-anti-fraud-and-whistleblower-policies",
+      "summary": "Explains Walton County's adopted Anti-Fraud and Whistleblower Policies and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "anti-fraud and whistleblower policies",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Anti-Fraud and Whistleblower Policies require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-investment-policy",
+      "summary": "Explains Walton County's adopted Investment Policy and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "investment policy",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Investment Policy require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "what-is-the-indirect-administrative-cost-allocation-policy",
+      "summary": "Explains Walton County's adopted Indirect Administrative Cost Allocation Policy and what it governs.",
+      "recommended_documents": [
+        "/ai/financial-policies.md"
+      ],
+      "related_topics": [
+        "Financial Policies"
+      ],
+      "keywords": [
+        "indirect administrative cost allocation policy",
+        "financial policy"
+      ],
+      "common_follow_up_questions": [
+        "What does the Indirect Administrative Cost Allocation Policy require?",
+        "Who adopted this policy?"
+      ],
+      "primary_budget_sections": [
+        "Financial Policies"
+      ]
+    },
+    {
+      "intent": "define-millage-rate",
+      "summary": "Defines the budget term \"Millage Rate\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "millage rate",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Millage Rate?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-ad-valorem-taxes",
+      "summary": "Defines the budget term \"Ad Valorem Taxes\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "ad valorem taxes",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Ad Valorem Taxes?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-fund-balance",
+      "summary": "Defines the budget term \"Fund Balance\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "fund balance",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Fund Balance?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-special-revenue-fund",
+      "summary": "Defines the budget term \"Special Revenue Fund\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "special revenue fund",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Special Revenue Fund?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-general-fund",
+      "summary": "Defines the budget term \"General Fund\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "general fund",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is General Fund?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-adopted-budget",
+      "summary": "Defines the budget term \"Adopted Budget\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "adopted budget",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Adopted Budget?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-proposed-budget",
+      "summary": "Defines the budget term \"Proposed Budget\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "proposed budget",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Proposed Budget?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-capital-outlay",
+      "summary": "Defines the budget term \"Capital Outlay\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "capital outlay",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Capital Outlay?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-capital-improvements",
+      "summary": "Defines the budget term \"Capital Improvements\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "capital improvements",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Capital Improvements?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-debt-service",
+      "summary": "Defines the budget term \"Debt Service\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "debt service",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Debt Service?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-interfund-transfers",
+      "summary": "Defines the budget term \"Interfund Transfers\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "interfund transfers",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Interfund Transfers?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-impact-fees",
+      "summary": "Defines the budget term \"Impact Fees\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "impact fees",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Impact Fees?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-taxable-valuation",
+      "summary": "Defines the budget term \"Taxable Valuation\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "taxable valuation",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Taxable Valuation?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-encumbrance",
+      "summary": "Defines the budget term \"Encumbrance\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "encumbrance",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Encumbrance?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-reserve-for-contingencies",
+      "summary": "Defines the budget term \"Reserve for Contingencies\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "reserve for contingencies",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Reserve for Contingencies?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-object-code",
+      "summary": "Defines the budget term \"Object Code\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "object code",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Object Code?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-department-vs-division",
+      "summary": "Defines the budget term \"Department vs. Division\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "department vs. division",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Department vs. Division?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "define-recurring-vs-non-recurring-revenue",
+      "summary": "Defines the budget term \"Recurring vs. Non-Recurring Revenue\" in plain English.",
+      "recommended_documents": [
+        "/ai/budget-terminology.md"
+      ],
+      "related_topics": [
+        "Budget Terminology"
+      ],
+      "keywords": [
+        "recurring vs. non-recurring revenue",
+        "definition",
+        "glossary"
+      ],
+      "common_follow_up_questions": [
+        "What is Recurring vs. Non-Recurring Revenue?"
+      ],
+      "primary_budget_sections": [
+        "Glossary, Acronyms, and Frequently Asked Questions"
+      ]
+    },
+    {
+      "intent": "why-taxes-feel-high",
+      "summary": "Explains the factual process behind tax rate setting, without taking a position on whether rates are appropriate.",
+      "recommended_documents": [
+        "/ai/controversies.md",
+        "/ai/budget-process.md"
+      ],
+      "related_topics": [
+        "Controversies",
+        "Budget Process"
+      ],
+      "keywords": [
+        "why taxes feel high"
+      ],
+      "common_follow_up_questions": [
+        "What is the formal process for resolving this?"
+      ],
+      "primary_budget_sections": [
+        "Budget Process & Calendar"
+      ]
+    },
+    {
+      "intent": "how-millage-rates-are-set",
+      "summary": "Explains the statutory process for setting and adopting a millage rate.",
+      "recommended_documents": [
+        "/ai/controversies.md",
+        "/ai/budget-process.md"
+      ],
+      "related_topics": [
+        "Controversies",
+        "Budget Process"
+      ],
+      "keywords": [
+        "how millage rates are set"
+      ],
+      "common_follow_up_questions": [
+        "What is the formal process for resolving this?"
+      ],
+      "primary_budget_sections": [
+        "Budget Process & Calendar"
+      ]
+    },
+    {
+      "intent": "how-the-public-participates-in-budgeting",
+      "summary": "Explains TRIM hearings, workshops, and public comment opportunities.",
+      "recommended_documents": [
+        "/ai/controversies.md",
+        "/ai/budget-process.md"
+      ],
+      "related_topics": [
+        "Controversies",
+        "Budget Process"
+      ],
+      "keywords": [
+        "how the public participates in budgeting"
+      ],
+      "common_follow_up_questions": [
+        "What is the formal process for resolving this?"
+      ],
+      "primary_budget_sections": [
+        "Budget Process & Calendar"
+      ]
+    },
+    {
+      "intent": "why-commissioners-disagree",
+      "summary": "Explains that Board disagreement on budget tradeoffs is a normal function of representative government, resolved by public vote.",
+      "recommended_documents": [
+        "/ai/controversies.md",
+        "/ai/budget-process.md"
+      ],
+      "related_topics": [
+        "Controversies",
+        "Budget Process"
+      ],
+      "keywords": [
+        "why commissioners disagree"
+      ],
+      "common_follow_up_questions": [
+        "What is the formal process for resolving this?"
+      ],
+      "primary_budget_sections": [
+        "Budget Process & Calendar"
+      ]
+    },
+    {
+      "intent": "how-large-projects-are-evaluated",
+      "summary": "Explains the Capital Improvement Plan evaluation process for large projects.",
+      "recommended_documents": [
+        "/ai/controversies.md",
+        "/ai/budget-process.md"
+      ],
+      "related_topics": [
+        "Controversies",
+        "Budget Process"
+      ],
+      "keywords": [
+        "how large projects are evaluated"
+      ],
+      "common_follow_up_questions": [
+        "What is the formal process for resolving this?"
+      ],
+      "primary_budget_sections": [
+        "Budget Process & Calendar"
+      ]
+    },
+    {
+      "intent": "why-is-walton-county-growing",
+      "summary": "Explains the documented drivers of growth in Walton County and how the County manages it through planning, without citing unpublished population statistics.",
+      "recommended_documents": [
+        "/ai/intents/why-is-walton-county-growing.md",
+        "/ai/county-profile.md"
+      ],
+      "related_topics": [
+        "County Profile",
+        "How Growth Affects the Budget"
+      ],
+      "keywords": [
+        "walton county growth",
+        "population growth",
+        "why is the county growing"
+      ],
+      "common_follow_up_questions": [
+        "Does the County publish population statistics?",
+        "Who reviews new development proposals?"
+      ],
+      "primary_budget_sections": [
+        "Statistical & Supplemental Information",
+        "Financial Forecast"
+      ]
+    },
+    {
+      "intent": "why-are-roads-under-construction",
+      "summary": "Explains why road projects are visible across multiple years and what determines their pacing.",
+      "recommended_documents": [
+        "/ai/intents/why-are-roads-under-construction.md",
+        "/ai/intents/how-roads-are-funded.md"
+      ],
+      "related_topics": [
+        "Capital Improvement Plan",
+        "Transportation"
+      ],
+      "keywords": [
+        "road construction",
+        "why are roads always under construction",
+        "infrastructure delays"
+      ],
+      "common_follow_up_questions": [
+        "Can I find a specific road project's timeline?",
+        "Is all road construction related to growth?"
+      ],
+      "primary_budget_sections": [
+        "Capital Improvement Plan Overview",
+        "CIP Project Search"
+      ]
+    },
+    {
+      "intent": "how-are-beaches-maintained",
+      "summary": "Explains which departments maintain Walton County's beaches and how that work is funded.",
+      "recommended_documents": [
+        "/ai/intents/how-are-beaches-maintained.md",
+        "/ai/tourism.md"
+      ],
+      "related_topics": [
+        "Tourism",
+        "Tourist Development Tax"
+      ],
+      "keywords": [
+        "beach maintenance",
+        "beach renourishment",
+        "who pays for beach maintenance"
+      ],
+      "common_follow_up_questions": [
+        "Do residents pay for beach maintenance through property taxes?",
+        "Why does beach renourishment happen repeatedly?"
+      ],
+      "primary_budget_sections": [
+        "Summary of Expenses",
+        "Fund Financial Schedules"
+      ]
+    }
+  ]
+}

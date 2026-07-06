@@ -1,0 +1,577 @@
+{
+  "description": "AI answer evaluation prompts for Walton County's FY 2027 Budget Knowledge Layer. Each prompt maps to a real, fully-authored intent document (not fabricated). Intended for benchmarking AI system answers (ChatGPT, Gemini, Claude, Perplexity, Copilot) against grounded, sourced expectations.",
+  "prompt_count": 18,
+  "prompts": [
+    {
+      "question": "Where does Walton County get most of its money?",
+      "expected_concepts": [
+        "ad valorem tax",
+        "General Fund",
+        "Tourist Development Tax",
+        "fund restriction",
+        "revenue categories"
+      ],
+      "preferred_documents": [
+        "/ai/intents/where-county-money-comes-from.md",
+        "/ai/revenue-guide.md"
+      ],
+      "expected_entities": [
+        "walton-county",
+        "general-fund",
+        "property-tax",
+        "tourist-development-tax"
+      ],
+      "common_hallucinations": [
+        "Citing a specific dollar total not verified against the live Summary of Revenues page.",
+        "Claiming sales tax (state-collected) is the largest source.",
+        "Implying all revenue is interchangeable."
+      ],
+      "common_misconceptions": [
+        "Every dollar the County collects can be spent on anything."
+      ],
+      "minimum_acceptable_answer": "Names ad valorem (property) tax as the largest General Fund source and correctly notes the Tourist Development Tax is restricted to tourism use, without asserting an unverified dollar figure.",
+      "ideal_answer_outline": [
+        "Explain revenue categories exist because of legal restriction, not arbitrary grouping",
+        "Name ad valorem tax as largest, most flexible source",
+        "Name Tourist Development Tax as major but restricted source",
+        "Point to live Summary of Revenues for current totals",
+        "Avoid asserting a specific number without sourcing it to a dated figure"
+      ]
+    },
+    {
+      "question": "Why did my property tax bill go up even though I heard the County didn't raise taxes?",
+      "expected_concepts": [
+        "millage rate",
+        "taxable value",
+        "Property Appraiser",
+        "TRIM",
+        "rolled-back rate"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-property-taxes-increase.md",
+        "/ai/property-tax.md"
+      ],
+      "expected_entities": [
+        "property-tax",
+        "property-appraiser",
+        "board-of-county-commissioners"
+      ],
+      "common_hallucinations": [
+        "Claiming the Board of County Commissioners sets property values.",
+        "Claiming the millage rate must have increased.",
+        "Confusing assessed value with taxable value."
+      ],
+      "common_misconceptions": [
+        "A tax bill increase always means the Board raised taxes."
+      ],
+      "minimum_acceptable_answer": "Correctly distinguishes the millage rate (Board decision) from taxable value (Property Appraiser determination) and explains a bill can rise from value changes alone.",
+      "ideal_answer_outline": [
+        "Explain the tax formula: millage rate x taxable value / 1000",
+        "Clarify who sets each factor and why they are independent",
+        "Introduce TRIM and rolled-back rate as the standard disclosure mechanism",
+        "Avoid political framing about whether the increase is justified"
+      ]
+    },
+    {
+      "question": "Why can't the County use tourist tax money to fix a pothole on my street?",
+      "expected_concepts": [
+        "Tourist Development Tax",
+        "Section 125.0104",
+        "Tourist Development Fund",
+        "rational nexus",
+        "fund restriction"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-tourist-tax-is-restricted.md",
+        "/ai/tourist-development-tax.md"
+      ],
+      "expected_entities": [
+        "tourist-development-tax",
+        "tourist-development-fund"
+      ],
+      "common_hallucinations": [
+        "Claiming the restriction is County policy rather than state statute.",
+        "Claiming the tax is paid by residents' property taxes."
+      ],
+      "common_misconceptions": [
+        "Tourist tax money is just sitting unused."
+      ],
+      "minimum_acceptable_answer": "States the tax is legally restricted by Florida Statute 125.0104 to tourism-related purposes and cannot fund unrelated road maintenance.",
+      "ideal_answer_outline": [
+        "Explain who pays the tax (visitors, not residents)",
+        "Cite the statutory restriction",
+        "Explain what it does fund",
+        "Distinguish this from a County policy choice"
+      ]
+    },
+    {
+      "question": "How does Walton County pay for road repairs?",
+      "expected_concepts": [
+        "Transportation Fund",
+        "Local Option Fuel Tax",
+        "state revenue sharing",
+        "impact fees",
+        "Mobility Fee Fund"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-roads-are-funded.md",
+        "/ai/transportation.md",
+        "/ai/fuel-taxes.md"
+      ],
+      "expected_entities": [
+        "transportation-fund",
+        "road-maintenance",
+        "fuel-taxes",
+        "impact-fees"
+      ],
+      "common_hallucinations": [
+        "Claiming roads are funded mainly by property tax.",
+        "Claiming impact fees can fund any county need."
+      ],
+      "common_misconceptions": [
+        "All road funding comes from property taxes."
+      ],
+      "minimum_acceptable_answer": "Identifies fuel taxes and the Transportation Fund as the primary funding source and notes impact/mobility fees fund growth-related needs.",
+      "ideal_answer_outline": [
+        "Name the Transportation Fund and its revenue sources",
+        "Explain fuel tax restriction to transportation",
+        "Explain impact fees fund growth-driven infrastructure",
+        "Name Public Works and Engineering as delivery departments"
+      ]
+    },
+    {
+      "question": "How much does the Sheriff's Office cost, and what does that pay for?",
+      "expected_concepts": [
+        "Sheriff Fund",
+        "Constitutional Officer",
+        "corrections",
+        "animal control",
+        "fire rescue",
+        "911 dispatch"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-public-safety-is-funded.md",
+        "/ai/public-safety.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "expected_entities": [
+        "sheriff",
+        "sheriff-fund",
+        "e911-communications",
+        "fire-rescue",
+        "animal-control"
+      ],
+      "common_hallucinations": [
+        "Omitting that the Sheriff's Office runs animal control and fire rescue in Walton County (this is not standard in every county).",
+        "Claiming the Board directs Sheriff's Office internal spending.",
+        "Asserting an unverified dollar figure."
+      ],
+      "common_misconceptions": [
+        "The Sheriff's Office only does law enforcement."
+      ],
+      "minimum_acceptable_answer": "Explains the Sheriff's Office covers law enforcement, corrections, court services, animal control, fire rescue, and 911 dispatch, and that the Board appropriates but does not control internal spending.",
+      "ideal_answer_outline": [
+        "Explain Constitutional Officer independence",
+        "List all six Sheriff's Office functional areas specific to Walton County",
+        "Name funding sources (Sheriff Fund, General Fund, E911 Fund, Law Enforcement Trust Fund)",
+        "Point to live Summary of Expenses for current total"
+      ]
+    },
+    {
+      "question": "Why doesn't Walton County just spend all its reserve money instead of sitting on it?",
+      "expected_concepts": [
+        "Fund Balance Policy",
+        "liquidity",
+        "emergency preparedness",
+        "credit rating",
+        "Reserve for Contingencies"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-the-county-maintains-reserves.md",
+        "/ai/reserves.md"
+      ],
+      "expected_entities": [
+        "reserves",
+        "financial-policies"
+      ],
+      "common_hallucinations": [
+        "Claiming reserves are entirely unrestricted and freely spendable.",
+        "Ignoring the credit rating connection."
+      ],
+      "common_misconceptions": [
+        "Reserves are unused, forgotten money."
+      ],
+      "minimum_acceptable_answer": "Names at least two real reasons (liquidity, emergency/hurricane preparedness, credit rating) grounded in the Fund Balance Policy.",
+      "ideal_answer_outline": [
+        "Define fund balance/reserves",
+        "Explain liquidity need",
+        "Explain hurricane/emergency preparedness link",
+        "Explain credit rating impact (Aa1 from Moody's) and cost-of-borrowing consequence",
+        "Note not all fund balance is freely spendable"
+      ]
+    },
+    {
+      "question": "Why does the County borrow money instead of just paying cash for everything?",
+      "expected_concepts": [
+        "revenue bonds",
+        "general obligation debt",
+        "credit rating",
+        "dedicated revenue pledge"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-government-uses-debt.md",
+        "/ai/debt.md"
+      ],
+      "expected_entities": [
+        "debt",
+        "capital-improvements"
+      ],
+      "common_hallucinations": [
+        "Claiming Walton County has general obligation bonds outstanding (it retired its last in 2010).",
+        "Claiming debt is secured by general tax revenue rather than dedicated revenue.",
+        "Comparing county debt to household credit card debt without noting the structural difference."
+      ],
+      "common_misconceptions": [
+        "The County is in debt like a household with credit card debt."
+      ],
+      "minimum_acceptable_answer": "Explains debt spreads capital cost across years of benefit, and correctly notes Walton County's current debt is revenue-backed (dedicated half-cent sales tax), not general obligation.",
+      "ideal_answer_outline": [
+        "Explain the cost-spreading rationale for debt",
+        "Distinguish general obligation vs. revenue-backed debt",
+        "Cite the county's Aa1 Moody's rating and its effect on borrowing cost",
+        "Note no outstanding general obligation debt since 2010"
+      ]
+    },
+    {
+      "question": "How does Walton County decide which road or infrastructure project gets built first?",
+      "expected_concepts": [
+        "Capital Improvement Plan",
+        "project financing method",
+        "multi-year budgeting"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-capital-projects-are-selected.md",
+        "/ai/capital-projects.md"
+      ],
+      "expected_entities": [
+        "capital-improvements",
+        "road-maintenance"
+      ],
+      "common_hallucinations": [
+        "Claiming projects are chosen by a single formula without documentation.",
+        "Claiming every project is funded the same way."
+      ],
+      "common_misconceptions": [],
+      "minimum_acceptable_answer": "Explains projects are planned through the multi-year CIP, each with its own documented timeline, cost, location, and financing method.",
+      "ideal_answer_outline": [
+        "Define capital project and capital improvement budget",
+        "Explain multi-year CIP scheduling",
+        "Explain blended funding (current revenue, grants, debt)",
+        "Point to CIP Project Search for specific project lookup"
+      ]
+    },
+    {
+      "question": "How is Walton County's budget actually put together each year?",
+      "expected_concepts": [
+        "Preparation",
+        "Review",
+        "Workshops",
+        "Adoption",
+        "TRIM",
+        "Section 129.06"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-the-budget-is-created.md",
+        "/ai/budget-process.md"
+      ],
+      "expected_entities": [
+        "board-of-county-commissioners",
+        "office-of-management-and-budget"
+      ],
+      "common_hallucinations": [
+        "Omitting the required public hearings.",
+        "Claiming the budget cannot change after adoption."
+      ],
+      "common_misconceptions": [
+        "The budget is finalized the moment it's proposed."
+      ],
+      "minimum_acceptable_answer": "Names all four phases (Preparation, Review, Workshops, Adoption) and notes TRIM public hearings are legally required before adoption.",
+      "ideal_answer_outline": [
+        "List the four phases in order",
+        "Explain the modified accrual/GAAP accounting basis",
+        "Explain fund-level budgetary control",
+        "Explain the Section 129.06 amendment process"
+      ]
+    },
+    {
+      "question": "Does new development in Walton County pay for the infrastructure it needs, or do existing residents pay for it?",
+      "expected_concepts": [
+        "impact fees",
+        "Mobility Fee Fund",
+        "rational nexus",
+        "concurrency management"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-growth-affects-the-budget.md",
+        "/ai/intents/how-impact-fees-work.md"
+      ],
+      "expected_entities": [
+        "planning",
+        "impact-fees"
+      ],
+      "common_hallucinations": [
+        "Claiming impact fees cover 100% of all growth-related costs.",
+        "Claiming existing residents pay impact fees directly."
+      ],
+      "common_misconceptions": [
+        "New development doesn't pay for its own infrastructure impact."
+      ],
+      "minimum_acceptable_answer": "Explains impact fees and the Mobility Fee Fund charge new development for its own infrastructure burden under the rational nexus rule, while noting not every growth cost is fully offset.",
+      "ideal_answer_outline": [
+        "Define concurrency management",
+        "Explain impact fees/Mobility Fee Fund mechanism",
+        "Note the rational nexus legal requirement",
+        "Acknowledge some growth-driven costs are funded through ongoing operations, not fees"
+      ]
+    },
+    {
+      "question": "What does Walton County government actually do for residents?",
+      "expected_concepts": [
+        "general government",
+        "public safety",
+        "transportation",
+        "economic environment",
+        "human services",
+        "culture and recreation",
+        "court-related cost"
+      ],
+      "preferred_documents": [
+        "/ai/intents/what-the-county-actually-does.md",
+        "/ai/departments.md"
+      ],
+      "expected_entities": [
+        "walton-county"
+      ],
+      "common_hallucinations": [
+        "Claiming the County operates public schools or hospitals.",
+        "Omitting Constitutional Officers from the service picture."
+      ],
+      "common_misconceptions": [],
+      "minimum_acceptable_answer": "Lists at least four of the eight activity categories and correctly notes the County does not run schools or hospitals (though it helps fund the Health Department).",
+      "ideal_answer_outline": [
+        "List the eight expenditure activity categories with examples",
+        "Note the five Constitutional Officers as a separate but included group",
+        "Clarify schools/hospitals are not County-run",
+        "Note the Health Department is a state-contractual arrangement"
+      ]
+    },
+    {
+      "question": "What is the difference between a Constitutional Officer and a County department?",
+      "expected_concepts": [
+        "Florida Constitution",
+        "independent election",
+        "appropriation vs. control",
+        "five offices"
+      ],
+      "preferred_documents": [
+        "/ai/intents/what-constitutional-officers-do.md",
+        "/ai/constitutional-officers.md"
+      ],
+      "expected_entities": [
+        "constitutional-officers-group",
+        "sheriff",
+        "property-appraiser",
+        "tax-collector"
+      ],
+      "common_hallucinations": [
+        "Stating there are six Constitutional Officers (there are five).",
+        "Claiming the County Administrator supervises them."
+      ],
+      "common_misconceptions": [
+        "Constitutional Officers are County departments."
+      ],
+      "minimum_acceptable_answer": "Names all five Constitutional Officers correctly and explains they are independently elected and self-managing once budgeted.",
+      "ideal_answer_outline": [
+        "Name all five offices exactly",
+        "Explain the Florida constitutional basis",
+        "Explain Board appropriates but does not control internal operations",
+        "Note Property Appraiser/Tax Collector budgets need Dept. of Revenue approval too"
+      ]
+    },
+    {
+      "question": "What exactly is an impact fee and how is it different from a property tax?",
+      "expected_concepts": [
+        "one-time developer charge",
+        "rational nexus",
+        "new growth pays for growth"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-impact-fees-work.md",
+        "/ai/impact-fees.md"
+      ],
+      "expected_entities": [
+        "impact-fees"
+      ],
+      "common_hallucinations": [
+        "Claiming impact fees are paid by existing homeowners annually like property tax.",
+        "Claiming impact fee revenue can fund any infrastructure category."
+      ],
+      "common_misconceptions": [
+        "Impact fees can be spent anywhere the County needs money."
+      ],
+      "minimum_acceptable_answer": "Correctly distinguishes a one-time developer charge (impact fee) from a recurring property tax, and notes the rational nexus restriction.",
+      "ideal_answer_outline": [
+        "Define impact fee and who pays it",
+        "Explain rational nexus",
+        "Contrast with recurring ad valorem property tax",
+        "Name Walton County's Mobility Fee Fund and Recreation Plat Fee Fund as related mechanisms"
+      ]
+    },
+    {
+      "question": "Why does a budget number for the same department look different this year compared to last year?",
+      "expected_concepts": [
+        "Actual vs Budget vs Proposed",
+        "one-time items",
+        "recurring vs non-recurring",
+        "Section 129.06 amendments"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-budget-amounts-change.md",
+        "/ai/how-to-read-the-budget.md"
+      ],
+      "expected_entities": [],
+      "common_hallucinations": [
+        "Assuming any year-over-year change indicates an error.",
+        "Ignoring one-time capital/grant items as an explanation."
+      ],
+      "common_misconceptions": [],
+      "minimum_acceptable_answer": "Identifies at least two legitimate causes (revenue performance, cost changes, one-time items, mandates, Board decisions, or formal amendments) for a year-over-year change.",
+      "ideal_answer_outline": [
+        "List the legitimate causes of budget change",
+        "Explain Actual vs Budget/Proposed variance is normal",
+        "Reference the Section 129.06 amendment process",
+        "Recommend checking whether a change is one-time or recurring before drawing conclusions"
+      ]
+    },
+    {
+      "question": "What happens to Walton County's budget during and after a hurricane?",
+      "expected_concepts": [
+        "Emergency Operations Center",
+        "Whole Community Approach",
+        "Fund Balance Policy",
+        "FEMA Public Assistance"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-hurricanes-affect-the-budget.md",
+        "/ai/reserves.md"
+      ],
+      "expected_entities": [
+        "emergency-management",
+        "reserves",
+        "disaster-response",
+        "hurricane-recovery"
+      ],
+      "common_hallucinations": [
+        "Claiming FEMA reimbursement arrives before the County spends money.",
+        "Claiming FEMA reimbursement is guaranteed to cover all costs.",
+        "Presenting FEMA program details as Walton-County-specific commitments rather than general federal program rules."
+      ],
+      "common_misconceptions": [],
+      "minimum_acceptable_answer": "Explains reserves fund immediate response/recovery and that federal/state reimbursement, where eligible, typically follows the County's own upfront spending.",
+      "ideal_answer_outline": [
+        "Describe Emergency Management's 24/7 role and the EOC",
+        "Explain reserves specifically fund disaster response readiness",
+        "Explain FEMA/state reimbursement timing (general program mechanism, not a county-specific guarantee)",
+        "Connect reserve adequacy to the county's credit rating"
+      ]
+    },
+    {
+      "question": "Why is Walton County growing so much, and is the County tracking that?",
+      "expected_concepts": [
+        "coastal amenities",
+        "tourism economy",
+        "Comprehensive Plan",
+        "concurrency management"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-is-walton-county-growing.md",
+        "/ai/county-profile.md"
+      ],
+      "expected_entities": [
+        "planning",
+        "walton-county"
+      ],
+      "common_hallucinations": [
+        "Citing a specific, unsourced population growth percentage or migration statistic.",
+        "Claiming growth is unmanaged or unplanned."
+      ],
+      "common_misconceptions": [],
+      "minimum_acceptable_answer": "Explains documented growth drivers (coastal amenities, tourism economy) without citing an unverified statistic, and names the Planning Department's role in managing growth.",
+      "ideal_answer_outline": [
+        "Note documented, general drivers without inventing statistics",
+        "Point to Statistical & Supplemental Information for any official figures",
+        "Explain the Comprehensive Plan/Land Development Code/concurrency management role",
+        "Connect to impact fees as the financial growth-management tool"
+      ]
+    },
+    {
+      "question": "Why does it feel like there's always road construction happening in Walton County?",
+      "expected_concepts": [
+        "multi-year Capital Improvement Plan",
+        "project phases",
+        "growth-driven infrastructure"
+      ],
+      "preferred_documents": [
+        "/ai/intents/why-are-roads-under-construction.md",
+        "/ai/capital-projects.md"
+      ],
+      "expected_entities": [
+        "road-maintenance",
+        "capital-improvements"
+      ],
+      "common_hallucinations": [
+        "Claiming all construction is due to poor planning or coordination failures.",
+        "Claiming every project is funded identically."
+      ],
+      "common_misconceptions": [],
+      "minimum_acceptable_answer": "Explains that capital projects span multiple years and phases, so several are visible simultaneously at different stages.",
+      "ideal_answer_outline": [
+        "Define capital project timeline documentation",
+        "Explain multiple concurrent projects at different phases",
+        "Distinguish routine maintenance from growth-driven new capacity",
+        "Point to CIP Project Search for a specific project's real status"
+      ]
+    },
+    {
+      "question": "Who pays to keep Walton County's beaches maintained and renourished?",
+      "expected_concepts": [
+        "Tourist Development Tax",
+        "Beach Renourishment",
+        "Beach Operations",
+        "Section 125.0104"
+      ],
+      "preferred_documents": [
+        "/ai/intents/how-are-beaches-maintained.md",
+        "/ai/tourism.md"
+      ],
+      "expected_entities": [
+        "tourism",
+        "tourist-development-tax"
+      ],
+      "common_hallucinations": [
+        "Claiming residents' property taxes primarily fund beach maintenance.",
+        "Claiming beach renourishment is a one-time project."
+      ],
+      "common_misconceptions": [
+        "Tourism only benefits visitors."
+      ],
+      "minimum_acceptable_answer": "Correctly identifies the Tourist Development Tax as the primary funding source, paid by visitors, not resident property tax.",
+      "ideal_answer_outline": [
+        "Name the relevant departments (Beach Operations, Beach Renourishment, Lifeguard Services)",
+        "Explain the Tourist Development Tax funding source and its statutory basis",
+        "Explain renourishment is a recurring need due to erosion",
+        "Note the blended public-safety/tourism nature of lifeguard funding"
+      ]
+    }
+  ]
+}

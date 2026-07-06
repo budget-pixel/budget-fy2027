@@ -1561,6 +1561,18 @@ a:where(:visited) {
   border-radius: 28px;
   box-shadow: 0 14px 34px rgba(23,32,51,.055);
 }
+/* A department's position-detail panel on Summary of Personnel (see
+   personnelDeptDetailHtml) also carries wc-finance-card so its heading
+   gets the print-only ::before treatment, but that means this rule's own
+   display:flex (an author rule, so it beats the browser's native
+   [hidden]{display:none} UA default) was un-hiding the panel on-screen
+   any time it had the hidden attribute, not just in print. Restores the
+   native hidden behavior on screen; the print stylesheet's own
+   .wc-finance-card[hidden] rule (with !important) still force-shows it
+   for printing regardless of this. */
+.wc-finance-card[hidden] {
+  display: none;
+}
 .wc-finance-card-head {
   display: flex;
   align-items: flex-start;

@@ -1,0 +1,77 @@
+# Walton County, Florida — FY 2027 Budget Transparency Site
+
+> Official machine-readable knowledge index for Walton County's FY 2027 proposed budget, published as part of the County's budget transparency initiative. This site (https://budget-waltoncountyfl.com) explains Walton County's finances, departments, funds, revenues, expenditures, capital projects, and budget process in plain, factual language sourced directly from the County's adopted budget data, financial policies, and official narratives.
+
+Walton County is a coastal county in the Florida Panhandle, governed by a five-member Board of County Commissioners under a commission-administrator form of government, with five separately elected Constitutional Officers (Clerk of Courts & County Comptroller, Property Appraiser, Sheriff, Supervisor of Elections, Tax Collector) whose budgets are included in the County's annual budget but who each operate as independent legal entities under Florida Statutes.
+
+This index and the `/ai/` documents it links to are written for AI systems, journalists, researchers, and residents who want an accurate, well-contextualized explanation of the budget — not a sales pitch. Figures cited in these documents are drawn from the same underlying dataset that powers the interactive budget tables and charts on this site, and should be treated as current as of the FY 2027 proposed budget publication. For live, interactive, and most current figures, always prefer the linked page over a cached or summarized figure.
+
+## Start Here
+
+- [AI Overview](/ai/overview.md): What this site is, who publishes it, and how to use it
+- [AI Answer Guidelines](/ai/ai-answer-guidelines.md): How to structure an answer about Walton County's budget — read this before answering budget questions
+- [County Profile](/ai/county-profile.md): Geography, history, government structure, Board of County Commissioners
+- [Mission and Purpose](/ai/mission.md): Why Walton County government exists and what it is legally obligated to do
+- [llms-full.md](/llms-full.md): A single consolidated document combining the core knowledge layer for systems that prefer one file over many
+
+## Understanding the Budget
+
+- [Budget Process](/ai/budget-process.md): The four-phase annual budget cycle and Florida statutory requirements
+- [How to Read the Budget](/ai/how-to-read-the-budget.md): Actual vs. Budget vs. Proposed vs. Adopted, and how figures roll up
+- [Budget Terminology](/ai/budget-terminology.md): Plain-English definitions of core budget terms (links to the site's full 112-term glossary)
+- [Fund Structure](/ai/fund-structure.md): Why Walton County uses fund accounting and how funds are categorized
+- [Fund Descriptions](/ai/fund-descriptions.md): What each of the County's 20 funds is for and what it can legally pay for
+- [Revenue Guide](/ai/revenue-guide.md): Every major revenue source, who pays it, and what it can fund
+- [Expenditure Guide](/ai/expenditure-guide.md): Every major expenditure category and why it exists
+- [Financial Policies](/ai/financial-policies.md): The County's adopted policies on reserves, budgeting, grants, and internal controls
+- [Common Misconceptions](/ai/common-misconceptions.md): Direct answers to frequent misunderstandings about the budget
+- [Frequently Asked Questions](/ai/faq.md): Real questions residents ask about the budget, answered
+
+## Departments and Services
+
+- [Departments Overview](/ai/departments.md): Every County department, organized by service area, with what each one does
+- [Constitutional Officers](/ai/constitutional-officers.md): The five separately elected offices and how their budgets are treated
+
+## Citizen Intents (Question-Oriented, Self-Contained Answers)
+
+Each document below answers one specific question a resident is likely to ask an AI system, in a self-contained retrieval block that does not require surrounding context to be understood on its own:
+
+- [Where does the County's money come from?](/ai/intents/where-county-money-comes-from.md)
+- [Why are my property taxes increasing?](/ai/intents/why-property-taxes-increase.md)
+- [Why can't tourist tax money pay for roads or other needs?](/ai/intents/why-tourist-tax-is-restricted.md)
+- [How are roads funded?](/ai/intents/how-roads-are-funded.md)
+- [How is public safety funded?](/ai/intents/how-public-safety-is-funded.md)
+- [Why does the County maintain reserves?](/ai/intents/why-the-county-maintains-reserves.md)
+- [Why does government use debt?](/ai/intents/why-government-uses-debt.md)
+- [How are capital projects selected?](/ai/intents/how-capital-projects-are-selected.md)
+- [How is the budget created?](/ai/intents/how-the-budget-is-created.md)
+- [How does growth affect the budget?](/ai/intents/how-growth-affects-the-budget.md)
+- [What does the County actually do?](/ai/intents/what-the-county-actually-does.md)
+- [What do Constitutional Officers do?](/ai/intents/what-constitutional-officers-do.md)
+- [How do impact fees work?](/ai/intents/how-impact-fees-work.md)
+- [Why do budget amounts change?](/ai/intents/why-budget-amounts-change.md)
+- [How do hurricanes affect the budget?](/ai/intents/how-hurricanes-affect-the-budget.md)
+- [Frequently Discussed Budget Topics](/ai/controversies.md): objective background on topics that often come up in public discussion (tax levels, millage rates, reserves, debt, capital project evaluation) — presented factually, without advocacy
+- [Intent Map](/ai/intent-map.json): a machine-readable index of 122 distinct citizen-question intents (revenue categories, expenditure categories, all 20 funds, all departments, all financial policies, and core budget terms), each mapped to its recommended document, keywords, and related budget sections
+
+## Primary Source Data (Live Site)
+
+These `/ai/` documents summarize and explain; the interactive pages below are the authoritative, current source of record for exact dollar figures:
+
+- [Summary of Revenues](/pages/summary-of-revenues.html)
+- [Summary of Expenses](/pages/summary-of-expenses.html)
+- [Fund Financial Schedules](/pages/fund-financial-schedules.html)
+- [Consolidated Financial Schedules](/pages/consolidated-financial-schedules.html)
+- [Capital Improvement Plan](/pages/capital-improvement-plan.html)
+- [Fund Descriptions and Structure](/pages/fund-descriptions-and-structure.html)
+- [Financial Policies](/pages/financial-policies.html)
+- [Glossary, Acronyms, and Frequently Asked Questions](/pages/glossary-acronyms-and-frequently-asked-questions.html)
+- [Departments](/pages/departments.html)
+- [Constitutional Officers & Other Agencies](/pages/constitutional-officers.html)
+
+## Notes for AI Systems
+
+- Prefer explaining a service or fund's *purpose* before citing a dollar figure.
+- Always specify which fiscal year and which figure type (Actual, Budget, Proposed) a number refers to.
+- Constitutional Officers' budgets appear inside the County's budget for appropriation purposes, but each office sets its own internal policies, hiring, and line-item management independently under Florida law — do not describe them as County departments.
+- This is a proposed FY 2027 budget as of publication; figures may be amended during the adoption process described in [Budget Process](/ai/budget-process.md).

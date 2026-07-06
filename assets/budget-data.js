@@ -7461,6 +7461,46 @@
       .join("");
   }
 
+  // Same underlying position data as renderStaffingTable, but as a plain
+  // schedule table (matching the all-departments view on Summary of
+  // Personnel) instead of the department page's staffing-card layout with
+  // its top-5 breakdown bars and collapsed "View Position Detail" panel --
+  // used when a user filters Summary of Personnel down to one department,
+  // where the card treatment reads as a duplicate mini department page
+  // rather than a table row detail.
+  function renderStaffingPlainTable(rows) {
+    if (!rows.length) return "";
+    const years = [2024, 2025, 2026, 2027];
+    const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
+    return groupNames
+      .map((name) => {
+        const groupRows = rows
+          .filter((r) => (r.Dept_Name || "") === name)
+          .slice()
+          .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""));
+        const totals = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
+        const bodyRows = groupRows.map((r) => {
+          years.forEach((y) => { totals[y] += r[y] || 0; });
+          return (
+            "<tr><td>" + escapeHtml(r.Position_Name || "") + "</td>" +
+            years.map((y) => '<td class="wc-num">' + formatNumber(r[y] || 0) + "</td>").join("") +
+            "</tr>"
+          );
+        });
+        bodyRows.push(
+          '<tr class="wc-table-total-row"><td>Total FTE</td>' +
+          years.map((y) => '<td class="wc-num">' + formatNumber(totals[y]) + "</td>").join("") +
+          "</tr>"
+        );
+        return renderTable({
+          caption: groupNames.length > 1 ? name : null,
+          columns: [{ label: "Position Name" }].concat(years.map((y) => ({ label: "FY " + y, num: true }))),
+          bodyRows: bodyRows
+        });
+      })
+      .join("");
+  }
+
   function renderMachineryTable(rows) {
     if (!rows.length) return "";
     let total = 0;
@@ -8846,8 +8886,7 @@
       }
 
       if (deptName) {
-        mountOrHide(tableEl, renderStaffingTable(filtered));
-        bindPriorYearsToggle(tableEl);
+        mountOrHide(tableEl, renderStaffingPlainTable(filtered));
         mountOrHide(notesContainer, buildPersonnelSummaryFteNotes(filtered));
         return;
       }
