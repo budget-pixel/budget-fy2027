@@ -44,7 +44,10 @@ var PRINT_CSS = `
 @media print{
   @page{
     size:letter landscape;
-    margin:.35in;
+    /* A touch more on the right than the other sides -- content (e.g. a
+       department's Statement of Function paragraph) was sitting flush
+       enough against the printable-area edge to just barely get clipped. */
+    margin:.35in .5in .35in .35in;
   }
 
   .wc-pdf-button,
@@ -55,7 +58,8 @@ var PRINT_CSS = `
   .wc-forecast-sort-toggle,
   .wc-forecast-sort-button,
   .wc-fy-column-toggle-wrap,
-  .wc-revenue-chart-legend button{
+  .wc-revenue-chart-legend button,
+  .wc-skip-link{
     display:none !important;
     visibility:hidden !important;
   }
@@ -160,6 +164,17 @@ var PRINT_CSS = `
     background:#ffffff !important;
     overflow:visible !important;
     box-shadow:none !important;
+  }
+
+  /* Belt-and-suspenders on top of @page's own right margin above -- justified
+     paragraph text (see .content-section p etc. below) runs flush to the
+     container's right edge by design, so it still needs its own buffer
+     against the printable area's edge rather than relying on @page's
+     margin alone to never round short by a pixel or two. */
+  main#content,
+  main#main-content{
+    padding-right:.15in !important;
+    box-sizing:border-box !important;
   }
 
   main#content::before,
@@ -312,8 +327,7 @@ var PRINT_CSS = `
 
   .wc-metrics-strip,
   .wc-dept-fund-summary,
-  .wc-forecast-fund-grid,
-  .wc-revenue-topic-row{
+  .wc-forecast-fund-grid{
     display:block !important;
     width:100% !important;
     margin:0 0 .12in 0 !important;
@@ -323,8 +337,6 @@ var PRINT_CSS = `
   .wc-metric-card,
   .wc-dept-fund-card,
   .wc-forecast-fund-card,
-  .wc-revenue-topic-chart-card,
-  .wc-revenue-topic-narrative-card,
   .wc-directory-list li{
     display:block !important;
     width:100% !important;
@@ -760,7 +772,9 @@ var PRINT_CSS = `
 
   .wc-statement-panel h2,
   .wc-statement-panel .editable h2,
-  .wc-statement-panel .editable-paragraph-text h2{
+  .wc-statement-panel .editable-paragraph-text h2,
+  .wc-fund-section-heading,
+  .wc-forecast-fund h3{
     font-size:10.5pt !important;
     line-height:1.25 !important;
     margin:0 0 .07in 0 !important;
@@ -769,11 +783,14 @@ var PRINT_CSS = `
     font-weight:600 !important;
     letter-spacing:.035em !important;
     text-transform:none !important;
+    border:0 !important;
   }
 
   .wc-statement-panel h2::after,
   .wc-statement-panel .editable h2::after,
-  .wc-statement-panel .editable-paragraph-text h2::after{
+  .wc-statement-panel .editable-paragraph-text h2::after,
+  .wc-fund-section-heading::after,
+  .wc-forecast-fund h3::after{
     content:"" !important;
     display:block !important;
     width:.42in !important;
@@ -887,8 +904,42 @@ var PRINT_CSS = `
     color:#000000 !important;
   }
 
+  /* Financial Forecast: the Revenue/Expenditure Assumptions section
+     (growth-rate methodology tables, normally collapsed <details>) is
+     planning-methodology detail, not something anyone printing the
+     forecast needs -- and would otherwise force-open and print in full
+     via the openPrintDetails() logic below. :has() targets the whole
+     wc-forecast-section (heading included) rather than just the two
+     <details> blocks, since that section holds nothing else. */
+  .wc-forecast-section:has(.wc-forecast-assumptions-detail){
+    display:none !important;
+  }
+
+  /* Same page: also drop each fund's own "Category Forecast Detail"
+     breakdown (revenue/expense line items behind that fund's main
+     forecast table) -- like Assumptions above, it's a collapsed <details>
+     that would otherwise force-open and print in full. This rule also
+     covers the two Assumptions <details> from the block above (same
+     wc-forecast-detail base class), which is fine since that whole
+     section is already hidden either way. */
+  .wc-forecast-detail{
+    display:none !important;
+  }
+
   a[href]::after{
     content:"" !important;
+  }
+
+  /* Summary of Revenues/Expenses "View Budget Lines" detail: the actual-
+     amount transaction drilldown links and department row links are only
+     useful in the live, clickable site -- in print they should just read
+     as plain text, not styled or clickable like a web link. */
+  .wc-actual-drilldown-link,
+  .wc-department-row-link{
+    color:inherit !important;
+    text-decoration:none !important;
+    pointer-events:none !important;
+    cursor:default !important;
   }
 
   a[href*="youtube.com"],
@@ -927,124 +978,181 @@ var PRINT_CSS = `
     font-size:17pt !important;
   }
 
+  /* Performance measures/objectives are department-internal tracking, not
+     something anyone printing a budget document needs -- hide the whole
+     section (and its narrative banner/table) rather than formatting it
+     for print like the rest of the page. */
+  .wc-performance-card,
   .wc-performance-page,
   .wc-performance-page.is-embedded,
   #wc-performance-measures{
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    overflow:visible !important;
-    margin:0 0 14px 0 !important;
-    padding:0 !important;
-  }
-
-  .wc-performance-card{
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    overflow:hidden !important;
-    margin:0 0 14px 0 !important;
-    padding:0 !important;
-    border:0 !important;
-    border-radius:8px !important;
-    background:#ffffff !important;
-  }
-
-  .wc-performance-card::before{
-    position:static !important;
-    display:block !important;
-    top:auto !important;
-    left:auto !important;
-    transform:none !important;
-    margin:0 0 .085in 0 !important;
-    padding:0 0 .08in 0 !important;
-    white-space:normal !important;
-    text-align:left !important;
-    color:#000000 !important;
-    font-family:"Avenir Next", "Helvetica Neue", Arial, Helvetica, sans-serif !important;
-    font-size:10.5pt !important;
-    font-weight:600 !important;
-    line-height:1.25 !important;
-    letter-spacing:.035em !important;
-    text-transform:none !important;
-    border-left:0 !important;
-    border-radius:0 !important;
-    background:linear-gradient(#d1be78, #d1be78) left bottom / .42in 2px no-repeat !important;
+    display:none !important;
   }
 
   .wc-fy-column-toggle-wrap{
     display:none !important;
   }
 
-  .wc-performance-table-wrap{
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    overflow:hidden !important;
-    margin:0 !important;
+  /* Summary of Revenues / Summary of Expenses: drop the FY2020 and FY2021
+     columns (2nd/3rd column, after the row-label column) from the
+     Consolidated Revenue/Expense Summary table when printing -- those two
+     years are far enough back that they just add clutter to the printout.
+     Scoped to .wc-table-wrap specifically (the summary table's own
+     wrapper) rather than a bare descendant "table" -- the same container
+     div also holds the separate "View Budget Lines" print detail table
+     (.wc-print-budget-table-wrap), which already starts at FY2022 on its
+     own (see printYearColumns), so matching every table here would strip
+     ITS 2nd/3rd columns instead -- FY2022 and FY2023, not FY2020/2021. */
+  #consolidated-revenue-summary-table .wc-table-wrap table th:nth-child(2),
+  #consolidated-revenue-summary-table .wc-table-wrap table td:nth-child(2),
+  #consolidated-revenue-summary-table .wc-table-wrap table th:nth-child(3),
+  #consolidated-revenue-summary-table .wc-table-wrap table td:nth-child(3),
+  #consolidated-expense-summary-table .wc-table-wrap table th:nth-child(2),
+  #consolidated-expense-summary-table .wc-table-wrap table td:nth-child(2),
+  #consolidated-expense-summary-table .wc-table-wrap table th:nth-child(3),
+  #consolidated-expense-summary-table .wc-table-wrap table td:nth-child(3){
+    display:none !important;
+  }
+
+  /* Summary of Expenses' own "View Budget Lines" detail (department-level,
+     via renderExpenseDepartmentBudgetLinesFooter) has no separate
+     print-only table the way Summary of Revenues does -- it's the same
+     table on-screen and in print, with two label columns (Category,
+     Department) before the year columns start, so FY2020/2021 land on
+     the 3rd/4th column here instead of the 2nd/3rd. The Category
+     (Activity) column itself is also dropped from print -- the
+     department name alone is enough there. */
+  #consolidated-expense-summary-table .wc-budget-lines-detail table th:nth-child(1),
+  #consolidated-expense-summary-table .wc-budget-lines-detail table td:nth-child(1),
+  #consolidated-expense-summary-table .wc-budget-lines-detail table th:nth-child(3),
+  #consolidated-expense-summary-table .wc-budget-lines-detail table td:nth-child(3),
+  #consolidated-expense-summary-table .wc-budget-lines-detail table th:nth-child(4),
+  #consolidated-expense-summary-table .wc-budget-lines-detail table td:nth-child(4){
+    display:none !important;
+  }
+
+  /* Summary of Revenues / Summary of Expenses: nothing after the summary
+     table should print at all -- every revenue topic/expense activity
+     section below it (heading, narrative, and chart alike) is a sibling
+     of the table's own container div within main#content, so this one
+     rule drops all of them in one shot. */
+  #consolidated-revenue-summary-table ~ *,
+  #consolidated-expense-summary-table ~ *{
+    display:none !important;
+  }
+
+  /* "Last Updated" stamp (see lastUpdatedNoteHtml/.wc-data-updated-note in
+     budget-data.js) shows up under nearly every table/chart/card sitewide
+     -- it's noise on a printed page no matter which page it's on, so
+     hidden globally rather than scoped to just these two pages. */
+  .wc-data-updated-note{
+    display:none !important;
+  }
+
+  /* Summary of Personnel: the Department/Fund filters and sort toggle,
+     plus the "Click on a department name..." hint, are only meaningful
+     for the live, interactive page -- dropped from print entirely. The
+     department-rollup table itself (one row per department, each a
+     "View Positions" toggle into that department's own hidden position
+     list) is also dropped, since every department's position-detail
+     panel already force-shows in print anyway (see the .wc-budget-lines-
+     detail[hidden] rule above) -- keeping both would print the same FTE
+     counts twice, once rolled up and once again in full. What's left is
+     just the fund callout cards up top followed by one position list per
+     department, each labeled by its own print-title heading (see
+     personnelDeptDetailHtml in budget-data.js). */
+  #personnel-summary .wc-filter-bar,
+  #personnel-summary .wc-personnel-table-hint,
+  #personnel-summary .wc-financial-summary-table > .wc-data-table-wrap{
+    display:none !important;
+  }
+
+  /* Same page: also drop the "contact the office for a detailed position-
+     level FTE table" Staffing Notes some departments' position lists carry
+     (see STAFFING_GROUP_NOTES) -- moot here since the print output already
+     is that detailed position-level table. */
+  #personnel-summary .wc-staffing-notes{
+    display:none !important;
+  }
+
+  /* Summary of Machinery, Vehicles & Equipment: same idea as Summary of
+     Personnel above -- the Department filter is only meaningful on the
+     live, interactive page. Unlike Personnel, this page's own table
+     already lists every item flat (with its own Department column) when
+     no filter is applied, so only the filter bar itself needs hiding. */
+  #machinery-summary .wc-filter-bar{
+    display:none !important;
+  }
+
+  /* Capital Fund Schedules (Capital Projects/Transportation/Sheriff/
+     Tourist Development, see renderFundSchedule in cip-fund-schedule.js):
+     only one fiscal year's table is ever in the DOM at a time -- the year
+     buttons swap it out entirely on click rather than just toggling
+     visibility -- so print can't show every year at once. Drop the whole
+     controls box (heading, FY total, and year-picker buttons together)
+     and the three-stat summary row (fund total/projects listed/in-house
+     engineering) -- what's left is just the project tables themselves. */
+  .wc-cip-schedule-controls,
+  .wc-cip-year-summary{
+    display:none !important;
+  }
+
+  /* Give every table caption (see renderTable/.wc-table-label in
+     budget-data.js -- used sitewide, including Interfund Transfers Out/In,
+     Revenue/Expenditure Budget, and every other captioned data table) the
+     same compact, gold-underlined header treatment department pages
+     already get for their "Statement of Function" panel (see
+     .wc-statement-panel h2 above and ensureStatementPanel in this file) --
+     it's a <p>, not an h2, so it needs its own copy of that rule rather
+     than matching the shared selector. */
+  .wc-table-label{
+    font-size:10.5pt !important;
+    line-height:1.25 !important;
+    margin:0 0 .07in 0 !important;
     padding:0 !important;
-    border:0 !important;
-    border-radius:8px !important;
-    background:#ffffff !important;
+    color:#000000 !important;
+    font-weight:600 !important;
+    letter-spacing:.035em !important;
+    text-transform:none !important;
   }
 
-  .wc-performance-table,
-  .wc-performance-table table,
-  table.wc-performance-table{
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    table-layout:fixed !important;
-    border-collapse:collapse !important;
+  .wc-table-label::after{
+    content:"" !important;
+    display:block !important;
+    width:.42in !important;
+    height:2px !important;
+    margin:.055in 0 0 0 !important;
+    background:#d1be78 !important;
   }
 
-  table.wc-performance-table,
-  .wc-performance-table{
-    border-radius:8px !important;
-    overflow:hidden !important;
+  /* Fund Financial Schedules page: same FY2020/2021 drop as the two
+     Summary pages above, but every fund card here (Consolidated, each
+     Major fund, each Non-Major fund) nests a nth-child(2)/(3) revenue-
+     source or department detail table inside its own collapsible activity
+     rows -- all sharing the exact same column order (label, then
+     FY2020-FY2027), so one plain descendant selector catches the outer
+     schedule table and every nested breakdown table alike. */
+  #consolidated-fund-financial-schedule table th:nth-child(2),
+  #consolidated-fund-financial-schedule table td:nth-child(2),
+  #consolidated-fund-financial-schedule table th:nth-child(3),
+  #consolidated-fund-financial-schedule table td:nth-child(3),
+  #major-fund-financial-schedules table th:nth-child(2),
+  #major-fund-financial-schedules table td:nth-child(2),
+  #major-fund-financial-schedules table th:nth-child(3),
+  #major-fund-financial-schedules table td:nth-child(3),
+  #non-major-fund-financial-schedules table th:nth-child(2),
+  #non-major-fund-financial-schedules table td:nth-child(2),
+  #non-major-fund-financial-schedules table th:nth-child(3),
+  #non-major-fund-financial-schedules table td:nth-child(3){
+    display:none !important;
   }
 
-  .wc-performance-table th,
-  .wc-performance-table td{
-    white-space:normal !important;
-    word-break:normal !important;
-    overflow-wrap:break-word !important;
-    hyphens:auto !important;
-    font-size:7.5pt !important;
-    line-height:1.2 !important;
-    padding:4px 5px !important;
-    vertical-align:middle !important;
-  }
-
-  .wc-performance-table th,
   .wc-print-budget-table-wrap .wc-data-table th{
     white-space:pre-line !important;
     word-break:keep-all !important;
     overflow-wrap:normal !important;
     hyphens:none !important;
     line-height:1.15 !important;
-  }
-
-  .wc-performance-table th:nth-child(1),
-  .wc-performance-table td:nth-child(1){width:5% !important;}
-  .wc-performance-table th:nth-child(2),
-  .wc-performance-table td:nth-child(2){width:20% !important;}
-  .wc-performance-table th:nth-child(3),
-  .wc-performance-table td:nth-child(3){width:25% !important;}
-  .wc-performance-table th:nth-child(4),
-  .wc-performance-table td:nth-child(4){width:26% !important;}
-  .wc-performance-card .wc-performance-table .wc-fy-2022.wc-prior-year,
-  .wc-performance-card .wc-performance-table .wc-fy-2023.wc-prior-year{
-    width:0 !important;
-  }
-  .wc-performance-table th:nth-child(n+5),
-  .wc-performance-table td:nth-child(n+5){width:6% !important;}
-
-  .wc-performance-table td:nth-child(n+5){
-    text-align:right !important;
   }
 
   .wc-finance-card{
@@ -1105,6 +1213,54 @@ var PRINT_CSS = `
     opacity:1 !important;
   }
 
+  /* A staffing card's notes sit between the (print-hidden) summary footer
+     and the position-detail table in the source markup -- fine on-screen,
+     where the notes are meant to always show regardless of whether the
+     detail table is expanded, but in print that puts them above the table
+     they're actually annotating. Reordered with flex rather than moving
+     them in the DOM, so on-screen visibility/placement is untouched. */
+  .wc-staffing-card{
+    display:flex !important;
+    flex-direction:column !important;
+  }
+  .wc-staffing-card > .wc-budget-lines-detail{
+    order:1 !important;
+  }
+  .wc-staffing-card > .wc-staffing-notes{
+    order:2 !important;
+  }
+
+  /* Expenditure/Revenue Notes and Staffing Notes (same shared markup, see
+     renderNotesHtml) read as an on-screen callout box (background, gold
+     left border, .82rem text) that's oversized and out of place next to
+     the compact print typography used everywhere else (see
+     .wc-statement-panel p) -- stripped down to a plain, smaller footnote
+     here instead. */
+  .wc-staffing-notes{
+    margin:.08in 0 0 0 !important;
+    padding:0 !important;
+    background:transparent !important;
+    border:0 !important;
+    border-radius:0 !important;
+    font-size:8.5pt !important;
+    line-height:1.35 !important;
+    color:#000000 !important;
+    font-style:italic !important;
+  }
+
+  .wc-staffing-notes p{
+    margin:0 0 .04in 0 !important;
+  }
+
+  .wc-staffing-notes p:last-child{
+    margin-bottom:0 !important;
+  }
+
+  .wc-staffing-notes-title{
+    font-weight:700 !important;
+    font-style:normal !important;
+  }
+
   .wc-budget-lines-tools,
   .wc-budget-lines-detail-header{
     display:none !important;
@@ -1161,17 +1317,9 @@ var PRINT_CSS = `
 
   .wc-prior-year,
   .wc-budget-lines-card:not(.show-prior-years) .wc-prior-year,
-  .wc-staffing-card:not(.show-prior-years) .wc-staffing-table .wc-prior-year,
-  .wc-performance-card:not(.show-prior-years) .wc-performance-table .wc-col-prior-year,
-  .wc-performance-card:not(.show-prior-years) .wc-performance-table .wc-prior-year{
+  .wc-staffing-card:not(.show-prior-years) .wc-staffing-table .wc-prior-year{
     display:table-cell !important;
     visibility:visible !important;
-  }
-
-  .wc-performance-card .wc-performance-table .wc-fy-2022.wc-prior-year,
-  .wc-performance-card .wc-performance-table .wc-fy-2023.wc-prior-year{
-    display:none !important;
-    visibility:hidden !important;
   }
 
   .wc-budget-line-detail-row{
@@ -1183,6 +1331,14 @@ var PRINT_CSS = `
   .wc-staffing-table tr{
     display:table-row !important;
     visibility:visible !important;
+  }
+
+  /* Summary of Expenses' department-level "View Budget Lines" detail: a
+     row that's $0 across every column print shows (FY2022-FY2027) is
+     dropped from print, even though it stays visible on-screen -- see
+     the recentFields check in renderExpenseDepartmentBudgetLinesFooter. */
+  .wc-print-zero-recent{
+    display:none !important;
   }
 
   .wc-fy-2020,
@@ -1310,7 +1466,6 @@ var PRINT_CSS = `
   }
 
   .media-block,
-  .wc-performance-card,
   [data-report-table-container-id],
   .wc-plaque-card{
     break-inside:avoid !important;
@@ -1373,11 +1528,14 @@ var PRINT_CSS = `
   }
 
   function ensureStatementPanel() {
-    document.querySelectorAll("h2").forEach(function (heading) {
-      if (heading.textContent.trim().toLowerCase() !== "statement of function") return;
-
-      var section = heading.closest("section");
-      if (section) section.classList.add("wc-statement-panel");
+    // Every department page's own "Statement of Function" section already
+    // carries this class -- matching on it directly (rather than the
+    // heading's exact text) means the same compact, gold-underlined print
+    // header also applies to same-shaped sections whose heading reads
+    // something else, like Summary of Revenues' "Revenue Overview" or
+    // Summary of Expenses' "Expenditure Overview".
+    document.querySelectorAll(".statement-of-function").forEach(function (section) {
+      section.classList.add("wc-statement-panel");
     });
   }
 

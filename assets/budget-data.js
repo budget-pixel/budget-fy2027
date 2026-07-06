@@ -1343,6 +1343,18 @@
       ) {
         return "Statutory & Other";
       }
+      // A raw sheet row can carry Dept_Name "Unclassified" even though its
+      // Dept_Code is a real, named entry in the activities/department
+      // catalog -- e.g. the Tourist Development Fund's Beach Operations/
+      // Beach Renourishment/Sales and Visitors Center/Communications/
+      // Marketing/Beach Tram sub-departments (111410xx), which the sheet
+      // never carries a real Dept_Name for. Try that catalog entry before
+      // falling all the way back to the generic fund name.
+      const deptCode = String((r && r.Dept_Code) || "").trim();
+      const catalogEntry = deptCode && (cache.activities || []).find((a) => String(a.Dept_Code || "").trim() === deptCode);
+      if (catalogEntry && catalogEntry.Dept_Name && normalizeDeptName(catalogEntry.Dept_Name) !== "unclassified") {
+        return catalogEntry.Dept_Name;
+      }
       return fundNameForRow(r);
     }
     return name;
@@ -1996,15 +2008,25 @@
     ["10118000", "Public Works"]
   ]);
 
-  // These seven revenue codes have Supabase actuals but no Revenue_Name row
-  // anywhere in the published Revenues sheet (checked across every fund,
-  // not just Transportation) -- so synthesizeMissingRevenueRows would
-  // otherwise land all of them in "Unclassified Account" under the generic
-  // Miscellaneous Revenue type. Reclassified per county guidance: the
-  // impact fee code belongs under Permits, Fees, and Special Assessments;
-  // the federal/state grant codes belong under Intergovernmental Revenues;
-  // the contribution codes stay under Miscellaneous Revenue but get a real
-  // name instead of "Unclassified Account".
+  // These revenue codes have Supabase actuals but no Revenue_Name row
+  // anywhere in the published Revenues sheet (checked across every fund) --
+  // so synthesizeMissingRevenueRows would otherwise land all of them in
+  // "Unclassified Account" under the generic Miscellaneous Revenue type.
+  // The first 7 (324001-366003) were reclassified per county guidance for
+  // the Transportation Fund. The rest surfaced the same way on the
+  // Consolidated Fund Financial Schedule, spread across the General,
+  // Building, Sheriff (Law Enforcement Trust), Tourist Development, Solid
+  // Waste, E911, Mosquito Control, and Capital Projects funds -- named/
+  // typed from Florida's Uniform Chart of Accounts numeric ranges
+  // (321-329 Permits/Fees/Special Assessments, 331-339 Intergovernmental,
+  // 341-349 Charges for Services, 351-359 Judgments/Fines/Forfeitures,
+  // 361-369 Miscellaneous, 381-389 Other Financing Sources) and, where it
+  // lined up with one of those ranges, the activities sheet's own category
+  // label for that synthesized row's placeholder Dept_Code (e.g. 001331 is
+  // labeled "Federal Grants" there, 300384 "Debt Proceeds"). Several
+  // distinct codes intentionally share one catch-all name/type below (e.g.
+  // every generic "Interest & Other Earnings" or "Federal Grant (Other)"
+  // code) since the county never gave them their own line either.
   const REVENUE_CODE_OVERRIDES = new Map([
     ["324001", { name: "Road Impact Fees", type: "Permits Fees and Special Assessments" }],
     ["331900", { name: "Federal Grant (Other)", type: "Intergovernmental Revenues" }],
@@ -2012,7 +2034,53 @@
     ["334500", { name: "State Grant (Other)", type: "Intergovernmental Revenues" }],
     ["366000", { name: "Contributions and Donations", type: "Miscellaneous Revenue" }],
     ["366002", { name: "Contributions and Donations (Private Sources)", type: "Miscellaneous Revenue" }],
-    ["366003", { name: "Contributions and Donations (Other)", type: "Miscellaneous Revenue" }]
+    ["366003", { name: "Contributions and Donations (Other)", type: "Miscellaneous Revenue" }],
+
+    // General Fund (001), Solid Waste (112), Capital Projects (300)
+    ["329008", { name: "Special Assessments", type: "Permits Fees and Special Assessments" }],
+    ["331690", { name: "Federal Grant (Other)", type: "Intergovernmental Revenues" }],
+    ["331700", { name: "Federal Grant (Other)", type: "Intergovernmental Revenues" }],
+    ["331390", { name: "Federal Grant (Other)", type: "Intergovernmental Revenues" }],
+    ["334390", { name: "State Grant (Other)", type: "Intergovernmental Revenues" }],
+    ["334320", { name: "State Grant (Solid Waste)", type: "Intergovernmental Revenues" }],
+    ["323700", { name: "Franchise Fees", type: "Permits Fees and Special Assessments" }],
+    ["341000", { name: "General Government Fees", type: "Charges for Services" }],
+    ["341300", { name: "General Government Fees", type: "Charges for Services" }],
+    ["341206", { name: "General Government Fees", type: "Charges for Services" }],
+    ["341207", { name: "General Government Fees", type: "Charges for Services" }],
+    ["343402", { name: "Physical Environment Fees", type: "Charges for Services" }],
+    ["343404", { name: "Physical Environment Fees", type: "Charges for Services" }],
+    ["343406", { name: "Physical Environment Fees", type: "Charges for Services" }],
+    ["343409", { name: "Physical Environment Fees", type: "Charges for Services" }],
+    ["361110", { name: "Interest and Other Earnings", type: "Miscellaneous Revenue" }],
+    ["364000", { name: "Sale of Fixed Assets", type: "Miscellaneous Revenue" }],
+    ["364002", { name: "Sale of Fixed Assets", type: "Miscellaneous Revenue" }],
+    ["366001", { name: "Contributions and Donations", type: "Miscellaneous Revenue" }],
+
+    // Law Enforcement Trust Fund (108)
+    ["351300", { name: "Judgments and Fines", type: "Judgments, Fines and Forfeits" }],
+    ["351400", { name: "Judgments and Fines", type: "Judgments, Fines and Forfeits" }],
+    ["351500", { name: "Judgments and Fines", type: "Judgments, Fines and Forfeits" }],
+    ["351600", { name: "Judgments and Fines", type: "Judgments, Fines and Forfeits" }],
+
+    // Tourist Development Fund (111)
+    ["312140", { name: "Tourist Development Tax (Other)", type: "General Government Taxes" }],
+    ["361104", { name: "Interest and Other Earnings", type: "Miscellaneous Revenue" }],
+    ["361109", { name: "Interest and Other Earnings", type: "Miscellaneous Revenue" }],
+    ["361112", { name: "Interest and Other Earnings", type: "Miscellaneous Revenue" }],
+
+    // E911 Fund (109)
+    ["335220", { name: "State Shared Revenue (Other)", type: "Intergovernmental Revenues" }],
+    ["335223", { name: "State Shared Revenue (Other)", type: "Intergovernmental Revenues" }],
+
+    // Mosquito Control Fund (105)
+    ["346900", { name: "Human Services Fees", type: "Charges for Services" }],
+
+    // Capital Projects Fund (300) -- 384000 is bond/loan proceeds, an
+    // "other financing source" by nature rather than everyday revenue, so
+    // (unlike everything else here) it's reclassified out of Miscellaneous
+    // Revenue entirely rather than just renamed.
+    ["384000", { name: "Debt Proceeds", type: "Other Sources" }]
   ]);
 
   // A synthesized row's catalog entry (the activities sheet) often carries
@@ -2591,13 +2659,26 @@
     // departments' Dept_Codes) into one line. On a single department's own
     // breakdown, every row is kept separate so distinct budget lines that
     // happen to share an Object/Revenue Name aren't hidden from each other.
+    // On the Summary of Revenues' county-wide list, the many individual
+    // "State Grant (X)"/"Federal Grant (X)" lines (one per activity, see
+    // REVENUE_CODE_OVERRIDES) are still one program-level source of money
+    // as far as most readers care -- collapsed into a single "State
+    // Grants"/"Federal Grants" row each, same mechanism as the by-name
+    // merge below.
+    function collapsedBudgetLineName(rawName) {
+      if (isExpense) return rawName;
+      if (/^Federal Grant\b/.test(rawName)) return "Federal Grants";
+      if (/^State Grant\b/.test(rawName)) return "State Grants";
+      return rawName;
+    }
+
     let mergedRows = rows;
     if (combineByName) {
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
       const grouped = new Map();
       const seenRevenueOriginalBudget = new Map();
       rows.forEach((r) => {
-        const name = r[nameField] || "";
+        const name = collapsedBudgetLineName(r[nameField] || "");
         const existing = grouped.get(name);
         const description = itemizedDescriptionForBudgetLine(r, descriptionField, isExpense);
         if (!existing) {
@@ -2637,6 +2718,14 @@
         sumFields.forEach((f) => { row[f] = merged[f]; });
         return row;
       });
+      // A merged, county-wide name with zero dollars in every single year
+      // (e.g. a retired account code with no activity ever recorded) is
+      // just noise on the Summary of Revenues/Expenses "View Budget Lines"
+      // list. Only applied here (combineByName's merged rows), not to a
+      // single department's own popup -- there a $0 row can still mean
+      // "this department has budget authority here but didn't collect/
+      // spend anything this year," which is worth keeping visible.
+      mergedRows = mergedRows.filter((row) => sumFields.some((f) => (row[f] || 0) !== 0));
     }
 
     const fy2026BudgetColumn = priorYearColumns.find((c) => c.field === "FY2026_Original_Budget");
@@ -2887,8 +2976,16 @@
     });
 
     const printYearColumns = priorYearColumns.filter((c) => c.year !== 2020 && c.year !== 2021);
+    // A row that's exactly $0 across every column the printout actually
+    // shows (FY2022-FY2027) is just noise there -- even if it had real
+    // FY2020/2021 activity, since those two columns are dropped from print
+    // entirely (see printYearColumns above), a reader would otherwise see
+    // a row with nothing but zeroes and no way to tell why it's listed.
     const printRows = summaryRows
       .slice()
+      .filter((row) =>
+        printYearColumns.some((c) => (budgetLineVisibleColumnAmount(row, c) || 0) !== 0) ||
+        (row.FY2027_Proposed || 0) !== 0)
       .sort((a, b) => String(a[codeField] || "").localeCompare(String(b[codeField] || "")));
 
     function printBudgetLineRowHtml(row, label, rowClass) {
@@ -5979,6 +6076,33 @@
     );
   }
 
+  // A few of this table's rows are named after their underlying fund
+  // (e.g. a row falling back to "Sheriff Fund" instead of a real
+  // department) even though a differently-named row for the actual
+  // department already exists elsewhere in the same list -- collapsed
+  // into that existing row's name so the two merge into one instead of
+  // showing the same money twice under two labels.
+  const EXPENSE_DEPARTMENT_ROW_ALIASES = new Map([
+    ["north walton tourist development tax", "Tourism North Walton"],
+    ["msbu fund", "MSBU"],
+    ["sheriff fund", "Walton County Sheriff's Office"],
+    // The activities/department catalog names these six Tourist
+    // Development Fund sub-departments with a "Tourism" prefix, but the
+    // sheet's own already-correctly-named rows for the same real
+    // departments (111410xx's siblings) use the shorter name -- aliased
+    // to match so a previously-"Unclassified" row merges into its
+    // existing counterpart instead of showing as a second, duplicate row.
+    ["tourism beach operations", "Beach Operations"],
+    ["tourism beach renourishment", "Beach Renourishment"],
+    ["tourism beach tram", "Beach Tram"],
+    ["tourism communications", "Communications"],
+    ["tourism marketing", "Marketing"],
+    ["tourism sales and visitors center", "Sales and Visitors Center"]
+  ]);
+  function collapsedDeptRowName(rawName) {
+    return EXPENSE_DEPARTMENT_ROW_ALIASES.get(normalizeDeptName(rawName)) || rawName;
+  }
+
   // The Consolidated Expense Summary's "View Budget Lines" detail shows
   // department-level subtotals (with each department's category) rather
   // than individual object-code lines, since the visible table above is
@@ -6019,11 +6143,15 @@
 
     const repByCodeAndName = clusterDeptNamesByCode(rows.concat(dedupedRows || []));
     function representativeName(r) {
-      return expenseDisplayDeptName(repByCodeAndName, r);
+      return collapsedDeptRowName(expenseDisplayDeptName(repByCodeAndName, r));
     }
+    // Keyed by display name alone (not Dept_Code) -- this table is meant
+    // to show one row per department, but several departments (Capital
+    // Projects, Statutory & Other, etc.) book spending under more than one
+    // underlying Dept_Code that all resolve to the same representative
+    // name, which used to leave each Dept_Code as its own separate row.
     function groupKeyFor(r) {
-      const code = String(r.Dept_Code || "").trim();
-      return code ? code + "|" + normalizeDeptName(representativeName(r)) : "name:" + normalizeDeptName(r.Dept_Name);
+      return normalizeDeptName(representativeName(r)) || normalizeDeptName(r.Dept_Name);
     }
     function entryFor(byDept, r) {
       const key = groupKeyFor(r);
@@ -6051,12 +6179,25 @@
       return a.Dept_Name.localeCompare(b.Dept_Name);
     });
 
+    // Unlike Summary of Revenues, this department-level detail has no
+    // separate print-only table (see printYearColumns there) -- it's the
+    // same rows on-screen and in print, just with FY2020/2021 hidden by
+    // CSS for print (see budget-pdf.js). So a row that's $0 across every
+    // column print actually shows (FY2022-FY2027) gets its own class here
+    // instead of being dropped from the array outright, letting print
+    // hide it while the on-screen view still shows every department.
+    const recentFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS
+      .filter((c) => c.year !== 2020 && c.year !== 2021)
+      .map((c) => c.field)
+      .concat(["FY2027_Proposed"]);
     const bodyRows = deptRows.map((d) => {
       const isZeroCurrent = (d.FY2027_Proposed || 0) === 0;
+      const isZeroRecent = recentFields.every((f) => (d[f] || 0) === 0);
+      const rowClasses = [isZeroCurrent && "wc-budget-line-zero-current", isZeroRecent && "wc-print-zero-recent"].filter(Boolean);
       const deptHref = departmentPageHref(d.Dept_Name);
       const deptLabel = escapeHtml(d.Dept_Name);
       return (
-        "<tr" + (isZeroCurrent ? ' class="wc-budget-line-zero-current"' : "") + ">" +
+        "<tr" + (rowClasses.length ? ' class="' + rowClasses.join(" ") + '"' : "") + ">" +
         "<td>" + escapeHtml(activityLabel(d.activity)) + "</td>" +
         "<td>" + (deptHref ? '<a class="wc-department-row-link" href="' + escapeHtml(deptHref) + '">' + deptLabel + "</a>" : deptLabel) + "</td>" +
         BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) =>
@@ -8267,8 +8408,23 @@
     const years = [2024, 2025, 2026, 2027];
     const priorYears = years.filter((y) => y < 2027);
     const showPriorLocal = getShowPriorYears();
-    const sortedPositions = deptRows
-      .slice()
+    // Departments merged into one display name for this view (e.g. Code
+    // Compliance Street/Beach, both shown as just "Code Compliance") often
+    // share the exact same position title across their sub-programs --
+    // grouped here by title, summing FTE, so "Office Manager" or "Code
+    // Compliance Manager" shows as one row instead of once per sub-program.
+    const positionsByName = new Map();
+    deptRows.forEach((r) => {
+      const name = (r.Position_Name || "").trim();
+      if (!positionsByName.has(name)) {
+        const entry = { Position_Name: name };
+        years.forEach((y) => { entry[y] = 0; });
+        positionsByName.set(name, entry);
+      }
+      const entry = positionsByName.get(name);
+      years.forEach((y) => { entry[y] += r[y] || 0; });
+    });
+    const sortedPositions = Array.from(positionsByName.values())
       .sort((a, b) => (a.Position_Name || "").localeCompare(b.Position_Name || ""));
     const totals = { 2024: 0, 2025: 0, 2026: 0, 2027: 0 };
     const bodyRows = sortedPositions.map((r) => {
@@ -8302,7 +8458,15 @@
         "</div>"
       : "";
     const detailHtml =
-      '<div class="wc-budget-lines-detail wc-budget-lines-card' + (showPriorLocal ? " show-prior-years" : "") + '" id="' + detailId + '" hidden>' +
+      // wc-finance-card + data-print-title reuse the same print-only
+      // "::before shows the department name as a heading" treatment the
+      // staffing cards get elsewhere (see .wc-finance-card::before in
+      // budget-pdf.js) -- needed here because in print this panel is
+      // force-shown (see .wc-budget-lines-detail[hidden] print rule) with
+      // its rollup table and toggle button both hidden, so without this
+      // the department name (currently only on that hidden toggle button)
+      // would be lost entirely.
+      '<div class="wc-budget-lines-detail wc-budget-lines-card wc-finance-card' + (showPriorLocal ? " show-prior-years" : "") + '" data-print-title="' + escapeHtml(deptName || "") + '" id="' + detailId + '" hidden>' +
         priorYearsToggleHtml(showPriorLocal, "wc-budget-lines-detail-header") +
         '<div class="wc-data-table-scroll">' +
         '<table class="wc-data-table wc-staffing-table">' +
