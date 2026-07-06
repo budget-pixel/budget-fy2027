@@ -773,12 +773,6 @@
   .wc-tax-calc-panel .wc-millage-panel-head h3{
     margin-bottom:0;
   }
-  .wc-tax-calc-intro{
-    margin:0 0 18px;
-    color:var(--wc-muted);
-    font-size:14px;
-    line-height:1.55;
-  }
   .wc-tax-calc-subhead{
     margin-top:24px;
     padding-top:22px;
@@ -940,146 +934,11 @@
     height:16px;
     accent-color:var(--wc-green);
   }
-  .wc-tax-metrics{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:10px;
-    margin-bottom:10px;
-  }
-  .wc-tax-metric{
-    display:grid;
-    grid-template-rows:minmax(3.2em, auto) auto;
-    align-content:space-between;
-    border:1px solid var(--wc-line);
-    border-radius:12px;
-    background:#fff;
-    padding:10px 12px;
-  }
-  .wc-tax-metric span{
-    display:block;
-    color:var(--wc-muted);
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:.04em;
-    text-transform:uppercase;
-  }
-  .wc-tax-metric strong{
-    display:block;
-    margin-top:6px;
-    color:var(--wc-green);
-    font-size:17px;
-    font-variant-numeric:tabular-nums;
-  }
-  .wc-tax-metric-exemption{
-    border-color:var(--wc-gold);
-    background:rgba(209,190,120,.16);
-  }
-  .wc-tax-metric-loss{
-    border-color:#b3261e;
-    background:rgba(179,38,30,.06);
-  }
-  .wc-tax-metric-loss strong{
-    color:#b3261e;
-  }
-  .wc-tax-calc-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:14px;
-    padding:10px 14px;
-    margin-bottom:10px;
-    border:1px solid var(--wc-line);
-    border-radius:12px;
-    background:#fff;
-  }
-  .wc-tax-calc-row span{
-    color:var(--wc-muted);
-    font-size:13px;
-    font-weight:700;
-  }
-  .wc-tax-calc-row strong{
-    color:var(--wc-ink);
-    font-size:16px;
-    font-variant-numeric:tabular-nums;
-  }
-  .wc-tax-calc-row-total{
-    background:rgba(0,98,49,.06);
-    border-color:var(--wc-green);
-  }
-  .wc-tax-calc-row-total span,
-  .wc-tax-calc-row-total strong{
-    color:var(--wc-green);
-    font-weight:900;
-  }
-  .wc-tax-calc-row-total strong{
-    font-size:20px;
-  }
-  .wc-homestead-block{
-    margin:12px 0;
-    padding:16px;
-    border:1px solid var(--wc-line);
-    border-radius:14px;
-    background:rgba(0,98,49,.03);
-  }
-  .wc-homestead-block .wc-millage-panel-head{
-    align-items:flex-start;
-    flex-wrap:wrap;
-    gap:14px 18px;
-  }
-  .wc-homestead-block h4{
-    max-width:18rem;
-    line-height:1.35;
-  }
-  .wc-homestead-block h4,
   .wc-tax-calc-subhead h4{
     margin:0;
     color:var(--wc-ink);
     font-size:15px;
     font-weight:800;
-  }
-  .wc-homestead-toggle{
-    margin-bottom:0;
-  }
-  .wc-homestead-options{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-    width:min(100%, 20rem);
-  }
-  .wc-homestead-option{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:9px;
-    margin:0;
-    border:1px solid var(--wc-line);
-    border-radius:999px;
-    background:#fff;
-    min-height:44px;
-    padding:9px 13px;
-    color:var(--wc-ink);
-    font-size:12px;
-    font-weight:800;
-    line-height:1.2;
-    cursor:pointer;
-  }
-  .wc-homestead-option input{
-    margin:0;
-    width:16px;
-    height:16px;
-    flex:0 0 16px;
-    accent-color:var(--wc-green);
-  }
-  .wc-exemption-message{
-    margin:10px 0 0;
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid var(--wc-gold);
-    background:rgba(209,190,120,.2);
-    color:var(--wc-ink);
-    font-size:12px;
-    font-weight:700;
-    line-height:1.5;
   }
   .wc-tax-calc-note{
     margin:14px 0 0;
@@ -1317,10 +1176,7 @@
   html[data-theme="dark"] .wc-tax-calc-panel h3{
     color:var(--wc-ink);
   }
-  html[data-theme="dark"] .wc-tax-calc-field input,
-  html[data-theme="dark"] .wc-tax-calc-row,
-  html[data-theme="dark"] .wc-tax-metric,
-  html[data-theme="dark"] .wc-homestead-option{
+  html[data-theme="dark"] .wc-tax-calc-field input{
     background:rgba(10,20,16,.7);
     border-color:var(--wc-line);
     color:var(--wc-ink);
@@ -1335,19 +1191,7 @@
     color:#f2f8f4;
     box-shadow:0 12px 26px rgba(0,0,0,.4);
   }
-  html[data-theme="dark"] .wc-tax-calc-row-total{
-    background:rgba(123,211,159,.1);
-  }
-  html[data-theme="dark"] .wc-homestead-block{
-    background:rgba(10,20,16,.45);
-    border-color:var(--wc-line);
-  }
-  html[data-theme="dark"] .wc-homestead-block h4,
   html[data-theme="dark"] .wc-tax-calc-subhead h4{
-    color:var(--wc-ink);
-  }
-  html[data-theme="dark"] .wc-exemption-message{
-    background:rgba(209,190,120,.14);
     color:var(--wc-ink);
   }
   html[data-theme="dark"] .wc-tax-info-dialog{
@@ -1388,20 +1232,10 @@
   @media (max-width:900px){
     .wc-tax-grid{grid-template-columns:1fr;}
     .wc-taxpayer-tiers{grid-template-columns:repeat(3,minmax(0,1fr));}
-    .wc-tax-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
   @media (max-width:560px){
     .wc-millage-grid{grid-template-columns:1fr;}
     .wc-taxpayer-tiers{grid-template-columns:repeat(2,minmax(0,1fr));}
-    .wc-tax-metrics{grid-template-columns:1fr;}
-    .wc-homestead-block .wc-millage-panel-head{
-      display:block;
-    }
-    .wc-homestead-options{
-      grid-template-columns:1fr;
-      width:100%;
-      margin-top:14px;
-    }
   }
 
   .wc-budget-grid{
@@ -1968,68 +1802,17 @@
             <h3>Property Tax Breakdown</h3>
             <button type="button" class="wc-millage-reset" id="taxCalcReset">Reset</button>
           </div>
-          <p class="wc-tax-calc-intro">Estimate your property tax breakdown using the last approved budget and countywide millage rate, plus the North Walton Mosquito Control millage if your property is within that district.</p>
           <div class="wc-tax-calc-field wc-property-search-field">
             <span>Find Your Property</span>
-            <input id="propertyAddressSearch" type="text" autocomplete="off" placeholder="Search by address">
+            <input id="propertyAddressSearch" type="text" autocomplete="off" placeholder="Search by address, or enter a taxable value like $300,000">
             <div id="propertyAddressResults" class="wc-property-search-results" hidden></div>
-            <p id="propertyAddressStatus" class="wc-property-search-status">Click in the field above, then start typing an address to find your property.</p>
+            <p id="propertyAddressStatus" class="wc-property-search-status" hidden></p>
+            <input id="taxCalcValue" type="hidden">
           </div>
-          <label class="wc-tax-calc-field" id="taxManualEstimateField">
-            <span>Manual Estimate</span>
-            <input id="taxCalcValue" type="text" inputmode="numeric" placeholder="$300,000">
-          </label>
           <label class="wc-tax-calc-checkbox">
             <input id="taxCalcMosquito" type="checkbox">
             <span>Located within the North Walton Mosquito Control District</span>
           </label>
-
-          <div class="wc-tax-calc-row wc-tax-calc-row-mosquito" id="taxCalcMosquitoRow" hidden>
-            <span>+ North Walton Mosquito Control (0.441 mills)</span>
-            <strong id="taxCalcMosquitoAmount"></strong>
-          </div>
-          <div class="wc-tax-calc-row wc-tax-calc-row-total">
-            <span>Estimated Annual Property Tax</span>
-            <strong id="taxCalcTotal">$0</strong>
-          </div>
-
-          <div class="wc-homestead-block" id="calcExemptionBlock" hidden>
-            <div class="wc-millage-panel-head">
-              <h4>Proposed Additional Homestead Exemption</h4>
-              <div class="wc-homestead-options" aria-label="Choose exemption scenario">
-                <label class="wc-homestead-option">
-                  <input id="use2027Exemption" name="exemptionScenario" type="radio" value="2027">
-                  <span>2027 $150,000</span>
-                </label>
-                <label class="wc-homestead-option">
-                  <input id="use2028Exemption" name="exemptionScenario" type="radio" value="2028">
-                  <span>2028 $250,000</span>
-                </label>
-              </div>
-            </div>
-            <div id="calcExemptionResults" hidden>
-              <div class="wc-tax-metrics">
-                <div class="wc-tax-metric wc-tax-metric-exemption">
-                  <span>Additional Exemption</span>
-                  <strong id="calcExemptionAmount">$0</strong>
-                </div>
-                <div class="wc-tax-metric">
-                  <span>New Estimated Taxable Value</span>
-                  <strong id="calcAdjustedTaxableValue">$0</strong>
-                </div>
-                <div class="wc-tax-metric">
-                  <span>Estimated New Property Tax Levied</span>
-                  <strong id="calcNewPropertyTaxLevied">$0</strong>
-                </div>
-                <div class="wc-tax-metric wc-tax-metric-loss">
-                  <span>Estimated County Funding Lost</span>
-                  <strong id="calcFundingLoss">$0</strong>
-                </div>
-              </div>
-              <p id="calcZeroTaxMessage" class="wc-exemption-message" hidden>Your county taxable value would be completely reduced under the State proposed amendment. Your estimated new property tax levied would be $0, which means you would not be providing funding for any of the services listed below.</p>
-              <p id="calcPartialTaxMessage" class="wc-exemption-message" hidden>Your bill would not be completely reduced under the State proposed amendment; however, it would still reduce funding for the services below.</p>
-            </div>
-          </div>
 
           <div class="wc-tax-calc-subhead" id="taxSupportBreakdownSection" tabindex="-1">
             <div class="wc-millage-panel-head">
@@ -2142,11 +1925,11 @@
   </footer>
 </div>
 
-<script src="assets/walton-split-logo.js?v=20260627-axe-a11y"></script>
-<script src="assets/walton-budget-search-data.js"></script>
-<script src="assets/walton-budget-search.js?v=20260627-lighthouse-a11y"></script>
+<script src="assets/brand-logo.js?v=20260627-axe-a11y"></script>
+<script src="assets/search-data.js"></script>
+<script src="assets/search.js?v=20260627-lighthouse-a11y"></script>
 <script src="assets/budget-data.js?v=20260627-prior-years-a11y"></script>
-<script src="assets/walton-cip-projects.js?v=20260622-project-images-v3"></script>
+<script src="assets/cip-projects-data.js?v=20260622-project-images-v3"></script>
 <script>
   (function(){
     function $(selector, root){
@@ -2451,7 +2234,7 @@
     // FY2027 funding for one project, summed across whichever
     // funding_by_year entries (a project can draw from more than one
     // source/fund in the same year) are tagged "FY2027" -- see
-    // walton-cip-projects.js.
+    // cip-projects-data.js.
     function fy2027FundingAmount(project){
       var entries = Array.isArray(project && project.funding_by_year) ? project.funding_by_year : [];
       return entries.reduce(function(sum, entry){
@@ -2472,7 +2255,7 @@
 
       // Excludes grant-funded projects (project.funding === "Grant Funded",
       // same match used by the Grant Funded Schedule page -- see
-      // renderFundSchedule in walton-cip-fund-schedule.js) -- this callout
+      // renderFundSchedule in cip-fund-schedule.js) -- this callout
       // is meant to reflect the County's own FY2027 capital investment,
       // not grant dollars that are awarded/administered separately.
       var realProjects = (projects || []).filter(function(project){
@@ -2688,39 +2471,29 @@
 
     // Property Tax Calculator: estimates one taxpayer's own bill using the
     // same Countywide/North Walton Mosquito Control millage rates shown on
-    // the Property Taxes card above (see wc-budget-card-millage).
-    // Mirrors the standalone walton-property-breakdown calculator: shows
-    // Just Value/Taxable Value/Property Tax Levied, models the proposed
-    // additional homestead exemption scenarios, and breaks the county tax
-    // bill down proportionally across departments by each one's share of total ad
-    // valorem revenue (same data as the static breakdown panel above).
+    // the Property Taxes card above (see wc-budget-card-millage), then
+    // breaks that bill down proportionally across departments by each
+    // one's share of total ad valorem revenue (same data as the static
+    // breakdown panel above).
     function initTaxCalculator(){
       var valueInput = $("#taxCalcValue");
       if(!valueInput) return;
       var mosquitoCheckbox = $("#taxCalcMosquito");
-      var use2027Checkbox = $("#use2027Exemption");
-      var use2028Checkbox = $("#use2028Exemption");
       var showPercentCheckbox = $("#showBreakdownPercentages");
       var resetButton = $("#taxCalcReset");
       var infoButton = $("#taxInfoOpen");
       var infoDialog = $("#taxInfoDialog");
       var infoCloseButton = $("#taxInfoClose");
-      var manualEstimateField = $("#taxManualEstimateField");
       var propertySearchInput = $("#propertyAddressSearch");
       var propertySearchResults = $("#propertyAddressResults");
       var propertySearchStatus = $("#propertyAddressStatus");
       var COUNTYWIDE_MILLAGE = 3.519;
       var MOSQUITO_MILLAGE = 0.441;
-      var ADDITIONAL_EXEMPTION = 150000;
-      var ADDITIONAL_EXEMPTION_2028 = 250000;
       var BREAKDOWN_PREVIEW_COUNT = 7;
       var lastCountyTax = 0;
       var lastMosquitoTax = 0;
       var breakdownShowAll = false;
 
-      function money(value){
-        return "$" + Math.round(Number(value) || 0).toLocaleString("en-US");
-      }
       function moneyWithCents(value){
         return "$" + (Number(value) || 0).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 });
       }
@@ -2782,53 +2555,12 @@
         });
       }
 
-      function formatValueInput(){
-        var digits = valueInput.value.replace(/[^0-9]/g, "");
-        valueInput.value = digits ? "$" + Number(digits).toLocaleString("en-US") : "";
-      }
-      function setManualEstimateVisible(visible){
-        if(manualEstimateField) manualEstimateField.hidden = !visible;
-      }
-
       function render(){
         var taxableValue = parseDollarAmount(valueInput.value);
         var countywideAmount = taxableValue * COUNTYWIDE_MILLAGE / 1000;
-        if(selectedParcelMeta && selectedParcelMeta.taxableValue === taxableValue){
-          setManualEstimateVisible(false);
-        }
 
         var includeMosquito = mosquitoCheckbox.checked;
         var mosquitoAmount = includeMosquito ? taxableValue * MOSQUITO_MILLAGE / 1000 : 0;
-        var mosquitoRow = $("#taxCalcMosquitoRow");
-        mosquitoRow.hidden = !includeMosquito;
-        $("#taxCalcMosquitoAmount").textContent = money(mosquitoAmount);
-
-        $("#taxCalcTotal").textContent = money(countywideAmount + mosquitoAmount);
-
-        // Homestead exemption scenario stays idle until a taxable value is
-        // entered, then only applies when the user opts into one of the
-        // proposed exemption scenarios.
-        var exemptionBlock = $("#calcExemptionBlock");
-        var exemptionResults = $("#calcExemptionResults");
-        if(!taxableValue){
-          exemptionBlock.hidden = true;
-          exemptionResults.hidden = true;
-        } else {
-          exemptionBlock.hidden = false;
-          exemptionResults.hidden = false;
-          var selectedExemption = use2028Checkbox.checked ? ADDITIONAL_EXEMPTION_2028 : use2027Checkbox.checked ? ADDITIONAL_EXEMPTION : 0;
-          var exemptionAmount = selectedExemption;
-          var adjustedTaxableValue = Math.max(taxableValue - exemptionAmount, 0);
-          var newCountyTax = adjustedTaxableValue * COUNTYWIDE_MILLAGE / 1000;
-          var fundingLoss = Math.max(countywideAmount - newCountyTax, 0);
-
-          $("#calcExemptionAmount").textContent = money(exemptionAmount);
-          $("#calcAdjustedTaxableValue").textContent = money(adjustedTaxableValue);
-          $("#calcNewPropertyTaxLevied").textContent = money(newCountyTax);
-          $("#calcFundingLoss").textContent = money(fundingLoss);
-          $("#calcZeroTaxMessage").hidden = !(newCountyTax === 0);
-          $("#calcPartialTaxMessage").hidden = !(newCountyTax > 0 && fundingLoss > 0);
-        }
 
         lastCountyTax = countywideAmount;
         lastMosquitoTax = mosquitoAmount;
@@ -2839,12 +2571,9 @@
         if(!event.detail || !event.detail.preserveParcelMeta){
           selectedParcelMeta = null;
         }
-        formatValueInput();
         render();
       });
       mosquitoCheckbox.addEventListener("change", render);
-      use2027Checkbox.addEventListener("change", render);
-      use2028Checkbox.addEventListener("change", render);
       showPercentCheckbox.addEventListener("change", function(){ renderPersonalBreakdown(lastCountyTax, lastMosquitoTax); });
       if(infoButton && infoDialog){
         infoButton.addEventListener("click", function(){
@@ -2869,18 +2598,18 @@
           selectedParcelMeta = null;
           valueInput.value = "";
           mosquitoCheckbox.checked = false;
-          use2027Checkbox.checked = false;
-          use2028Checkbox.checked = false;
           showPercentCheckbox.checked = false;
           lastMosquitoTax = 0;
           breakdownShowAll = false;
           if(propertySearchInput) propertySearchInput.value = "";
-          setManualEstimateVisible(true);
           if(propertySearchResults){
             propertySearchResults.hidden = true;
             propertySearchResults.innerHTML = "";
           }
-          if(propertySearchStatus) propertySearchStatus.textContent = "Click in the field above, then start typing an address to find your property.";
+          if(propertySearchStatus){
+            propertySearchStatus.textContent = "";
+            propertySearchStatus.hidden = true;
+          }
           render();
         });
       }
@@ -2900,10 +2629,14 @@
       var resultsBox = $("#propertyAddressResults");
       var statusEl = $("#propertyAddressStatus");
       var valueInput = $("#taxCalcValue");
-      var manualEstimateField = $("#taxManualEstimateField");
       var records = [];
       var loaded = false;
       var loading = false;
+
+      function setStatus(text){
+        statusEl.textContent = text || "";
+        statusEl.hidden = !text;
+      }
 
       function showResults(matches){
         if(!matches.length){
@@ -2931,7 +2664,6 @@
         input.value = record.address;
         resultsBox.hidden = true;
         resultsBox.innerHTML = "";
-        if(manualEstimateField) manualEstimateField.hidden = true;
         selectedParcelMeta = {
           taxableValue: record.taxableValue,
           justValue: record.justValue,
@@ -2939,15 +2671,74 @@
         };
         if(valueInput && typeof record.taxableValue === "number"){
           valueInput.value = String(record.taxableValue);
+          setStatus("Using a taxable value of $" + record.taxableValue.toLocaleString("en-US") + " for this property.");
           valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:true } }));
-          if(manualEstimateField) manualEstimateField.hidden = true;
         }
       }
 
+      // The single field doubles as an address search and a manual
+      // taxable-value entry -- a query with no letters (just digits/$/,)
+      // is treated as a typed-in dollar amount instead of an address, so
+      // there's no separate "manual estimate" field for that path.
+      function isManualValueQuery(raw){
+        var stripped = raw.replace(/[$,\s]/g, "");
+        return stripped.length > 0 && /^[0-9]+$/.test(stripped);
+      }
+
+      function clearManualValue(promptText){
+        valueInput.value = "";
+        selectedParcelMeta = null;
+        setStatus(promptText);
+        valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:false } }));
+      }
+
+      function commitManualValue(digits){
+        showResults([]);
+        selectedParcelMeta = null;
+        var formatted = digits ? "$" + Number(digits).toLocaleString("en-US") : "";
+        if(input.value !== formatted) input.value = formatted;
+        valueInput.value = digits;
+        setStatus("Estimating using a taxable value of " + formatted + ".");
+        valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:false } }));
+      }
+
+      var idlePrompt = "";
+
       function handleSearchInput(){
-        var query = input.value.trim().toLowerCase();
-        if(manualEstimateField) manualEstimateField.hidden = false;
-        if(!query || query.length < 3){
+        var raw = input.value;
+
+        if(!raw){
+          clearManualValue(idlePrompt);
+          showResults([]);
+          return;
+        }
+
+        if(isManualValueQuery(raw)){
+          var digits = raw.replace(/[^0-9]/g, "");
+          // A bare run of digits is ambiguous while parcel data is still
+          // loading (or loading failed) -- it could be the start of a
+          // house number ("331 Oak Grove Rd") or a typed-in dollar
+          // amount. Only commit to the dollar-amount reading once we can
+          // confirm no loaded address actually starts with these digits;
+          // otherwise, keep showing it as an in-progress address search
+          // so a house number doesn't get clobbered into "$331" mid-type.
+          if(loaded){
+            var addressMatches = records.filter(function(record){
+              return record.address && record.address.toLowerCase().indexOf(raw.trim().toLowerCase()) === 0;
+            });
+            if(addressMatches.length){
+              showResults(addressMatches);
+              return;
+            }
+            commitManualValue(digits);
+          } else {
+            showResults([]);
+          }
+          return;
+        }
+
+        var query = raw.trim().toLowerCase();
+        if(query.length < 3){
           showResults([]);
           return;
         }
@@ -2960,7 +2751,7 @@
       function loadRecords(){
         if(loaded || loading) return;
         loading = true;
-        statusEl.textContent = "Loading county parcel records...";
+        setStatus("Loading county parcel records...");
         fetch("data/walton-parcels.csv").then(function(res){
           if(!res.ok) throw new Error("Failed to load property records");
           return res.text();
@@ -2993,10 +2784,14 @@
           loaded = true;
           loading = false;
           input.disabled = false;
-          statusEl.textContent = "Start typing an address to find your property.";
+          if(input.value){
+            handleSearchInput();
+          } else {
+            setStatus(idlePrompt);
+          }
         }).catch(function(){
           loading = false;
-          statusEl.textContent = "Property address search is not available right now.";
+          setStatus("Property address search is not available right now.");
         });
       }
 

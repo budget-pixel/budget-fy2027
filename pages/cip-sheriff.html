@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
+<!-- nav#nav-menu.nav-menu is the hook nav.js uses for logo + search injection -->
 <nav id="nav-menu" class="nav-menu">
   <div class="logo-container"></div>
 </nav>
@@ -25,8 +25,8 @@
 
 <div id="sheriffTables"></div>
 
-<script src="../assets/walton-cip-projects.js"></script>
-<script src="../assets/walton-cip-fund-schedule.js"></script>
+<script src="../assets/cip-projects-data.js"></script>
+<script src="../assets/cip-fund-schedule.js"></script>
 <script>
   renderFundSchedule({
     mountId:"sheriffTables",
@@ -40,7 +40,7 @@
 </main>
 </div>
 
-<!-- walton-budget-nav.js will inject footer[role="contentinfo"] here -->
+<!-- nav.js will inject footer[role="contentinfo"] here -->
 
 <script>
 /* set wcBudgetPages before nav script runs so search is fully populated */
@@ -125,6 +125,6 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Statistical & Supplemental Information",section:"Our County",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
 ];
 </script>
-<script src="../assets/walton-budget-nav.js?v=20260627-prior-years-a11y"></script>
+<script src="../assets/nav.js?v=20260627-prior-years-a11y"></script>
 </body>
 </html>

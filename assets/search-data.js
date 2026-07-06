@@ -1,6 +1,6 @@
 
 
-// walton-budget-search-data.js
+// search-data.js
 
 window.wcProjectSearchBaseUrl = window.location.pathname.indexOf("/pages/") !== -1
   ? "search.html?q="

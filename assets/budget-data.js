@@ -779,6 +779,7 @@
       const dept = deptByCode.get(org);
       const deptName = DEPT_CODE_NAME_OVERRIDES.get(org) || resolveSynthesizedDeptName(dept, knownDeptNames);
       const revenue = coaRevenueCodes.get(object);
+      const revenueOverride = REVENUE_CODE_OVERRIDES.get(object);
 
       extraRows.push({
         Dept_Code: org,
@@ -786,8 +787,8 @@
         Note: "",
         Project_Name: "",
         Revenue_Code: object,
-        Revenue_Name: revenue ? revenue.Revenue_Name : "Unclassified Account",
-        Revenue_Type: revenue ? revenue.Revenue_Type : "Miscellaneous Revenue",
+        Revenue_Name: revenueOverride ? revenueOverride.name : (revenue ? revenue.Revenue_Name : "Unclassified Account"),
+        Revenue_Type: revenueOverride ? revenueOverride.type : (revenue ? revenue.Revenue_Type : "Miscellaneous Revenue"),
         FY2027_Proposed: 0
       });
     }
@@ -1971,7 +1972,36 @@
   // 30047030). Naming it "Capital Projects" here too means the Summary of
   // Expenses' Transportation activity chart groups it with that same
   // series instead of showing a separate, unhelpful "Unclassified" slice.
-  const DEPT_CODE_NAME_OVERRIDES = new Map([["20146000", "Capital Projects"]]);
+  // org 10118000's own synthesized row similarly finds no match in the
+  // department catalog and would otherwise fall back to the generic
+  // "Unclassified" Dept_Name -- but it's a Transportation Fund (101)
+  // intergovernmental transfer that belongs to Public Works, the fund's
+  // only real department alongside Engineering Services, so it's named
+  // "Public Works" here too rather than showing as a separate, unhelpful
+  // "Unclassified" slice on the Transportation Fund's own schedule.
+  const DEPT_CODE_NAME_OVERRIDES = new Map([
+    ["20146000", "Capital Projects"],
+    ["10118000", "Public Works"]
+  ]);
+
+  // These seven revenue codes have Supabase actuals but no Revenue_Name row
+  // anywhere in the published Revenues sheet (checked across every fund,
+  // not just Transportation) -- so synthesizeMissingRevenueRows would
+  // otherwise land all of them in "Unclassified Account" under the generic
+  // Miscellaneous Revenue type. Reclassified per county guidance: the
+  // impact fee code belongs under Permits, Fees, and Special Assessments;
+  // the federal/state grant codes belong under Intergovernmental Revenues;
+  // the contribution codes stay under Miscellaneous Revenue but get a real
+  // name instead of "Unclassified Account".
+  const REVENUE_CODE_OVERRIDES = new Map([
+    ["324001", { name: "Road Impact Fees", type: "Permits Fees and Special Assessments" }],
+    ["331900", { name: "Federal Grant (Other)", type: "Intergovernmental Revenues" }],
+    ["334340", { name: "State Grant (Transportation)", type: "Intergovernmental Revenues" }],
+    ["334500", { name: "State Grant (Other)", type: "Intergovernmental Revenues" }],
+    ["366000", { name: "Contributions and Donations", type: "Miscellaneous Revenue" }],
+    ["366002", { name: "Contributions and Donations (Private Sources)", type: "Miscellaneous Revenue" }],
+    ["366003", { name: "Contributions and Donations (Other)", type: "Miscellaneous Revenue" }]
+  ]);
 
   // A synthesized row's catalog entry (the activities sheet) often carries
   // a Dept_Name too specific/inconsistent to match any real Dept_Name used
@@ -6158,7 +6188,7 @@
   // Scriptable options (the `() => ...` callbacks set on each chart's
   // scales/datasets below) only get re-evaluated when something tells
   // Chart.js to redraw -- they don't repaint on their own just because
-  // --text/--border changed. The theme toggle (walton-budget-nav.js) flips
+  // --text/--border changed. The theme toggle (nav.js) flips
   // data-theme on <html> with no page reload and without dispatching any
   // event of its own, so this observes that attribute directly (one
   // observer total, regardless of how many listeners are registered) and

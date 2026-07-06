@@ -27,7 +27,7 @@
   gtag("config", "G-Z7W0K4BTDP");
   var mobileStylesheetId = "wc-budget-mobile-styles";
   var splitLogoScriptId = "wc-split-logo-script";
-  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "walton-split-logo.js?v=20260627-axe-a11y";
+  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "brand-logo.js?v=20260627-axe-a11y";
   var wcThemeStorageKey = "waltonBudgetTheme";
   function applyHiddenAdminThemeParam(){
     try{
@@ -85,7 +85,7 @@
       mobileStylesheet.id = mobileStylesheetId;
       mobileStylesheet.rel = "stylesheet";
     }
-    mobileStylesheet.href = wcBudgetAssetBaseUrl + "walton-budget-mobile.css?v=23";
+    mobileStylesheet.href = wcBudgetAssetBaseUrl + "mobile.css?v=23";
     document.head.appendChild(mobileStylesheet);
   }
   function loadWcScriptOnce(scriptId, src, onload){
@@ -137,11 +137,11 @@
   function loadWaltonBudgetSearchModules(onReady){
     loadWcScriptOnce(
       "wc-budget-search-data-script",
-      wcBudgetAssetBaseUrl + "walton-budget-search-data.js?v=1",
+      wcBudgetAssetBaseUrl + "search-data.js?v=1",
       function(){
         loadWcScriptOnce(
           "wc-budget-search-script",
-          wcBudgetAssetBaseUrl + "walton-budget-search.js?v=20260627-lighthouse-a11y",
+          wcBudgetAssetBaseUrl + "search.js?v=20260627-lighthouse-a11y",
           function(){
             var fallbackSlot = document.querySelector(".wc-nav-search-slot-fallback");
             if(fallbackSlot && fallbackSlot.parentNode){
@@ -503,7 +503,7 @@
   function loadWaltonPerformanceMobile(){
     loadWcScriptOnce(
       "wc-performance-mobile-script",
-      wcBudgetAssetBaseUrl + "walton-performance-mobile.js?v=2"
+      wcBudgetAssetBaseUrl + "performance-mobile.js?v=2"
     );
   }
   var WC_PDF_EXCLUDED_PAGE_NAMES = {
@@ -531,7 +531,7 @@
     }
     loadWcScriptOnce(
       "wc-budget-pdf-script",
-      wcBudgetAssetBaseUrl + "walton-budget-pdf.js?v=20260630-print"
+      wcBudgetAssetBaseUrl + "budget-pdf.js?v=20260630-print"
     );
   }
   var css = `
@@ -1100,8 +1100,8 @@
     position:absolute !important;
     left:50% !important;
     top:50% !important;
-    --wc-menu-icon-x:1px;
-    --wc-menu-icon-y:2px;
+    --wc-menu-icon-x:0px;
+    --wc-menu-icon-y:0px;
     width:18px !important;
     height:2px !important;
     border-radius:999px !important;

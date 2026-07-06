@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<!-- nav#nav-menu.nav-menu is the hook walton-budget-nav.js uses for logo + search injection -->
+<!-- nav#nav-menu.nav-menu is the hook nav.js uses for logo + search injection -->
 <nav id="nav-menu" class="nav-menu">
   <div class="logo-container"></div>
 </nav>
@@ -27,14 +27,14 @@
 </main>
 </div>
 
-<script src="../assets/walton-budget-search-data.js"></script>
-<script src="../assets/walton-cip-projects.js?v=20260622-project-images-v3"></script>
-<script src="../assets/walton-budget-nav.js?v=20260627-prior-years-a11y"></script>
-<script src="../assets/walton-budget-pdf.js"></script>
+<script src="../assets/search-data.js"></script>
+<script src="../assets/cip-projects-data.js?v=20260622-project-images-v3"></script>
+<script src="../assets/nav.js?v=20260627-prior-years-a11y"></script>
+<script src="../assets/budget-pdf.js"></script>
 <script>
   (function(){
     // "funding" matches each fund schedule page's own renderFundSchedule
-    // config (see walton-cip-fund-schedule.js). Sheriff Projects is a
+    // config (see cip-fund-schedule.js). Sheriff Projects is a
     // department-wide view, so it uses departmentFilter instead of adding
     // another fund bucket that could be mistaken for a separate total.
     var pages = [
