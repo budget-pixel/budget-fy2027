@@ -22,12 +22,14 @@
 
 <section class="wc-dept-fund-summary" aria-label="Constitutional officers and agencies by fund, at a glance" id="officerFundSummary"></section>
 
-<section aria-label="Constitutional Officers directory" class="page-text">
+<p class="wc-dept-fund-filter-status" id="officerFilterStatus"></p>
+
+<section aria-label="Constitutional Officers directory" class="page-text" id="officerSection">
   <h2>Constitutional Officers</h2>
   <ul class="wc-directory-list" id="officerList"></ul>
 </section>
 
-<section aria-label="Other Agencies directory" class="page-text" style="margin-top:40px;">
+<section aria-label="Other Agencies directory" class="page-text" id="entitySection" style="margin-top:40px;">
   <h2>Other Agencies</h2>
   <ul class="wc-directory-list" id="entityList"></ul>
 </section>
@@ -194,7 +196,7 @@
       return String((row && row.Dept_Code) || "").trim().slice(0, 3);
     }
 
-    function fundLabelForItem(budgetRows, fundsByCode){
+    function fundCodesForItem(budgetRows){
       var codes = [];
       budgetRows.forEach(function(row){
         // Skip rows with no FY2027 budget of their own (e.g. a legacy-fund
@@ -205,6 +207,10 @@
         var code = fundCodeForRow(row);
         if(code && codes.indexOf(code) === -1) codes.push(code);
       });
+      return codes;
+    }
+
+    function fundLabelForItem(codes, fundsByCode){
       if(!codes.length) return "Not listed";
       return codes
         .map(function(code){
@@ -306,6 +312,7 @@
         var priorFte = staffing.reduce(function(sum, row){
           return rowMatches(row, item.name, group.aliasMap) ? sum + (Number(row["2026"]) || 0) : sum;
         }, 0);
+        var fundCodes = fundCodesForItem(budgetRows);
 
         return {
           name:item.name,
@@ -316,7 +323,8 @@
           trendDollar:formatTrendDollar(budget, priorBudget),
           fte:formatFte(fte),
           fteTrend:formatFteTrend(fte, priorFte),
-          fund:fundLabelForItem(budgetRows, fundsByCode)
+          fund:fundLabelForItem(fundCodes, fundsByCode),
+          fundCodes:fundCodes
         };
       });
     }
@@ -437,16 +445,29 @@
         '<span class="wc-dept-fund-chip-value-wrap"><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + "</strong>" + percentHtml + "</span></div>";
     }
 
+    // Clicking a fund card filters the directory list(s) below to just the
+    // items on that card's fund AND group (two specs can share the same
+    // fund code -- e.g. General Fund is split into a Constitutional
+    // Officers card and an Agencies & State Mandates card -- so the active
+    // filter tracks the card's index in FUND_SUMMARY_SPECS, not just its
+    // fund code, and hides the section for the *other* group entirely
+    // while active).
+    var activeSpecIndex = null;
+    var lastFundSummaries = null;
+    var lastGroupItems = null;
+
     function renderFundSummary(fundSummaries){
+      lastFundSummaries = fundSummaries;
       var el = $("#officerFundSummary");
       if(!el) return;
-      el.innerHTML = fundSummaries.map(function(f){
+      el.innerHTML = fundSummaries.map(function(f, index){
         var trendClass = (f.trendDollar && f.trendDollar !== "Loading") ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var fteTrendClass = (f.fteTrend && f.fteTrend !== "Loading") ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var propertyTaxValueHtml = f.propertyTax === "Loading"
           ? LOADING_DOTS_HTML
           : escapeHtml(f.propertyTax || "$0");
-        return '<div class="wc-dept-fund-card">' +
+        var isActive = activeSpecIndex === index;
+        return '<button type="button" class="wc-dept-fund-card wc-dept-fund-card--clickable' + (isActive ? " wc-dept-fund-card--active" : "") + '" data-spec-index="' + index + '" aria-pressed="' + (isActive ? "true" : "false") + '">' +
           '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +
           '<div class="wc-dept-fund-card-chips">' +
             fundChipHtml(valueOrLoadingHtml(f.budget), "Budget") +
@@ -455,8 +476,64 @@
             fundChipHtml(valueOrLoadingHtml(f.fte), "Personnel") +
             fundChipHtml(f.fteTrend === "Loading" ? LOADING_DOTS_HTML : (f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;"), "YoY FTE", fteTrendClass) +
           '</div>' +
-        '</div>';
+        '</button>';
       }).join("");
+
+      Array.prototype.forEach.call(el.querySelectorAll(".wc-dept-fund-card--clickable"), function(card){
+        card.addEventListener("click", function(){
+          var index = Number(card.getAttribute("data-spec-index"));
+          activeSpecIndex = activeSpecIndex === index ? null : index;
+          renderFundSummary(lastFundSummaries);
+          renderFilteredGroups();
+        });
+      });
+    }
+
+    function renderFilterStatus(){
+      var status = $("#officerFilterStatus");
+      if(!status) return;
+      if(activeSpecIndex === null){
+        status.innerHTML = "";
+        return;
+      }
+      var spec = FUND_SUMMARY_SPECS[activeSpecIndex];
+      var label = spec ? spec.label : "";
+      status.innerHTML = "Showing entries in <strong>" + escapeHtml(label) + "</strong> &middot; " +
+        '<button type="button" id="officerFilterClear">Show all</button>';
+      var clearBtn = $("#officerFilterClear");
+      if(clearBtn){
+        clearBtn.addEventListener("click", function(){
+          activeSpecIndex = null;
+          renderFundSummary(lastFundSummaries);
+          renderFilteredGroups();
+        });
+      }
+    }
+
+    // Re-renders both directory lists (and shows/hides their sections)
+    // against the currently-active fund card, using whichever items were
+    // last computed by initDirectory (loading placeholders or real data).
+    function renderFilteredGroups(){
+      renderFilterStatus();
+      if(!lastGroupItems) return;
+      var spec = activeSpecIndex === null ? null : FUND_SUMMARY_SPECS[activeSpecIndex];
+      lastGroupItems.forEach(function(entry, groupIndex){
+        var sectionId = groupIndex === 0 ? "officerSection" : "entitySection";
+        var section = $("#" + sectionId);
+        if(!spec){
+          if(section) section.style.display = "";
+          renderItems(entry.group, entry.items);
+          return;
+        }
+        if(spec.groupIndex !== groupIndex){
+          if(section) section.style.display = "none";
+          return;
+        }
+        if(section) section.style.display = "";
+        renderItems(entry.group, entry.items.filter(function(item){
+          return (item.fundCodes || []).indexOf(spec.code) !== -1;
+        }));
+      });
     }
 
     function statBlockHtml(modifierClass, valueHtml, label, trendClass){
@@ -528,9 +605,12 @@
             fund:"Loading",
             trend:"Loading",
             trendDollar:"Loading",
-            fteTrend:"Loading"
+            fteTrend:"Loading",
+            fundCodes:[]
           };
         });
+        lastGroupItems = lastGroupItems || [];
+        lastGroupItems[GROUPS.indexOf(group)] = { group:group, items:loadingItems };
         renderItems(group, loadingItems);
         return { group:group, baseItems:baseItems };
       });
@@ -553,14 +633,15 @@
       if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
         window.WCBudgetData.loadBudgetData()
           .then(function(data){
-            groupItems.forEach(function(entry){
-              renderItems(entry.group, enrichItems(entry.group, entry.baseItems, data));
+            groupItems.forEach(function(entry, groupIndex){
+              lastGroupItems[groupIndex] = { group:entry.group, items:enrichItems(entry.group, entry.baseItems, data) };
             });
             renderFundSummary(computeFundSummaries(data));
+            renderFilteredGroups();
           })
           .catch(function(){
-            groupItems.forEach(function(entry){
-              renderItems(entry.group, entry.baseItems.map(function(item){
+            groupItems.forEach(function(entry, groupIndex){
+              lastGroupItems[groupIndex] = { group:entry.group, items:entry.baseItems.map(function(item){
                 return {
                   name:item.name,
                   href:item.href,
@@ -570,10 +651,12 @@
                   fund:"Not listed",
                   trend:"",
                   trendDollar:"",
-                  fteTrend:""
+                  fteTrend:"",
+                  fundCodes:[]
                 };
-              }));
+              }) };
             });
+            renderFilteredGroups();
           });
       }
     }

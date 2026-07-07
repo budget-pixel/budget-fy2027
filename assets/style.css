@@ -2470,6 +2470,30 @@ a:where(:visited) {
   .wc-dept-fund-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Fund cards double as filters (see initFundCardFilter in departments.html
+   and constitutional-officers.html) -- clicking one narrows the directory
+   list(s) below to just that fund; clicking it again clears the filter. */
+.wc-dept-fund-card--clickable {
+  cursor: pointer; text-align: left; width: 100%; font: inherit;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.wc-dept-fund-card--clickable:hover { border-color: var(--green); }
+.wc-dept-fund-card--clickable:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.wc-dept-fund-card--active {
+  border-color: var(--green); box-shadow: 0 0 0 1px var(--green);
+}
+.wc-dept-fund-filter-status {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin: -8px 0 16px; font-size: .85rem; color: var(--muted);
+}
+.wc-dept-fund-filter-status button {
+  cursor: pointer; border: 1px solid var(--border); background: #fff;
+  color: var(--text); border-radius: 999px; padding: 4px 12px;
+  font-size: .78rem; font-weight: 700; font-family: inherit;
+}
+.wc-dept-fund-filter-status button:hover { border-color: var(--green); }
+:root[data-theme="dark"] .wc-dept-fund-filter-status button { background: rgba(14,28,22,.92); }
+
 .wc-filter-bar {
   display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
   padding: 16px; margin-bottom: 14px;

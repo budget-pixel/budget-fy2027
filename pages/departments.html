@@ -22,6 +22,8 @@
 
 <section class="wc-dept-fund-summary" aria-label="Departments by fund, at a glance" id="departmentFundSummary"></section>
 
+<p class="wc-dept-fund-filter-status" id="departmentFilterStatus"></p>
+
 <section aria-label="Department directory">
   <ul class="wc-directory-list" id="departmentList"></ul>
 </section>
@@ -325,16 +327,26 @@
     // line's own label and value sitting inline with each other (not
     // stacked), so every metric's label/value pair lines up the same way
     // down the card.
+    // Clicking a fund card filters the directory list below to just that
+    // fund's departments (see rendered wc-dept-fund-card--clickable
+    // buttons' click handler in initDirectory); clicking the active card
+    // again clears the filter back to showing every department.
+    var activeFundCode = null;
+    var lastFundSummaries = null;
+
     function renderFundSummary(fundSummaries){
+      lastFundSummaries = fundSummaries;
       var el = $("#departmentFundSummary");
       if(!el) return;
-      el.innerHTML = fundSummaries.map(function(f){
+      el.innerHTML = fundSummaries.map(function(f, index){
         var trendClass = (f.trendDollar && f.trendDollar !== "Loading") ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var fteTrendClass = (f.fteTrend && f.fteTrend !== "Loading") ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var propertyTaxValueHtml = f.propertyTax === "Loading"
           ? LOADING_DOTS_HTML
           : escapeHtml(f.propertyTax || "$0");
-        return '<div class="wc-dept-fund-card">' +
+        var group = FUND_SUMMARY_GROUPS[index];
+        var isActive = group && activeFundCode === group.code;
+        return '<button type="button" class="wc-dept-fund-card wc-dept-fund-card--clickable' + (isActive ? " wc-dept-fund-card--active" : "") + '" data-fund-code="' + escapeHtml(group ? group.code : "") + '" aria-pressed="' + (isActive ? "true" : "false") + '">' +
           '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +
           '<div class="wc-dept-fund-card-chips">' +
             fundChipHtml(valueOrLoadingHtml(f.budget), "Budget") +
@@ -343,8 +355,17 @@
             fundChipHtml(valueOrLoadingHtml(f.fte), "Personnel") +
             fundChipHtml(f.fteTrend === "Loading" ? LOADING_DOTS_HTML : (f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;"), "YoY FTE", fteTrendClass) +
           '</div>' +
-        '</div>';
+        '</button>';
       }).join("");
+
+      Array.prototype.forEach.call(el.querySelectorAll(".wc-dept-fund-card--clickable"), function(card){
+        card.addEventListener("click", function(){
+          var code = card.getAttribute("data-fund-code");
+          activeFundCode = activeFundCode === code ? null : code;
+          renderFundSummary(lastFundSummaries);
+          renderDepartments();
+        });
+      });
     }
 
     function descriptionFromNarrative(text){
@@ -394,7 +415,7 @@
         .sort(function(a, b){ return a.name.localeCompare(b.name); });
     }
 
-    function fundLabelForDepartment(name, expenditures, fundsByCode){
+    function fundCodesForDepartment(name, expenditures){
       var codes = [];
       expenditures.forEach(function(row){
         if(!rowMatchesDepartment(row, name)) return;
@@ -409,6 +430,10 @@
         var code = fundCodeForRow(row);
         if(code && codes.indexOf(code) === -1) codes.push(code);
       });
+      return codes;
+    }
+
+    function fundLabelForDepartment(codes, fundsByCode){
       if(!codes.length) return "Not listed";
       var names = codes
         .map(function(code){
@@ -453,6 +478,7 @@
         var priorFte = staffing.reduce(function(sum, row){
           return rowMatchesDepartment(row, dept.name) ? sum + (Number(row["2026"]) || 0) : sum;
         }, 0);
+        var fundCodes = fundCodesForDepartment(dept.name, expenditures);
 
         return {
           name:dept.name,
@@ -463,7 +489,8 @@
           trendDollar:formatTrendDollar(budget, priorBudget),
           fte:formatFte(fte),
           fteTrend:formatFteTrend(fte, priorFte),
-          fund:fundLabelForDepartment(dept.name, expenditures, fundsByCode)
+          fund:fundLabelForDepartment(fundCodes, fundsByCode),
+          fundCodes:fundCodes
         };
       });
     }
@@ -488,14 +515,40 @@
       return trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up";
     }
 
+    function renderFilterStatus(){
+      var status = $("#departmentFilterStatus");
+      if(!status) return;
+      if(!activeFundCode){
+        status.innerHTML = "";
+        return;
+      }
+      var group = FUND_SUMMARY_GROUPS.filter(function(g){ return g.code === activeFundCode; })[0];
+      var label = group ? group.label : activeFundCode;
+      status.innerHTML = "Showing departments in <strong>" + escapeHtml(label) + "</strong> &middot; " +
+        '<button type="button" id="departmentFilterClear">Show all departments</button>';
+      var clearBtn = $("#departmentFilterClear");
+      if(clearBtn){
+        clearBtn.addEventListener("click", function(){
+          activeFundCode = null;
+          renderFundSummary(lastFundSummaries);
+          renderDepartments();
+        });
+      }
+    }
+
     function renderDepartments(){
       var list = $("#departmentList");
+      renderFilterStatus();
+
+      var visibleDepartments = activeFundCode
+        ? departments.filter(function(dept){ return (dept.fundCodes || []).indexOf(activeFundCode) !== -1; })
+        : departments;
 
       // Every stat renders in the same fixed-width slot, in the same order,
       // on every row -- even when a department has no data for it -- so
       // the columns line up down the whole list instead of shifting left
       // whenever one department is missing a fund, trend, or FTE figure.
-      list.innerHTML = departments.map(function(dept){
+      list.innerHTML = visibleDepartments.map(function(dept){
         var fundStat = statBlockHtml("wc-directory-item-stat--fund", dept.fund === "Loading" ? LOADING_DOTS_HTML : escapeHtml(dept.fund && dept.fund !== "Not listed" ? dept.fund : "Not listed"), "Fund");
         var budgetStat = statBlockHtml("wc-directory-item-stat--budget", valueOrLoadingHtml(dept.budget), "FY 2027 Budget");
         var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(dept.trend, dept.trendDollar), "YoY Change", trendClassFor(dept.trend));
