@@ -972,9 +972,28 @@
     ["001389|389000", [{ org: "001389", object: "389000" }, { org: "201389", object: "389000" }]]
   ]);
 
+  // The FY2027 Proposed budget for Dept_Code 101312 / Revenue_Code 312410
+  // (Local Option Fuel Tax) is intentionally split across two sheet rows,
+  // "Public Works" and "Engineering Services" -- a real planning-budget
+  // split (Engineering became its own in-house division only in the last
+  // couple of years; see its "In-House Engineering Savings" card). But
+  // there is only ONE real ledger account behind both rows, and Supabase
+  // has no way to know it's split -- without this override, both rows
+  // independently look up the SAME org+object and each get the FULL
+  // historical actual for the whole account, so Engineering's page
+  // appeared to "receive" the entire county fuel-tax revenue on top of
+  // Public Works also showing the same full total. Engineering's actual
+  // revenue isn't separately tracked, so its historical actual is left at
+  // the sheet's own (unset -> 0) value rather than duplicating Public
+  // Works' real figure.
+  const ZERO_ACTUAL_REVENUE_ROWS = new Set(["101312|engineering services|312410"]);
+
   function supabaseLookupsForRow(row, org, codeValue) {
     const key = String((row && row.Dept_Code) || "").trim() + "|" + String(codeValue || "").trim();
     const deptNorm = normalizeDeptName(row && row.Dept_Name);
+    if (ZERO_ACTUAL_REVENUE_ROWS.has(String((row && row.Dept_Code) || "").trim() + "|" + deptNorm + "|" + String(codeValue || "").trim())) {
+      return [];
+    }
     const lookups = SUPABASE_LOOKUP_OVERRIDES.get(key) || [{ org: org, object: codeValue }];
     if (
       deptNorm === "code compliance" &&
@@ -1717,6 +1736,18 @@
     if (dept === "building construction and maintenance") {
       return code === "335180" || name === "local government 1 2 cent sales tax";
     }
+    // Engineering Services' only revenue row (Local Option Fuel Tax,
+    // 312410) is intentionally zeroed at the actuals layer -- see
+    // ZERO_ACTUAL_REVENUE_ROWS -- since that account's real ledger total
+    // belongs to Public Works, not Engineering. Engineering still has its
+    // own real expenditures in years it existed as an in-house division
+    // (FY2023-2025), so this designates that same row as the department's
+    // plug: revenue backfills to match expenses for years with real
+    // spending, and stays $0 for FY2022 (when Engineering had no
+    // expenditures either).
+    if (dept === "engineering services") {
+      return code === "312410" || name === "local option fuel tax";
+    }
     return isGeneralFundRevenuePlugRow(row);
   }
 
@@ -1758,6 +1789,13 @@
         (
           code === "335121" ||
           name === "state revenue share proceeds"
+        )
+      ) ||
+      (
+        dept === "engineering services" &&
+        (
+          code === "312410" ||
+          name === "local option fuel tax"
         )
       ) ||
       (
@@ -7445,13 +7483,43 @@
     "code compliance street": 0.5
   };
 
+  function isCodeComplianceStaffingSplit(groupNames) {
+    const normalized = groupNames.map((name) => normalizeDeptName(name));
+    return normalized.length > 1 && normalized.every((name) =>
+      name === "code compliance" || name === "code compliance beach" || name === "code compliance street"
+    );
+  }
+
+  // Combines Code Compliance Street's and Beach's position rows into one
+  // list by Position_Name (summing FTE across both), the same merge
+  // Summary of Personnel already does for this exact split (see
+  // personnelDeptDisplayName) -- several titles (Director of Code
+  // Compliance, Office Manager, Code Compliance Manager, etc.) exist on
+  // both sides, so a true single list has to add them together rather
+  // than just listing each side's rows one after another.
+  function mergeStaffingRowsByPosition(rows) {
+    const years = [2024, 2025, 2026, 2027];
+    const merged = new Map();
+    rows.forEach((row) => {
+      const key = (row.Position_Name || "").trim();
+      if (!merged.has(key)) {
+        const entry = { Position_Name: row.Position_Name, Dept_Name: "Code Compliance" };
+        years.forEach((y) => { entry[y] = 0; });
+        merged.set(key, entry);
+      }
+      const entry = merged.get(key);
+      years.forEach((y) => { entry[y] += row[y] || 0; });
+    });
+    return Array.from(merged.values());
+  }
+
   function renderStaffingTable(rows) {
     if (!rows.length) return "";
     const groupNames = uniqueSorted(rows.map((r) => r.Dept_Name || ""));
     if (groupNames.length <= 1) {
       return renderStaffingGroup(rows, "Staffing / FTE", null, STAFFING_GROUP_NOTES[normalizeDeptName(rows[0].Dept_Name || "")]);
     }
-    return groupNames
+    const screenCardsHtml = groupNames
       .map((name) => renderStaffingGroup(
         rows.filter((r) => (r.Dept_Name || "") === name),
         name,
@@ -7459,6 +7527,22 @@
         STAFFING_GROUP_NOTES[normalizeDeptName(name)]
       ))
       .join("");
+
+    // On screen, Code Compliance's Street/Beach split still shows as two
+    // separate labeled cards (matches its real org structure). In print,
+    // that reads as redundant, so a single merged card takes its place
+    // there instead -- see wc-code-compliance-staffing-screen/-print in
+    // budget-pdf.js for the screen/print visibility swap.
+    if (isCodeComplianceStaffingSplit(groupNames)) {
+      const mergedRows = mergeStaffingRowsByPosition(rows);
+      const printCardHtml = renderStaffingGroup(mergedRows, "Staffing / FTE", null, STAFFING_GROUP_NOTES[normalizeDeptName("code compliance")]);
+      return (
+        '<div class="wc-code-compliance-staffing-screen">' + screenCardsHtml + "</div>" +
+        '<div class="wc-code-compliance-staffing-print">' + printCardHtml + "</div>"
+      );
+    }
+
+    return screenCardsHtml;
   }
 
   // Same underlying position data as renderStaffingTable, but as a plain

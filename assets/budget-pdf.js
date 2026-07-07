@@ -41,6 +41,9 @@ var PRINT_CSS = `
 .wc-print-budget-table-wrap{
   display:none;
 }
+.wc-code-compliance-staffing-print{
+  display:none;
+}
 @media print{
   @page{
     size:letter landscape;
@@ -123,7 +126,30 @@ var PRINT_CSS = `
   .libraries-statement-lower,
   .mosquito-statement-media,
   .eagle-springs-statement-media,
-  .eagle-springs-grill-statement-media{
+  .eagle-springs-grill-statement-media,
+  .code-compliance-statement-media{
+    display:block !important;
+    grid-template-columns:none !important;
+  }
+
+  /* Code Compliance's Street/Beach staffing split reads as two redundant
+     cards in print (see renderStaffingTable's isCodeComplianceStaffingSplit
+     in budget-data.js) -- the screen version stays hidden and a single
+     merged card takes its place instead. */
+  .wc-code-compliance-staffing-screen{
+    display:none !important;
+  }
+  .wc-code-compliance-staffing-print{
+    display:block !important;
+  }
+  /* style.css's #department-staffing-table:has(.wc-finance-card +
+     .wc-finance-card) rule puts the two Street/Beach cards side by side
+     in a 2-column grid on screen -- but :has() matches on DOM structure,
+     not visibility, so it still fires in print even though those two
+     cards are hidden (display:none isn't "removed"). Without this, the
+     one visible merged card above gets squeezed into a single grid
+     column instead of using the full page width. */
+  #department-staffing-table:has(.wc-code-compliance-staffing-print){
     display:block !important;
     grid-template-columns:none !important;
   }
