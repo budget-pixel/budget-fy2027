@@ -860,6 +860,16 @@
     font-weight:700;
     vertical-align:top;
   }
+  .wc-tax-table td a{
+    color:inherit;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-color:var(--wc-line);
+  }
+  .wc-tax-table td a:hover{
+    color:var(--wc-green);
+    text-decoration-color:currentColor;
+  }
   .wc-tax-table td.wc-num{
     color:var(--wc-green);
     font-weight:800;
@@ -869,16 +879,6 @@
   .wc-tax-table td.wc-tax-zero-value{
     color:var(--wc-muted);
     font-weight:700;
-  }
-  .wc-tax-table tfoot td{
-    border-bottom:none;
-    border-top:2px solid var(--wc-line);
-    padding-top:14px;
-    color:var(--wc-ink);
-    font-weight:900;
-  }
-  .wc-tax-table tfoot td.wc-num{
-    color:var(--wc-green);
   }
   @media (max-width:760px){
     .wc-tax-calc-panel .wc-millage-panel-head{
@@ -942,6 +942,15 @@
   .wc-info-button:focus::after{
     opacity:1;
     visibility:visible;
+  }
+  /* The property tax breakdown table scrolls horizontally
+     (.wc-tax-table-wrap), which forces its vertical overflow to clip too --
+     an upward-opening tooltip on the very first row (Sheriff's Office, the
+     largest ad valorem department) gets cut off by the table header above
+     it. Opening downward instead keeps it inside the table's own bounds. */
+  .wc-tax-table .wc-info-button::after{
+    bottom:auto;
+    top:calc(100% + 8px);
   }
   .wc-tax-breakdown-loading,
   .wc-tax-breakdown-error{
@@ -1057,29 +1066,6 @@
     text-transform:none;
     letter-spacing:normal;
     font-weight:600;
-  }
-  .wc-tax-checkbox-row{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:flex-start;
-    column-gap:28px;
-  }
-  .wc-tax-calc-checkbox{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    margin-bottom:18px;
-    color:var(--wc-ink);
-    font-size:14px;
-    line-height:1.4;
-    cursor:pointer;
-  }
-  .wc-tax-calc-checkbox input{
-    margin-top:3px;
-    flex:0 0 auto;
-    width:16px;
-    height:16px;
-    accent-color:var(--wc-green);
   }
   .wc-tax-calc-note{
     margin:14px 0 0;
@@ -1222,8 +1208,7 @@
   }
   html[data-theme="dark"] .wc-tax-single,
   html[data-theme="dark"] .wc-tax-table td,
-  html[data-theme="dark"] .wc-tax-table th,
-  html[data-theme="dark"] .wc-tax-table tfoot td{
+  html[data-theme="dark"] .wc-tax-table th{
     border-color:var(--wc-line);
   }
   html[data-theme="dark"] .wc-tax-breakdown-track{
@@ -1824,18 +1809,6 @@
             <p id="propertyAddressStatus" class="wc-property-search-status" hidden></p>
             <input id="taxCalcValue" type="hidden">
           </div>
-          <div class="wc-tax-checkbox-row">
-            <label class="wc-tax-calc-checkbox">
-              <input id="taxCalcMosquito" type="checkbox">
-              <span>I live in the North Walton Mosquito Control District</span>
-              <button type="button" class="wc-info-button" aria-label="North Walton Mosquito Control District info" data-tip="A small additional tax that funds mosquito control services specifically in North Walton neighborhoods. Check this if you live in that district.">i</button>
-            </label>
-            <label class="wc-tax-calc-checkbox">
-              <input id="showBreakdownPercentages" type="checkbox">
-              <span>Show as % instead of $</span>
-            </label>
-          </div>
-
           <p class="wc-tax-columns-prompt" id="taxColumnsPrompt">Enter your address or home value above to see your personalized breakdown.</p>
           <div class="wc-tax-single" id="taxColumns" hidden>
             <div class="wc-millage-panel-head" id="taxSupportBreakdownSection" tabindex="-1">
@@ -1846,13 +1819,13 @@
                 <thead>
                   <tr>
                     <th scope="col">Department</th>
+                    <th scope="col" class="wc-num">% of Total</th>
                     <th scope="col" class="wc-num">Current</th>
                     <th scope="col" class="wc-num">FY 2027 Change</th>
                     <th scope="col" class="wc-num">Estimated New Amount</th>
                   </tr>
                 </thead>
                 <tbody id="personalTaxTableBody"></tbody>
-                <tfoot id="personalTaxTableFoot"></tfoot>
               </table>
             </div>
           </div>
@@ -1863,7 +1836,7 @@
                 <button type="button" class="wc-millage-reset" id="taxInfoClose">Close</button>
               </div>
               <p><strong>Taxable value</strong> is the value the Property Appraiser uses to calculate your tax bill &mdash; it is usually lower than your home's market value because of the homestead exemption and other assessment limits. Your official taxable value is on your annual TRIM notice or the Property Appraiser's website.</p>
-              <p><strong>What's included:</strong> this covers the County's own portion of your property tax bill, including the North Walton Mosquito Control District tax if it applies to you. <strong>What's NOT included:</strong> school district taxes, water management district taxes, and any other independent taxing authorities on your bill &mdash; those are set and billed separately.</p>
+              <p><strong>What's included:</strong> this covers the County's own countywide portion of your property tax bill. <strong>What's NOT included:</strong> school district taxes, water management district taxes, special taxing districts (such as North Walton Mosquito Control), and any other independent taxing authorities on your bill &mdash; those are set and billed separately.</p>
               <p><strong>What Your Property Tax Supports</strong> estimates your County property tax bill using your taxable value and the last approved Walton County millage rate of 3.519 mills, then allocates that estimated bill proportionally across Walton County's property tax revenue allocations. This is the <strong>Current</strong> column. Some listed services are shown as fully funded by property tax revenue, while others represent only the portion of that service funded by property tax revenue; other revenues (charges for services, fees, etc.) are netted out, leaving just the property tax revenue portion.</p>
               <p>The <strong>FY 2027 Change</strong> column highlights departments with an actual budget change from FY2026 to FY2027 that are funded, in whole or in part, by County property tax (ad valorem) revenue &mdash; departments with no such change are shown at $0.00 rather than left off the list. The dollar amount shown for each department estimates how much of your County property tax supports that change by applying the department's actual FY2026-to-FY2027 budget change percentage to your estimated current-year contribution. The <strong>Estimated New Amount</strong> column is simply Current plus that change.</p>
               <p><strong class="wc-tax-info-warning">These estimates are provided for informational and educational purposes only and should not be considered an official determination of taxes.</strong> Actual tax amounts may vary based on property classification, exemptions, assessment limitations, taxable value determinations, millage rates, voter-approved levies, and other factors. Users should view official records from the Walton County Property Appraiser for parcel-specific tax information.</p>
@@ -2313,7 +2286,23 @@
     // a real, sizeable budget increase silently fails to match and shows
     // as $0.00 instead of the real figure.
     var NAME_MATCH_ALIASES = {
-      "clerk of court": "clerk of courts & county comptroller"
+      "clerk of court": "clerk of courts & county comptroller",
+      // The expenditures dataset books every Statutory & Other Agency
+      // Funding row under the literal Dept_Name "Statutory & Other" (see
+      // applyStatutoryExpenseOverrides in assets/budget-data.js), while
+      // the ad valorem revenue sheet spells out the full "Statutory &
+      // Other Agency Funding" -- without this alias its real FY2027
+      // increase silently fails to match and shows as $0.00.
+      "statutory & other": "statutory & other agency funding",
+      // The expenditures dataset splits South Walton Fire & State Control
+      // across three separate raw Dept_Name values -- "South Walton
+      // Fire", "State Fire", and "Volunteer Fire" (see the display-name
+      // map in assets/budget-data.js) -- none of which match the ad
+      // valorem sheet's combined "South Walton Fire & State Control",
+      // so its real FY2027 increase was silently dropped without these.
+      "south walton fire": "south walton fire & state control",
+      "state fire": "south walton fire & state control",
+      "volunteer fire": "south walton fire & state control"
     };
     function normalizeMatchName(name){
       var normalized = String(name || "")
@@ -2335,7 +2324,6 @@
       "sheriff's office": "Law enforcement, jail operations, and school resource deputies for all of Walton County.",
       "board of county commissioners": "The elected body that sets County policy and adopts the annual budget.",
       "supervisor of elections": "An independently elected official who administers voter registration and elections in Walton County.",
-      "statutory & other agency funding": "Spending the County is required to provide under Florida law, such as the Medical Examiner and certain court-related costs.",
       // Set explicitly (rather than left to rely on a parenthetical in
       // the raw name) so this department gets the same tooltip on both
       // sides -- the increases column's own name for this fund comes
@@ -2344,12 +2332,6 @@
       // revenue sheet's "Capital Projects (Public Safety, Roads,
       // Recreational Infrastructure)" used on the breakdown side.
       "capital projects": "Major construction and infrastructure: public safety facilities, roads, and recreational infrastructure."
-    };
-    // Renames a small number of entries whose real source-data label is
-    // accurate but reads like internal terminology -- the underlying data
-    // and totals are unchanged, only the displayed label differs.
-    var DEPARTMENT_DISPLAY_NAME_OVERRIDES = {
-      "statutory & other agency funding": "State-Required Programs"
     };
     // Independently elected Constitutional Officers -- shown with a
     // small "Elected Office" tag so a resident doesn't mistake them for
@@ -2362,6 +2344,29 @@
       "supervisor of elections": true
     };
 
+    // A few department names on the ad valorem sheet don't exactly match
+    // the title used for that department's own page in wcBudgetPages
+    // (assets/search-data.js) -- resolved here so the breakdown link can
+    // still find the right page instead of silently rendering as
+    // plain text.
+    var DEPARTMENT_PAGE_NAME_ALIASES = {
+      "environmental services": "environmental resources",
+      "probation services": "probation"
+    };
+    var departmentPageHrefByName = null;
+    function getDepartmentPageHref(norm){
+      if(!departmentPageHrefByName){
+        departmentPageHrefByName = {};
+        (window.wcBudgetPages || []).forEach(function(page){
+          if(page && page.title && page.href){
+            departmentPageHrefByName[normalizeMatchName(page.title)] = page.href;
+          }
+        });
+      }
+      var lookupName = DEPARTMENT_PAGE_NAME_ALIASES[norm] || norm;
+      return departmentPageHrefByName[lookupName] || "";
+    }
+
     // Builds the display label (name + optional "Elected Office" tag +
     // optional info tooltip) used for a department wherever it appears
     // across both breakdown columns, so the same entity gets the same
@@ -2369,15 +2374,18 @@
     // valorem sheet's "Capital Projects (Public Safety, Roads,
     // Recreational Infrastructure)") becomes the tooltip content instead
     // of cluttering the visible name, using the sheet's own real text
-    // rather than an invented description.
+    // rather than an invented description. The name itself links to that
+    // department's own budget page when one exists.
     function departmentLabelHtml(rawName){
       var norm = normalizeMatchName(rawName);
-      var displayName = DEPARTMENT_DISPLAY_NAME_OVERRIDES[norm] || String(rawName || "").replace(/\s*\([^)]*\)\s*/g, "").trim();
+      var displayName = String(rawName || "").replace(/\s*\([^)]*\)\s*/g, "").trim();
       var parenMatch = String(rawName || "").match(/\(([^)]*)\)/);
       var tooltip = DEPARTMENT_TOOLTIPS[norm] || (parenMatch ? "Includes: " + parenMatch[1] + "." : "");
       var tagHtml = CONSTITUTIONAL_OFFICER_NAMES[norm] ? ' <span class="wc-tax-row-tag">&mdash; Elected Office</span>' : "";
       var tipHtml = tooltip ? ' <button type="button" class="wc-info-button" aria-label="' + escapeHtml(displayName) + ' info" data-tip="' + escapeHtml(tooltip) + '">i</button>' : "";
-      return escapeHtml(displayName) + tagHtml + tipHtml;
+      var href = getDepartmentPageHref(norm);
+      var nameHtml = href ? '<a href="' + escapeHtml(href) + '">' + escapeHtml(displayName) + '</a>' : escapeHtml(displayName);
+      return nameHtml + tagHtml + tipHtml;
     }
 
     // Real, already-adopted FY2026 -> FY2027 dollar/percent increases for
@@ -2473,27 +2481,30 @@
         if(!res.ok) throw new Error("Failed to load property tax breakdown");
         return res.text();
       }).then(function(text){
+        // Soil Conservation and Geographic Info Systems are excluded from
+        // this breakdown entirely (not just hidden) -- their small shares
+        // are folded back into everyone else's proportional share so the
+        // visible departments still add up to the full property tax bill.
+        var EXCLUDED_DEPARTMENTS = ["soil conservation", "geographic info systems"];
         var rows = parseCsv(text).slice(1); // drop header row
         return rows
           .filter(function(r){ return r[0] && r[0].trim() && r[0].trim().toLowerCase().indexOf("total ad valorem") === -1; })
           .map(function(r){ return { name: r[0].trim(), amount: parseDollarAmount(r[3]) }; })
           .filter(function(d){ return d.amount > 0; })
+          .filter(function(d){ return EXCLUDED_DEPARTMENTS.indexOf(normalizeMatchName(d.name)) === -1; })
           .sort(function(a, b){ return b.amount - a.amount; });
       });
       return departmentAdValoremRowsPromise;
     }
 
     // Property Tax Calculator: estimates one taxpayer's own bill using the
-    // same Countywide/North Walton Mosquito Control millage rates shown on
-    // the Property Taxes card above (see wc-budget-card-millage), then
-    // breaks that bill down proportionally across departments by each
-    // one's share of total ad valorem revenue (same data as the static
-    // breakdown panel above).
+    // Countywide millage rate shown on the Property Taxes card above (see
+    // wc-budget-card-millage), then breaks that bill down proportionally
+    // across departments by each one's share of total ad valorem revenue
+    // (same data as the static breakdown panel above).
     function initTaxCalculator(){
       var valueInput = $("#taxCalcValue");
       if(!valueInput) return;
-      var mosquitoCheckbox = $("#taxCalcMosquito");
-      var showPercentCheckbox = $("#showBreakdownPercentages");
       var resetButton = $("#taxCalcReset");
       var infoButton = $("#taxInfoOpen");
       var infoDialog = $("#taxInfoDialog");
@@ -2502,10 +2513,12 @@
       var propertySearchResults = $("#propertyAddressResults");
       var propertySearchStatus = $("#propertyAddressStatus");
       var COUNTYWIDE_MILLAGE = 3.519;
-      var MOSQUITO_MILLAGE = 0.441;
       var BREAKDOWN_PREVIEW_COUNT = 7;
+      // Departments with a real FY2027 increase worth surfacing even
+      // though their ad valorem dollar share falls outside the default
+      // top-7 cutoff (e.g. South Walton Fire & State Control ranks #11).
+      var ALWAYS_VISIBLE_DEPARTMENTS = ["statutory & other agency funding", "south walton fire & state control"];
       var lastCountyTax = 0;
-      var lastMosquitoTax = 0;
       var breakdownShowAll = false;
 
       function moneyWithCents(value){
@@ -2513,106 +2526,88 @@
       }
 
       // One combined table: for every ad valorem-funded department,
-      // what you currently pay it (Current), whether it has a real,
-      // Board-adopted FY2026->FY2027 budget increase and what that means
-      // in personalized dollars (FY2027 Increase, $0.00 if flat -- shown,
+      // what you currently pay it (% of Total alongside the Current
+      // dollar amount), whether it has a real, Board-adopted
+      // FY2026->FY2027 budget increase and what that means in
+      // personalized dollars (FY2027 Increase, $0.00 if flat -- shown,
       // not hidden, so growing and flat departments are directly
-      // comparable), and the resulting total (New Amount). "Show as %
-      // instead of $" only ever applies to the Current column -- a real
-      // budget-increase percent read out of context invites confusing it
-      // with a personalized figure, so Increase/New Amount always stay
-      // in dollars.
-      function renderCombinedBreakdown(countyTax, mosquitoTax){
+      // comparable), and the resulting total (New Amount).
+      function renderCombinedBreakdown(countyTax){
         var tbody = $("#personalTaxTableBody");
-        var tfoot = $("#personalTaxTableFoot");
         if(!tbody) return;
-        var hasValue = !!(countyTax || mosquitoTax);
-        tbody.innerHTML = '<tr><td colspan="4" class="wc-tax-breakdown-loading">Loading breakdown...</td></tr>';
-        if(tfoot) tfoot.innerHTML = "";
+        tbody.innerHTML = '<tr><td colspan="5" class="wc-tax-breakdown-loading">Loading breakdown...</td></tr>';
         Promise.all([getDepartmentAdValoremRows(), getRealAdValoremIncreases()]).then(function(results){
           var departments = results[0];
           var increases = results[1];
           var grandTotal = departments.reduce(function(sum, d){ return sum + d.amount; }, 0);
-          var showPercent = !hasValue || (showPercentCheckbox && showPercentCheckbox.checked);
-          var combinedTax = countyTax + mosquitoTax;
           var increaseByName = {};
           increases.forEach(function(inc){ increaseByName[normalizeMatchName(inc.name)] = inc.percent; });
 
           var rows = departments.map(function(d){
             var share = grandTotal ? d.amount / grandTotal : 0;
             var currentAmount = countyTax * share;
-            var percentShare = hasValue ? (combinedTax ? currentAmount / combinedTax : 0) : share;
             var percent = increaseByName[normalizeMatchName(d.name)] || 0;
             var increaseAmount = currentAmount * (percent / 100);
             return {
               name: d.name,
               currentAmount: currentAmount,
-              currentDisplay: showPercent ? percentShare * 100 : currentAmount,
+              percentShare: share,
               increaseAmount: increaseAmount,
               newAmount: currentAmount + increaseAmount
             };
-          // A row that rounds to $0.00 (or 0.00%) Current at this taxable
-          // value isn't meaningfully "where your tax goes" -- dropped as
-          // noise. A $0.00 FY2027 Increase is kept deliberately (that's
-          // the point: showing flat departments beside growing ones).
-          }).filter(function(d){ return Math.abs(d.currentDisplay) >= 0.005; });
+          // A row that rounds to $0.00 Current at this taxable value
+          // isn't meaningfully "where your tax goes" -- dropped as noise.
+          // A $0.00 FY2027 Increase is kept deliberately (that's the
+          // point: showing flat departments beside growing ones).
+          }).filter(function(d){ return Math.abs(d.currentAmount) >= 0.005; });
 
-          var visible = breakdownShowAll ? rows : rows.slice(0, BREAKDOWN_PREVIEW_COUNT);
+          // Largest share of property tax allocation first (departments
+          // already arrive from getDepartmentAdValoremRows sorted this
+          // way, but re-sorting here keeps this the explicit, guaranteed
+          // order regardless of upstream changes).
+          rows.sort(function(a, b){ return b.percentShare - a.percentShare; });
+
+          var visible;
+          if(breakdownShowAll){
+            visible = rows;
+          } else {
+            var topRows = rows.slice(0, BREAKDOWN_PREVIEW_COUNT);
+            var topNames = {};
+            topRows.forEach(function(d){ topNames[normalizeMatchName(d.name)] = true; });
+            var forcedRows = rows.filter(function(d){
+              return !topNames[normalizeMatchName(d.name)] && ALWAYS_VISIBLE_DEPARTMENTS.indexOf(normalizeMatchName(d.name)) !== -1;
+            });
+            visible = topRows.concat(forcedRows).sort(function(a, b){ return b.percentShare - a.percentShare; });
+          }
           var rowsHtml = visible.map(function(d){
             var hasIncrease = d.increaseAmount >= 0.005;
             var increaseDisplay = hasIncrease ? "+" + moneyWithCents(d.increaseAmount) : moneyWithCents(0);
             var increaseClass = hasIncrease ? "" : "wc-tax-zero-value";
-            var currentDisplay = showPercent ? d.currentDisplay.toFixed(2) + "%" : moneyWithCents(d.currentDisplay);
             return "<tr>" +
               "<td>" + departmentLabelHtml(d.name) + "</td>" +
-              '<td class="wc-num">' + currentDisplay + "</td>" +
+              '<td class="wc-num">' + (d.percentShare * 100).toFixed(2) + "%</td>" +
+              '<td class="wc-num">' + moneyWithCents(d.currentAmount) + "</td>" +
               '<td class="wc-num ' + increaseClass + '">' + increaseDisplay + "</td>" +
               '<td class="wc-num">' + moneyWithCents(d.newAmount) + "</td>" +
             "</tr>";
           }).join("");
 
-          var mosquitoRowHtml = "";
-          if(mosquitoTax > 0){
-            var mosquitoShare = combinedTax ? mosquitoTax / combinedTax : 0;
-            var mosquitoCurrentDisplay = showPercent ? (mosquitoShare * 100).toFixed(2) + "%" : moneyWithCents(mosquitoTax);
-            mosquitoRowHtml = "<tr>" +
-              "<td>North Walton Mosquito Control</td>" +
-              '<td class="wc-num">' + mosquitoCurrentDisplay + "</td>" +
-              '<td class="wc-num wc-tax-zero-value">' + moneyWithCents(0) + "</td>" +
-              '<td class="wc-num">' + moneyWithCents(mosquitoTax) + "</td>" +
-            "</tr>";
-          }
-
           var toggleRowHtml = "";
           if(rows.length > BREAKDOWN_PREVIEW_COUNT){
-            toggleRowHtml = '<tr class="wc-tax-table-toggle-row"><td colspan="4">' +
+            toggleRowHtml = '<tr class="wc-tax-table-toggle-row"><td colspan="5">' +
               '<button type="button" id="personalBreakdownToggle" class="wc-millage-reset wc-breakdown-toggle">' +
               (breakdownShowAll ? "Show Fewer" : "Explore All " + rows.length + " County Services &rarr;") +
               "</button></td></tr>";
           }
 
-          tbody.innerHTML = rowsHtml + mosquitoRowHtml + toggleRowHtml;
-
-          if(tfoot){
-            // Always dollars regardless of the $/% toggle -- a sum of
-            // percentages (or of "New Amount" while "Current" reads as a
-            // percentage) isn't a meaningful number.
-            var totalCurrent = rows.reduce(function(sum, d){ return sum + d.currentAmount; }, 0) + mosquitoTax;
-            var totalIncrease = rows.reduce(function(sum, d){ return sum + d.increaseAmount; }, 0);
-            tfoot.innerHTML = "<tr>" +
-              "<td>Total</td>" +
-              '<td class="wc-num">' + moneyWithCents(totalCurrent) + "</td>" +
-              '<td class="wc-num">+' + moneyWithCents(totalIncrease) + "</td>" +
-              '<td class="wc-num">' + moneyWithCents(totalCurrent + totalIncrease) + "</td>" +
-            "</tr>";
-          }
+          tbody.innerHTML = rowsHtml + toggleRowHtml;
 
           var toggleButton = $("#personalBreakdownToggle");
           if(toggleButton){
             toggleButton.addEventListener("click", function(){
               var shouldReturnToTop = breakdownShowAll;
               breakdownShowAll = !breakdownShowAll;
-              renderCombinedBreakdown(lastCountyTax, lastMosquitoTax);
+              renderCombinedBreakdown(lastCountyTax);
               if(shouldReturnToTop){
                 window.setTimeout(function(){
                   var section = $("#taxSupportBreakdownSection");
@@ -2625,7 +2620,7 @@
             });
           }
         }).catch(function(){
-          tbody.innerHTML = '<tr><td colspan="4" class="wc-tax-breakdown-error">Property tax breakdown is not available right now.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="wc-tax-breakdown-error">Property tax breakdown is not available right now.</td></tr>';
         });
       }
 
@@ -2643,18 +2638,13 @@
         if(promptEl) promptEl.hidden = hasValue;
         if(!hasValue){
           lastCountyTax = 0;
-          lastMosquitoTax = 0;
           return;
         }
 
         var countywideAmount = taxableValue * COUNTYWIDE_MILLAGE / 1000;
 
-        var includeMosquito = mosquitoCheckbox.checked;
-        var mosquitoAmount = includeMosquito ? taxableValue * MOSQUITO_MILLAGE / 1000 : 0;
-
         lastCountyTax = countywideAmount;
-        lastMosquitoTax = mosquitoAmount;
-        renderCombinedBreakdown(countywideAmount, mosquitoAmount);
+        renderCombinedBreakdown(countywideAmount);
       }
 
       valueInput.addEventListener("input", function(event){
@@ -2663,8 +2653,6 @@
         }
         render();
       });
-      mosquitoCheckbox.addEventListener("change", render);
-      showPercentCheckbox.addEventListener("change", function(){ renderCombinedBreakdown(lastCountyTax, lastMosquitoTax); });
       function openInfoDialog(){
         if(!infoDialog) return;
         if(typeof infoDialog.showModal === "function"){
@@ -2703,9 +2691,6 @@
       if(resetButton){
         resetButton.addEventListener("click", function(){
           selectedParcelMeta = null;
-          mosquitoCheckbox.checked = false;
-          showPercentCheckbox.checked = false;
-          lastMosquitoTax = 0;
           breakdownShowAll = false;
           valueInput.value = "";
           if(propertySearchInput) propertySearchInput.value = "";
@@ -2720,18 +2705,6 @@
           render();
         });
       }
-      // The mosquito district info button lives inside its <label> (so it
-      // sits inline with that checkbox's own text) -- without stopping
-      // the click here, the label's native behavior would toggle the
-      // checkbox any time a resident clicks the "i" to read the tooltip.
-      var mosquitoInfoButton = document.querySelector('label.wc-tax-calc-checkbox .wc-info-button');
-      if(mosquitoInfoButton){
-        mosquitoInfoButton.addEventListener("click", function(event){
-          event.preventDefault();
-          event.stopPropagation();
-        });
-      }
-
       render();
     }
 
@@ -2739,9 +2712,7 @@
     // parcel,parcelno,address,city,zip,homestead,justValue,assessedValue,
     // taxableValue). It's the full county parcel roll (~93k rows, ~7MB),
     // so it's only fetched once the user actually focuses the search box,
-    // not on every homepage load. The file has no mosquito control
-    // district column, so that checkbox is left for the user to set
-    // manually after picking a result.
+    // not on every homepage load.
     function initPropertyAddressSearch(){
       var input = $("#propertyAddressSearch");
       if(!input) return;
