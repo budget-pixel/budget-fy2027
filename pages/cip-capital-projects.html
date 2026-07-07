@@ -25,10 +25,27 @@
 
 <div id="capitalTables"></div>
 
+<section class="statement-of-function content-section" id="grant-funded">
+  <h2>Grant Funded Schedule</h2>
+  <p>The Grant Funded Capital Projects portion of Walton County’s Capital Improvement Plan (CIP) consists of projects that receive financial support from various federal and state grant programs. These grants provide essential funding for road construction, drainage improvements, transportation enhancements, and other critical infrastructure needs without relying solely on local tax revenues.</p>
+  <p>Grant funds come from multiple sources, including state transportation programs, federal initiatives, and specialized grant opportunities designated for specific project types. These funds help Walton County leverage outside resources to maximize improvements while minimizing the financial impact on local budgets. Grant-funded Sheriff's Office projects are shown on the <a href="cip-sheriff.html">Sheriff Projects</a> schedule instead of here.</p>
+</section>
+
+<div id="grantsTables"></div>
+
 <script src="../assets/cip-projects-data.js"></script>
 <script src="../assets/cip-fund-schedule.js"></script>
 <script>
   renderFundSchedule({funding:"capital projects fund", mountId:"capitalTables", label:"Capital Projects Fund"});
+  renderFundSchedule({
+    mountId:"grantsTables",
+    label:"Grant Funded",
+    showFundingColumn:true,
+    projectFilter:function(project){
+      return String(project && project.funding || "").toLowerCase() === "grant funded" &&
+        String(project && project.department_filter || "").toLowerCase() !== "sheriff";
+    }
+  });
 </script>
 </main>
 </div>
@@ -108,7 +125,6 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Capital Improvement Plan Overview",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/capital-improvement-plan.html"},
   {title:"CIP Project Search",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/search.html"},
   {title:"Capital Projects Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-capital-projects.html"},
-  {title:"Grant Funded Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-grants.html"},
   {title:"Sheriff Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-sheriff.html"},
   {title:"Tourist Development Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-tourist-development.html"},
   {title:"Transportation Fund Schedule",section:"Capital Improvement Plan",href:"https://budget-pixel.github.io/budget-fy2027/../pages/cip-transportation.html"},

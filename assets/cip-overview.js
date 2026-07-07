@@ -33,6 +33,15 @@ function normalizeFilterValue(value){
   return String(value || "").trim().toLowerCase();
 }
 
+// Sheriff-owned capital projects are booked against whichever fund
+// actually pays for them (Sheriff Fund, Grant Funded, Capital Projects
+// Fund, etc. -- see cip-sheriff.html's departmentFilter, which is how the
+// CIP fund schedule pages already show every Sheriff project regardless
+// of its fund). The raw "funding" values would otherwise split Sheriff's
+// own projects across several fund buttons here, so this bucket is keyed
+// off department_filter instead of a literal fund name.
+const SHERIFF_PROJECTS_FUND_VALUE = normalizeFilterValue("Sheriff Projects");
+
 function escapeHtml(value){
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -87,7 +96,7 @@ function getCipOverviewStats(projects){
       label: "Grant Funded",
       value: fundTotal(["grant"]),
       text: "Projects supported by federal, state, or regional grant funding.",
-      href: "cip-grants.html"
+      href: "cip-capital-projects.html#grant-funded"
     },
     {
       label: "Sheriff Projects",
@@ -195,7 +204,7 @@ function getFilteredProjects(){
 
     const matchesFund =
       filters.fund === "all" ||
-      funding.includes(filters.fund);
+      (filters.fund === SHERIFF_PROJECTS_FUND_VALUE ? department === "sheriff" : funding.includes(filters.fund));
 
     return (
       matchesSearch &&
@@ -308,14 +317,28 @@ function renderProjects(){
     "Administration",
     "Capital Projects"
   ]);
-  const fundOptions = getFilterOptions(allProjects, "funding", [
+  const preferredFundOrder = [
     "Capital Projects Fund",
     "Transportation Fund",
     "Tourist Development Fund",
     "Grant Funded",
     "Sheriff Projects",
     "General Fund"
-  ]);
+  ];
+  const hasSheriffProjects = allProjects.some(project =>
+    normalizeFilterValue(project.department_filter) === "sheriff"
+  );
+  const fundOptions = getFilterOptions(allProjects, "funding", preferredFundOrder)
+    .filter(option => option.value !== normalizeFilterValue("Sheriff Fund"))
+    .concat(hasSheriffProjects ? [{ label: "Sheriff Projects", value: SHERIFF_PROJECTS_FUND_VALUE }] : []);
+
+  const fundOrderIndex = preferredFundOrder.map(normalizeFilterValue);
+  fundOptions.sort((a, b) => {
+    const aOrder = fundOrderIndex.indexOf(a.value);
+    const bOrder = fundOrderIndex.indexOf(b.value);
+
+    return (aOrder === -1 ? 999 : aOrder) - (bOrder === -1 ? 999 : bOrder) || a.label.localeCompare(b.label);
+  });
   const rows = [];
 
   for(let i = 0; i < visibleProjects.length; i += 3){

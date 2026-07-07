@@ -86,7 +86,6 @@ var wcCoreBudgetPages = [
   { title:"Capital Improvement Plan Overview", section:"Capital Improvement Plan", href:"capital-improvement-plan.html" },
   { title:"CIP Project Search", section:"Capital Improvement Plan", href:"search.html" },
   { title:"Capital Projects Fund Schedule", section:"Capital Improvement Plan", href:"cip-capital-projects.html" },
-  { title:"Grant Funded Schedule", section:"Capital Improvement Plan", href:"cip-grants.html" },
   { title:"Sheriff Projects", section:"Capital Improvement Plan", href:"cip-sheriff.html" },
   { title:"Tourist Development Fund Schedule", section:"Capital Improvement Plan", href:"cip-tourist-development.html" },
   { title:"Transportation Fund Schedule", section:"Capital Improvement Plan", href:"cip-transportation.html" },
@@ -417,11 +416,7 @@ var wcHiddenBudgetPageTitles = new Set([
     ],
 
     "Capital Projects Fund Schedule": [
-      "capital projects fund", "capital schedule", "capital projects schedule", "project appropriations", "in-house engineering"
-    ],
-
-    "Grant Funded Schedule": [
-      "grant funded", "grants", "grant schedule", "federal grants", "state grants", "grant projects"
+      "capital projects fund", "capital schedule", "capital projects schedule", "project appropriations", "in-house engineering", "grant funded", "grants", "grant schedule", "federal grants", "state grants", "grant projects"
     ],
 
     "Sheriff Projects": [
@@ -531,7 +526,6 @@ var wcHiddenBudgetPageTitles = new Set([
     "Capital Improvement Plan Overview": "capital-improvement-plan.html",
     "CIP Project Search": "search.html",
     "Capital Projects Fund Schedule": "cip-capital-projects.html",
-    "Grant Funded Schedule": "cip-grants.html",
     "Sheriff Projects": "cip-sheriff.html",
     "Tourist Development Fund Schedule": "cip-tourist-development.html",
     "Transportation Fund Schedule": "cip-transportation.html",

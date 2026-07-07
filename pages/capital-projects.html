@@ -33,10 +33,11 @@
 <script src="../assets/budget-pdf.js"></script>
 <script>
   (function(){
-    // "funding" matches each fund schedule page's own renderFundSchedule
-    // config (see cip-fund-schedule.js). Sheriff Projects is a
-    // department-wide view, so it uses departmentFilter instead of adding
-    // another fund bucket that could be mistaken for a separate total.
+    // "funding"/"fundings" matches each fund schedule page's own
+    // renderFundSchedule config (see cip-fund-schedule.js). Sheriff
+    // Projects is a department-wide view, so it uses departmentFilter
+    // instead of adding another fund bucket that could be mistaken for a
+    // separate total.
     var pages = [
       {
         title:"Capital Improvement Plan Overview",
@@ -51,8 +52,12 @@
       {
         title:"Capital Projects Fund Schedule",
         href:"cip-capital-projects.html",
-        description:"View the capital projects fund schedule and related project appropriations.",
-        funding:"capital projects fund"
+        description:"View the capital projects fund schedule, grant-funded projects, and related project appropriations.",
+        // Grant-funded projects that belong to the Sheriff's Office are
+        // shown on the Sheriff Projects page instead (via departmentFilter
+        // above), so they're excluded here to avoid double-counting.
+        fundings:["capital projects fund", "grant funded"],
+        excludeDepartmentFilter:"sheriff"
       },
       {
         title:"Transportation Fund Schedule",
@@ -71,12 +76,6 @@
         href:"cip-tourist-development.html",
         description:"Explore tourism-related capital investments funded through tourist development resources.",
         funding:"tourist development fund"
-      },
-      {
-        title:"Grant Funded Schedule",
-        href:"cip-grants.html",
-        description:"Browse capital projects supported by federal, state, and other grant funding sources.",
-        funding:"grant funded"
       }
     ];
 
@@ -135,10 +134,17 @@
 
     function pageProjectMatches(page, project){
       if(!project || isLegacyInHouseEngineeringRow(project)) return false;
+      if(page.excludeDepartmentFilter && String(project.department_filter || "").toLowerCase() === page.excludeDepartmentFilter){
+        return false;
+      }
       if(page.departmentFilter){
         return String(project.department_filter || "").toLowerCase() === page.departmentFilter;
       }
-      return String(project.funding || "").toLowerCase() === page.funding;
+      var projectFunding = String(project.funding || "").toLowerCase();
+      if(Array.isArray(page.fundings)){
+        return page.fundings.indexOf(projectFunding) !== -1;
+      }
+      return projectFunding === page.funding;
     }
 
     function projectStatsHtml(page, allProjects, isLoading){
@@ -164,7 +170,7 @@
       if(!list) return;
 
       list.innerHTML = pages.map(function(page){
-        var statsHtml = (page.funding || page.departmentFilter) ? '<div class="wc-directory-item-meta">' + projectStatsHtml(page, allProjects, isLoading) + '</div>' : "";
+        var statsHtml = (page.funding || page.fundings || page.departmentFilter) ? '<div class="wc-directory-item-meta">' + projectStatsHtml(page, allProjects, isLoading) + '</div>' : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
           '<div class="wc-directory-item-main">' +
             '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +
