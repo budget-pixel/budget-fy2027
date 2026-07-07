@@ -574,7 +574,7 @@
     border:0 !important;
   }
   .wc-skip-link{
-    position:absolute !important;
+    position:fixed !important;
     top:12px !important;
     left:12px !important;
     z-index:10000 !important;
