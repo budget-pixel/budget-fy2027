@@ -85,36 +85,52 @@ function getCipOverviewStats(projects){
     }, 0);
   }
 
+  function departmentTotal(departmentMatches){
+    return currentProjects.reduce((sum, project) => {
+      const department = String(project.department_filter || "").toLowerCase();
+      return departmentMatches.some(match => department.includes(match)) ? sum + projectBudgetValue(project) : sum;
+    }, 0);
+  }
+
+  function grantTotal(departmentMatches){
+    return currentProjects.reduce((sum, project) => {
+      const funding = String(project.funding || "").toLowerCase();
+      const department = String(project.department_filter || "").toLowerCase();
+
+      return funding === "grant funded" && departmentMatches.some(match => department.includes(match))
+        ? sum + projectBudgetValue(project)
+        : sum;
+    }, 0);
+  }
+
   const fundCards = [
     {
       label: "Capital Projects Fund",
       value: fundTotal(["capital projects fund", "capital project"]),
+      grantValue: grantTotal(["building construction", "administration", "public works"]),
       text: "County facilities, public infrastructure, and major improvements.",
       href: "cip-capital-projects.html"
     },
     {
-      label: "Grant Funded",
-      value: fundTotal(["grant"]),
-      text: "Projects supported by federal, state, or regional grant funding.",
-      href: "cip-capital-projects.html#grant-funded"
-    },
-    {
-      label: "Sheriff Projects",
-      value: fundTotal(["sheriff", "fine", "forfeiture"]),
-      text: "Public safety facilities, equipment, and law enforcement capital needs.",
-      href: "cip-sheriff.html"
+      label: "Transportation Fund",
+      value: fundTotal(["transportation"]),
+      grantValue: 0,
+      text: "Road, bridge, drainage, and mobility infrastructure.",
+      href: "cip-transportation.html"
     },
     {
       label: "Tourist Development Fund",
       value: fundTotal(["tourist", "tourism"]),
+      grantValue: grantTotal(["beach operations"]),
       text: "Beach operations, visitor infrastructure, and destination improvements.",
       href: "cip-tourist-development.html"
     },
     {
-      label: "Transportation Fund",
-      value: fundTotal(["transportation"]),
-      text: "Road, bridge, drainage, and mobility infrastructure.",
-      href: "cip-transportation.html"
+      label: "Sheriff Projects",
+      value: departmentTotal(["sheriff"]),
+      grantValue: grantTotal(["sheriff"]),
+      text: "Public safety facilities, equipment, and law enforcement capital needs.",
+      href: "cip-sheriff.html"
     }
   ];
 
@@ -1036,7 +1052,7 @@ function renderProjects(){
 
       .wc-cip-fund-grid{
         display:grid;
-        grid-template-columns:repeat(5, minmax(0,1fr));
+        grid-template-columns:repeat(4, minmax(0,1fr));
         gap:14px;
       }
 
@@ -1071,10 +1087,19 @@ function renderProjects(){
 
       .wc-cip-fund-card strong{
         display:block;
-        margin-top:18px;
+        margin-top:0;
         color:var(--green);
         font-size:clamp(28px, 3vw, 42px);
         line-height:1;
+      }
+
+      .wc-cip-fund-card em{
+        display:block;
+        margin-top:8px;
+        color:var(--muted);
+        font-size:12px;
+        font-style:normal;
+        font-weight:700;
       }
 
       .wc-cip-fund-card p{
@@ -2193,13 +2218,14 @@ function renderProjects(){
           <div class="wc-cip-story-header">
             <span class="wc-cip-kicker">Capital Funding</span>
             <h2>Capital investments by funding source.</h2>
-            <p>Capital projects are organized by fund so residents can see how restricted revenues, grants, and county resources are directed toward long-term improvements.</p>
+            <p>Capital projects are organized by fund so residents can see how restricted revenues, grants, and county resources are directed toward long-term improvements. Totals reflect the five-year capital improvement plan, FY 2027 through FY 2031.</p>
           </div>
           <div class="wc-cip-fund-grid">
             ${overviewStats.fundCards.map(card => `
               <a class="wc-cip-fund-card" href="${escapeHtml(card.href)}">
                 <small>${escapeHtml(card.label)}</small>
                 <strong>${escapeHtml(formatMoneyShort(card.value))}</strong>
+                ${card.grantValue > 0 ? `<em>${escapeHtml(formatMoneyShort(card.grantValue))} grant funded</em>` : ""}
                 <p>${escapeHtml(card.text)}</p>
                 <span>View Schedule</span>
               </a>

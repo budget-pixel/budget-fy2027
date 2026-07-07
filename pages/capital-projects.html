@@ -35,9 +35,9 @@
   (function(){
     // "funding"/"fundings" matches each fund schedule page's own
     // renderFundSchedule config (see cip-fund-schedule.js). Sheriff
-    // Projects is a department-wide view, so it uses departmentFilter
-    // instead of adding another fund bucket that could be mistaken for a
-    // separate total.
+    // Projects is a standalone rollup of all Sheriff's Office projects
+    // regardless of funding source, so its totals intentionally overlap
+    // with whichever fund page each project's funding source belongs to.
     var pages = [
       {
         title:"Capital Improvement Plan Overview",
@@ -53,11 +53,12 @@
         title:"Capital Projects Fund Schedule",
         href:"cip-capital-projects.html",
         description:"View the capital projects fund schedule, grant-funded projects, and related project appropriations.",
-        // Grant-funded projects that belong to the Sheriff's Office are
-        // shown on the Sheriff Projects page instead (via departmentFilter
-        // above), so they're excluded here to avoid double-counting.
-        fundings:["capital projects fund", "grant funded"],
-        excludeDepartmentFilter:"sheriff"
+        // Matches the capitalTables renderFundSchedule call on
+        // cip-capital-projects.html so this card's total always equals the
+        // Capital Projects Fund schedule total shown on that page. The
+        // Grant Funded schedule on the same page has its own total and is
+        // intentionally not folded into this stat.
+        funding:"capital projects fund"
       },
       {
         title:"Transportation Fund Schedule",
@@ -66,16 +67,16 @@
         funding:"transportation fund"
       },
       {
-        title:"Sheriff Projects",
-        href:"cip-sheriff.html",
-        description:"Review all capital projects associated with the Walton County Sheriff's Office.",
-        departmentFilter:"sheriff"
-      },
-      {
         title:"Tourist Development Fund Schedule",
         href:"cip-tourist-development.html",
         description:"Explore tourism-related capital investments funded through tourist development resources.",
         funding:"tourist development fund"
+      },
+      {
+        title:"Sheriff Projects",
+        href:"cip-sheriff.html",
+        description:"Review all capital projects associated with the Walton County Sheriff's Office.",
+        departmentFilter:"sheriff"
       }
     ];
 
@@ -134,8 +135,8 @@
 
     function pageProjectMatches(page, project){
       if(!project || isLegacyInHouseEngineeringRow(project)) return false;
-      if(page.excludeDepartmentFilter && String(project.department_filter || "").toLowerCase() === page.excludeDepartmentFilter){
-        return false;
+      if(typeof page.match === "function"){
+        return page.match(project);
       }
       if(page.departmentFilter){
         return String(project.department_filter || "").toLowerCase() === page.departmentFilter;
@@ -156,9 +157,9 @@
       var matching = allProjects.filter(function(p){
         return pageProjectMatches(page, p);
       });
-      var budgetTotal = matching.reduce(function(sum, p){ return sum + getFy2027Amount(p); }, 0);
       var projectCount = matching.filter(function(p){ return getFy2027Amount(p) > 0; }).length;
       var inHouseTotal = matching.reduce(function(sum, p){ return sum + getInHouseEngineeringAmount(p); }, 0);
+      var budgetTotal = matching.reduce(function(sum, p){ return sum + getFy2027Amount(p); }, 0);
 
       return statHtml("wc-directory-item-stat--fund-budget", escapeHtml(formatMoneyShort(budgetTotal)), "FY 2027 Budget") +
         statHtml("wc-directory-item-stat--fund-projects", escapeHtml(projectCount.toLocaleString("en-US")), "Number of Projects") +
