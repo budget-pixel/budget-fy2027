@@ -1238,9 +1238,19 @@
   }
   .wc-budget-card,
   .wc-investment-card{
+    display:block;
     min-height:180px;
     padding:22px;
     border-radius:24px;
+    color:inherit;
+    text-decoration:none;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .wc-budget-card:hover,
+  .wc-investment-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(0,98,49,.28);
+    box-shadow:0 22px 48px rgba(23,32,51,.12);
   }
   .wc-budget-card small,
   .wc-investment-card small{
@@ -1763,11 +1773,11 @@
         <a class="wc-section-link" href="pages/summary-of-revenues.html">View Summary of Revenues &rarr;</a>
       </div>
       <div class="wc-budget-grid">
-        <div class="wc-budget-card" data-revenue-card="property"><small>Property Taxes</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Supports core county services, public safety, facilities, and general operations.</p><span class="wc-budget-card-millage"><span class="wc-budget-card-millage-label">Millage</span>Countywide 3.519<br>North Walton Mosquito Control 0.441</span></div>
-        <div class="wc-budget-card" data-revenue-card="tdt"><small>Tourist Development Tax</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Visitor lodging taxes restricted to tourism, beaches, facilities, and eligible visitor impacts.</p></div>
-        <div class="wc-budget-card" data-revenue-card="surtax"><small>Local Discretionary Sales Surtax</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Supports solid waste, transportation, road maintenance, capital, infrastructure, and other general governmental operations.</p></div>
-        <div class="wc-budget-card" data-revenue-card="halfcent"><small>Local Government Half-Cent Sales Tax</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>State-shared sales tax used for county purposes, debt service, and public improvements.</p></div>
-        <div class="wc-budget-card" data-revenue-card="other"><small>All Other Revenues</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Fees, permits, interest, intergovernmental revenues, and other program support.</p></div>
+        <a class="wc-budget-card" href="pages/summary-of-revenues.html#ad-valorem-taxes" data-revenue-card="property"><small>Property Taxes</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Supports core county services, public safety, facilities, and general operations.</p><span class="wc-budget-card-millage"><span class="wc-budget-card-millage-label">Millage</span>Countywide 3.519<br>North Walton Mosquito Control 0.441</span></a>
+        <a class="wc-budget-card" href="pages/summary-of-revenues.html#tourist-development-taxes" data-revenue-card="tdt"><small>Tourist Development Tax</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Visitor lodging taxes restricted to tourism, beaches, facilities, and eligible visitor impacts.</p></a>
+        <a class="wc-budget-card" href="pages/summary-of-revenues.html#local-discretionary-sales-surtax" data-revenue-card="surtax"><small>Local Discretionary Sales Surtax</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Supports solid waste, transportation, road maintenance, capital, infrastructure, and other general governmental operations.</p></a>
+        <a class="wc-budget-card" href="pages/summary-of-revenues.html#local-government-half-cent-sales-tax" data-revenue-card="halfcent"><small>Local Government Half-Cent Sales Tax</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>State-shared sales tax used for county purposes, debt service, and public improvements.</p></a>
+        <a class="wc-budget-card" href="pages/summary-of-revenues.html" data-revenue-card="other"><small>All Other Revenues</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Fees, permits, interest, intergovernmental revenues, and other program support.</p></a>
       </div>
       <div class="wc-section-heading wc-investment-heading">
         <div>

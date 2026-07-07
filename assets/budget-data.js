@@ -7147,6 +7147,26 @@
     }, 0);
   }
 
+  // Shared with renderRevenueTopicPlaceholders so a topic's placeholder
+  // and its real, data-loaded block land on the exact same id.
+  function revenueTopicSlug(title) {
+    return String(title || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+
+  // Renders an instant, data-free skeleton for each topic (same ids as
+  // the real charts renderRevenueTopicCards fills in later) so a homepage
+  // revenue card's #slug link has something to scroll to immediately,
+  // instead of waiting on loadBudgetData() -- which is a network fetch
+  // and can take a beat -- before the target id even exists.
+  function renderRevenueTopicPlaceholders(container, topics) {
+    if (!container) return;
+    container.innerHTML = topics.map((topic) =>
+      '<div class="wc-revenue-topic-block" id="' + escapeHtml(revenueTopicSlug(topic.title)) + '">' +
+      '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>" +
+      "</div>"
+    ).join("");
+  }
+
   function renderRevenueTopicCards(container, topics, idPrefix) {
     if (!container) return;
     // The Self-Insurance Fund (503) is an Internal Service fund, not a
@@ -7179,7 +7199,7 @@
       const isReversed = topicIndex % 2 === 1;
 
       return (
-        '<div class="wc-revenue-topic-block">' +
+        '<div class="wc-revenue-topic-block" id="' + escapeHtml(revenueTopicSlug(topic.title)) + '">' +
         '<div class="wc-revenue-topic-row' + (isReversed ? " wc-revenue-topic-row-reverse" : "") + '">' +
         (isReversed ? narrativeCardHtml + chartCardHtml : chartCardHtml + narrativeCardHtml) +
         "</div>" +
@@ -7291,9 +7311,17 @@
     const sections = REVENUE_CLASSIFICATION_SECTIONS.filter((s) => document.getElementById(s.containerId));
     if (!sections.length) return;
 
+    // Placeholders carry the real per-topic ids immediately (synchronously,
+    // before loadBudgetData()'s network fetch even starts), so a homepage
+    // revenue card's #slug link has something to jump to right away
+    // instead of waiting on the data to arrive.
     sections.forEach((s) => {
-      document.getElementById(s.containerId).innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
+      renderRevenueTopicPlaceholders(document.getElementById(s.containerId), s.topics);
     });
+    if (window.location.hash) {
+      const initialTarget = document.getElementById(window.location.hash.slice(1));
+      if (initialTarget) initialTarget.scrollIntoView();
+    }
 
     loadBudgetData()
       .then((data) => {
@@ -7305,6 +7333,14 @@
           }
           renderRevenueTopicCards(container, s.topics, "wc-chart-" + s.containerId);
         });
+        // Re-settle scroll position once the real (taller) charts replace
+        // the placeholders -- topics above the target growing from a
+        // one-line loading message to a full chart would otherwise leave
+        // the page scrolled to the wrong spot.
+        if (window.location.hash) {
+          const target = document.getElementById(window.location.hash.slice(1));
+          if (target) target.scrollIntoView();
+        }
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load revenue topic cards", err);
