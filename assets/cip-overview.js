@@ -188,9 +188,10 @@ function getFilteredProjects(){
       project.status_text
     ].join(" ").toLowerCase();
 
+    const searchTerm = filters.search.trim().toLowerCase();
     const matchesSearch =
-      !filters.search ||
-      content.includes(filters.search);
+      !searchTerm ||
+      content.includes(searchTerm);
 
     const matchesDepartment =
       filters.department === "all" ||
@@ -2421,7 +2422,12 @@ function renderProjects(){
 
   if(searchField){
     searchField.addEventListener("input", e => {
-      filters.search = e.target.value.trim().toLowerCase();
+      // Keep the raw typed value (including spaces the user is still
+      // typing) -- getFilteredProjects trims/lowercases its own copy for
+      // matching. Trimming here would get force-written back into the
+      // field below once the debounced re-render fires, silently eating
+      // any trailing space the moment the user paused typing.
+      filters.search = e.target.value;
       resetVisibleLimit();
 
       clearTimeout(window.wcProjectSearchTimer);
