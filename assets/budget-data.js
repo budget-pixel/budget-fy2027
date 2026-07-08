@@ -4915,6 +4915,33 @@
     return undefined;
   }
 
+  function forecastBeachVendingHistoricalOverride(row, yearField) {
+    if (String(row.Revenue_Code || "").trim() !== BCC_BEACH_VENDING_REVENUE_CODE) return undefined;
+    const actualYearMatch = /^FY(\d{4})_Actual$/.exec(yearField);
+    if (!actualYearMatch) return undefined;
+
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    if (dept === "board of county commissioners") return 0;
+    if (dept !== "code compliance" && dept !== "code compliance beach") return undefined;
+
+    const year = Number(actualYearMatch[1]);
+    const result = sumRawActualsForAccount(
+      cache.revenueActualRows,
+      row.Dept_Code,
+      BCC_BEACH_VENDING_REVENUE_CODE,
+      year
+    );
+    return result.matched ? revenueDisplayAmount(result.total) : undefined;
+  }
+
+  function forecastHistoricalRevenueOverride(row, yearField) {
+    const adValoremOverride = forecastAdValoremHistoricalOverride(row, yearField);
+    if (adValoremOverride !== undefined) return adValoremOverride;
+    const beachVendingOverride = forecastBeachVendingHistoricalOverride(row, yearField);
+    if (beachVendingOverride !== undefined) return beachVendingOverride;
+    return undefined;
+  }
+
   // FY2020-FY2025 actuals and the FY2026 Original Budget are recorded once
   // per account, but a sheet account shared by many departments (e.g. the
   // General Fund's Ad Valorem Taxes line, Dept_Code 001311) repeats that
@@ -4956,7 +4983,7 @@
       const rawValue = Number(row[yearField]) || 0;
       let value = needsDedup ? revenueDisplayAmount(rawValue) : rawValue;
       if (needsDedup) {
-        const override = forecastAdValoremHistoricalOverride(row, yearField);
+        const override = forecastHistoricalRevenueOverride(row, yearField);
         if (override !== undefined) value = override;
       }
       totals.set(category, (totals.get(category) || 0) + value);
@@ -5020,7 +5047,7 @@
       const rawValue = Number(row[yearField]) || 0;
       let value = needsDedup ? revenueDisplayAmount(rawValue) : rawValue;
       if (needsDedup) {
-        const override = forecastAdValoremHistoricalOverride(row, yearField);
+        const override = forecastHistoricalRevenueOverride(row, yearField);
         if (override !== undefined) value = override;
       }
       addRow(row, value);
