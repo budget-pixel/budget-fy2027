@@ -60,7 +60,14 @@
       "court technology"
     ],
     "public defender": ["court technology public defender"],
-    "statutory and other agency funding": ["statutory and other agency fund", "statutory and other"],
+    "statutory and other agency funding": [
+      "statutory and other agency fund",
+      "statutory and other",
+      "culture and recreation senior centers",
+      "culture and recreation senior centers and mainstreet",
+      "senior centers",
+      "senior centers and mainstreet"
+    ],
     "south walton fire and state control": ["south walton fire", "state fire"],
     "code compliance": ["code compliance beach", "code compliance street"],
     "libraries": ["county libraries"],
@@ -2447,10 +2454,11 @@
   }
 
   // Dev-only sanity check, never shown in the UI -- logs to the browser
-  // console automatically after every data load. Sums expenditures vs.
-  // revenues per department/service on a single budget field (default
-  // FY2027_Proposed) and flags any department where the two totals don't
-  // balance. Can also be run on demand via
+  // console automatically after every data load. Reuses the same row
+  // selection that feeds department expense/revenue cards, including
+  // supplemental expense cards and revenue backfills, then compares the
+  // displayed totals on a single budget field (default FY2027_Proposed).
+  // Can also be run on demand via
   // WCBudgetData.auditDepartmentExpenseRevenueParity().
   // Groups distinct Dept_Names together for the parity audit only, beyond
   // what DEPT_ALIASES covers -- these are legitimately separate line items
@@ -2465,6 +2473,30 @@
   const AUDIT_DEPT_GROUP_OVERRIDES = {
     "solid waste": ["solid waste transfer"],
     "board of county commissioners": ["bcc other uses contingency"],
+    "capital projects": [
+      "interfund group transfer in",
+      "interfund group transfer out"
+    ],
+    "self-insurance": [
+      "self-insurance expense",
+      "self-insurance expense fees and charges",
+      "self-insurance expenses",
+      "self-insurance fees and charges",
+      "self-insurance interest",
+      "self insurance",
+      "self insurance expense",
+      "self insurance expense fees and charges",
+      "self insurance expenses",
+      "self insurance fees and charges",
+      "self insurance interest"
+    ],
+    "statutory and other agency funding": [
+      "statutory and other",
+      "culture and recreation senior centers",
+      "culture and recreation senior centers and mainstreet",
+      "senior centers",
+      "senior centers and mainstreet"
+    ],
     tourism: [
       "tourism administration",
       "tourism beach operations",
@@ -2486,6 +2518,137 @@
     });
     return map;
   })();
+  const AUDIT_GROUPS_RENDERED_BY_CANONICAL_PAGE = new Set([
+    "board of county commissioners",
+    "solid waste",
+    "statutory and other agency funding"
+  ]);
+
+  function departmentFinancialDisplayRows(deptName, deptCode) {
+    const norm = normalizeDeptName(deptName);
+    let expenseRows;
+    let expenseRowsForRevenuePlug;
+    let supplementalRevenueRows = [];
+
+    if (norm === "statutory and other agency funding" || norm === "statutory and other") {
+      expenseRows = (cache.expenditures || []).filter((r) => (r.Note || "").trim() === "Statutory & Other");
+      expenseRowsForRevenuePlug = expenseRows;
+    } else if (norm === "court innovations") {
+      expenseRows = (cache.expenditures || []).filter(
+        (r) =>
+          (r.Dept_Code === "00101000" && r.Project_Code === "1040") ||
+          normalizeDeptName(r.Dept_Name) === "court innovations"
+      );
+      expenseRowsForRevenuePlug = expenseRows;
+    } else {
+      const excludedObjectCodes = EXPENSE_OBJECT_CODES_BROKEN_OUT[norm] || [];
+      const isBcc = norm === "board of county commissioners";
+      const isBuildingConstruction = norm === "building construction and maintenance";
+      const isSolidWaste = norm === "solid waste";
+      const isCourtTechnology = norm === "court technology and innovations";
+      const expenseMainRows = filterAllZeroRowsForSelectedDepartments(getDepartmentExpenses(deptName, deptCode).filter(
+        (r) =>
+          !excludedObjectCodes.includes(String(r.Object_Code || "").trim()) &&
+          !(isBcc && String(r.Project_Code || "").trim() === "1040")
+      ), deptName);
+      const supplementalRows = [];
+      if (isSolidWaste) {
+        supplementalRows.push(
+          ...rowsForExactDepartment(cache.expenditures, "Solid Waste").filter((r) => String(r.Object_Code || "").trim() === "534000"),
+          ...rowsForExactDepartment(cache.expenditures, "Solid Waste Transfer")
+        );
+      } else if (isBcc) {
+        supplementalRows.push(...rowsForExactDepartment(cache.expenditures, "BCC Other Uses Contingency"));
+      } else if (isBuildingConstruction) {
+        supplementalRows.push(
+          ...rowsForExactDepartment(cache.expenditures, "Building Construction and Maintenance")
+            .filter((r) => String(r.Object_Code || "").trim() === "543000")
+        );
+      } else if (norm === "office of the county attorney" || norm === "office of county attorney") {
+        supplementalRows.push(
+          ...getDepartmentExpenses(deptName, deptCode).filter((r) => String(r.Object_Code || "").trim() === "531000")
+        );
+      } else if (isCourtTechnology) {
+        supplementalRows.push(
+          ...(cache.expenditures || []).filter(
+            (r) =>
+              (r.Dept_Code === "00101000" && r.Project_Code === "1040") ||
+              normalizeDeptName(r.Dept_Name) === "court innovations"
+          )
+        );
+        supplementalRevenueRows = (cache.revenues || []).filter(
+          (r) => normalizeDeptName(r.Dept_Name) === "court innovations"
+        );
+      }
+      expenseRows = expenseMainRows.concat(supplementalRows);
+      if (isBcc || isBuildingConstruction) {
+        expenseRowsForRevenuePlug = expenseRows;
+      } else {
+        expenseRowsForRevenuePlug = expenseMainRows;
+      }
+    }
+
+    const rawRevenueRows = getDepartmentRevenues(deptName, deptCode);
+    const deptExpenseRows = dedupBudgetLinesAcrossDeptNames(expenseRowsForRevenuePlug || getDepartmentExpenses(deptName, deptCode));
+    let filledRevenueRows = fillRevenueActualsFromExpenses(rawRevenueRows, deptExpenseRows);
+    if (filledRevenueRows.some((r) => isSheriffRevenueDept(r))) {
+      const all381 = filledRevenueRows.filter((r) => String((r && r.Revenue_Code) || "").trim() === "381000");
+      const src311 = filledRevenueRows.find((r) => String((r && r.Revenue_Code) || "").trim() === "311000");
+      if (all381.length && src311) {
+        const sum381fy2024 = all381.reduce((s, r) => s + (r.FY2024_Actual || 0), 0);
+        const sum381fy2025 = all381.reduce((s, r) => s + (r.FY2025_Actual || 0), 0);
+        const sum381fy2026 = all381.reduce((s, r) => s + (r.FY2026_Original_Budget || r.FY2026_Budget || 0), 0);
+        const total2027 = [src311, ...all381].reduce((s, r) => s + (r.FY2027_Proposed || 0), 0);
+        const fy2027AdValorem = Math.max(0, total2027 - 480000);
+        let interfundAssigned = false;
+        filledRevenueRows = filledRevenueRows.map((r) => {
+          const code = String((r && r.Revenue_Code) || "").trim();
+          if (code === "311000") {
+            return {
+              ...r,
+              _actualsBackfilled: true,
+              FY2024_Actual: sum381fy2024,
+              FY2025_Actual: sum381fy2025,
+              FY2026_Original_Budget: sum381fy2026,
+              FY2026_Budget: sum381fy2026,
+              FY2027_Proposed: fy2027AdValorem,
+            };
+          }
+          if (code === "381000") {
+            const fy2027 = !interfundAssigned ? 480000 : 0;
+            interfundAssigned = true;
+            return {
+              ...r,
+              _actualsBackfilled: true,
+              _originalBudgetDeduped: true,
+              FY2024_Actual: 0,
+              FY2025_Actual: 0,
+              FY2026_Original_Budget: 0,
+              FY2026_Budget: 0,
+              FY2027_Proposed: fy2027,
+            };
+          }
+          return r;
+        });
+      }
+      const adValoremIndex = filledRevenueRows.findIndex((r) => String((r && r.Revenue_Code) || "").trim() === "311000");
+      const delinquentRows = filledRevenueRows.filter((r) => String((r && r.Revenue_Code) || "").trim() === "311001");
+      if (adValoremIndex !== -1 && delinquentRows.length) {
+        const mergeFields = ["FY2020_Actual", "FY2021_Actual", "FY2022_Actual", "FY2023_Actual", "FY2024_Actual", "FY2025_Actual", "FY2026_Original_Budget", "FY2026_Budget", "FY2027_Proposed"];
+        const merged = { ...filledRevenueRows[adValoremIndex], _actualsBackfilled: true };
+        delinquentRows.forEach((r) => {
+          mergeFields.forEach((f) => { merged[f] = (merged[f] || 0) + (r[f] || 0); });
+        });
+        filledRevenueRows[adValoremIndex] = merged;
+        filledRevenueRows = filledRevenueRows.filter((r) => String((r && r.Revenue_Code) || "").trim() !== "311001");
+      }
+    }
+
+    return {
+      expenseRows,
+      revenueRows: filterAllZeroRowsForSelectedDepartments(filledRevenueRows, deptName).concat(supplementalRevenueRows)
+    };
+  }
 
   function auditDepartmentExpenseRevenueParity(options) {
     const field = (options && options.field) || "FY2027_Proposed";
@@ -2505,19 +2668,24 @@
       return AUDIT_DEPT_GROUP_CANONICAL.get(canonical) || canonical;
     }
 
-    const byKey = new Map();
-    (cache.expenditures || []).forEach((row) => {
+    const sourceDeptNamesByKey = new Map();
+    (cache.expenditures || []).concat(cache.revenues || []).forEach((row) => {
       const key = keyFor(row);
       if (!key) return;
-      const entry = byKey.get(key) || { deptName: row.Dept_Name, expense: 0, revenue: 0 };
-      entry.expense += toNumber(row[field]);
-      byKey.set(key, entry);
+      if (!sourceDeptNamesByKey.has(key)) sourceDeptNamesByKey.set(key, new Set());
+      const sourceName = DEPT_ALIAS_CANONICAL.get(normalizeDeptName(row.Dept_Name)) || normalizeDeptName(row.Dept_Name);
+      if (AUDIT_GROUPS_RENDERED_BY_CANONICAL_PAGE.has(key) && sourceName !== key) return;
+      sourceDeptNamesByKey.get(key).add(sourceName);
     });
-    (cache.revenues || []).forEach((row) => {
-      const key = keyFor(row);
-      if (!key) return;
-      const entry = byKey.get(key) || { deptName: row.Dept_Name, expense: 0, revenue: 0 };
-      entry.revenue += revenueDisplayAmount(row[field]);
+
+    const byKey = new Map();
+    sourceDeptNamesByKey.forEach((sourceNames, key) => {
+      const entry = { deptName: key, expense: 0, revenue: 0 };
+      sourceNames.forEach((sourceName) => {
+        const rows = departmentFinancialDisplayRows(sourceName);
+        entry.expense += (rows.expenseRows || []).reduce((sum, row) => sum + toNumber(row[field]), 0);
+        entry.revenue += (rows.revenueRows || []).reduce((sum, row) => sum + revenueDisplayAmount(row[field]), 0);
+      });
       byKey.set(key, entry);
     });
 
@@ -2527,7 +2695,7 @@
       .sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference));
 
     if (!(options && options.log === false)) {
-      console.group("Department expense/revenue parity audit (" + field + ")");
+      console.group("Department displayed-card expense/revenue parity audit (" + field + ")");
       console.table(mismatches.map((m) => ({
         Dept_Name: m.deptName,
         Expense: m.expense,
