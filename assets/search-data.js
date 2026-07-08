@@ -264,7 +264,16 @@ var wcHiddenBudgetPageTitles = new Set([
     ],
 
     "Statutory & Other Agency Funding": [
-      "statutory funding", "agency funding", "outside agencies", "mandated funding", "state required", "other agencies", "intergovernmental"
+      "statutory funding", "agency funding", "outside agencies", "mandated funding", "state required", "other agencies", "intergovernmental",
+      "argyle volunteer fire department", "argyle volunteer fire", "argyle fire",
+      "economic development alliance", "eda",
+      "community redevelopment agency", "cra",
+      "defuniak springs interlocal", "life enrichment center",
+      "gulf coast kids house",
+      "lakeview center", "lakeview center baker act", "lakeview center backer act", "baker act",
+      "lakeview center mental health",
+      "lakeview center women and children", "lakeview center women & children",
+      "liberty volunteer fire department", "liberty volunteer fire", "liberty fire district"
     ],
 
     "E911 Fund": [

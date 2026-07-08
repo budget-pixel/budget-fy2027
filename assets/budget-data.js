@@ -4547,6 +4547,60 @@
     });
   }
 
+  // Statutory & Other Agency Funding rolls up a dozen-plus unrelated
+  // outside agencies (Argyle Volunteer Fire, Gulf Coast Kids House,
+  // Lakeview Center, etc.) into one or two Object_Type buckets, so the
+  // normal top-3-categories card would just show "Operating Expenditures:
+  // 100%" and hide which agencies got funded behind the "View Budget
+  // Lines" modal. Each Object_Type row gets an always-visible subline per
+  // agency (by Project_Name) instead, so the full FY2027 list reads
+  // straight off the card -- same inline sublines mechanism already used
+  // for Code Compliance's Street/Beach split, just keyed by agency instead
+  // of Dept_Name.
+  function renderStatutoryAgencyExpenseCard(rows, caption, descriptionField) {
+    const yearFields = BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => c.field).concat(["FY2027_Proposed"]);
+    const totalsByType = new Map();
+    const grandTotals = {};
+    yearFields.forEach((f) => { grandTotals[f] = 0; });
+    const agencyByType = new Map();
+    rows.forEach((r) => {
+      const type = r.Object_Type || "Other";
+      const totals = totalsByType.get(type) || {};
+      yearFields.forEach((f) => {
+        const amt = r[f] || 0;
+        totals[f] = (totals[f] || 0) + amt;
+        grandTotals[f] += amt;
+      });
+      totalsByType.set(type, totals);
+
+      const agencyName = String(r[descriptionField || "Project_Name"] || r.Note || "Other").trim() || "Other";
+      const byAgency = agencyByType.get(type) || new Map();
+      byAgency.set(agencyName, (byAgency.get(agencyName) || 0) + (r.FY2027_Proposed || 0));
+      agencyByType.set(type, byAgency);
+    });
+
+    const cardRows = Array.from(totalsByType.entries()).map(([type, totals]) => {
+      const amount = totals.FY2027_Proposed || 0;
+      const priorAmount = totals.FY2026_Original_Budget || 0;
+      const byAgency = agencyByType.get(type) || new Map();
+      const sublines = Array.from(byAgency.entries())
+        .map(([label, amt]) => ({ label, amount: amt }))
+        .filter((s) => s.amount !== 0)
+        .sort((a, b) => b.amount - a.amount);
+      return { label: type, amount, priorAmount, changeAmount: amount, changePriorAmount: priorAmount, sublines };
+    });
+
+    return renderFinancialDashboardCard({
+      caption,
+      kind: "expense",
+      rows: cardRows,
+      total: grandTotals.FY2027_Proposed || 0,
+      showPrior: getShowPriorYears(),
+      detail: renderBudgetLinesToggle(rows, descriptionField, "expense"),
+      showChange: true
+    });
+  }
+
   // When a department's rows span more than one distinct Dept_Name (e.g.
   // "Planning" includes a separately tracked "Planning Short-Term Rental"
   // program), render one labeled table per sub-program instead of merging
@@ -9845,7 +9899,7 @@
         if (normalizeDeptName(deptName) === "statutory and other agency funding") {
           const statutoryRows = (cache.expenditures || []).filter((r) => (r.Note || "").trim() === "Statutory & Other");
           expenseRowsForRevenuePlug = statutoryRows;
-          expenseHtml = renderTypeSummaryGroup(statutoryRows, "expense", "Expenditure Summary", null, "Project_Name");
+          expenseHtml = renderStatutoryAgencyExpenseCard(statutoryRows, "Expenditure Summary", "Project_Name");
         } else {
           // Some departments break specific object codes out into their own
           // supplemental table below; exclude those codes here to avoid
