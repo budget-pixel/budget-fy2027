@@ -124,7 +124,7 @@
       if(!callouts || !callouts.length) return "";
       return '<div class="wc-personnel-fund-stats wc-personnel-fund-stats--compact">' +
         callouts.map(function(c){
-          return '<a class="wc-personnel-fund-stat" href="' + escapeHtml(href) + '?fund=' + encodeURIComponent(c.label) + '">' +
+          return '<a class="wc-personnel-fund-stat" href="' + escapeHtml(href) + '?fund=' + encodeURIComponent(c.filterLabel || c.label) + '">' +
             '<strong>' + escapeHtml(window.WCBudgetData.formatNumber(c.total)) + '</strong><span>' + escapeHtml(c.label) + '</span></a>';
         }).join("") +
         '</div>';

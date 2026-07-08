@@ -10217,13 +10217,16 @@
   // financials.html), so both stay in sync with one grouping definition.
   // Sorted largest to smallest so the biggest funds/offices read first.
   function getPersonnelFundCallouts(rows) {
-    const totalsByLabel = new Map();
+    const totalsByFilterLabel = new Map();
     rows.forEach((r) => {
       const label = personnelFundLabelForRow(r);
-      totalsByLabel.set(label, (totalsByLabel.get(label) || 0) + (Number(r[2027]) || 0));
+      const filterLabel = personnelFundFilterLabelForRow(r);
+      if (!totalsByFilterLabel.has(filterLabel)) {
+        totalsByFilterLabel.set(filterLabel, { label, filterLabel, total: 0 });
+      }
+      totalsByFilterLabel.get(filterLabel).total += Number(r[2027]) || 0;
     });
-    const callouts = [];
-    totalsByLabel.forEach((total, label) => callouts.push({ label, total }));
+    const callouts = Array.from(totalsByFilterLabel.values());
     return callouts.sort((a, b) => b.total - a.total);
   }
 
@@ -10232,7 +10235,7 @@
     return (
       '<div class="wc-personnel-fund-stats">' +
       callouts.map((c) =>
-        '<button type="button" class="wc-personnel-fund-stat" data-personnel-fund-filter="' + escapeHtml(c.label) + '">' +
+        '<button type="button" class="wc-personnel-fund-stat" data-personnel-fund-filter="' + escapeHtml(c.filterLabel) + '">' +
         "<strong>" + formatNumber(c.total) + "</strong><span>" + escapeHtml(c.label) + "</span></button>"
       ).join("") +
       "</div>"
@@ -10386,8 +10389,13 @@
     } catch (e) {
       requestedFund = "";
     }
-    if (requestedFund && fundNames.includes(requestedFund)) {
+    if (requestedFund && fundFilterNames.includes(requestedFund)) {
       fundSelect.value = requestedFund;
+    } else if (requestedFund) {
+      const requestedCallout = getPersonnelFundCallouts(rows).find((c) => c.label === requestedFund);
+      if (requestedCallout && fundFilterNames.includes(requestedCallout.filterLabel)) {
+        fundSelect.value = requestedCallout.filterLabel;
+      }
     }
 
     applyFilters();
