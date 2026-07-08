@@ -144,6 +144,12 @@
     ["communications", "Tourism Administration"],
     ["marketing", "Tourism Administration"],
     ["north walton tourist development tax", "Tourism Administration"],
+    // The expenditures sheet's own Dept_Name for this division is
+    // "Tourism North Walton" (not "North Walton Tourist Development Tax",
+    // which is what the revenue side uses) -- without this, its Summary
+    // of Expenses "View Budget Lines" row had no department page link at
+    // all, unlike every sibling division (Marketing, Communications, etc).
+    ["tourism north walton", "Tourism Administration"],
     ["beach operations", "Tourism Beach Operations"],
     ["beach code enforcement", "Tourism Beach Operations"],
     ["beach renourishment", "Tourism Beach Operations"],
@@ -163,9 +169,33 @@
     ["Sidewalk Fund", "sidewalk-fund.html"]
   ]);
 
+  // A raw Dept_Name that's really one division of a combined department
+  // page (see renderTourismAdministrationSections) should link straight to
+  // that division's own section, not just the top of the page -- keyed by
+  // every spelling variant that shows up across sheets, valued by the
+  // exact section label (spec.label) so it matches the id
+  // renderTourismAdministrationSections gives that section.
+  const DEPARTMENT_PAGE_ANCHOR_OVERRIDES = new Map([
+    ["sales and visitor center", "Sales and Visitor Center"],
+    ["sales and visitors center", "Sales and Visitor Center"],
+    ["communications", "Communications"],
+    ["tourism communications", "Communications"],
+    ["marketing", "Marketing"],
+    ["tourism marketing", "Marketing"],
+    ["north walton", "North Walton"],
+    ["north walton tourist development tax", "North Walton"],
+    ["tourism north walton", "North Walton"]
+  ]);
+
   function localPageHref(filename) {
     if (!filename) return "";
     return window.location.pathname.indexOf("/pages/") !== -1 ? filename : "pages/" + filename;
+  }
+
+  // Shared with renderTourismAdministrationSections so a division's
+  // section id and the anchor departmentPageHref links to always match.
+  function slugifyId(str) {
+    return String(str || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   }
 
   function departmentPageHref(deptName) {
@@ -174,12 +204,18 @@
     const pages = window.wcBudgetPages || [];
     const title = DEPARTMENT_PAGE_TITLE_ALIASES.get(norm) || deptName;
     const exact = pages.find((p) => normalizeDeptName(p.title) === normalizeDeptName(title));
-    if (exact && exact.href) return exact.href;
-    const departmentMatch = pages.find((p) =>
-      p.section === "Departments" && normalizeDeptName(p.title) === norm
-    );
-    if (departmentMatch && departmentMatch.href) return departmentMatch.href;
-    return localPageHref(DEPARTMENT_PAGE_FALLBACK_HREFS.get(title));
+    let href = "";
+    if (exact && exact.href) {
+      href = exact.href;
+    } else {
+      const departmentMatch = pages.find((p) =>
+        p.section === "Departments" && normalizeDeptName(p.title) === norm
+      );
+      href = (departmentMatch && departmentMatch.href) || localPageHref(DEPARTMENT_PAGE_FALLBACK_HREFS.get(title));
+    }
+    if (!href) return "";
+    const anchorLabel = DEPARTMENT_PAGE_ANCHOR_OVERRIDES.get(norm);
+    return anchorLabel ? href + "#" + slugifyId(anchorLabel) : href;
   }
 
   // Explanatory notes shown under a sub-group's Expenditure Summary table,
@@ -7826,7 +7862,7 @@
 
       if (!body) return "";
       return (
-        '<section class="tourism-admin-section">' +
+        '<section class="tourism-admin-section" id="' + escapeHtml(slugifyId(spec.label)) + '">' +
         '<h2 class="tourism-admin-section-title">' + escapeHtml(spec.label) + "</h2>" +
         body +
         "</section>"
@@ -8400,6 +8436,13 @@
           mountOrHide(countyAttorneyEl, "");
           mountOrHide(courtInnovationsEl, "");
           mountOrHide(fundScheduleEl, "");
+          // Combined pages (e.g. Tourism Administration's #marketing)
+          // return here, before the non-combined exit point below -- do
+          // the hash-scroll here too so a division link still works.
+          if (window.location.hash) {
+            const target = document.getElementById(window.location.hash.slice(1));
+            if (target) target.scrollIntoView();
+          }
           return;
         }
 
@@ -8422,6 +8465,13 @@
           mountOrHide(countyAttorneyEl, "");
           mountOrHide(courtInnovationsEl, "");
           mountOrHide(fundScheduleEl, "");
+          // Combined pages (e.g. Tourism Administration's #marketing)
+          // return here, before the non-combined exit point below -- do
+          // the hash-scroll here too so a division link still works.
+          if (window.location.hash) {
+            const target = document.getElementById(window.location.hash.slice(1));
+            if (target) target.scrollIntoView();
+          }
           return;
         }
 
@@ -8506,6 +8556,28 @@
               return r;
             });
           }
+          // Ad Valorem Taxes Delinquent (Revenue_Code 311001) is its own
+          // separate raw row for the Sheriff's own fund (107311), and
+          // REVENUE_CODE_NAME_OVERRIDES relabels it to display as "Ad
+          // Valorem Taxes" too (see that map's own comment -- delinquent
+          // collections are the same underlying tax, just collected late).
+          // Every other summary that groups by name already folds it into
+          // one combined line; this department's own itemized Revenue
+          // Lines table doesn't group by name at all, so without this it
+          // renders as a second, identically-labeled "Ad Valorem Taxes"
+          // row instead of one. Scoped to just the Sheriff here -- not a
+          // sitewide combine-by-name change to this table.
+          const adValoremIndex = filledRevenueRows.findIndex((r) => String((r && r.Revenue_Code) || "").trim() === "311000");
+          const delinquentRows = filledRevenueRows.filter((r) => String((r && r.Revenue_Code) || "").trim() === "311001");
+          if (adValoremIndex !== -1 && delinquentRows.length) {
+            const mergeFields = ["FY2020_Actual", "FY2021_Actual", "FY2022_Actual", "FY2023_Actual", "FY2024_Actual", "FY2025_Actual", "FY2026_Original_Budget", "FY2026_Budget", "FY2027_Proposed"];
+            const merged = { ...filledRevenueRows[adValoremIndex], _actualsBackfilled: true };
+            delinquentRows.forEach((r) => {
+              mergeFields.forEach((f) => { merged[f] = (merged[f] || 0) + (r[f] || 0); });
+            });
+            filledRevenueRows[adValoremIndex] = merged;
+            filledRevenueRows = filledRevenueRows.filter((r) => String((r && r.Revenue_Code) || "").trim() !== "311001");
+          }
         }
         const revenueRows = filterAllZeroRowsForSelectedDepartments(filledRevenueRows, deptName);
         mountOrHide(
@@ -8580,6 +8652,17 @@
           bccEl,
           countyAttorneyEl
         ], deptName);
+
+        // A combined page's per-division sections (e.g. Tourism
+        // Administration's #marketing, #communications) don't exist until
+        // this point -- a page loaded with that hash already missed the
+        // browser's automatic scroll-on-load, so do it manually now that
+        // the target exists (e.g. a "View Budget Lines" department link
+        // from Summary of Expenses).
+        if (window.location.hash) {
+          const target = document.getElementById(window.location.hash.slice(1));
+          if (target) target.scrollIntoView();
+        }
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load budget data", err);

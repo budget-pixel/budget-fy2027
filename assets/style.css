@@ -589,6 +589,11 @@ a:where(:visited) {
 
 .tourism-admin-section {
   margin: 0 0 40px;
+  /* Summary of Expenses' "View Budget Lines" department links jump
+     straight to a division's own section (see departmentPageHref's
+     DEPARTMENT_PAGE_ANCHOR_OVERRIDES) -- without this, the sticky nav
+     covers the section heading it lands on. */
+  scroll-margin-top: 110px;
 }
 
 .tourism-admin-section > p {
