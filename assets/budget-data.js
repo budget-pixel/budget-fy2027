@@ -7927,7 +7927,7 @@
 
       if (!body) return "";
       return (
-        '<section class="tourism-admin-section">' +
+        '<section class="tourism-admin-section" id="' + escapeHtml(slugifyId(spec.label)) + '">' +
         '<h2 class="tourism-admin-section-title">' + escapeHtml(spec.label) + "</h2>" +
         body +
         "</section>"
@@ -8014,6 +8014,25 @@
     "tourism administration": renderTourismAdministrationSections,
     "tourism beach operations": renderTourismBeachOperationsSections
   };
+
+  // Section labels for each combined page, in the same order they render
+  // -- used only to paint instant, data-free placeholders (see
+  // renderCombinedSectionPlaceholders) with the real ids a division link
+  // (e.g. Summary of Expenses' "Tourism North Walton" row) needs to jump
+  // to right away, before loadBudgetData() resolves.
+  const COMBINED_SECTION_LABELS = {
+    "tourism administration": TOURISM_ADMIN_SECTIONS.map((spec) => spec.label),
+    "tourism beach operations": TOURISM_BEACH_SECTIONS.map((spec) => spec.label)
+  };
+
+  function renderCombinedSectionPlaceholders(labels) {
+    return labels.map((label) =>
+      '<section class="tourism-admin-section" id="' + escapeHtml(slugifyId(label)) + '">' +
+      '<h2 class="tourism-admin-section-title">' + escapeHtml(label) + "</h2>" +
+      '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>" +
+      "</section>"
+    ).join("");
+  }
 
   // Departments whose combined sections (above) already render their own
   // Performance Measures table inline, so the page's standalone
@@ -8397,7 +8416,26 @@
     const deptCode = getDeptCodeFromPage();
     if (!deptName) return;
 
-    showLoadingState(containers);
+    // Combined pages (Tourism Administration, Tourism Beach Operations)
+    // get instant, data-free placeholders carrying their real per-division
+    // ids (e.g. #north-walton) instead of the generic loading message --
+    // otherwise a division link (Summary of Expenses' "Tourism North
+    // Walton" row, or the homepage) has nothing to scroll to until
+    // loadBudgetData() resolves.
+    const combinedSectionLabels = COMBINED_SECTION_LABELS[normalizeDeptName(deptName)];
+    if (combinedSectionLabels) {
+      const narrativeEl = containers[0];
+      if (narrativeEl) {
+        narrativeEl.hidden = false;
+        narrativeEl.innerHTML = renderCombinedSectionPlaceholders(combinedSectionLabels);
+      }
+      if (window.location.hash) {
+        const initialTarget = document.getElementById(window.location.hash.slice(1));
+        if (initialTarget) initialTarget.scrollIntoView();
+      }
+    } else {
+      showLoadingState(containers);
+    }
 
     loadBudgetData()
       .then((data) => {
