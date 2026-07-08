@@ -190,14 +190,49 @@
   }
 
   .wc-fund-flow-row{
-    display:grid;
-    grid-template-columns:minmax(220px,.34fr) minmax(0,1fr) minmax(150px,.18fr);
-    gap:14px;
-    align-items:center;
     padding:14px;
     border:1px solid var(--border);
     border-radius:18px;
     background:var(--light);
+  }
+
+  .wc-fund-flow-row-main{
+    display:grid;
+    grid-template-columns:minmax(220px,.34fr) minmax(0,1fr) minmax(150px,.18fr);
+    gap:14px;
+    align-items:center;
+  }
+
+  /* General Fund's breakdown into Constitutional Officers / Agencies and
+     State Mandates / Board Departments -- same grouping as the site's own
+     directories (constitutional-officers.html, departments.html) -- shown
+     as sublines under its one combined bar, not as separate fund rows. */
+  .wc-fund-flow-sublines{
+    display:grid;
+    gap:6px;
+    margin:12px 0 0;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+  }
+
+  .wc-fund-flow-subline{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    padding-left:14px;
+  }
+
+  .wc-fund-flow-subline span{
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  .wc-fund-flow-subline strong{
+    color:var(--text);
+    font-size:13px;
+    font-weight:800;
+    white-space:nowrap;
   }
 
   .wc-fund-flow-name strong{
@@ -420,7 +455,7 @@
 
     .wc-fund-hero,
     .wc-relationship-row,
-    .wc-fund-flow-row{
+    .wc-fund-flow-row-main{
       grid-template-columns:1fr;
     }
 
@@ -609,6 +644,8 @@
           <a class="wc-relationship-chip" href="state-attorney.html">State Attorney</a>
           <a class="wc-relationship-chip" href="guardian-ad-litem.html">Guardian Ad Litem</a>
           <a class="wc-relationship-chip" href="public-defender.html">Public Defender</a>
+          <a class="wc-relationship-chip" href="walton-county-health-department.html">Walton County Health Department</a>
+          <a class="wc-relationship-chip" href="non-profit-funding-program.html">Non-Profit Funding Program</a>
         </div>
         <div class="wc-relationship-fund">General Fund</div>
       </div>
@@ -798,6 +835,100 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
       .replace(/'/g, "&#39;");
   }
 
+  function normalizeDeptName(name){
+    return String(name || "")
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/['’]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  // The General Fund (001) is split into the same three groups used by the
+  // site's own directories (constitutional-officers.html, departments.html)
+  // instead of one combined bar, so this view lines up with how residents
+  // already browse departments elsewhere. Every alias spelling that shows
+  // up across the expenditures sheet for each department is listed here so
+  // no General Fund spending silently falls through to "General Fund
+  // (Other)" below.
+  const GENERAL_FUND_GROUPS = [
+    {
+      key: "001-constitutional",
+      name: "Constitutional Officers",
+      type: "001 / General Fund",
+      deptNames: [
+        "board of county commissioners", "bcc other uses contingency",
+        "clerk of court", "clerk of courts and county comptroller", "clerk of circuit court",
+        "property appraiser",
+        "supervisor of elections",
+        "tax collector"
+      ]
+    },
+    {
+      key: "001-agencies",
+      name: "Agencies and State Mandates",
+      type: "001 / General Fund",
+      deptNames: [
+        "circuit court",
+        "county court",
+        "court technology and innovations", "court technology innovations", "court technology court administration",
+        "court technology state attorney", "court technology public defender", "court technology", "court innovations",
+        "guardian ad litem",
+        "medical examiner",
+        "public defender",
+        "south walton fire and state control", "south walton fire", "state fire", "volunteer fire",
+        "state attorney",
+        "walton county health department",
+        // Statutory & Other Agency Funding rolls up several small,
+        // independent aid/grant recipients under their own raw Dept_Name
+        // (see applyStatutoryExpenseOverrides/STATUTORY_EXPENSE_OVERRIDES
+        // in assets/budget-data.js) -- each listed here so its share of
+        // General Fund spending lands in this group, not "Other".
+        "statutory and other agency funding", "statutory and other agency fund", "statutory and other",
+        "statutory other agency funding", "statutory other agency fund", "statutory other",
+        "non profit funding program", "human services", "economic development alliance",
+        "gulf coast kids house", "culture and recreation senior centers and mainstreet",
+        "culture and recreation senior centers", "senior centers and mainstreet", "senior centers",
+        "indigent cremation program", "lakeview"
+      ]
+    },
+    {
+      key: "001-board",
+      name: "Board Departments",
+      type: "001 / General Fund",
+      deptNames: [
+        "county administration",
+        "office of the county attorney", "office of county attorney",
+        "office of management and budget",
+        "human resources",
+        "purchasing", "procurement",
+        "geographic info systems",
+        "building construction and maintenance",
+        "planning", "planning short term rental",
+        "code compliance", "code compliance beach", "code compliance street",
+        "emergency management",
+        "probation", "probation services",
+        "libraries", "county libraries",
+        "recreation", "recreation fbip boating allocation",
+        "eagle springs golf and recreation center",
+        "eagle springs grill",
+        "extension office",
+        "environmental resources", "environmental services",
+        "soil conservation",
+        "veteran services"
+      ]
+    }
+  ];
+  function generalFundGroupKeyFor(deptName){
+    const norm = normalizeDeptName(deptName);
+    for (let i = 0; i < GENERAL_FUND_GROUPS.length; i++){
+      if (GENERAL_FUND_GROUPS[i].deptNames.indexOf(norm) !== -1) return GENERAL_FUND_GROUPS[i].key;
+    }
+    return null;
+  }
+
   function fundCodeForRow(row){
     return String((row && row.Dept_Code) || "").trim().slice(0, 3);
   }
@@ -855,11 +986,45 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
       return fundMap.get(code);
     }
 
+    // General Fund (001) stays one row/bar, same as every other fund, but
+    // also breaks down into the same three groups the site's own
+    // directories use (Constitutional Officers, Agencies and State
+    // Mandates, Board Departments) as sublines underneath it -- see
+    // GENERAL_FUND_GROUPS.
+    const generalFundGroupTotals = new Map();
+    GENERAL_FUND_GROUPS.forEach(function(group){ generalFundGroupTotals.set(group.key, 0); });
+    let generalFundOtherTotal = 0;
+
     (data.expenditures || []).forEach(function(row){
       if (isInterfundTransferOut(row)) return;
-      const fund = ensureFund(fundCodeForRow(row));
-      if (fund) fund.expense += Number(row.FY2027_Proposed) || 0;
+      const code = fundCodeForRow(row);
+      const amount = Number(row.FY2027_Proposed) || 0;
+      if (code === "001"){
+        const key = generalFundGroupKeyFor(row.Dept_Name);
+        if (key) generalFundGroupTotals.set(key, generalFundGroupTotals.get(key) + amount);
+        else generalFundOtherTotal += amount;
+        const fund = ensureFund(code);
+        if (fund) fund.expense += amount;
+        return;
+      }
+      const fund = ensureFund(code);
+      if (fund) fund.expense += amount;
     });
+
+    const generalFund = fundMap.get("001");
+    if (generalFund){
+      const sublines = GENERAL_FUND_GROUPS
+        .map(function(group){ return { name: group.name, expense: generalFundGroupTotals.get(group.key) || 0 }; })
+        .filter(function(s){ return Math.abs(s.expense) > 0; })
+        .sort(function(a, b){ return Math.abs(b.expense) - Math.abs(a.expense); });
+      // Catches any General Fund spending whose Dept_Name isn't covered by
+      // one of the three groups above, so it stays visible (and easy to
+      // spot as a gap to fix) instead of silently disappearing.
+      if (Math.abs(generalFundOtherTotal) > 0){
+        sublines.push({ name: "General Fund (Other)", expense: generalFundOtherTotal });
+      }
+      generalFund.sublines = sublines;
+    }
 
     const funds = Array.from(fundMap.values())
       .filter(function(fund){ return !isSelfInsuranceFund(fund) && Math.abs(fund.expense) > 0; })
@@ -877,8 +1042,14 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     const rows = funds.map(function(fund){
       const amount = fund.expense;
       const share = maxAmount ? Math.max(2, (Math.abs(amount) / maxAmount) * 100) : 0;
+      const sublinesHtml = fund.sublines && fund.sublines.length
+        ? '<div class="wc-fund-flow-sublines">' + fund.sublines.map(function(s){
+            return '<div class="wc-fund-flow-subline"><span>' + escapeHtml(s.name) + '</span><strong>' + escapeHtml(compactCurrency(s.expense)) + '</strong></div>';
+          }).join("") + '</div>'
+        : '';
       return (
         '<div class="wc-fund-flow-row">' +
+          '<div class="wc-fund-flow-row-main">' +
           '<div class="wc-fund-flow-name">' +
             '<strong>' + escapeHtml(fund.name) + '</strong>' +
             '<span>' + escapeHtml(fund.type || fund.code) + '</span>' +
@@ -889,6 +1060,8 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
           '<div class="wc-fund-flow-amount" title="' + escapeHtml(currency(fund.expense)) + '">' +
             escapeHtml(compactCurrency(fund.expense)) +
           '</div>' +
+          '</div>' +
+          sublinesHtml +
         '</div>'
       );
     }).join("");
