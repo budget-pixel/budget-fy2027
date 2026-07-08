@@ -23,7 +23,7 @@
   </div>
   <aside class="wc-savings-card" aria-label="In-house engineering savings">
     <p class="wc-savings-card-kicker">In-House Engineering Savings</p>
-    <p class="wc-savings-card-value">$1,850,080</p>
+    <p class="wc-savings-card-value" id="wc-engineering-savings-value">Loading<span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></p>
     <p class="wc-savings-card-label">Estimated FY 2027 savings from designing capital projects in-house instead of hiring outside engineering consultants</p>
   </aside>
 </div>
@@ -121,7 +121,21 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
 ];
 </script>
 <script src="../assets/budget-data.js?v=20260707-beach-vending-fy2026-fix"></script>
+<script src="../assets/cip-projects-data.js?v=20260622-project-images-v3"></script>
 <script src="../assets/nav.js?v=20260627-prior-years-a11y"></script>
 <script src="../assets/budget-pdf.js"></script>
+<script>
+  // In-House Engineering Savings is the sum of every CIP project's own
+  // "In-House Engineering" sheet value (see cip-projects-data.js's
+  // in_house_engineering_value) rather than a fixed figure, so it tracks
+  // whatever the FY2027 sheet says without a manual update here.
+  (window.wcCipProjectsReady || Promise.resolve()).then(function () {
+    const el = document.getElementById("wc-engineering-savings-value");
+    if (!el) return;
+    const projects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
+    const total = projects.reduce((sum, p) => sum + (Number(p && p.in_house_engineering_value) || 0), 0);
+    el.textContent = "$" + Math.round(total).toLocaleString("en-US");
+  });
+</script>
 </body>
 </html>
