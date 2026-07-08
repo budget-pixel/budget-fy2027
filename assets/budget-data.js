@@ -93,6 +93,22 @@
     ]
   };
 
+  // DEPT_ALIASES only points canonical -> aliases, so matchNames() only
+  // expands when called with the canonical name; a row already named with
+  // an alias (e.g. "Code Compliance Beach") doesn't resolve back to its
+  // canonical ("Code Compliance"). This reverse index lets any name
+  // variant -- canonical or alias -- collapse to the same canonical key.
+  const DEPT_ALIAS_CANONICAL = (() => {
+    const map = new Map();
+    Object.keys(DEPT_ALIASES).forEach((canonical) => {
+      map.set(canonical, canonical);
+      DEPT_ALIASES[canonical].forEach((alias) => {
+        if (!map.has(alias)) map.set(alias, canonical);
+      });
+    });
+    return map;
+  })();
+
   // Object codes pulled out into their own supplemental Expenditure Summary
   // table on certain department pages (see render*SupplementalTables below)
   // and therefore excluded from that department's main summary table so
@@ -2430,6 +2446,101 @@
       .then(parseCSV);
   }
 
+  // Dev-only sanity check, never shown in the UI -- logs to the browser
+  // console automatically after every data load. Sums expenditures vs.
+  // revenues per department/service on a single budget field (default
+  // FY2027_Proposed) and flags any department where the two totals don't
+  // balance. Can also be run on demand via
+  // WCBudgetData.auditDepartmentExpenseRevenueParity().
+  // Groups distinct Dept_Names together for the parity audit only, beyond
+  // what DEPT_ALIASES covers -- these are legitimately separate line items
+  // in the sheets (and stay separate on their own department pages) but
+  // share one funding source, so their combined expense/revenue should
+  // balance even though each piece individually won't: Solid Waste
+  // Transfer draws down the same revenue as Solid Waste; BCC Other Uses
+  // Contingency is part of the Board of County Commissioners' budget; and
+  // every tourism sub-program (marketing, beach ops, lifeguard services,
+  // etc., each its own canonical DEPT_ALIASES bucket) is funded from the
+  // shared Tourist Development Tax rather than its own dedicated revenue.
+  const AUDIT_DEPT_GROUP_OVERRIDES = {
+    "solid waste": ["solid waste transfer"],
+    "board of county commissioners": ["bcc other uses contingency"],
+    tourism: [
+      "tourism administration",
+      "tourism beach operations",
+      "tourism beach tram",
+      "tourism communications",
+      "tourism marketing",
+      "tourism sales and visitor center",
+      "tourism lifeguard services and beach safety",
+      "tourist development taxes",
+      "tourism north walton",
+      "tourism public safety"
+    ]
+  };
+  const AUDIT_DEPT_GROUP_CANONICAL = (() => {
+    const map = new Map();
+    Object.keys(AUDIT_DEPT_GROUP_OVERRIDES).forEach((canonical) => {
+      map.set(canonical, canonical);
+      AUDIT_DEPT_GROUP_OVERRIDES[canonical].forEach((member) => map.set(member, canonical));
+    });
+    return map;
+  })();
+
+  function auditDepartmentExpenseRevenueParity(options) {
+    const field = (options && options.field) || "FY2027_Proposed";
+    const tolerance = (options && options.tolerance) || 1;
+
+    // Dept_Code isn't a shared identity space between the two sheets (e.g.
+    // the Sheriff's Office is "10730000" on expenditures but "107381" on
+    // revenues), so departments have to be joined by name -- through the
+    // same DEPT_ALIASES canonicalization the rest of the app uses (made
+    // symmetric via DEPT_ALIAS_CANONICAL), plus this audit's own grouping
+    // for known shared-funding splits -- rather than by code.
+    function keyFor(row) {
+      const name = String((row && row.Dept_Name) || "").trim();
+      if (!name) return "";
+      const norm = normalizeDeptName(name);
+      const canonical = DEPT_ALIAS_CANONICAL.get(norm) || norm;
+      return AUDIT_DEPT_GROUP_CANONICAL.get(canonical) || canonical;
+    }
+
+    const byKey = new Map();
+    (cache.expenditures || []).forEach((row) => {
+      const key = keyFor(row);
+      if (!key) return;
+      const entry = byKey.get(key) || { deptName: row.Dept_Name, expense: 0, revenue: 0 };
+      entry.expense += toNumber(row[field]);
+      byKey.set(key, entry);
+    });
+    (cache.revenues || []).forEach((row) => {
+      const key = keyFor(row);
+      if (!key) return;
+      const entry = byKey.get(key) || { deptName: row.Dept_Name, expense: 0, revenue: 0 };
+      entry.revenue += revenueDisplayAmount(row[field]);
+      byKey.set(key, entry);
+    });
+
+    const mismatches = Array.from(byKey.values())
+      .map((entry) => Object.assign({}, entry, { difference: entry.expense - entry.revenue }))
+      .filter((entry) => Math.abs(entry.difference) > tolerance)
+      .sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference));
+
+    if (!(options && options.log === false)) {
+      console.group("Department expense/revenue parity audit (" + field + ")");
+      console.table(mismatches.map((m) => ({
+        Dept_Name: m.deptName,
+        Expense: m.expense,
+        Revenue: m.revenue,
+        Difference: m.difference
+      })));
+      console.log(mismatches.length + " of " + byKey.size + " department(s)/service(s) do not balance.");
+      console.groupEnd();
+    }
+
+    return mismatches;
+  }
+
   function loadBudgetData() {
     if (loadPromise) return loadPromise;
 
@@ -2511,6 +2622,8 @@
       cache.dedupedExpenseRows = buildDedupedHistoricalExpenseRows(cache);
 
       cache.machinery = buildMachineryRowsFromExpenditures(cache.expenditures);
+
+      auditDepartmentExpenseRevenueParity();
 
       return cache;
     });
@@ -10512,6 +10625,7 @@
     renderInterfundTransfersInTable,
     renderConsolidatedRevenueSummaryTable,
     renderRevenueTopicCards,
-    renderFinancialForecast
+    renderFinancialForecast,
+    auditDepartmentExpenseRevenueParity
   };
 })();
