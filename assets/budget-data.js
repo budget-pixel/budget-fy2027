@@ -1827,6 +1827,9 @@
     const dept = normalizeDeptName(row && row.Dept_Name);
     const code = String((row && row.Revenue_Code) || "").trim();
     const name = normalizeDeptName(row && row.Revenue_Name);
+    if (dept === "mosquito control" && (code === "311000" || name === "ad valorem taxes")) {
+      return false;
+    }
     if (dept === "building construction and maintenance") {
       return code === "335180" || name === "local government 1 2 cent sales tax";
     }
@@ -1869,6 +1872,9 @@
     const dept = normalizeDeptName(row && row.Dept_Name);
     const code = String((row && row.Revenue_Code) || "").trim();
     const name = normalizeDeptName(row && row.Revenue_Name);
+    if (dept === "mosquito control" && (code === "311000" || name === "ad valorem taxes")) {
+      return false;
+    }
     return (
       isGeneralFundRevenuePlugRow(row) ||
       (
@@ -3359,8 +3365,23 @@
         const name = collapsedBudgetLineName(r[nameField] || "");
         const existing = grouped.get(name);
         const description = itemizedDescriptionForBudgetLine(r, descriptionField, isExpense);
+        const rowDeptCode = String(r.Dept_Code || "").trim();
         if (!existing) {
-          const merged = { codes: [r[codeField] || ""].filter(Boolean), descriptions: description ? [description] : [], category: r[categoryField] || "" };
+          const merged = {
+            codes: [r[codeField] || ""].filter(Boolean),
+            descriptions: description ? [description] : [],
+            category: r[categoryField] || "",
+            // Tracks whether every row folded into this name shares one
+            // Dept_Code -- if so, the merged row can carry it forward so
+            // budgetLineColumnAmount's per-row Supabase lookup stays scoped
+            // to that one fund/department instead of silently falling back
+            // to its all-funds total (see deptCode below). A name spanning
+            // several departments (the normal case for a county-wide
+            // rollup like "Ad Valorem Taxes") correctly gets no Dept_Code,
+            // same as before.
+            deptCode: rowDeptCode,
+            deptCodeConsistent: true
+          };
           sumFields.forEach((f) => {
             if (!isExpense && f === "FY2026_Original_Budget") {
               const key = revenueBudgetUniqueKey(r);
@@ -3378,6 +3399,7 @@
         }
         if (r[codeField] && !existing.codes.includes(r[codeField])) existing.codes.push(r[codeField]);
         if (description && !existing.descriptions.includes(description)) existing.descriptions.push(description);
+        if (existing.deptCodeConsistent && rowDeptCode !== existing.deptCode) existing.deptCodeConsistent = false;
         sumFields.forEach((f) => {
           if (!isExpense && f === "FY2026_Original_Budget") {
             const key = revenueBudgetUniqueKey(r);
@@ -3399,6 +3421,7 @@
       });
       mergedRows = Array.from(grouped.entries()).map(([name, merged]) => {
         const row = { [nameField]: name, [codeField]: merged.codes.join(", "), [descField]: merged.descriptions.join("; "), [categoryField]: merged.category };
+        if (merged.deptCodeConsistent && merged.deptCode) row.Dept_Code = merged.deptCode;
         sumFields.forEach((f) => { row[f] = merged[f]; });
         return row;
       });
@@ -6929,6 +6952,7 @@
     const expenseRows = cache.expenditures || [];
     if ((!revenueRows.length && !expenseRows.length) || !(cache.fundBalances || []).length) return "";
 
+    const isMosquitoControlFundOnlyView = fundCodes.length === 1 && fundCodes[0] === "105";
     const isExcludedFund = (r) => CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r));
     // The Ad Valorem 5% row's nominal Dept_Code (102389) maps to fund
     // "102" (MSBU), which doesn't actually levy this reduction -- it's
@@ -7046,6 +7070,12 @@
       return FUND_SCHEDULE_YEAR_COLUMNS.map((c) => sumFor(rows, predicate, c.field));
     }
 
+    function mosquitoControlDisplayedAdValoremValues() {
+      const adValoremRows = departmentFinancialDisplayRows("Mosquito Control").revenueRows
+        .filter((r) => normalizeDeptName(r.Revenue_Name) === "ad valorem taxes");
+      return FUND_SCHEDULE_YEAR_COLUMNS.map((c) => budgetLineColumnTotal(adValoremRows, c, false));
+    }
+
     function rowHtml(label, values, rowClass) {
       const labelClass = rowClass && rowClass.indexOf("wc-table-total-row") !== -1 ? ' class="wc-fund-total-label-cell"' : "";
       const rowClasses = [];
@@ -7103,6 +7133,13 @@
         label: name,
         values: rowValues((r) => predicate(r) && labelFor(r) === name, sourceRows)
       }));
+      if (!isExpenseKind && isMosquitoControlFundOnlyView) {
+        const adValoremEntry = entries.find((e) => normalizeDeptName(e.label) === "ad valorem taxes");
+        if (adValoremEntry) adValoremEntry.values = mosquitoControlDisplayedAdValoremValues();
+        if (extraLine && normalizeDeptName(extraLine.label) === "ad valorem taxes") {
+          extraLine = null;
+        }
+      }
       // The Ad Valorem 5% statutory reduction (see
       // adValoremFivePercentReductionForFunds) isn't a row this fund's
       // revenue rows can be filtered/grouped to -- it's pulled separately
@@ -7507,7 +7544,31 @@
       // Self-Insurance Fund (503) is an Internal Service fund rather than
       // a governmental one, so both are excluded here.
       const matching = rows.filter((r) => r.Revenue_Type === spec.type && !isReportedElsewhere(r));
-      allMatchingRows.push(...matching);
+      // Mosquito Control levies its own Ad Valorem millage on top of the
+      // County's General Fund millage, but both land in this same
+      // "General Government Taxes" row -- there's no separate Ad Valorem
+      // line on this table. Its rows are relabeled (only in the copy fed to
+      // the "View Budget Lines" detail below, not in the main row's own
+      // totals) so that detail's combineByName grouping breaks Mosquito
+      // Control's share out onto its own line instead of folding it into
+      // the single combined "Ad Valorem Taxes" line -- visible only when a
+      // reader opens Budget Lines, not on the main table.
+      let matchingForDetail = matching.map((r) => {
+        const isMosquitoAdValorem = spec.type === "General Government Taxes" &&
+          normalizeDeptName(r.Revenue_Name) === "ad valorem taxes" && fundCodeForRow(r) === "105";
+        return isMosquitoAdValorem ? { ...r, Revenue_Name: "Ad Valorem Taxes (Mosquito Control Fund)" } : r;
+      });
+      if (spec.type === "General Government Taxes") {
+        const mosquitoAdValoremRows = departmentFinancialDisplayRows("Mosquito Control").revenueRows
+          .filter((r) => normalizeDeptName(r.Revenue_Name) === "ad valorem taxes")
+          .map((r) => ({ ...r, Revenue_Name: "Ad Valorem Taxes (Mosquito Control Fund)" }));
+        if (mosquitoAdValoremRows.length) {
+          matchingForDetail = matchingForDetail
+            .filter((r) => normalizeDeptName(r.Revenue_Name) !== "ad valorem taxes mosquito control fund")
+            .concat(mosquitoAdValoremRows);
+        }
+      }
+      allMatchingRows.push(...matchingForDetail);
       return (
         "<tr><td>" + escapeHtml(spec.label) + "</td>" +
         CONSOLIDATED_REVENUE_SUMMARY_COLUMNS.map((col, i) => {
