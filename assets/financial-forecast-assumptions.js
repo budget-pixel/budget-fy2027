@@ -49,6 +49,13 @@
   };
 
   const fundOverrides = {
+    "001": {
+      revenue: {
+        "General Government Taxes": [0.02, 0.02, 0.02, 0.02]
+      },
+      method: "conservative manual growth",
+      notes: "General Fund tax revenue is held to a lower growth assumption so the forecast reflects a more conservative 1% to 2% annual revenue change."
+    },
     "300": {
       revenue: {
         "Other Sources": [0, 0, 0, 0],

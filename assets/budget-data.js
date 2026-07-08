@@ -2699,8 +2699,9 @@
       const codes = splitBudgetLineCodes(row.Revenue_Code);
       const fundCode = fundCodeForRow(row);
       const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
-      if (row._suppressRevenueBudgetFallback) return revenueDisplayAmount(rowAmount);
-      if (row._originalBudgetDeduped) return revenueDisplayAmount(rowAmount);
+      if (row._suppressRevenueBudgetFallback || row._originalBudgetDeduped) {
+        return revenueDisplayAmount(row.FY2026_Original_Budget || 0);
+      }
       return revenueDisplayAmount(rowAmount ||
         revenueBudgetAmountForCodes(codes, "FY2026_Original_Budget", fundCode) ||
         revenueBudgetAmountForCodes(codes, "FY2026_Budget", fundCode));
@@ -2999,6 +3000,62 @@
       return isExpense ? rawName : collapsedRevenueSourceName(rawName);
     }
 
+    function departmentRevenueLineMergeName(row) {
+      if (isExpense) return "";
+      const code = String((row && row[codeField]) || "").trim();
+      const name = String((row && row[nameField]) || "");
+      const dept = normalizeDeptName(row && row.Dept_Name);
+      const normalizedName = normalizeDeptName(name);
+      if (/interest/i.test(name)) return "Interest";
+      if (/^tourist development tax/i.test(name) || code === "312140" || normalizedName === "tourist development tax other") {
+        if (dept.indexOf("north walton") !== -1) return "North Walton Tourist Development Tax";
+        return "Tourist Development Taxes";
+      }
+      return "";
+    }
+
+    function mergeDepartmentRevenueLineRows(rowsToMerge) {
+      if (isExpense || combineByName) return rowsToMerge;
+      const sumFields = priorYearColumns.map((c) => c.field)
+        .concat(["FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+      const grouped = new Map();
+      const output = [];
+      rowsToMerge.forEach((row) => {
+        const mergeName = departmentRevenueLineMergeName(row);
+        if (!mergeName) {
+          output.push(row);
+          return;
+        }
+        const key = [row[categoryField] || "", mergeName].join("||");
+        const existing = grouped.get(key);
+        if (!existing) {
+          const merged = Object.assign({}, row, {
+            [nameField]: mergeName,
+            [codeField]: String(row[codeField] || ""),
+            [descField]: itemizedDescriptionForBudgetLine(row, descriptionField, isExpense),
+            _actualsDeduped: true,
+            _originalBudgetDeduped: true,
+            _suppressRevenueBudgetFallback: true
+          });
+          sumFields.forEach((field) => { merged[field] = Number(row[field]) || 0; });
+          grouped.set(key, merged);
+          output.push(merged);
+          return;
+        }
+        if (row[codeField] && !splitBudgetLineCodes(existing[codeField]).includes(String(row[codeField]).trim())) {
+          existing[codeField] = [existing[codeField], row[codeField]].filter(Boolean).join(", ");
+        }
+        const description = itemizedDescriptionForBudgetLine(row, descriptionField, isExpense);
+        if (description && !String(existing[descField] || "").split("; ").includes(description)) {
+          existing[descField] = [existing[descField], description].filter(Boolean).join("; ");
+        }
+        sumFields.forEach((field) => {
+          existing[field] = (Number(existing[field]) || 0) + (Number(row[field]) || 0);
+        });
+      });
+      return output;
+    }
+
     let mergedRows = rows;
     if (combineByName) {
       const sumFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
@@ -3072,6 +3129,15 @@
       // "this department has budget authority here but didn't collect/
       // spend anything this year," which is worth keeping visible.
       mergedRows = mergedRows.filter((row) => sumFields.some((f) => (row[f] || 0) !== 0));
+    } else {
+      mergedRows = mergeDepartmentRevenueLineRows(mergedRows);
+      if (!isExpense) {
+        const visibleFields = priorYearColumns.map((c) => c.field)
+          .concat(["FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+        mergedRows = mergedRows.filter((row) =>
+          visibleFields.some((field) => Math.abs(Number(row[field]) || 0) > 0.005)
+        );
+      }
     }
 
     const fy2026BudgetColumn = priorYearColumns.find((c) => c.field === "FY2026_Original_Budget");
@@ -3729,6 +3795,36 @@
     });
   });
 
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".wc-forecast-fund-card-button");
+    if (!button) return;
+    const template = document.getElementById(button.dataset.forecastFundDetail || "");
+    if (!template) return;
+    const modal = ensureBudgetDetailModal();
+    const title = modal.querySelector("#wc-budget-detail-title");
+    const kicker = modal.querySelector(".wc-budget-detail-kicker");
+    const body = modal.querySelector(".wc-budget-detail-body");
+    if (title) title.textContent = button.dataset.forecastFundName || "Fund Schedule";
+    if (kicker) kicker.textContent = "Forecast Fund Schedule";
+    if (body) {
+      body.className = "wc-budget-detail-body wc-forecast-fund-modal-body";
+      body.innerHTML = template.innerHTML;
+    }
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.classList.add("is-open"));
+    document.body.classList.add("wc-budget-detail-open");
+    const closeButton = modal.querySelector(".wc-budget-detail-close");
+    if (closeButton) closeButton.focus();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const button = event.target.closest(".wc-forecast-fund-card-button");
+    if (!button) return;
+    event.preventDefault();
+    button.click();
+  });
+
 
   function lastUpdatedNoteHtml() {
     const stamp = new Date().toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -3981,13 +4077,23 @@
     const totalsByType = new Map();
     const grandTotals = {};
     yearFields.forEach((f) => { grandTotals[f] = 0; });
+    const revenueFy2026BestByTypeKey = new Map();
     rows.forEach((r) => {
       const type = r[typeField] || "Other";
       const totals = totalsByType.get(type) || {};
       yearFields.forEach((f) => {
-        const amt = (!isExpense && f === "FY2026_Original_Budget")
-          ? (departmentRevenueFy2026PlugOverrideForRow(r) || r[f] || 0)
-          : (r[f] || 0);
+        let amt = r[f] || 0;
+        if (!isExpense && f === "FY2026_Original_Budget") {
+          const key = [type, revenueBudgetUniqueKey(r)].join("|");
+          const contribution = departmentRevenueFy2026PlugOverrideForRow(r) ||
+            ((r._suppressRevenueBudgetFallback || r._originalBudgetDeduped)
+              ? revenueDisplayAmount(r.FY2026_Original_Budget || 0)
+              : revenueBudgetMergeContribution(r));
+          const previousBest = revenueFy2026BestByTypeKey.has(key) ? revenueFy2026BestByTypeKey.get(key) : null;
+          if (previousBest !== null && contribution <= previousBest) return;
+          revenueFy2026BestByTypeKey.set(key, contribution);
+          amt = previousBest === null ? contribution : contribution - previousBest;
+        }
         totals[f] = (totals[f] || 0) + amt;
         grandTotals[f] += amt;
       });
@@ -4757,6 +4863,65 @@
 
   const FINANCIAL_FORECAST_YEARS = [2027, 2028, 2029, 2030, 2031];
   const FINANCIAL_FORECAST_ACTUAL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+  const FORECAST_EXCLUDED_EXPENSE_OBJECT_CODES = new Set(["561000", "549006", "549007", "549009"]);
+
+  function isForecastExcludedExpenseRow(row) {
+    const objectCode = String((row && row.Object_Code) || "").trim();
+    if (FORECAST_EXCLUDED_EXPENSE_OBJECT_CODES.has(objectCode)) return true;
+    if (
+      (objectCode === "562000" || objectCode === "563000") &&
+      fundCodeForRow(row) === "001" &&
+      normalizeDeptName(row && row.Dept_Name) === "board of county commissioners"
+    ) {
+      return true;
+    }
+    return (
+      objectCode === "563000" &&
+      fundCodeForRow(row) === "111" &&
+      normalizeDeptName(row && row.Dept_Name) === "beach operations"
+    );
+  }
+
+  function forecastFundCodeForRow(row, normalizeForAssumptions) {
+    if (
+      normalizeForAssumptions &&
+      String((row && row.Dept_Code) || "").trim() === "00120000" &&
+      normalizeDeptName(row && row.Dept_Name) === "engineering services"
+    ) {
+      return "101";
+    }
+    return fundCodeForRow(row);
+  }
+
+  function isTouristDevelopmentPersonnelRow(row) {
+    return (
+      fundCodeForRow(row) === "111" &&
+      normalizeForecastCategory(row && row.Object_Type, "expense") === "Personnel Services"
+    );
+  }
+
+  function forecastTouristDevelopmentPersonnelHistoricalDetailValue(row, yearField) {
+    const actualYearMatch = /^FY(\d{4})_Actual$/.exec(yearField);
+    if (!actualYearMatch || Number(actualYearMatch[1]) >= 2024) return undefined;
+    if (!isTouristDevelopmentPersonnelRow(row)) return undefined;
+
+    const year = Number(actualYearMatch[1]);
+    const fy2024 = Number(row && row.FY2024_Actual) || 0;
+    const fy2025 = Number(row && row.FY2025_Actual) || 0;
+    const baseYear = fy2024 ? 2024 : 2025;
+    const baseValue = fy2024 || fy2025;
+    if (!baseValue) return 0;
+
+    const observedGrowth = fy2024 && fy2025 ? (fy2025 - fy2024) / Math.abs(fy2024) : 0;
+    const growth = Math.max(-0.03, Math.min(0.05, observedGrowth));
+    return baseValue / Math.pow(1 + growth, baseYear - year);
+  }
+
+  function forecastExpenseDetailValue(row, yearField) {
+    const tdtPersonnelValue = forecastTouristDevelopmentPersonnelHistoricalDetailValue(row, yearField);
+    if (tdtPersonnelValue !== undefined) return tdtPersonnelValue;
+    return Number(row[yearField]) || 0;
+  }
 
   function forecastMoney(value) {
     const rounded = Math.round(Number(value) || 0);
@@ -4811,8 +4976,25 @@
   // fund+category level) -- e.g. a specific line item known to need its
   // own, deliberately-judged rate rather than the category default.
   const FORECAST_DETAIL_ASSUMPTION_OVERRIDES = new Map([
-    ["grill food revenue", { method: "Management Estimate", rate: 0.01 }]
+    ["grill food revenue", { method: "Management Estimate", rate: 0.01 }],
+    ["non-profit funding program", { method: "Management Estimate", rate: 0 }],
+    ["state fire", { method: "Management Estimate", rate: 0 }]
   ]);
+  const FORECAST_DECLINING_BASE_EXPENSE_GROWTH = 0.01;
+
+  function forecastDetailGrowthOverride(lineType, name, valuesByYear) {
+    const detailOverride = FORECAST_DETAIL_ASSUMPTION_OVERRIDES.get(String(name || "").trim().toLowerCase());
+    if (detailOverride && Number.isFinite(detailOverride.rate)) return detailOverride.rate;
+    return forecastDecliningBaseGrowthOverride(lineType, valuesByYear);
+  }
+
+  function forecastDecliningBaseGrowthOverride(lineType, valuesByYear) {
+    if (lineType !== "expense") return null;
+    const originalBudget = Number(valuesByYear && valuesByYear[2026]) || 0;
+    const proposedBudget = Number(valuesByYear && valuesByYear[2027]) || 0;
+    if (originalBudget > 0 && proposedBudget > 0 && proposedBudget < originalBudget) return FORECAST_DECLINING_BASE_EXPENSE_GROWTH;
+    return null;
+  }
 
   // Keeps the Forecast Assumptions table's "Method" column to a short,
   // fixed vocabulary (see the 7 terms below) instead of free text, so a
@@ -4820,13 +5002,22 @@
   // derived from signals already computed elsewhere on this same row
   // (historical flatness, available history, the manual assumption vs.
   // the historically-suggested trend) rather than invented per row.
-  function forecastAssumptionMethod(detail, manualValue) {
+  function forecastAssumptionMethod(detail, manualValue, lineType) {
     const detailOverride = FORECAST_DETAIL_ASSUMPTION_OVERRIDES.get(String(detail.name || "").trim().toLowerCase());
     if (detailOverride) return detailOverride.method;
+    if (detail.baseDeclineOverride) return "Management Estimate";
     if (FORECAST_STATUTORY_REVENUE_NAMES.has(String(detail.name || "").trim().toLowerCase())) {
       return "Statutory";
     }
     if (isForecastHistoryFlat(detail.values)) return "Flat";
+    if (
+      lineType === "revenue" &&
+      Number.isFinite(detail.cagr) &&
+      detail.cagr < 0 &&
+      (Number(manualValue) > 0 || Number(detail.categorySuggested) > 0)
+    ) {
+      return "Declining";
+    }
 
     const hasManual = Number.isFinite(manualValue);
     const hasHistory = Number.isFinite(detail.avgGrowth) || Number.isFinite(detail.cagr);
@@ -4835,6 +5026,9 @@
     const suggested = detail.categorySuggested;
     if (!hasManual) {
       return Number.isFinite(suggested) && suggested < 0 ? "Declining" : "Normalized";
+    }
+    if (Number.isFinite(detail.cagr) && detail.cagr < 0 && manualValue >= 0) {
+      return "Management Estimate";
     }
 
     // A manual rate isn't compared to itself -- only meaningful once
@@ -4954,14 +5148,16 @@
   // Government Taxes (dominated by the Ad Valorem line) on this page.
   // FY2027 Proposed is left alone: it comes straight from the sheet's own
   // itemized budget lines, which can legitimately share org/code values.
-  function forecastCategoryRows(lineType, fundCode, yearField) {
+  function forecastCategoryRows(lineType, fundCode, yearField, options) {
+    const normalizeForAssumptions = Boolean(options && options.normalizeForAssumptions);
     const needsDedup = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(yearField);
     const categoryField = lineType === "expense" ? "Object_Type" : "Revenue_Type";
     const totals = new Map();
     if (lineType === "expense") {
       const rows = needsDedup ? (cache.dedupedExpenseRows || []) : (cache.expenditures || []);
       rows.forEach((row) => {
-        if (fundCodeForRow(row) !== fundCode) return;
+        if (forecastFundCodeForRow(row, normalizeForAssumptions) !== fundCode) return;
+        if (normalizeForAssumptions && isForecastExcludedExpenseRow(row)) return;
         const category = normalizeForecastCategory(row[categoryField], lineType);
         totals.set(category, (totals.get(category) || 0) + (Number(row[yearField]) || 0));
       });
@@ -5006,10 +5202,25 @@
   // sub-program split.
   const FORECAST_DETAIL_NAME_MERGE = new Map([
     ["Code Compliance Beach", "Code Compliance"],
-    ["Planning Short-Term Rental", "Planning"]
+    ["Planning Short-Term Rental", "Planning"],
+    ["Court Technology - Court Administration", "Court Technology / State Attorney / Public Defender"],
+    ["Court Technology Court Administration", "Court Technology / State Attorney / Public Defender"],
+    ["Court Technology State Attorney", "Court Technology / State Attorney / Public Defender"],
+    ["Court Technology Public Defender", "Court Technology / State Attorney / Public Defender"],
+    ["State Attorney", "Court Technology / State Attorney / Public Defender"],
+    ["Public Defender", "Court Technology / State Attorney / Public Defender"]
   ]);
 
-  function forecastDetailRows(lineType, fundCode, yearField) {
+  function forecastDetailName(lineType, fundCode, rawName) {
+    const name = String(rawName || "").trim() || "Unclassified";
+    if (lineType === "revenue" && fundCode === "111" && /^tourist development tax/i.test(name)) {
+      return "Tourist Development Taxes";
+    }
+    return FORECAST_DETAIL_NAME_MERGE.get(name) || name;
+  }
+
+  function forecastDetailRows(lineType, fundCode, yearField, options) {
+    const normalizeForAssumptions = Boolean(options && options.normalizeForAssumptions);
     const needsDedup = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(yearField);
     const categoryField = lineType === "expense" ? "Object_Type" : "Revenue_Type";
     const nameField = lineType === "expense" ? "Dept_Name" : "Revenue_Name";
@@ -5017,21 +5228,26 @@
 
     function addRow(row, value) {
       const category = normalizeForecastCategory(row[categoryField], lineType);
-      const rawName = String(row[nameField] || "").trim() || "Unclassified";
-      const name = FORECAST_DETAIL_NAME_MERGE.get(rawName) || rawName;
+      const name = forecastDetailName(lineType, fundCode, row[nameField]);
+      const amount = Number(value) || 0;
       const existing = totals.get(name);
       if (existing) {
-        existing.value += value;
+        existing.value += amount;
+        existing.parts[category] = (existing.parts[category] || 0) + amount;
+        if (Math.abs(existing.parts[category]) > Math.abs(existing.parts[existing.category] || 0)) {
+          existing.category = category;
+        }
       } else {
-        totals.set(name, { category, value });
+        totals.set(name, { category, value: amount, parts: { [category]: amount } });
       }
     }
 
     if (lineType === "expense") {
       const rows = needsDedup ? (cache.dedupedExpenseRows || []) : (cache.expenditures || []);
       rows.forEach((row) => {
-        if (fundCodeForRow(row) !== fundCode) return;
-        addRow(row, Number(row[yearField]) || 0);
+        if (forecastFundCodeForRow(row, normalizeForAssumptions) !== fundCode) return;
+        if (normalizeForAssumptions && isForecastExcludedExpenseRow(row)) return;
+        addRow(row, forecastExpenseDetailValue(row, yearField));
       });
       return totals;
     }
@@ -5169,6 +5385,19 @@
     return Math.max(-0.03, Math.min(0.05, blended));
   }
 
+  function cappedForecastGrowth(value) {
+    if (!Number.isFinite(value)) return null;
+    return Math.max(-0.03, Math.min(0.05, value));
+  }
+
+  function effectiveForecastGrowth(lineType, manual, suggested, cagr) {
+    const baseGrowth = manual !== null ? manual : (Number.isFinite(suggested) ? suggested : 0);
+    if (lineType === "revenue" && Number.isFinite(cagr) && cagr < 0 && baseGrowth > 0) {
+      return cappedForecastGrowth(cagr);
+    }
+    return baseGrowth;
+  }
+
   function buildForecastAssumptionLookup() {
     const rows = Array.isArray(window.WCFinancialForecastAssumptions) ? window.WCFinancialForecastAssumptions : [];
     const lookup = new Map();
@@ -5207,11 +5436,12 @@
 
   function categoryValuesForTrend(lineType, fundCode, category) {
     const values = {};
+    const trendOptions = { normalizeForAssumptions: true };
     FINANCIAL_FORECAST_ACTUAL_YEARS.forEach((year) => {
-      values[year] = forecastCategoryRows(lineType, fundCode, "FY" + year + "_Actual").get(category) || 0;
+      values[year] = forecastCategoryRows(lineType, fundCode, "FY" + year + "_Actual", trendOptions).get(category) || 0;
     });
-    values[2026] = forecastCategoryRows(lineType, fundCode, "FY2026_Original_Budget").get(category) || 0;
-    values[2027] = forecastCategoryRows(lineType, fundCode, "FY2027_Proposed").get(category) || 0;
+    values[2026] = forecastCategoryRows(lineType, fundCode, "FY2026_Original_Budget", trendOptions).get(category) || 0;
+    values[2027] = forecastCategoryRows(lineType, fundCode, "FY2027_Proposed", trendOptions).get(category) || 0;
     return values;
   }
 
@@ -5236,7 +5466,7 @@
         assumptionDetails.set(detailsKey, details);
         const previous = categories.get(category)[year - 1] || 0;
         const manual = forecastAssumptionValue(details.assumption, year);
-        const growth = manual !== null ? manual : (Number.isFinite(details.suggested) ? details.suggested : 0);
+        const growth = effectiveForecastGrowth(lineType, manual, details.suggested, details.cagr);
         categories.get(category)[year] = previous * (1 + growth);
       });
     });
@@ -5252,21 +5482,97 @@
   // is read, not recomputed.
   function forecastAnnualDetails(fund, lineType, baselineDetails, assumptionDetails) {
     const details = new Map();
+    const detailHistory = forecastDetailHistoryByYear(lineType, fund.code);
+    function detailTrendValues(name) {
+      const values = {};
+      FINANCIAL_FORECAST_ACTUAL_YEARS.forEach((year) => {
+        const entry = detailHistory.get("FY" + year + "_Actual").get(name);
+        values[year] = entry ? entry.value : 0;
+      });
+      const entry2026 = detailHistory.get("FY2026_Original_Budget").get(name);
+      values[2026] = entry2026 ? entry2026.value : 0;
+      const entry2027 = detailHistory.get("FY2027_Proposed").get(name);
+      values[2027] = entry2027 ? entry2027.value : 0;
+      return values;
+    }
+    function detailCagr(name) {
+      const values = detailTrendValues(name);
+      return historicalCagr(values);
+    }
     baselineDetails.forEach((entry, name) => {
-      details.set(name, { category: entry.category, values: { 2027: entry.value } });
+      const trendValues = detailTrendValues(name);
+      details.set(name, {
+        category: entry.category,
+        values: { 2027: entry.value },
+        cagr: detailCagr(name),
+        growthOverride: forecastDetailGrowthOverride(lineType, name, trendValues),
+        parts: Object.assign({}, entry.parts || { [entry.category]: entry.value })
+      });
     });
     FINANCIAL_FORECAST_YEARS.slice(1).forEach((year) => {
       details.forEach((entry) => {
+        if (lineType === "expense" && entry.parts) {
+          let total = 0;
+          const nextParts = {};
+          Object.keys(entry.parts).forEach((category) => {
+            const detailsKey = [fund.code, lineType, category].join("|");
+            const categoryDetails = assumptionDetails.get(detailsKey);
+            const manual = categoryDetails ? forecastAssumptionValue(categoryDetails.assumption, year) : null;
+            const suggested = categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : 0;
+            const growth = Number.isFinite(entry.growthOverride)
+              ? entry.growthOverride
+              : effectiveForecastGrowth(lineType, manual, suggested, null);
+            const previous = entry.parts[category] || 0;
+            const next = previous * (1 + growth);
+            nextParts[category] = next;
+            total += next;
+          });
+          entry.parts = nextParts;
+          entry.values[year] = total;
+          return;
+        }
         const detailsKey = [fund.code, lineType, entry.category].join("|");
         const categoryDetails = assumptionDetails.get(detailsKey);
         const manual = categoryDetails ? forecastAssumptionValue(categoryDetails.assumption, year) : null;
         const suggested = categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : 0;
-        const growth = manual !== null ? manual : suggested;
+        const growth = effectiveForecastGrowth(lineType, manual, suggested, entry.cagr);
         const previous = entry.values[year - 1] || 0;
         entry.values[year] = previous * (1 + growth);
       });
     });
     return details;
+  }
+
+  function weightedDetailCategoryAssumption(parts, fund, lineType, assumptionDetails, year) {
+    const entries = Object.entries(parts || {}).filter(([, amount]) => (Number(amount) || 0) !== 0);
+    if (!entries.length) return null;
+    let weightedTotal = 0;
+    let weightTotal = 0;
+    entries.forEach(([category, amount]) => {
+      const categoryDetails = assumptionDetails.get([fund.code, lineType, category].join("|"));
+      const manual = categoryDetails ? forecastAssumptionValue(categoryDetails.assumption, year) : null;
+      const suggested = categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : 0;
+      const growth = effectiveForecastGrowth(lineType, manual, suggested, null);
+      const weight = Math.abs(Number(amount) || 0);
+      weightedTotal += growth * weight;
+      weightTotal += weight;
+    });
+    return weightTotal ? weightedTotal / weightTotal : null;
+  }
+
+  function weightedDetailCategorySuggested(parts, fund, lineType, assumptionDetails) {
+    const entries = Object.entries(parts || {}).filter(([, amount]) => (Number(amount) || 0) !== 0);
+    if (!entries.length) return null;
+    let weightedTotal = 0;
+    let weightTotal = 0;
+    entries.forEach(([category, amount]) => {
+      const categoryDetails = assumptionDetails.get([fund.code, lineType, category].join("|"));
+      if (!categoryDetails || !Number.isFinite(categoryDetails.suggested)) return;
+      const weight = Math.abs(Number(amount) || 0);
+      weightedTotal += categoryDetails.suggested * weight;
+      weightTotal += weight;
+    });
+    return weightTotal ? weightedTotal / weightTotal : null;
   }
 
   // Same eight year-fields forecastAssumptionDetails reads per category,
@@ -5277,10 +5583,10 @@
   // the Ad Valorem Taxes case: one line item dominated "General Government
   // Taxes" enough to make a recording change in that one account look like
   // the whole category's trend).
-  function forecastDetailHistoryByYear(lineType, fundCode) {
+  function forecastDetailHistoryByYear(lineType, fundCode, options) {
     const yearFields = FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => "FY" + year + "_Actual").concat(["FY2026_Original_Budget", "FY2027_Proposed"]);
     const byYear = new Map();
-    yearFields.forEach((field) => byYear.set(field, forecastDetailRows(lineType, fundCode, field)));
+    yearFields.forEach((field) => byYear.set(field, forecastDetailRows(lineType, fundCode, field, options)));
     return byYear;
   }
 
@@ -5291,7 +5597,7 @@
   // forecastAnnualDetails); each name's own avgGrowth/cagr below is its
   // own, independent of the category, to surface it as an individual driver.
   function forecastDetailAssumptionRows(fund, lineType, assumptionDetails) {
-    const byYearDetailMaps = forecastDetailHistoryByYear(lineType, fund.code);
+    const byYearDetailMaps = forecastDetailHistoryByYear(lineType, fund.code, { normalizeForAssumptions: true });
     const baseline = byYearDetailMaps.get("FY2027_Proposed");
     return Array.from(baseline.keys()).map((name) => {
       const category = baseline.get(name).category;
@@ -5302,16 +5608,31 @@
       });
       const entry2026 = byYearDetailMaps.get("FY2026_Original_Budget").get(name);
       values[2026] = entry2026 ? entry2026.value : 0;
-      values[2027] = baseline.get(name).value;
+      const baselineEntry = baseline.get(name);
+      values[2027] = baselineEntry.value;
       const categoryDetails = assumptionDetails.get([fund.code, lineType, category].join("|"));
+      const hasMixedParts = baselineEntry.parts && Object.keys(baselineEntry.parts).filter((part) => (baselineEntry.parts[part] || 0) !== 0).length > 1;
+      const growthOverride = forecastDetailGrowthOverride(lineType, name, values);
+      const detailOverride = FORECAST_DETAIL_ASSUMPTION_OVERRIDES.get(String(name || "").trim().toLowerCase());
       return {
         name,
         category,
         values,
         avgGrowth: historicalAverageGrowth(values),
         cagr: historicalCagr(values),
+        baseDeclineOverride: Number.isFinite(growthOverride) && !detailOverride,
         categoryAssumption: categoryDetails ? categoryDetails.assumption : null,
-        categorySuggested: categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : null
+        categorySuggested: hasMixedParts
+          ? weightedDetailCategorySuggested(baselineEntry.parts, fund, lineType, assumptionDetails)
+          : (categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : null),
+        weightedAssumptions: Number.isFinite(growthOverride)
+          ? Object.fromEntries(FINANCIAL_FORECAST_YEARS.slice(1).map((year) => [year, growthOverride]))
+          : hasMixedParts
+          ? Object.fromEntries(FINANCIAL_FORECAST_YEARS.slice(1).map((year) => [
+            year,
+            weightedDetailCategoryAssumption(baselineEntry.parts, fund, lineType, assumptionDetails, year)
+          ]))
+          : null
       };
     });
   }
@@ -5320,6 +5641,53 @@
     let total = 0;
     categories.forEach((values) => { total += values[year] || 0; });
     return total;
+  }
+
+  function sumForecastBaselineCategories(categories) {
+    let total = 0;
+    categories.forEach((value) => { total += Number(value) || 0; });
+    return total;
+  }
+
+  function sumForecastBaselineDetails(details, predicate) {
+    let total = 0;
+    details.forEach((entry, name) => {
+      if (predicate && !predicate(name, entry)) return;
+      total += Number(entry && entry.value) || 0;
+    });
+    return total;
+  }
+
+  function isTouristDevelopmentTaxRevenueName(name) {
+    return /tourist development tax/i.test(String(name || ""));
+  }
+
+  function addForecastBaselineDetail(details, name, category, amount) {
+    if (!details || !Number.isFinite(amount) || amount <= 0) return;
+    const existing = details.get(name);
+    if (existing) {
+      existing.value = (Number(existing.value) || 0) + amount;
+      existing.parts = Object.assign({}, existing.parts || {});
+      existing.parts[category] = (Number(existing.parts[category]) || 0) + amount;
+      return;
+    }
+    details.set(name, { category, value: amount, parts: { [category]: amount } });
+  }
+
+  function applyTouristDevelopmentRevenueBaselineFloor(baselineRevenueCategories, baselineRevenueDetails) {
+    const category = "General Government Taxes";
+    const detailName = "Tourist Development Taxes";
+    const actualDetails = forecastDetailRows("revenue", "111", "FY2025_Actual");
+    const actualTaxTotal = sumForecastBaselineDetails(actualDetails, isTouristDevelopmentTaxRevenueName);
+    const baselineTaxTotal = sumForecastBaselineDetails(baselineRevenueDetails, isTouristDevelopmentTaxRevenueName);
+    const actualTotalFallback = sumForecastBaselineCategories(forecastCategoryRows("revenue", "111", "FY2025_Actual"));
+    const baselineTotalFallback = sumForecastBaselineCategories(baselineRevenueCategories);
+    const taxGap = actualTaxTotal > baselineTaxTotal ? actualTaxTotal - baselineTaxTotal : 0;
+    const fallbackGap = !taxGap && actualTotalFallback > baselineTotalFallback ? actualTotalFallback - baselineTotalFallback : 0;
+    const adjustment = taxGap || fallbackGap;
+    if (!adjustment) return;
+    baselineRevenueCategories.set(category, (Number(baselineRevenueCategories.get(category)) || 0) + adjustment);
+    addForecastBaselineDetail(baselineRevenueDetails, detailName, category, adjustment);
   }
 
   function capCapitalProjectsFinancingRevenue(revenueCategories, revenueDetails, expenseCategories) {
@@ -5425,6 +5793,89 @@
     });
   }
 
+  function balanceForecastFundToZeroNetChange(revenueCategories, revenueDetails, expenseCategories, balancingDetailName) {
+    const financingCategory = "Other Sources";
+    if (!revenueCategories.has(financingCategory)) revenueCategories.set(financingCategory, {});
+    const financingValues = revenueCategories.get(financingCategory);
+
+    if (revenueDetails && balancingDetailName && !revenueDetails.has(balancingDetailName)) {
+      revenueDetails.set(balancingDetailName, { category: financingCategory, values: {} });
+    }
+    const balancingDetail = revenueDetails && balancingDetailName ? revenueDetails.get(balancingDetailName) : null;
+
+    FINANCIAL_FORECAST_YEARS.forEach((year) => {
+      let nonFinancingRevenue = 0;
+      revenueCategories.forEach((values, category) => {
+        if (category !== financingCategory) nonFinancingRevenue += values[year] || 0;
+      });
+      const expenditures = sumForecastCategories(expenseCategories, year);
+      const neededFinancing = expenditures - nonFinancingRevenue;
+      financingValues[year] = neededFinancing;
+
+      if (!revenueDetails || !balancingDetail) return;
+      revenueDetails.forEach((entry, name) => {
+        if (entry.category !== financingCategory) return;
+        entry.values[year] = name === balancingDetailName ? neededFinancing : 0;
+      });
+    });
+  }
+
+  function adjustForecastExpenseDetailsForCategory(details, category, year, adjustment, preferredNames) {
+    if (!details || !adjustment) return;
+    const names = Array.isArray(preferredNames) ? preferredNames.map((name) => String(name || "").toLowerCase()) : [];
+    const entries = Array.from(details.entries())
+      .filter(([, entry]) => entry.category === category && (entry.values[year] || 0) > 0)
+      .sort((a, b) => {
+        const aPreferred = names.some((name) => a[0].toLowerCase().indexOf(name) !== -1);
+        const bPreferred = names.some((name) => b[0].toLowerCase().indexOf(name) !== -1);
+        if (aPreferred !== bPreferred) return aPreferred ? -1 : 1;
+        return (b[1].values[year] || 0) - (a[1].values[year] || 0);
+      });
+    if (!entries.length) return;
+
+    if (adjustment > 0) {
+      entries[0][1].values[year] = (entries[0][1].values[year] || 0) + adjustment;
+      return;
+    }
+
+    let remaining = Math.abs(adjustment);
+    entries.forEach(([, entry]) => {
+      if (remaining <= 0) return;
+      const current = entry.values[year] || 0;
+      const reduction = Math.min(current, remaining);
+      entry.values[year] = current - reduction;
+      remaining -= reduction;
+    });
+  }
+
+  function shapeGeneralFundInterfundTransferExpense(revenueCategories, expenseCategories, expenseDetails, beginningBalance) {
+    const category = "Other Uses / Transfers";
+    const values = expenseCategories.get(category);
+    if (!values) return;
+
+    const baseRevenues2027 = sumForecastCategories(revenueCategories, 2027);
+    const baseExpenses2027 = sumForecastCategories(expenseCategories, 2027);
+    const baseEnding2027 = beginningBalance + baseRevenues2027 - baseExpenses2027;
+    const targetEnding2031 = baseEnding2027 * 1.015;
+
+    let priorTargetEnding = baseEnding2027;
+    FINANCIAL_FORECAST_YEARS.slice(1).forEach((year, index) => {
+      const progress = (index + 1) / (FINANCIAL_FORECAST_YEARS.length - 1);
+      const targetEnding = baseEnding2027 + ((targetEnding2031 - baseEnding2027) * progress);
+      const targetNetChange = targetEnding - priorTargetEnding;
+      const revenues = sumForecastCategories(revenueCategories, year);
+      const currentExpenses = sumForecastCategories(expenseCategories, year);
+      const currentNetChange = revenues - currentExpenses;
+      const expenseAdjustment = currentNetChange - targetNetChange;
+      const previousValue = values[year] || 0;
+      const nextValue = Math.max(0, previousValue + expenseAdjustment);
+      const actualAdjustment = nextValue - previousValue;
+      values[year] = nextValue;
+      adjustForecastExpenseDetailsForCategory(expenseDetails, category, year, actualAdjustment, ["interfund", "transfer"]);
+      priorTargetEnding = targetEnding;
+    });
+  }
+
   function balanceTouristDevelopmentBeachRenourishment(revenueCategories, expenseCategories, expenseDetails) {
     const balancingDetailName = "Beach Renourishment";
     if (!expenseDetails || !expenseDetails.has(balancingDetailName)) return;
@@ -5490,6 +5941,11 @@
     const funds = FINANCIAL_FORECAST_FUNDS.map((fund) => {
       const baselineRevenueCategories = forecastCategoryRows("revenue", fund.code, "FY2027_Proposed");
       const baselineExpenseCategories = forecastCategoryRows("expense", fund.code, "FY2027_Proposed");
+      const baselineRevenueDetails = forecastDetailRows("revenue", fund.code, "FY2027_Proposed");
+      const baselineExpenseDetails = forecastDetailRows("expense", fund.code, "FY2027_Proposed");
+      if (fund.code === "111") {
+        applyTouristDevelopmentRevenueBaselineFloor(baselineRevenueCategories, baselineRevenueDetails);
+      }
       const revenueCategories = forecastAnnualCategories(fund, "revenue", baselineRevenueCategories, assumptionLookup, missingAssumptions, assumptionDetails);
       const expenseCategories = forecastAnnualCategories(fund, "expense", baselineExpenseCategories, assumptionLookup, missingAssumptions, assumptionDetails);
 
@@ -5497,8 +5953,6 @@
       // for the "Category Forecast Detail" table -- built after the
       // category-level forecasts above so assumptionDetails already has
       // every category's growth assumption populated for this fund/lineType.
-      const baselineRevenueDetails = forecastDetailRows("revenue", fund.code, "FY2027_Proposed");
-      const baselineExpenseDetails = forecastDetailRows("expense", fund.code, "FY2027_Proposed");
       const revenueDetails = forecastAnnualDetails(fund, "revenue", baselineRevenueDetails, assumptionDetails);
       const expenseDetails = forecastAnnualDetails(fund, "expense", baselineExpenseDetails, assumptionDetails);
 
@@ -5534,29 +5988,33 @@
           expenseDetails.get("CIP Project Schedule").values[year] = cipForecast.byYear[year] ? cipForecast.byYear[year].total : 0;
         });
 
-        capCapitalProjectsFinancingRevenue(revenueCategories, revenueDetails, expenseCategories);
+        balanceForecastFundToZeroNetChange(revenueCategories, revenueDetails, expenseCategories, "Interfund Group Transfer In");
       }
 
-      if (fund.code === "001") {
-        capGeneralFundRevenueGrowth(revenueCategories, revenueDetails, expenseCategories);
+      if (fund.code === "107") {
+        balanceForecastFundToZeroNetChange(revenueCategories, revenueDetails, expenseCategories, "Interfund Group Transfer In");
       }
 
-      if (fund.code === "101" || fund.code === "107") {
+      if (fund.code === "101") {
         balanceTransportationTransfersIn(revenueCategories, revenueDetails, expenseCategories);
       }
 
-      if (fund.code === "111") {
-        balanceTouristDevelopmentBeachRenourishment(revenueCategories, expenseCategories, expenseDetails);
-      }
-
       const beginningBalanceSourceYear = 2026;
+      if (fund.code === "001") {
+        shapeGeneralFundInterfundTransferExpense(
+          revenueCategories,
+          expenseCategories,
+          expenseDetails,
+          fundBalanceForYear(fund.code, beginningBalanceSourceYear)
+        );
+      }
       const annual = {};
 
       FINANCIAL_FORECAST_YEARS.forEach((year, index) => {
         const beginningBalance = index === 0 ? fundBalanceForYear(fund.code, beginningBalanceSourceYear) : annual[year - 1].endingBalance;
         const revenues = sumForecastCategories(revenueCategories, year);
         const expenditures = sumForecastCategories(expenseCategories, year);
-        const netChange = Math.max(0, revenues - expenditures);
+        const netChange = revenues - expenditures;
         annual[year] = {
           year,
           beginningBalance,
@@ -5700,7 +6158,11 @@
     "001|capital projects",
     "101|road impact fees",
     "111|sales & promotions",
-    "111|sales & promotions out of state"
+    "111|sales & promotions out of state",
+    "111|beach renourishment",
+    "001|copies and public records request",
+    "001|msbu fees",
+    "101|sewer impact fees"
   ]);
 
   // Lists each individual revenue source/department (rather than the
@@ -5711,6 +6173,15 @@
     const assumptionYears = FINANCIAL_FORECAST_YEARS.slice(1);
     const nameLabel = lineType === "revenue" ? "Revenue Source" : "Department";
     const detailsField = lineType === "revenue" ? "revenueDetailAssumptions" : "expenseDetailAssumptions";
+    const methodDisplayLabels = new Map([
+      ["Conservative", "Lower Than Trend"],
+      ["Normalized", "Adjusted Trend"],
+      ["Management Estimate", "Staff Estimate"],
+      ["Declining", "Expected To Decrease"],
+      ["Flat", "No Growth Assumed"],
+      ["New Revenue", "Limited History"],
+      ["Statutory", "Set By Law"]
+    ]);
 
     const rowData = model.funds.flatMap((item) => (item[detailsField] || []).map((detail) => ({ fund: item.fund, detail })))
       .filter(({ detail }) => !/^interfund group transfer/i.test(detail.name))
@@ -5749,7 +6220,12 @@
       .map(({ fund, detail }) => ({
         fund,
         detail,
-        assumptionValues: assumptionYears.map((year) => forecastAssumptionValue(detail.categoryAssumption, year))
+        assumptionValues: assumptionYears.map((year) => {
+          if (detail.weightedAssumptions && Number.isFinite(detail.weightedAssumptions[year])) {
+            return detail.weightedAssumptions[year];
+          }
+          return forecastAssumptionValue(detail.categoryAssumption, year);
+        })
       }))
       // Initial server-rendered order, before the sort buttons (added
       // below) take over client-side: biggest driver first, across every
@@ -5781,12 +6257,13 @@
         ? assumptionValues.map(() => detailOverride.rate)
         : historyIsFlat
         ? assumptionValues.map(() => 0)
-        : assumptionValues;
+        : assumptionValues.map((value) => effectiveForecastGrowth(lineType, value, detail.categorySuggested, detail.cagr));
       const assumptionCells = allRowsFlat
         ? '<td class="wc-num">' + escapeHtml(forecastPercent(displayAssumptionValues[0])) + '</td>'
         : displayAssumptionValues.map((value) => '<td class="wc-num">' + escapeHtml(forecastPercent(value)) + '</td>').join("");
       const excludedYears = historicalCagrExcludedYears(detail.values);
-      const methodLabel = forecastAssumptionMethod(detail, assumptionValues[0]);
+      const methodLabel = forecastAssumptionMethod(detail, displayAssumptionValues[0], lineType);
+      const methodDisplayLabel = methodDisplayLabels.get(methodLabel) || methodLabel;
       // data-sort-value/data-sort-name let the sort buttons below
       // reorder these rows client-side without re-running the whole
       // forecast model -- see the delegated click handler for
@@ -5800,7 +6277,7 @@
         ).join("") +
         '<td class="wc-num">' + escapeHtml(forecastCagrDisplay(detail.cagr)) + '</td>' +
         '<td class="wc-num">' + escapeHtml(historicalCagrBasisLabel(detail.values)) + '</td>' +
-        '<td>' + escapeHtml(methodLabel) + '</td>' +
+        '<td>' + escapeHtml(methodDisplayLabel) + '</td>' +
         assumptionCells + '</tr>'
       );
     });
@@ -5847,29 +6324,211 @@
         { label: "CAGR Basis", num: true },
         {
           label: "Method",
-          tooltip: "Conservative: assumption intentionally below historical trend. Normalized: based on normalized operations after excluding atypical years. Flat: no material growth expected. New Revenue: insufficient history available. Statutory: growth determined by law or fixed formula. Declining: long-term downward trend expected. Management Estimate: used where historical trends are not predictive."
+          tooltip: "Lower Than Trend: assumption intentionally below historical trend. Adjusted Trend: based on normalized operations after excluding atypical years. No Growth Assumed: no material growth expected. Limited History: insufficient history available. Set By Law: growth determined by law or fixed formula. Expected To Decrease: long-term downward trend expected. Staff Estimate: used where historical trends are not predictive."
         }
       ].concat(assumptionColumns),
       bodyRows: rows
     });
   }
 
+  function forecastShortMoney(value) {
+    const n = Math.round(Number(value) || 0);
+    const sign = n < 0 ? "-" : "";
+    const abs = Math.abs(n);
+    if (abs >= 1000000000) return sign + "$" + (abs / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+    if (abs >= 1000000) return sign + "$" + (abs / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (abs >= 1000) return sign + "$" + (abs / 1000).toFixed(0) + "K";
+    return sign + "$" + abs.toLocaleString("en-US");
+  }
+
+  function forecastPercentChange(start, end) {
+    const base = Number(start) || 0;
+    const finish = Number(end) || 0;
+    if (!base) return "New";
+    return forecastPercent((finish - base) / Math.abs(base));
+  }
+
+  function forecastFundHealth(item) {
+    const beginning = item.annual[2027].beginningBalance || 0;
+    const ending = item.annual[2031].endingBalance || 0;
+    const hasShortfall = FINANCIAL_FORECAST_YEARS.some((year) => (item.annual[year].revenues || 0) < (item.annual[year].expenditures || 0));
+    if (item.fund.code === "300") {
+      return { label: "Capital Plan Driven", className: "is-plan", text: "Project spending follows the capital improvement plan." };
+    }
+    if (item.fund.code === "101" || item.fund.code === "107") {
+      return { label: "Transfer Supported", className: "is-support", text: "Transfers help keep planned services funded." };
+    }
+    if (hasShortfall) {
+      return { label: "Watch", className: "is-watch", text: "Expenses are projected above recurring revenues in at least one year." };
+    }
+    if (ending >= beginning * 1.05) {
+      return { label: "Growing Reserve", className: "is-strong", text: "Projected revenues keep pace and reserves increase." };
+    }
+    return { label: "Stable", className: "is-stable", text: "Projected revenues generally keep pace with expenses." };
+  }
+
+  function forecastFundDetailId(fundCode) {
+    return "wc-forecast-fund-detail-" + String(fundCode || "").replace(/[^a-z0-9_-]/gi, "");
+  }
+
+  function renderForecastFundScheduleDetail(item) {
+    return (
+      renderForecastDetailTable(item) +
+      '<details class="wc-forecast-detail" open><summary>Category Forecast Detail</summary>' +
+        renderForecastDetailBreakdownTable(item, "revenue", item.revenueDetails) +
+        renderForecastDetailBreakdownTable(item, "expense", item.expenseDetails) +
+      '</details>'
+    );
+  }
+
+  function renderForecastFundDetailTemplates(model) {
+    return (
+      '<div class="wc-forecast-fund-detail-templates" hidden>' +
+        model.funds.map((item) => (
+          '<template id="' + escapeHtml(forecastFundDetailId(item.fund.code)) + '">' +
+            renderForecastFundScheduleDetail(item) +
+          '</template>'
+        )).join("") +
+      '</div>'
+    );
+  }
+
+  function renderForecastOverviewCards(model) {
+    return (
+      '<section class="wc-forecast-section wc-forecast-overview" aria-labelledby="forecast-overview-heading">' +
+        '<div class="wc-section-heading-row">' +
+          '<h2 id="forecast-overview-heading" class="wc-fund-section-heading">Forecast At A Glance</h2>' +
+          '<p>Each card answers the basic question: is this fund positioned to support planned services over the next five years? Select a card to view its detailed fund schedule.</p>' +
+        '</div>' +
+        '<div class="wc-forecast-health-grid">' +
+          model.funds.map((item) => {
+            const health = forecastFundHealth(item);
+            const beginning = item.annual[2027].beginningBalance || 0;
+            const ending = item.annual[2031].endingBalance || 0;
+            const revenue2031 = item.annual[2031].revenues || 0;
+            const expense2031 = item.annual[2031].expenditures || 0;
+            return (
+              '<article class="wc-forecast-health-card wc-forecast-fund-card-button ' + health.className + '" role="button" tabindex="0" data-forecast-fund-detail="' + escapeHtml(forecastFundDetailId(item.fund.code)) + '" data-forecast-fund-name="' + escapeHtml(item.fund.label) + '">' +
+                '<div class="wc-forecast-health-card-head">' +
+                  '<h3>' + escapeHtml(item.fund.label) + '</h3>' +
+                  '<span>' + escapeHtml(health.label) + '</span>' +
+                '</div>' +
+                '<p>' + escapeHtml(health.text) + '</p>' +
+                '<dl>' +
+                  '<div><dt>Starting Balance</dt><dd>' + forecastShortMoney(beginning) + '</dd></div>' +
+                  '<div><dt>2031 Balance</dt><dd>' + forecastShortMoney(ending) + '</dd></div>' +
+                  '<div><dt>Balance Change</dt><dd>' + escapeHtml(forecastPercentChange(beginning, ending)) + '</dd></div>' +
+                  '<div><dt>2031 Revenue vs Expense</dt><dd>' + forecastShortMoney(revenue2031 - expense2031) + '</dd></div>' +
+                '</dl>' +
+              '</article>'
+            );
+          }).join("") +
+        '</div>' +
+      '</section>'
+    );
+  }
+
+  function renderForecastBar(value, max, className, label) {
+    const width = max ? Math.max(2, Math.min(100, (Math.abs(value) / max) * 100)) : 0;
+    return (
+      '<span class="wc-forecast-comparison-bar ' + className + '" aria-label="' + escapeHtml(label) + '">' +
+        '<i style="width:' + width.toFixed(2) + '%"></i>' +
+      '</span>'
+    );
+  }
+
+  function renderForecastCharts(model) {
+    return (
+      '<section class="wc-forecast-section wc-forecast-visuals" aria-labelledby="forecast-visuals-heading">' +
+        '<div class="wc-section-heading-row">' +
+          '<h2 id="forecast-visuals-heading" class="wc-fund-section-heading">Revenues, Expenses, And Ending Balance</h2>' +
+          '<p>Bars compare money coming in, money going out, and the projected ending balance for each year.</p>' +
+        '</div>' +
+        '<div class="wc-forecast-visual-grid">' +
+          model.funds.map((item) => {
+            const max = Math.max.apply(null, FINANCIAL_FORECAST_YEARS.flatMap((year) => [
+              item.annual[year].revenues || 0,
+              item.annual[year].expenditures || 0,
+              item.annual[year].endingBalance || 0
+            ]));
+            return (
+              '<article class="wc-forecast-visual-panel">' +
+                '<h3>' + escapeHtml(item.fund.label) + '</h3>' +
+                '<div class="wc-forecast-legend" aria-hidden="true">' +
+                  '<span class="is-revenue">Revenue</span><span class="is-expense">Expense</span><span class="is-balance">Ending Balance</span>' +
+                '</div>' +
+                '<div class="wc-forecast-comparison-chart">' +
+                  FINANCIAL_FORECAST_YEARS.map((year) => {
+                    const annual = item.annual[year];
+                    return (
+                      '<div class="wc-forecast-comparison-row">' +
+                        '<strong>FY ' + year + '</strong>' +
+                        '<div>' +
+                          renderForecastBar(annual.revenues || 0, max, "is-revenue", "FY " + year + " revenue " + forecastMoney(annual.revenues || 0)) +
+                          renderForecastBar(annual.expenditures || 0, max, "is-expense", "FY " + year + " expense " + forecastMoney(annual.expenditures || 0)) +
+                          renderForecastBar(annual.endingBalance || 0, max, "is-balance", "FY " + year + " ending balance " + forecastMoney(annual.endingBalance || 0)) +
+                        '</div>' +
+                        '<span>' + forecastShortMoney(annual.endingBalance || 0) + '</span>' +
+                      '</div>'
+                    );
+                  }).join("") +
+                '</div>' +
+              '</article>'
+            );
+          }).join("") +
+        '</div>' +
+      '</section>'
+    );
+  }
+
+  function assumptionRateRange(model, lineType, category) {
+    const values = (model.assumptions || [])
+      .filter((row) => String(row.line_type || "").trim().toLowerCase() === lineType && normalizeForecastCategory(row.category, lineType) === category)
+      .flatMap((row) => FINANCIAL_FORECAST_YEARS.slice(1).map((year) => forecastAssumptionValue(row, year)))
+      .filter((value) => Number.isFinite(value));
+    if (!values.length) return "Varies";
+    const min = Math.min.apply(null, values);
+    const max = Math.max.apply(null, values);
+    return min === max ? forecastPercent(min) : forecastPercent(min) + " to " + forecastPercent(max);
+  }
+
+  function renderForecastAssumptionSummary(model) {
+    const rows = [
+      ["Personnel Services", "Wages, benefits, and staffing costs."],
+      ["Operating Expenses", "Recurring service costs, contracts, supplies, and utilities."],
+      ["Capital Outlay", "Recurring capital replacement; unusual one-time capital is removed from trend calculations."],
+      ["Grants and Aids", "Aid and outside-agency funding based on recurring expectations."],
+      ["Other Uses / Transfers", "Transfers, reserves, and other planned uses."]
+    ].map(([category, why]) => (
+      '<tr>' +
+        '<td>' + escapeHtml(category) + '</td>' +
+        '<td class="wc-num">' + escapeHtml(assumptionRateRange(model, "expense", category)) + '</td>' +
+        '<td>' + escapeHtml(why) + '</td>' +
+      '</tr>'
+    ));
+    return (
+      '<section class="wc-forecast-section wc-forecast-assumption-summary" aria-labelledby="forecast-assumption-summary-heading">' +
+        '<div class="wc-section-heading-row">' +
+          '<h2 id="forecast-assumption-summary-heading" class="wc-fund-section-heading">Broad Expense Category Assumptions</h2>' +
+        '</div>' +
+        renderTable({
+          caption: "Expense Assumption Summary",
+          columns: [{ label: "Expense Type" }, { label: "Annual Growth Used", num: true }, { label: "Plain-English Meaning" }],
+          bodyRows: rows
+        }) +
+      '</section>'
+    );
+  }
+
   function renderFinancialForecast(cipProjectList) {
     const model = buildFinancialForecastModel(cipProjectList);
     return (
-      '<section class="wc-forecast-section">' +
-        '<h2 class="wc-fund-section-heading">Major Fund Detail</h2>' +
-        model.funds.map((item) => (
-          '<article class="wc-forecast-fund">' +
-            '<h3>' + escapeHtml(item.fund.label) + '</h3>' +
-            renderForecastDetailTable(item) +
-            '<details class="wc-forecast-detail"><summary>Category Forecast Detail</summary>' +
-              renderForecastDetailBreakdownTable(item, "revenue", item.revenueDetails) +
-              renderForecastDetailBreakdownTable(item, "expense", item.expenseDetails) +
-            '</details>' +
-          '</article>'
-        )).join("") +
+      '<section class="wc-forecast-baseline-note">' +
+        '<strong>How to read this page:</strong> FY 2027 is the proposed budget baseline. Future years apply growth assumptions to that baseline.' +
       '</section>' +
+      renderForecastOverviewCards(model) +
+      renderForecastAssumptionSummary(model) +
+      renderForecastFundDetailTemplates(model) +
       '<section class="wc-forecast-section">' +
         '<h2 class="wc-fund-section-heading">Assumptions</h2>' +
         '<details class="wc-forecast-detail wc-forecast-assumptions-detail">' +
@@ -5879,6 +6538,7 @@
         '</details>' +
         '<details class="wc-forecast-detail wc-forecast-assumptions-detail">' +
           '<summary>Expenditure Assumptions</summary>' +
+          '<p class="wc-forecast-assumptions-intro">Expenditure assumptions are developed using normalized historical spending, known recurring operating needs, personnel cost expectations, capital exclusions, and management judgment. One-time capital purchases, administrative pass-throughs, land purchases, and other nonrecurring items are excluded from trend calculations where they would distort future operating growth. The FY 2027 baseline remains the proposed budget; these adjustments affect only the growth assumptions applied to future years.</p>' +
           renderForecastAssumptionsDetailTable(model, "expense") +
         '</details>' +
       '</section>' +
@@ -8136,6 +8796,57 @@
     return (rows || []).filter((r) => norms.includes(normalizeDeptName(r.Dept_Name)));
   }
 
+  function dedupeRevenueFy2026ByFundAccount(rows) {
+    const byKey = new Map();
+    (rows || []).forEach((row, index) => {
+      const code = String((row && row.Revenue_Code) || "").trim();
+      const key = [
+        fundCodeForRow(row),
+        code || String((row && row.Dept_Code) || "").trim() + "|" + normalizeDeptName(row && row.Revenue_Name),
+        String((row && row.Project_Code) || "").trim()
+      ].join("|");
+      if (!byKey.has(key)) byKey.set(key, []);
+      byKey.get(key).push({ row, index, contribution: revenueBudgetMergeContribution(row) });
+    });
+
+    const nextRows = (rows || []).map((row) => Object.assign({}, row));
+    byKey.forEach((entries) => {
+      if (entries.length <= 1) return;
+      const keeper = entries.reduce((best, entry) =>
+        Math.abs(entry.contribution) > Math.abs(best.contribution) ? entry : best
+      );
+      entries.forEach((entry) => {
+        nextRows[entry.index].FY2026_Original_Budget = 0;
+        nextRows[entry.index].FY2026_Budget = 0;
+        nextRows[entry.index].FY2026_Plug = 0;
+        nextRows[entry.index]._originalBudgetDeduped = true;
+        nextRows[entry.index]._suppressRevenueBudgetFallback = true;
+      });
+      nextRows[keeper.index].FY2026_Original_Budget = keeper.contribution;
+    });
+    return nextRows;
+  }
+
+  function normalizeTourismAdminRevenueRows(rows) {
+    let northWaltonTdtFy2026Assigned = false;
+    return dedupeRevenueFy2026ByFundAccount(rows).map((row) => {
+      const name = String((row && row.Revenue_Name) || "");
+      const dept = normalizeDeptName(row && row.Dept_Name);
+      if (/^tourist development tax/i.test(name) && dept.indexOf("north walton") !== -1) {
+        const fy2026Budget = northWaltonTdtFy2026Assigned ? 0 : 323000;
+        northWaltonTdtFy2026Assigned = true;
+        return Object.assign({}, row, {
+          FY2026_Original_Budget: fy2026Budget,
+          FY2026_Budget: fy2026Budget,
+          FY2026_Plug: fy2026Budget,
+          _originalBudgetDeduped: true,
+          _suppressRevenueBudgetFallback: true
+        });
+      }
+      return row;
+    });
+  }
+
   function renderTourismAdministrationSections() {
     const overview =
       '<section class="content-section tourism-admin-overview">' +
@@ -8144,12 +8855,16 @@
       TOURISM_ADMIN_HIGHLIGHTS_PARAGRAPHS.map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("") +
       "</section>";
     const tourismAdminSpec = TOURISM_ADMIN_SECTIONS.find((spec) => spec.label === "Tourism Administration");
+    // The Tourist Development Fund (111) books revenue under several
+    // Dept_Names across tourism divisions. This page should present that
+    // full fund revenue once, as a single Tourism Administration card,
+    // rather than splitting it into one card per Dept_Name.
     const tourismAdminRevenue = tourismAdminSpec
-      ? renderTypeSummaryTable(
-          rowsForExactNames(cache.revenues, tourismAdminSpec.revenueNames),
+      ? renderTypeSummaryGroup(
+          normalizeTourismAdminRevenueRows((cache.revenues || []).filter((r) => fundCodeForRow(r) === "111")),
           "revenue",
           "Revenue Summary",
-          tourismAdminSpec.label
+          null
         )
       : "";
 
@@ -8168,10 +8883,9 @@
         : "";
 
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
-      const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
       const expenseCardHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label);
-      const revenueCardHtml = spec.label === "Tourism Administration" ? "" : renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label);
+      const revenueCardHtml = "";
       const financialCardsHtml = expenseCardHtml && revenueCardHtml
         ? '<div class="tourism-admin-financial-pair">' + expenseCardHtml + revenueCardHtml + "</div>"
         : expenseCardHtml + revenueCardHtml;

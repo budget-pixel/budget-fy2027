@@ -2326,7 +2326,210 @@ a:where(:visited) {
   max-width: 980px;
 }
 .wc-forecast-section {
-  margin: 30px 0;
+  margin: 24px 0;
+}
+.wc-forecast-overview {
+  margin-top: 6px;
+}
+.wc-forecast-assumption-summary {
+  margin-top: 8px;
+}
+.wc-section-heading-row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.wc-section-heading-row p {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.wc-forecast-baseline-note {
+  margin: 16px 0 8px;
+  padding: 14px 16px;
+  border: 1px solid rgba(36,52,77,.16);
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  background: #f7faf8;
+  color: var(--text);
+  font-size: .9rem;
+}
+.wc-forecast-baseline-note strong {
+  color: var(--navy);
+}
+.wc-forecast-health-grid,
+.wc-forecast-driver-grid,
+.wc-forecast-visual-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.wc-forecast-health-card,
+.wc-forecast-driver-panel,
+.wc-forecast-visual-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(23,32,51,.06);
+}
+.wc-forecast-health-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.wc-forecast-fund-card-button {
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.wc-forecast-fund-card-button:hover {
+  border-color: rgba(0,98,49,.45);
+  box-shadow: 0 12px 26px rgba(23,32,51,.1);
+  transform: translateY(-1px);
+}
+.wc-forecast-fund-card-button:focus-visible {
+  outline: 3px solid rgba(209,190,120,.8);
+  outline-offset: 3px;
+}
+.wc-forecast-health-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.wc-forecast-health-card h3,
+.wc-forecast-driver-panel h3,
+.wc-forecast-visual-panel h3 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+.wc-forecast-health-card-head span {
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: var(--green);
+  font-size: .66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.wc-forecast-health-card.is-watch .wc-forecast-health-card-head span { color: #9a4b16; }
+.wc-forecast-health-card.is-support .wc-forecast-health-card-head span { color: #4f6395; }
+.wc-forecast-health-card.is-plan .wc-forecast-health-card-head span { color: #806a20; }
+.wc-forecast-health-card p,
+.wc-forecast-driver-panel p {
+  color: var(--muted);
+  font-size: .86rem;
+  margin: 0 0 12px;
+}
+.wc-forecast-health-card dl,
+.wc-forecast-driver-panel dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.wc-forecast-health-card dl div,
+.wc-forecast-driver-panel dl div {
+  display: grid;
+  gap: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.wc-forecast-health-card dt,
+.wc-forecast-driver-panel dt {
+  color: var(--muted);
+  font-size: .66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.wc-forecast-health-card dd,
+.wc-forecast-driver-panel dd {
+  color: var(--text);
+  font-size: .95rem;
+  font-weight: 800;
+}
+.wc-forecast-driver-panel dd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.wc-forecast-driver-panel dd strong {
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.wc-forecast-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 12px;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 800;
+}
+.wc-forecast-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  margin-right: 5px;
+}
+.wc-forecast-legend .is-revenue::before { background: var(--green); }
+.wc-forecast-legend .is-expense::before { background: #4f6395; }
+.wc-forecast-legend .is-balance::before { background: var(--gold2); }
+.wc-forecast-comparison-chart {
+  display: grid;
+  gap: 8px;
+}
+.wc-forecast-comparison-row {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 58px;
+  gap: 8px;
+  align-items: center;
+  font-size: .78rem;
+}
+.wc-forecast-comparison-row > strong {
+  color: var(--navy);
+}
+.wc-forecast-comparison-row > span {
+  color: var(--muted);
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.wc-forecast-comparison-row > div {
+  display: grid;
+  gap: 3px;
+}
+.wc-forecast-comparison-bar {
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(90,110,127,.14);
+}
+.wc-forecast-comparison-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.wc-forecast-comparison-bar.is-revenue i { background: var(--green); }
+.wc-forecast-comparison-bar.is-expense i { background: #4f6395; }
+.wc-forecast-comparison-bar.is-balance i { background: var(--gold2); }
+.wc-forecast-technical-detail {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #ffffff;
 }
 .wc-forecast-chart {
   display: grid;
@@ -2339,7 +2542,7 @@ a:where(:visited) {
   align-items: stretch;
   padding: 14px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   background: rgba(255,255,255,.72);
 }
 .wc-forecast-chart-label {
@@ -2382,7 +2585,7 @@ a:where(:visited) {
   margin: 22px 0;
   padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   background: rgba(255,255,255,.66);
 }
 .wc-forecast-fund h3 {
@@ -2405,22 +2608,45 @@ a:where(:visited) {
   line-height: 1.6;
 }
 :root[data-theme="dark"] .wc-forecast-chart-row,
-:root[data-theme="dark"] .wc-forecast-fund {
+:root[data-theme="dark"] .wc-forecast-fund,
+:root[data-theme="dark"] .wc-forecast-baseline-note,
+:root[data-theme="dark"] .wc-forecast-health-card,
+:root[data-theme="dark"] .wc-forecast-driver-panel,
+:root[data-theme="dark"] .wc-forecast-visual-panel,
+:root[data-theme="dark"] .wc-forecast-technical-detail {
   background: rgba(14,28,22,.92);
 }
 :root[data-theme="dark"] .wc-forecast-chart-label,
-:root[data-theme="dark"] .wc-forecast-fund h3 {
+:root[data-theme="dark"] .wc-forecast-fund h3,
+:root[data-theme="dark"] .wc-forecast-health-card h3,
+:root[data-theme="dark"] .wc-forecast-driver-panel h3,
+:root[data-theme="dark"] .wc-forecast-visual-panel h3,
+:root[data-theme="dark"] .wc-forecast-comparison-row > strong,
+:root[data-theme="dark"] .wc-forecast-baseline-note strong {
   color: var(--text);
 }
 :root[data-theme="dark"] .wc-forecast-bar {
   background: rgba(237,243,239,.13);
 }
 @media (max-width: 760px) {
+  .wc-forecast-health-grid,
+  .wc-forecast-driver-grid,
+  .wc-forecast-visual-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .wc-forecast-chart-row {
     grid-template-columns: 1fr;
   }
+  .wc-forecast-driver-panel dd {
+    display: grid;
+  }
 }
 @media (max-width: 520px) {
+  .wc-forecast-health-grid,
+  .wc-forecast-driver-grid,
+  .wc-forecast-visual-grid {
+    grid-template-columns: 1fr;
+  }
   .wc-forecast-bar-wrap {
     grid-template-columns: 54px 1fr;
   }
