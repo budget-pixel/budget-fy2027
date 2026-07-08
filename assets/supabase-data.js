@@ -213,7 +213,9 @@
     } else if (options.org !== undefined && options.org !== null && String(options.org).trim() !== "") {
       query = query.eq("department_code", options.org);
     }
-    if (options.object !== undefined && options.object !== null && String(options.object).trim() !== "") {
+    if (Array.isArray(options.object)) {
+      if (options.object.length) query = query.in("object_code", options.object);
+    } else if (options.object !== undefined && options.object !== null && String(options.object).trim() !== "") {
       query = query.eq("object_code", options.object);
     }
     if (options.fund !== undefined && options.fund !== null && String(options.fund).trim() !== "") {

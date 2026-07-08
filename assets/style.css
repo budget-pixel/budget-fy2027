@@ -1517,6 +1517,9 @@ a:where(:visited) {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
+.wc-department-financial-grid #department-staffing-table .wc-code-compliance-staffing-screen {
+  display: contents;
+}
 .wc-department-financial-grid #department-staffing-table:has(.wc-finance-card + .wc-finance-card) .wc-finance-card {
   margin: 0;
 }
@@ -1917,6 +1920,10 @@ a:where(:visited) {
 .wc-data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .85rem; }
 .wc-data-table th, .wc-data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: normal; }
 .wc-data-table th.wc-num, .wc-data-table td.wc-num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Forecast Assumptions detail table: a year excluded from a line's
+   Historical CAGR basis (see historicalCagrExcludedYears) reads as
+   de-emphasized rather than a normal actual, without hiding the figure. */
+.wc-forecast-cagr-excluded { color: var(--muted); }
 .wc-data-table thead th {
   position: sticky; top: 0; z-index: 1;
   background: linear-gradient(135deg, #003f28 0%, #005236 100%);
@@ -2389,6 +2396,13 @@ a:where(:visited) {
   cursor: pointer;
   font-weight: 800;
   color: var(--green);
+}
+.wc-forecast-assumptions-intro {
+  margin: 10px 0 16px;
+  max-width: 900px;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.6;
 }
 :root[data-theme="dark"] .wc-forecast-chart-row,
 :root[data-theme="dark"] .wc-forecast-fund {

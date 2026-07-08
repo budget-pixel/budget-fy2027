@@ -245,11 +245,12 @@
     // can mean a real historical fund move), so the fund filter is only
     // applied when there's a single, current org code to match against.
     const orgCodes = String(context.org || "").split(",").map((code) => code.trim()).filter(Boolean);
+    const objectCodes = String(context.objectCode || "").split(",").map((code) => code.trim()).filter(Boolean);
 
     const queryFilters = {
       year: context.fy,
       org: orgCodes.length > 1 ? orgCodes : orgCodes[0] || "",
-      object: context.objectCode,
+      object: objectCodes.length > 1 ? objectCodes : objectCodes[0] || "",
       fund: orgCodes.length > 1 ? "" : (context.fundCode || "")
     };
     // The "project" key is only added when the URL actually specified a

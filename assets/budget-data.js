@@ -569,11 +569,26 @@
   // (001311, 101311, 105311, 107311, 300311, and any future fund).
   const REVENUE_CODE_NAME_OVERRIDES = new Map([["311001", "Ad Valorem Taxes"]]);
 
+  const BCC_BEACH_VENDING_FY2026_BUDGET = 1530000;
+  const BCC_BEACH_VENDING_REVENUE_CODE = "329004";
+  const BCC_BEACH_VENDING_PROJECT_CODE = "10647";
+
+  function isBccBeachVendingRevenueRow(row) {
+    const dept = normalizeDeptName(row && row.Dept_Name);
+    const code = String((row && row.Revenue_Code) || "").trim();
+    const name = normalizeDeptName(row && row.Revenue_Name);
+    const project = String((row && row.Project_Code) || "").trim();
+    return dept === "board of county commissioners" &&
+      (code === BCC_BEACH_VENDING_REVENUE_CODE || /beach vending/.test(name)) &&
+      (!project || project === BCC_BEACH_VENDING_PROJECT_CODE);
+  }
+
   const REVENUE_FY2026_PLUG_OVERRIDES = new Map([
-    ["001329|board of county commissioners|329004|10647", 1530000]
+    ["001329|board of county commissioners|" + BCC_BEACH_VENDING_REVENUE_CODE + "|" + BCC_BEACH_VENDING_PROJECT_CODE, BCC_BEACH_VENDING_FY2026_BUDGET]
   ]);
 
   function revenueFy2026PlugOverride(row) {
+    if (isBccBeachVendingRevenueRow(row)) return BCC_BEACH_VENDING_FY2026_BUDGET;
     const key = [
       String((row && row.Dept_Code) || "").trim(),
       normalizeDeptName(row && row.Dept_Name),
@@ -1037,6 +1052,19 @@
     ) {
       return lookups.map((lookup) => ({ ...lookup, excludedProjects: ["10647"] }));
     }
+    // Beach Vending Permits' Project 10647 ($1,530,000 committed to Board
+    // initiatives) is booked on its own Board of County Commissioners row,
+    // separate from Code Compliance's general Beach Vending collections
+    // (excluded above so the two don't double up). Without this, BCC's row
+    // pulled every project under this org+code -- including Code
+    // Compliance's own blank-project total a second time -- instead of
+    // just its own committed slice.
+    if (
+      deptNorm === "board of county commissioners" &&
+      String(codeValue || "").trim() === "329004"
+    ) {
+      return lookups.map((lookup) => ({ ...lookup, projectScope: "10647" }));
+    }
     if (deptNorm === "planning" && row && row.Object_Code !== undefined) {
       return lookups.map((lookup) => ({ ...lookup, excludedProjects: ["10639"] }));
     }
@@ -1202,7 +1230,14 @@
 
       const lookups = supabaseLookupsForRow(row, org, codeValue);
       const result = sumRawActualsForLookups(rawBudgetRows, lookups, 2026, projectScope);
-      return { ...row, FY2026_Original_Budget: result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || revenueFy2026PlugOverride(row) || 0) };
+      // A plug override (currently just Beach Vending Permits' BCC/Project
+      // 10647 row, $1,530,000 committed to Board initiatives) is a known,
+      // deliberately-set figure -- it wins even when the BUC lookup finds
+      // a match, since a partial/mismatched BUC total for the same
+      // org+code+project shouldn't quietly replace a number known to be
+      // correct.
+      const plugOverride = revenueFy2026PlugOverride(row);
+      return { ...row, FY2026_Original_Budget: plugOverride || (result.matched ? result.total : (row.FY2026_Original_Budget || row.FY2026_Budget || 0)) };
     });
   }
 
@@ -2076,6 +2111,71 @@
     };
   }
 
+  const PTO_BUYBACK_OBJECT_CODE = "512007";
+  const REGULAR_SALARIES_OBJECT_CODE = "512000";
+  const REGULAR_SALARIES_OBJECT_NAME = "Regular Salaries & Wages";
+  const EXPENDITURE_MERGE_VALUE_FIELDS = HISTORICAL_ACTUAL_YEARS
+    .map((year) => "FY" + year + "_Actual")
+    .concat(["FY2026_Original_Budget", "FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+
+  function ptoBuybackMergeKey(row) {
+    return [
+      String((row && row.Dept_Code) || "").trim(),
+      normalizeDeptName(row && row.Dept_Name),
+      projectScopeForRow(row) === undefined ? "" : String(projectScopeForRow(row))
+    ].join("|");
+  }
+
+  function canonicalizePtoBuybackRow(row, mergedCodes) {
+    const next = {
+      ...row,
+      Object_Code: REGULAR_SALARIES_OBJECT_CODE,
+      Object_Name: REGULAR_SALARIES_OBJECT_NAME
+    };
+    const codes = (mergedCodes || row._mergedObjectCodes || [])
+      .map((code) => String(code || "").trim())
+      .filter(Boolean);
+    if (codes.length) next._mergedObjectCodes = uniqueSorted(codes);
+    return next;
+  }
+
+  function mergePtoBuybackIntoRegularSalaries(rows) {
+    const targetByKey = new Map();
+    const output = [];
+
+    (rows || []).forEach((row) => {
+      const objectCode = String(row.Object_Code || "").trim();
+      if (objectCode === PTO_BUYBACK_OBJECT_CODE) return;
+      if (objectCode !== REGULAR_SALARIES_OBJECT_CODE) {
+        output.push(row);
+        return;
+      }
+      const target = canonicalizePtoBuybackRow(row);
+      const key = ptoBuybackMergeKey(target);
+      if (!targetByKey.has(key)) targetByKey.set(key, target);
+      output.push(target);
+    });
+
+    (rows || []).forEach((row) => {
+      if (String(row.Object_Code || "").trim() !== PTO_BUYBACK_OBJECT_CODE) return;
+      const key = ptoBuybackMergeKey(row);
+      const target = targetByKey.get(key);
+      if (!target) {
+        output.push(canonicalizePtoBuybackRow(row, [PTO_BUYBACK_OBJECT_CODE]));
+        return;
+      }
+      EXPENDITURE_MERGE_VALUE_FIELDS.forEach((field) => {
+        target[field] = (target[field] || 0) + (row[field] || 0);
+      });
+      target._mergedObjectCodes = uniqueSorted(
+        (target._mergedObjectCodes || [REGULAR_SALARIES_OBJECT_CODE])
+          .concat([PTO_BUYBACK_OBJECT_CODE])
+      );
+    });
+
+    return output;
+  }
+
   function normalizeStaffingRow(row) {
     return {
       Dept_Code: (row.Dept_Code || "").trim(),
@@ -2402,6 +2502,7 @@
         cache.expenditures = applyOriginalBudgetToRows(cache.expenditures, actuals.originalBudgetRows);
         cache.revenues = applyOriginalBudgetToRows(cache.revenues, actuals.originalBudgetRows);
       }
+      cache.expenditures = mergePtoBuybackIntoRegularSalaries(cache.expenditures);
 
       // Computed once per load from the now-finalized cache.expenditures,
       // and shared by the Consolidated Expense Summary and
@@ -2589,6 +2690,12 @@
     if (!isExpense && column.field === "FY2026_Original_Budget") {
       const rowOverride = departmentRevenueFy2026PlugOverrideForRow(row);
       if (rowOverride) return rowOverride;
+      // Checked directly here too (not just in applyOriginalBudgetToRows,
+      // which sets row.FY2026_Original_Budget upstream) so this modal's own
+      // display is correct even if row.FY2026_Original_Budget somehow
+      // didn't carry the override through -- see revenueFy2026PlugOverride.
+      const plugOverride = revenueFy2026PlugOverride(row);
+      if (plugOverride) return plugOverride;
       const codes = splitBudgetLineCodes(row.Revenue_Code);
       const fundCode = fundCodeForRow(row);
       const rowAmount = row.FY2026_Original_Budget || row.FY2026_Budget || 0;
@@ -2661,6 +2768,12 @@
         const rowOverride = departmentRevenueFy2026PlugOverrideForRow(row);
         if (rowOverride) {
           rowTotal += rowOverride;
+          splitBudgetLineCodes(row.Revenue_Code).forEach((code) => codesWithRowAmount.add(code));
+          return;
+        }
+        const plugOverride = revenueFy2026PlugOverride(row);
+        if (plugOverride) {
+          rowTotal += plugOverride;
           splitBudgetLineCodes(row.Revenue_Code).forEach((code) => codesWithRowAmount.add(code));
           return;
         }
@@ -2793,7 +2906,9 @@
 
     const params = new URLSearchParams();
     const category = row[fields.categoryField] || "";
-    const objectCode = row[fields.codeField] || "";
+    const objectCode = Array.isArray(row._mergedObjectCodes) && row._mergedObjectCodes.length
+      ? row._mergedObjectCodes.join(",")
+      : (row[fields.codeField] || "");
     const objectName = row[fields.nameField] || "";
     const projectCode = row.Project_Code || "";
     const projectName = row.Project_Name || "";
@@ -3014,7 +3129,13 @@
       if (!isExpense && column.field === "FY2026_Original_Budget" && row._groupedBudgetLineSummary) {
         const rowOverride = departmentRevenueFy2026PlugOverrideForRow(row);
         if (rowOverride) return rowOverride;
+        const plugOverride = revenueFy2026PlugOverride(row);
+        if (plugOverride) return plugOverride;
         return revenueDisplayAmount(row.FY2026_Original_Budget || row.FY2026_Budget || 0);
+      }
+      if (!isExpense && column.field === "FY2026_Original_Budget") {
+        const plugOverride = revenueFy2026PlugOverride(row);
+        if (plugOverride) return plugOverride;
       }
       if (!isExpense && column.field === "FY2026_Original_Budget" && revenueFy2026PlugByKey.has(plugKey)) {
         return revenueDisplayAmount(revenueFy2026PlugByKey.get(plugKey));
@@ -3634,7 +3755,11 @@
       "<thead><tr>" +
       columns.map((c) => {
         const classes = (c.num ? ["wc-num"] : []).concat(c.classes || []);
-        return '<th scope="col" class="' + classes.join(" ") + '">' + escapeHtml(c.label) + "</th>";
+        const tooltipHtml = c.tooltip
+          ? ' <button type="button" class="wc-budget-line-tooltip-anchor" aria-label="' +
+            escapeHtml(c.label) + ' information" data-wc-tooltip="' + escapeHtml(c.tooltip) + '">i</button>'
+          : "";
+        return '<th scope="col" class="' + classes.join(" ") + '">' + escapeHtml(c.label) + tooltipHtml + "</th>";
       }).join("") +
       "</tr></thead>" +
       "<tbody>" + bodyRows.join("") + "</tbody>" +
@@ -4646,6 +4771,81 @@
     return (n * 100).toFixed(n === 0 ? 0 : 1) + "%";
   }
 
+  // Historical CAGR is only ever computed from a "stable" run of positive
+  // years (see historicalCagr's own base-year filtering), so a negative
+  // result means the line item is shrinking toward zero rather than
+  // showing a meaningful long-term rate -- displayed as N/A rather than a
+  // misleadingly precise negative percentage.
+  function forecastCagrDisplay(value) {
+    // historicalCagrDetails already restricts itself to a stable run of
+    // years (see its own base-year filtering), so a negative result is a
+    // real, meaningful long-term decline worth showing -- not noise to
+    // hide behind N/A.
+    return forecastPercent(value);
+  }
+
+  // True when every nonzero historical actual year for this line is
+  // identical -- a flat history has no real growth trend to project, so
+  // the assumption shown alongside it should read as flat too rather than
+  // a manually-entered rate that no longer reflects the actuals.
+  function isForecastHistoryFlat(valuesByYear) {
+    const available = forecastAvailableTrendValues(valuesByYear);
+    if (available.length < 2) return false;
+    return available.every((item) => item.value === available[0].value);
+  }
+
+  // A handful of revenue lines are set by state statute/formula rather
+  // than a locally chosen rate or a historical-trend projection -- their
+  // growth (or lack of it) reflects state policy/economic conditions, not
+  // anything derivable from this county's own actuals.
+  const FORECAST_STATUTORY_REVENUE_NAMES = new Set([
+    "local government half-cent sales tax",
+    "state revenue share proceeds",
+    "state fuel taxes",
+    "racing tax"
+  ]);
+
+  // Per-line overrides for individual revenue/expense names whose growth
+  // assumption shouldn't just inherit their parent category's rate (see
+  // financial-forecast-assumptions.js, which only sets assumptions at the
+  // fund+category level) -- e.g. a specific line item known to need its
+  // own, deliberately-judged rate rather than the category default.
+  const FORECAST_DETAIL_ASSUMPTION_OVERRIDES = new Map([
+    ["grill food revenue", { method: "Management Estimate", rate: 0.01 }]
+  ]);
+
+  // Keeps the Forecast Assumptions table's "Method" column to a short,
+  // fixed vocabulary (see the 7 terms below) instead of free text, so a
+  // reader (e.g. a GFOA reviewer) can scan it at a glance -- each label is
+  // derived from signals already computed elsewhere on this same row
+  // (historical flatness, available history, the manual assumption vs.
+  // the historically-suggested trend) rather than invented per row.
+  function forecastAssumptionMethod(detail, manualValue) {
+    const detailOverride = FORECAST_DETAIL_ASSUMPTION_OVERRIDES.get(String(detail.name || "").trim().toLowerCase());
+    if (detailOverride) return detailOverride.method;
+    if (FORECAST_STATUTORY_REVENUE_NAMES.has(String(detail.name || "").trim().toLowerCase())) {
+      return "Statutory";
+    }
+    if (isForecastHistoryFlat(detail.values)) return "Flat";
+
+    const hasManual = Number.isFinite(manualValue);
+    const hasHistory = Number.isFinite(detail.avgGrowth) || Number.isFinite(detail.cagr);
+    if (!hasHistory) return hasManual ? "Management Estimate" : "New Revenue";
+
+    const suggested = detail.categorySuggested;
+    if (!hasManual) {
+      return Number.isFinite(suggested) && suggested < 0 ? "Declining" : "Normalized";
+    }
+
+    // A manual rate isn't compared to itself -- only meaningful once
+    // there's a computed historical trend to compare it against.
+    if (!Number.isFinite(suggested)) return "Management Estimate";
+    const tolerance = 0.01;
+    if (Math.abs(manualValue - suggested) <= tolerance) return "Normalized";
+    if (manualValue < suggested - tolerance) return "Conservative";
+    return "Management Estimate";
+  }
+
   function forecastAssumptionValue(row, year) {
     if (!row) return null;
     const value = row["fy" + year + "_assumption"];
@@ -4778,7 +4978,8 @@
   // meant to show one driver per department, not its internal street/beach
   // sub-program split.
   const FORECAST_DETAIL_NAME_MERGE = new Map([
-    ["Code Compliance Beach", "Code Compliance"]
+    ["Code Compliance Beach", "Code Compliance"],
+    ["Planning Short-Term Rental", "Planning"]
   ]);
 
   function forecastDetailRows(lineType, fundCode, yearField) {
@@ -4870,7 +5071,11 @@
   // median of all nonzero actuals, whichever bar is lower to clear --
   // either is evidence the account was already at a normal run rate, not
   // still ramping up from nothing.
-  function historicalCagr(valuesByYear) {
+  // Shared by historicalCagr (the number) and historicalCagrBasisYears (the
+  // basis year range shown in its own "CAGR Basis" column) so the two
+  // never drift out of sync -- both describe the exact same stable-year
+  // window.
+  function historicalCagrDetails(valuesByYear) {
     const nonZero = forecastAvailableTrendValues(valuesByYear).filter((item) => item.value > 0);
     if (nonZero.length < 2) return null;
 
@@ -4890,7 +5095,44 @@
     const last = stableYears[stableYears.length - 1];
     const periods = last.year - first.year;
     if (periods <= 0 || first.value <= 0 || last.value <= 0) return null;
-    return Math.pow(last.value / first.value, 1 / periods) - 1;
+    return {
+      cagr: Math.pow(last.value / first.value, 1 / periods) - 1,
+      startYear: first.year,
+      endYear: last.year,
+      years: stableYears.map((item) => item.year)
+    };
+  }
+
+  function historicalCagr(valuesByYear) {
+    const details = historicalCagrDetails(valuesByYear);
+    return details ? details.cagr : null;
+  }
+
+  // "FY23-FY26" style label for the years actually used as this line's
+  // CAGR basis -- lets the table show which years were excluded (an
+  // unstable ramp-up year, say) without cluttering the historical actuals
+  // themselves.
+  function historicalCagrBasisLabel(valuesByYear) {
+    const details = historicalCagrDetails(valuesByYear);
+    if (!details) return "N/A";
+    const shortYear = (year) => "FY" + String(year).slice(-2);
+    return details.startYear === details.endYear
+      ? shortYear(details.startYear)
+      : shortYear(details.startYear) + "–" + shortYear(details.endYear);
+  }
+
+  // Years excluded from a line's CAGR basis (an unstable ramp-up year that
+  // historicalCagrDetails' stableThreshold filtered out) -- used to grey
+  // out just those actual-year cells rather than the whole row.
+  function historicalCagrExcludedYears(valuesByYear) {
+    const details = historicalCagrDetails(valuesByYear);
+    if (!details) return new Set();
+    const included = new Set(details.years);
+    return new Set(
+      forecastAvailableTrendValues(valuesByYear)
+        .map((item) => item.year)
+        .filter((year) => !included.has(year))
+    );
   }
 
   function suggestedForecastGrowth(avgGrowth, cagr) {
@@ -5041,7 +5283,8 @@
         values,
         avgGrowth: historicalAverageGrowth(values),
         cagr: historicalCagr(values),
-        categoryAssumption: categoryDetails ? categoryDetails.assumption : null
+        categoryAssumption: categoryDetails ? categoryDetails.assumption : null,
+        categorySuggested: categoryDetails && Number.isFinite(categoryDetails.suggested) ? categoryDetails.suggested : null
       };
     });
   }
@@ -5426,7 +5669,11 @@
     "111|federal grant (public safety)",
     "111|state grant (public safety)",
     "001|non-profit funding program",
-    "001|recreation - fbip boating allocation"
+    "001|recreation - fbip boating allocation",
+    "001|capital projects",
+    "101|road impact fees",
+    "111|sales & promotions",
+    "111|sales & promotions out of state"
   ]);
 
   // Lists each individual revenue source/department (rather than the
@@ -5442,6 +5689,25 @@
       .filter(({ detail }) => !/^interfund group transfer/i.test(detail.name))
       .filter(({ detail }) => !/^refund of prior year expenditures/i.test(detail.name))
       .filter(({ detail }) => !/^unclassified/i.test(detail.name))
+      // Miscellaneous/one-off revenue types that don't reflect a
+      // meaningful, forecastable trend for any fund -- interest income,
+      // budgeted use-of-fund-balance surpluses, grants (one-off/program-
+      // specific awards), asset sales, and contributions/donations.
+      // Excluded everywhere rather than per-fund since none of these are a
+      // useful forecast driver in any fund.
+      .filter(({ detail }) => !/interest/i.test(detail.name))
+      .filter(({ detail }) => !/^surplus budget/i.test(detail.name))
+      .filter(({ detail }) => !/^surplus equipment sales/i.test(detail.name))
+      .filter(({ detail }) => !/grant/i.test(detail.name))
+      .filter(({ detail }) => !/^sale of fixed assets/i.test(detail.name))
+      .filter(({ detail }) => !/^contributions and donations/i.test(detail.name))
+      .filter(({ detail }) => !/^housing prisoners revenue/i.test(detail.name))
+      .filter(({ detail }) => !/^white sands fee/i.test(detail.name))
+      .filter(({ detail }) => !/ordinance fine \(animal control\)/i.test(detail.name))
+      // Catches whatever's left of the broader Miscellaneous Revenue
+      // category (the name-based filters above already cover its biggest,
+      // named line items) -- same reasoning: not a useful forecast driver.
+      .filter(({ detail }) => detail.category !== "Miscellaneous Revenue")
       .filter(({ fund, detail }) => !FORECAST_ASSUMPTIONS_HIDDEN_FUND_ROWS.has(fund.code + "|" + detail.name.toLowerCase()))
       // A line with nothing recorded in either of the two most recent
       // actual years has effectively gone dormant/discontinued -- its
@@ -5467,18 +5733,33 @@
 
     // The editable assumptions file currently sets one flat rate across
     // FY2028-FY2031 for every category -- four identical columns are just
-    // noise in that case. Only collapse to one "Assumption" column when
-    // every row's four years agree; if even one category has a year-by-year
-    // assumption, show all four so that distinction stays visible.
+    // noise in that case. Only collapse to one "Annual Growth Assumption"
+    // column when every row's four years agree; if even one category has a
+    // year-by-year assumption, show all four so that distinction stays visible.
     const allRowsFlat = rowData.every((item) => item.assumptionValues.every((value) => value === item.assumptionValues[0]));
     const assumptionColumns = allRowsFlat
-      ? [{ label: "Assumption", num: true }]
-      : assumptionYears.map((year) => ({ label: "FY " + year + " Assumption", num: true }));
+      ? [{ label: "Annual Growth Assumption", num: true }]
+      : assumptionYears.map((year) => ({ label: "FY " + year + " Annual Growth Assumption", num: true }));
 
     const rows = rowData.map(({ fund, detail, assumptionValues }) => {
+      const detailOverride = FORECAST_DETAIL_ASSUMPTION_OVERRIDES.get(String(detail.name || "").trim().toLowerCase());
+      // A completely flat historical run has no real growth trend to
+      // project, so its assumption reads as flat too instead of a
+      // manually-entered rate left over from before the line went flat.
+      // A per-line override (see FORECAST_DETAIL_ASSUMPTION_OVERRIDES)
+      // takes priority over both the category rate and the flat-history
+      // check -- it's a deliberate, specific judgment call for this line.
+      const historyIsFlat = isForecastHistoryFlat(detail.values);
+      const displayAssumptionValues = detailOverride
+        ? assumptionValues.map(() => detailOverride.rate)
+        : historyIsFlat
+        ? assumptionValues.map(() => 0)
+        : assumptionValues;
       const assumptionCells = allRowsFlat
-        ? '<td class="wc-num">' + escapeHtml(forecastPercent(assumptionValues[0])) + '</td>'
-        : assumptionValues.map((value) => '<td class="wc-num">' + escapeHtml(forecastPercent(value)) + '</td>').join("");
+        ? '<td class="wc-num">' + escapeHtml(forecastPercent(displayAssumptionValues[0])) + '</td>'
+        : displayAssumptionValues.map((value) => '<td class="wc-num">' + escapeHtml(forecastPercent(value)) + '</td>').join("");
+      const excludedYears = historicalCagrExcludedYears(detail.values);
+      const methodLabel = forecastAssumptionMethod(detail, assumptionValues[0]);
       // data-sort-value/data-sort-name let the sort buttons below
       // reorder these rows client-side without re-running the whole
       // forecast model -- see the delegated click handler for
@@ -5487,8 +5768,12 @@
         '<tr data-fund-name="' + escapeHtml(fund.label) + '" data-sort-value="' + (detail.values[2027] || 0) + '" data-sort-name="' + escapeHtml(detail.name.toLowerCase()) + '">' +
         '<td>' + escapeHtml(fund.label) + '</td>' +
         '<td>' + escapeHtml(detail.name) + '</td>' +
-        FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) => '<td class="wc-num">' + forecastMoney(detail.values[year] || 0) + '</td>').join("") +
-        '<td class="wc-num">' + escapeHtml(forecastPercent(detail.cagr)) + '</td>' +
+        FINANCIAL_FORECAST_ACTUAL_YEARS.map((year) =>
+          '<td class="wc-num' + (excludedYears.has(year) ? ' wc-forecast-cagr-excluded' : '') + '">' + forecastMoney(detail.values[year] || 0) + '</td>'
+        ).join("") +
+        '<td class="wc-num">' + escapeHtml(forecastCagrDisplay(detail.cagr)) + '</td>' +
+        '<td class="wc-num">' + escapeHtml(historicalCagrBasisLabel(detail.values)) + '</td>' +
+        '<td>' + escapeHtml(methodLabel) + '</td>' +
         assumptionCells + '</tr>'
       );
     });
@@ -5527,7 +5812,16 @@
         { label: "FY 2023 Actual", num: true },
         { label: "FY 2024 Actual", num: true },
         { label: "FY 2025 Actual", num: true },
-        { label: "Historical CAGR", num: true }
+        {
+          label: "Historical CAGR",
+          num: true,
+          tooltip: "CAGR (Compound Annual Growth Rate) is the smoothed, year-over-year growth rate that a line item would need to grow at consistently to get from its starting value to its ending value over a span of years -- unlike a simple average of year-to-year changes, it accounts for compounding. It's a useful, stable basis for financial forecasting because it reflects the underlying long-term trend rather than any single volatile year. Historical CAGR here is calculated using normalized years and excludes atypical years that would otherwise distort long-term growth trends."
+        },
+        { label: "CAGR Basis", num: true },
+        {
+          label: "Method",
+          tooltip: "Conservative: assumption intentionally below historical trend. Normalized: based on normalized operations after excluding atypical years. Flat: no material growth expected. New Revenue: insufficient history available. Statutory: growth determined by law or fixed formula. Declining: long-term downward trend expected. Management Estimate: used where historical trends are not predictive."
+        }
       ].concat(assumptionColumns),
       bodyRows: rows
     });
@@ -5553,6 +5847,7 @@
         '<h2 class="wc-fund-section-heading">Assumptions</h2>' +
         '<details class="wc-forecast-detail wc-forecast-assumptions-detail">' +
           '<summary>Revenue Assumptions</summary>' +
+          '<p class="wc-forecast-assumptions-intro">Revenue assumptions are developed using historical trends, statutory requirements, economic conditions, development activity, and management judgment. Historical compound annual growth rates (CAGR) are provided for reference and are calculated using the most representative historical period for each recurring revenue source. Where historical data are insufficient or not representative of future expectations, CAGR is not presented. Annual growth assumptions are intentionally conservative and reflect expected future conditions rather than historical averages.</p>' +
           renderForecastAssumptionsDetailTable(model, "revenue") +
         '</details>' +
         '<details class="wc-forecast-detail wc-forecast-assumptions-detail">' +
@@ -8539,12 +8834,25 @@
           // the Court Innovations rollup instead, so it's excluded here to
           // avoid double-counting it on the BCC page.
           const isBcc = normalizeDeptName(deptName) === "board of county commissioners";
+          const isBuildingConstruction = normalizeDeptName(deptName) === "building construction and maintenance";
           const expenseRows = filterAllZeroRowsForSelectedDepartments(getDepartmentExpenses(deptName, deptCode).filter(
             (r) =>
               !excludedObjectCodes.includes(String(r.Object_Code || "").trim()) &&
               !(isBcc && String(r.Project_Code || "").trim() === "1040")
           ), deptName);
-          expenseRowsForRevenuePlug = expenseRows;
+          // Some pages display supplemental expense cards below the main
+          // Expenditure Summary. The revenue plug should balance to the
+          // same combined total a reader sees across those cards.
+          if (isBcc) {
+            expenseRowsForRevenuePlug = expenseRows.concat(rowsForExactDepartment(cache.expenditures, "BCC Other Uses Contingency"));
+          } else if (isBuildingConstruction) {
+            expenseRowsForRevenuePlug = expenseRows.concat(
+              rowsForExactDepartment(cache.expenditures, "Building Construction and Maintenance")
+                .filter((r) => String(r.Object_Code || "").trim() === "543000")
+            );
+          } else {
+            expenseRowsForRevenuePlug = expenseRows;
+          }
           expenseHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", deptName);
         }
         mountOrHide(expenseEl, expenseHtml);
@@ -9414,6 +9722,7 @@
           return;
         }
         container.innerHTML = renderFinancialForecast(cipProjects);
+        bindTooltipAnchors(container);
       })
       .catch((err) => {
         console.error("WCBudgetData: failed to load financial forecast", err);
