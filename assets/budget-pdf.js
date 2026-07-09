@@ -1110,6 +1110,17 @@ var PRINT_CSS = `
     display:none !important;
   }
 
+  /* Capital Projects Fund Schedule page (cip-capital-projects.html): this
+     is the one CIP fund page that bundles two schedules -- the fund's own
+     Capital Projects Fund schedule up top, then a second Grant Funded
+     Schedule below it -- but only the fund schedule is needed in print, so
+     the Grant Funded Schedule section (heading/narrative) and its table
+     are dropped from the printed page. */
+  #grant-funded,
+  #grantsTables{
+    display:none !important;
+  }
+
   /* Capital Fund Schedules (Capital Projects/Transportation/Sheriff/
      Tourist Development, see renderFundSchedule in cip-fund-schedule.js):
      only one fiscal year's table is ever in the DOM at a time -- the year
