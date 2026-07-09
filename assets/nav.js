@@ -85,7 +85,7 @@
       mobileStylesheet.id = mobileStylesheetId;
       mobileStylesheet.rel = "stylesheet";
     }
-    mobileStylesheet.href = wcBudgetAssetBaseUrl + "mobile.css?v=24";
+    mobileStylesheet.href = wcBudgetAssetBaseUrl + "mobile.css?v=27";
     document.head.appendChild(mobileStylesheet);
   }
   function loadWcScriptOnce(scriptId, src, onload){

@@ -588,6 +588,42 @@
     box-shadow:inset -1px 0 0 rgba(36,52,77,.20), 3px 0 6px rgba(36,52,77,.10) !important;
   }
 
+  /* "View Budget Lines" / "View Revenue Lines" detail tables: the
+     Category column (and, for expense tables, the Object Code column
+     right after it) is dropped on mobile -- too narrow to read
+     alongside the description and amount columns. Hidden on every row,
+     including Subtotal and Total rows -- an earlier version re-showed
+     the Category cell just for those two row types, but that gave them
+     one more visible cell than every other row (and the header), which
+     throws off the browser's per-column width/alignment for that row.
+     Their label ("<Category> Subtotal" / "Total") instead shows via a
+     data-wc-mobile-label attribute + ::before on the very next cell
+     (Object/Revenue Name, otherwise blank on these two row types), set
+     in budgetLineSubtotalRowHtml / the Total row builder in
+     budget-data.js -- same visible cell count as every data row.
+
+     Targeted by class (wc-category-column/wc-object-code-column, set on
+     both the header and every body cell in budgetLineRowHtml /
+     budgetLineSubtotalRowHtml / the Total row builder in
+     budget-data.js), not nth-child position -- the "Budget Lines"
+     popup (openBudgetDetailModal) copies only the detail card's inner
+     HTML into a new wrapper, dropping the wc-budget-lines-detail and
+     wc-print-kind-expense/revenue classes an nth-child+ancestor rule
+     would depend on. wc-budget-lines-card survives that copy (re-added
+     explicitly on the popup body), so it's the scoping class here. */
+  .wc-budget-lines-card .wc-data-table-wrap table th.wc-category-column,
+  .wc-budget-lines-card .wc-data-table-wrap table td.wc-category-column,
+  .wc-budget-lines-card .wc-data-table-wrap table th.wc-object-code-column,
+  .wc-budget-lines-card .wc-data-table-wrap table td.wc-object-code-column{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
+  .wc-budget-lines-card .wc-data-table-wrap table td[data-wc-mobile-label]::before{
+    content:attr(data-wc-mobile-label);
+    font-weight:900;
+  }
+
   .wc-budget-detail-body .wc-data-table-scroll{
     max-height:calc(82vh - 156px) !important;
     overflow:auto !important;

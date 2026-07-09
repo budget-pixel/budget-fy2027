@@ -3585,8 +3585,8 @@
       const drilldownFields = { categoryField, codeField, nameField, kind: isExpense ? "expense" : "revenue", combineByName, detailId };
       return (
         '<tr class="' + rowClass + (isZeroCurrent ? " wc-budget-line-zero-current" : "") + '">' +
-        "<td>" + escapeHtml(r[categoryField] || "") + "</td>" +
-        (isExpense ? "<td>" + escapeHtml(r[codeField] || "") + "</td>" : "") +
+        '<td class="wc-category-column">' + escapeHtml(r[categoryField] || "") + "</td>" +
+        (isExpense ? '<td class="wc-object-code-column">' + escapeHtml(r[codeField] || "") + "</td>" : "") +
         "<td>" + escapeHtml(r[nameField] || "") + "</td>" +
         '<td class="wc-itemized-description-column">' + escapeHtml(suppressDescription ? "" : itemizedDescriptionForBudgetLine(r, descriptionField, isExpense)) + "</td>" +
         priorYearColumns.map((c) => {
@@ -3604,10 +3604,20 @@
     }
 
     function budgetLineSubtotalRowHtml(category, categoryRows, rowClass) {
+      // The mobile Category/Object Code column-drop (mobile.css) hides
+      // both of these cells on every row, including this one -- so the
+      // label also carries a data-wc-mobile-label on the very next cell
+      // (Object/Revenue Name, otherwise blank on this row) and mobile.css
+      // renders that as its content via ::before. Keeping the label out
+      // of an extra always-visible cell means this row has exactly the
+      // same number of visible cells as every data row once Category and
+      // Object Code are hidden, instead of one more -- a mismatched cell
+      // count per row is what was throwing off column alignment.
+      const subtotalLabel = escapeHtml(category) + " Subtotal";
       const labelCells =
-        "<td>" + escapeHtml(category) + " Subtotal</td>" +
-        (isExpense ? "<td></td>" : "") +
-        "<td></td>" +
+        '<td class="wc-category-column">' + subtotalLabel + "</td>" +
+        (isExpense ? '<td class="wc-object-code-column"></td>' : "") +
+        '<td data-wc-mobile-label="' + subtotalLabel + '"></td>' +
         '<td class="wc-itemized-description-column"></td>';
       return (
         '<tr class="' + rowClass + ' wc-table-subtotal-row">' + labelCells +
@@ -3682,9 +3692,9 @@
       ? "Due to an accounting change actuals for " + formatYearList(missingActualYears) + " are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
       : "";
     const totalLabelCells =
-      "<td>Total</td>" +
-      (isExpense ? "<td></td>" : "") +
-      "<td></td>" +
+      '<td class="wc-category-column">Total</td>' +
+      (isExpense ? '<td class="wc-object-code-column"></td>' : "") +
+      '<td data-wc-mobile-label="Total"></td>' +
       '<td class="wc-itemized-description-column"></td>';
     bodyRows.push(
       '<tr class="wc-table-total-row">' + totalLabelCells +
@@ -3695,8 +3705,8 @@
     );
 
     const detailTable = renderTable({
-      columns: [{ label: "Category" }]
-        .concat(isExpense ? [{ label: "Object Code" }] : [])
+      columns: [{ label: "Category", classes: ["wc-category-column"] }]
+        .concat(isExpense ? [{ label: "Object Code", classes: ["wc-object-code-column"] }] : [])
         .concat([
           { label: isExpense ? "Object Name" : "Revenue Name" },
           { label: "Itemized Description", classes: ["wc-itemized-description-column"] }
@@ -3798,7 +3808,7 @@
       : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
     const dataNoteTexts = [generatedActualsNoteText, departmentDataNoteText].filter(Boolean);
-    const departmentDataNote = dataNoteTexts
+    const departmentDataNote = dataNoteTexts.length
       ? '<div class="wc-staffing-notes wc-budget-lines-note"><p class="wc-staffing-notes-title">Expenditure Notes:</p>' +
         dataNoteTexts.map((noteText) => "<p>" + escapeHtml(noteText) + "</p>").join("") +
         "</div>"

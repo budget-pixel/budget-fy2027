@@ -298,6 +298,411 @@
     background: rgba(14,28,22,.92);
     border-color: var(--border);
   }
+
+  /* "Your Property Tax" personalized calculator -- moved here from the
+     homepage. Uses the same live ad valorem department breakdown as the
+     allocation list above (loadAdValoremRows), just scaled to one
+     taxpayer's own estimated bill instead of shown as countywide totals. */
+  .wc-tax-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    margin-top:0;
+  }
+  .wc-tax-panel{
+    min-width:0;
+    border:1px solid var(--border);
+    background:#ffffff;
+    border-radius:28px;
+    box-shadow:0 14px 34px rgba(23,32,51,.05);
+    padding:28px;
+  }
+  .wc-tax-calc-panel h3{
+    margin:0 0 10px;
+    color:var(--text);
+    font-size:20px;
+    font-weight:800;
+  }
+  .wc-tax-calc-panel .wc-millage-panel-head h3{
+    margin-bottom:0;
+  }
+  .wc-tax-single{
+    margin-top:24px;
+    padding-top:22px;
+    border-top:1px solid var(--border);
+  }
+  .wc-tax-columns-prompt{
+    margin:24px 0 0;
+    padding-top:22px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+  }
+  .wc-tax-single h4{
+    margin:0;
+    color:var(--green);
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--green);
+  }
+  .wc-tax-row-tag{
+    color:var(--muted);
+    font-size:11px;
+    font-weight:700;
+    text-transform:none;
+    letter-spacing:normal;
+  }
+  .wc-tax-table-wrap{
+    margin-top:14px;
+    overflow-x:auto;
+  }
+  .wc-tax-table{
+    width:100%;
+    min-width:520px;
+    border-collapse:collapse;
+  }
+  .wc-tax-table th{
+    padding:0 0 8px;
+    border-bottom:1px solid var(--border);
+    color:var(--muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    text-align:left;
+  }
+  .wc-tax-table th.wc-num,
+  .wc-tax-table td.wc-num{
+    text-align:right;
+  }
+  .wc-tax-table td{
+    padding:11px 0;
+    border-bottom:1px solid var(--border);
+    color:var(--text);
+    font-size:14px;
+    font-weight:700;
+    vertical-align:top;
+  }
+  .wc-tax-table td a{
+    color:inherit;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-color:var(--border);
+  }
+  .wc-tax-table td a:hover{
+    color:var(--green);
+    text-decoration-color:currentColor;
+  }
+  .wc-tax-table td.wc-num{
+    color:var(--green);
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .wc-tax-table td.wc-tax-zero-value{
+    color:var(--muted);
+    font-weight:700;
+  }
+  @media (max-width:760px){
+    .wc-tax-calc-panel .wc-millage-panel-head{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:10px;
+    }
+  }
+  .wc-tax-disclaimer{
+    margin:0 0 18px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+  }
+  .wc-tax-disclaimer-emphasis{
+    color:var(--text);
+    font-size:15px;
+    font-weight:800;
+  }
+  .wc-info-button{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    border:1px solid var(--muted);
+    background:none;
+    color:var(--muted);
+    font-size:10px;
+    font-style:italic;
+    font-weight:700;
+    line-height:1;
+    cursor:help;
+    padding:0;
+    vertical-align:middle;
+  }
+  .wc-info-button::after{
+    content:attr(data-tip);
+    position:absolute;
+    z-index:5;
+    bottom:calc(100% + 8px);
+    left:0;
+    width:240px;
+    border-radius:10px;
+    background:var(--text);
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    text-transform:none;
+    letter-spacing:normal;
+    line-height:1.5;
+    padding:10px 12px;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .15s ease;
+    pointer-events:none;
+  }
+  .wc-info-button:hover::after,
+  .wc-info-button:focus::after{
+    opacity:1;
+    visibility:visible;
+  }
+  /* The property tax breakdown table scrolls horizontally
+     (.wc-tax-table-wrap), which forces its vertical overflow to clip too --
+     an upward-opening tooltip on the very first row (Sheriff's Office, the
+     largest ad valorem department) gets cut off by the table header above
+     it. Opening downward instead keeps it inside the table's own bounds. */
+  .wc-tax-table .wc-info-button::after{
+    bottom:auto;
+    top:calc(100% + 8px);
+  }
+  .wc-tax-breakdown-loading,
+  .wc-tax-breakdown-error{
+    margin:0;
+    padding:11px 0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .wc-tax-calc-field{
+    display:block;
+    margin-bottom:14px;
+  }
+  .wc-tax-calc-field span{
+    display:block;
+    margin-bottom:6px;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .wc-tax-calc-field input{
+    display:block;
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 12px;
+    color:var(--text);
+    font-size:18px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    background:var(--light);
+  }
+  .wc-tax-calc-field input:focus{
+    outline:3px solid var(--gold);
+    outline-offset:1px;
+  }
+  .wc-property-search-field{
+    position:relative;
+  }
+  .wc-property-search-field input:disabled{
+    cursor:not-allowed;
+    opacity:.6;
+  }
+  .wc-property-search-status{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.5;
+  }
+  .wc-property-search-results{
+    position:absolute;
+    z-index:6;
+    top:100%;
+    left:0;
+    right:0;
+    margin-top:4px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    box-shadow:0 10px 26px rgba(23,32,51,.14);
+    max-height:240px;
+    overflow-y:auto;
+  }
+  .wc-property-search-result{
+    display:block;
+    width:100%;
+    text-align:left;
+    border:0;
+    border-bottom:1px solid var(--border);
+    background:none;
+    padding:10px 12px;
+    cursor:pointer;
+    font:inherit;
+  }
+  .wc-property-search-result:last-child{
+    border-bottom:0;
+  }
+  .wc-property-search-result:hover,
+  .wc-property-search-result:focus{
+    background:rgba(0,98,49,.07);
+  }
+  .wc-property-search-result strong{
+    display:block;
+    color:var(--text);
+    font-size:13px;
+    font-weight:700;
+  }
+  .wc-property-search-result span{
+    display:block;
+    margin-top:2px;
+    color:var(--muted);
+    font-size:11px;
+    text-transform:none;
+    letter-spacing:normal;
+    font-weight:600;
+  }
+  .wc-tax-info-dialog{
+    width:min(92vw, 620px);
+    max-height:86vh;
+    margin:auto;
+    overflow-y:auto;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:#fff;
+    color:var(--text);
+    box-shadow:0 24px 70px rgba(23,32,51,.28);
+    padding:0;
+  }
+  .wc-tax-info-dialog::backdrop{
+    background:rgba(4,16,11,.52);
+  }
+  .wc-tax-info-dialog-inner{
+    padding:22px;
+  }
+  .wc-tax-info-dialog-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:12px;
+  }
+  .wc-tax-info-dialog h5{
+    margin:0;
+    color:var(--text);
+    font-size:17px;
+    font-weight:900;
+  }
+  .wc-tax-info-dialog p{
+    margin:12px 0 0;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.55;
+  }
+  .wc-tax-info-dialog-source{
+    font-size:11px;
+    font-style:italic;
+  }
+  .wc-tax-info-warning{
+    color:#b3261e;
+  }
+  .wc-millage-panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .wc-millage-panel-head h3{
+    margin:0;
+    color:var(--text);
+    font-size:20px;
+    font-weight:800;
+  }
+  .wc-tax-panel-head-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .wc-millage-reset{
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:999px;
+    padding:7px 16px;
+    color:var(--green);
+    font-size:13px;
+    font-weight:800;
+    cursor:pointer;
+    transition:background-color .15s ease,color .15s ease;
+  }
+  .wc-millage-reset:hover{
+    background:var(--green);
+    color:#fff;
+  }
+  .wc-breakdown-toggle{
+    display:block;
+    width:100%;
+    margin-top:6px;
+    text-align:center;
+  }
+
+  :root[data-theme="dark"] .wc-tax-panel{
+    background:rgba(14,28,22,.92);
+    border-color:var(--border);
+  }
+  :root[data-theme="dark"] .wc-millage-reset{
+    background:rgba(10,20,16,.7);
+    border-color:var(--border);
+  }
+  :root[data-theme="dark"] .wc-tax-calc-field input{
+    background:rgba(10,20,16,.7);
+    border-color:var(--border);
+    color:var(--text);
+  }
+  :root[data-theme="dark"] .wc-info-button{
+    border-color:rgba(224,239,230,.62);
+    color:rgba(224,239,230,.82);
+  }
+  :root[data-theme="dark"] .wc-info-button::after{
+    background:#08130f;
+    border:1px solid rgba(224,239,230,.22);
+    color:#f2f8f4;
+    box-shadow:0 12px 26px rgba(0,0,0,.4);
+  }
+  :root[data-theme="dark"] .wc-tax-info-dialog{
+    background:#0a1410;
+    border-color:var(--border);
+    color:var(--text);
+    box-shadow:0 24px 70px rgba(0,0,0,.5);
+  }
+  :root[data-theme="dark"] .wc-property-search-results{
+    background:rgba(10,20,16,.96);
+    border-color:var(--border);
+  }
+  :root[data-theme="dark"] .wc-property-search-result{
+    border-color:var(--border);
+  }
+  :root[data-theme="dark"] .wc-property-search-result:hover,
+  :root[data-theme="dark"] .wc-property-search-result:focus{
+    background:rgba(123,211,159,.12);
+  }
+  :root[data-theme="dark"] .wc-tax-single,
+  :root[data-theme="dark"] .wc-tax-table td,
+  :root[data-theme="dark"] .wc-tax-table th{
+    border-color:var(--border);
+  }
 </style>
 
 <section class="wc-ptax">
@@ -346,6 +751,65 @@
   <section class="wc-ptax-flow" id="wc-ptax-flow" aria-live="polite">
     <div class="wc-ptax-flow-loading">Loading property tax allocation...</div>
   </section>
+
+  <div class="wc-ptax-flow-head">
+    <h2>What does your own property tax pay for?</h2>
+    <p>Enter your address or home value to see a personalized estimate, scaled from the same countywide allocation above.</p>
+  </div>
+
+  <div class="wc-tax-grid">
+    <article class="wc-tax-panel wc-tax-calc-panel wc-tax-panel-wide">
+      <div class="wc-millage-panel-head">
+        <h3>Your Property Tax</h3>
+        <div class="wc-tax-panel-head-actions">
+          <button type="button" class="wc-millage-reset" id="taxInfoOpen" aria-haspopup="dialog" aria-controls="taxInfoDialog">How This Is Calculated</button>
+          <button type="button" class="wc-millage-reset" id="taxCalcReset">Reset</button>
+        </div>
+      </div>
+      <p class="wc-tax-disclaimer">Enter your address to see an <span class="wc-tax-disclaimer-emphasis">estimate</span> of how much County property tax you pay and exactly which services it funds. This is an <span class="wc-tax-disclaimer-emphasis">estimate only</span>, covering only the County portion of your property tax bill &mdash; your total tax bill also includes schools and other taxing authorities.</p>
+      <div class="wc-tax-calc-field wc-property-search-field">
+        <span>Enter Your Address or Home Value</span>
+        <input id="propertyAddressSearch" type="text" autocomplete="off" placeholder="e.g. 123 Main St, or $300,000">
+        <div id="propertyAddressResults" class="wc-property-search-results" hidden></div>
+        <p id="propertyAddressStatus" class="wc-property-search-status" hidden></p>
+        <input id="taxCalcValue" type="hidden">
+      </div>
+      <p class="wc-tax-columns-prompt" id="taxColumnsPrompt">Enter your address or home value above to see your personalized breakdown.</p>
+      <div class="wc-tax-single" id="taxColumns" hidden>
+        <div class="wc-millage-panel-head" id="taxSupportBreakdownSection" tabindex="-1">
+          <h4>What Your Property Tax Supports</h4>
+        </div>
+        <div class="wc-tax-table-wrap">
+          <table class="wc-tax-table">
+            <thead>
+              <tr>
+                <th scope="col">Department</th>
+                <th scope="col" class="wc-num">% of Total</th>
+                <th scope="col" class="wc-num">Current</th>
+                <th scope="col" class="wc-num">FY 2027 Change</th>
+                <th scope="col" class="wc-num">Estimated New Amount</th>
+              </tr>
+            </thead>
+            <tbody id="personalTaxTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <dialog class="wc-tax-info-dialog" id="taxInfoDialog" aria-labelledby="taxInfoDialogTitle">
+        <div class="wc-tax-info-dialog-inner">
+          <div class="wc-tax-info-dialog-head">
+            <h5 id="taxInfoDialogTitle">How This Is Calculated</h5>
+            <button type="button" class="wc-millage-reset" id="taxInfoClose">Close</button>
+          </div>
+          <p><strong>Taxable value</strong> is the value the Property Appraiser uses to calculate your tax bill &mdash; it is usually lower than your home's market value because of the homestead exemption and other assessment limits. Your official taxable value is on your annual TRIM notice or the Property Appraiser's website.</p>
+          <p><strong>What's included:</strong> this covers the County's own countywide portion of your property tax bill. <strong>What's NOT included:</strong> school district taxes, water management district taxes, special taxing districts (such as North Walton Mosquito Control), and any other independent taxing authorities on your bill &mdash; those are set and billed separately.</p>
+          <p><strong>What Your Property Tax Supports</strong> estimates your County property tax bill using your taxable value and the last approved Walton County millage rate of 3.519 mills, then allocates that estimated bill proportionally across the countywide property tax allocation shown above. This is the <strong>Current</strong> column. Some listed services are shown as fully funded by property tax revenue, while others represent only the portion of that service funded by property tax revenue; other revenues (charges for services, fees, etc.) are netted out, leaving just the property tax revenue portion.</p>
+          <p>The <strong>FY 2027 Change</strong> column highlights departments with an actual budget change from FY2026 to FY2027 that are funded, in whole or in part, by County property tax (ad valorem) revenue &mdash; departments with no such change are shown at $0.00 rather than left off the list. The dollar amount shown for each department estimates how much of your County property tax supports that change by applying the department's actual FY2026-to-FY2027 budget change percentage to your estimated current-year contribution. The <strong>Estimated New Amount</strong> column is simply Current plus that change.</p>
+          <p><strong class="wc-tax-info-warning">These estimates are provided for informational and educational purposes only and should not be considered an official determination of taxes.</strong> Actual tax amounts may vary based on property classification, exemptions, assessment limitations, taxable value determinations, millage rates, voter-approved levies, and other factors. Users should view official records from the Walton County Property Appraiser for parcel-specific tax information.</p>
+          <p class="wc-tax-info-dialog-source">Parcel data is sourced from the Florida GIO statewide dataset.</p>
+        </div>
+      </dialog>
+    </article>
+  </div>
 </section>
 </main>
 </div>
@@ -435,9 +899,13 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Statistical & Supplemental Information",section:"Our County",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
 ];
 </script>
-<script src="../assets/budget-data.js?v=20260707-beach-vending-fy2026-fix"></script>
+<script src="../assets/budget-data.js?v=20260709-mobile-line-columns-3"></script>
 <script>
 (function(){
+  function $(selector){
+    return document.querySelector(selector);
+  }
+
   function escapeHtml(value){
     return String(value == null ? "" : value)
       .replace(/&/g, "&amp;")
@@ -456,23 +924,30 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     return "$" + amount.toLocaleString();
   }
 
+  // A few department names on the revenue sheet don't exactly match the
+  // title used for that department's own page in wcBudgetPages, or the
+  // Dept_Name spelling used elsewhere in the expenditures dataset --
+  // resolved here once so every lookup (page links, tooltips, matching
+  // against real FY2027 budget increases) agrees on the same canonical
+  // name.
+  const NAME_ALIASES = {
+    "clerk of court": "clerk of courts & county comptroller",
+    "environmental services": "environmental resources",
+    "south walton fire": "south walton fire & state control",
+    "state fire": "south walton fire & state control",
+    "volunteer fire": "south walton fire & state control",
+    "statutory & other": "statutory & other agency funding",
+    "probation services": "probation"
+  };
   function normalizeMatchName(name){
-    return String(name || "")
+    const normalized = String(name || "")
       .replace(/\(.*?\)/g, "")
       .toLowerCase()
       .replace(/\s+/g, " ")
       .trim();
+    return NAME_ALIASES[normalized] || normalized;
   }
 
-  // A few department names on the revenue sheet don't exactly match the
-  // title used for that department's own page in wcBudgetPages -- resolved
-  // here so a row can still link to the right page.
-  const PAGE_NAME_ALIASES = {
-    "clerk of court": "clerk of courts & county comptroller",
-    "environmental services": "environmental resources",
-    "south walton fire": "south walton fire & state control",
-    "statutory & other": "statutory & other agency funding"
-  };
   let pageHrefByName = null;
   function getPageHref(norm){
     if (!pageHrefByName){
@@ -483,8 +958,48 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
         }
       });
     }
-    const lookup = PAGE_NAME_ALIASES[norm] || norm;
-    return pageHrefByName[lookup] || "";
+    return pageHrefByName[norm] || "";
+  }
+
+  // One-sentence, factual explanations for the names most likely to
+  // confuse a resident (independently elected offices, statutory
+  // spending) -- deliberately short and limited to well-established
+  // facts, not paraphrased guesses.
+  const DEPARTMENT_TOOLTIPS = {
+    "property appraiser": "An independently elected official who determines the value of property for tax purposes. Not a County department.",
+    "tax collector": "An independently elected official who collects and distributes property taxes to the County, schools, and other taxing authorities.",
+    "clerk of courts & county comptroller": "An independently elected official who manages court records and serves as the County's chief financial officer.",
+    "sheriff's office": "Law enforcement, jail operations, and school resource deputies for all of Walton County.",
+    "board of county commissioners": "The elected body that sets County policy and adopts the annual budget.",
+    "supervisor of elections": "An independently elected official who administers voter registration and elections in Walton County.",
+    "capital projects": "Major construction and infrastructure: public safety facilities, roads, and recreational infrastructure."
+  };
+  // Independently elected Constitutional Officers -- shown with a small
+  // "Elected Office" tag so a resident doesn't mistake them for
+  // County-run departments the Board directly manages.
+  const CONSTITUTIONAL_OFFICER_NAMES = {
+    "property appraiser": true,
+    "tax collector": true,
+    "clerk of courts & county comptroller": true,
+    "sheriff's office": true,
+    "supervisor of elections": true
+  };
+
+  // Builds the display label (name + optional "Elected Office" tag +
+  // optional info tooltip) used for a department wherever it appears in
+  // the personalized breakdown table, so the same entity gets the same
+  // treatment everywhere. The name itself links to that department's own
+  // budget page when one exists.
+  function departmentLabelHtml(rawName){
+    const norm = normalizeMatchName(rawName);
+    const displayName = String(rawName || "").replace(/\s*\([^)]*\)\s*/g, "").trim();
+    const parenMatch = String(rawName || "").match(/\(([^)]*)\)/);
+    const tooltip = DEPARTMENT_TOOLTIPS[norm] || (parenMatch ? "Includes: " + parenMatch[1] + "." : "");
+    const tagHtml = CONSTITUTIONAL_OFFICER_NAMES[norm] ? ' <span class="wc-tax-row-tag">&mdash; Elected Office</span>' : "";
+    const tipHtml = tooltip ? ' <button type="button" class="wc-info-button" aria-label="' + escapeHtml(displayName) + ' info" data-tip="' + escapeHtml(tooltip) + '">i</button>' : "";
+    const href = getPageHref(norm);
+    const nameHtml = href ? '<a href="' + escapeHtml(href) + '">' + escapeHtml(displayName) + '</a>' : escapeHtml(displayName);
+    return nameHtml + tagHtml + tipHtml;
   }
 
   const AD_VALOREM_REVENUE_CODES = ["311000", "311001"];
@@ -511,12 +1026,16 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   // Reads the same live revenues sheet (window.WCBudgetData) used
   // everywhere else on the site -- the FY2027 Ad Valorem Taxes revenue
   // rows recorded directly against each department, not a separately
-  // curated allocation sheet.
+  // curated allocation sheet. Powers both the countywide bar chart above
+  // and the personalized calculator below, so there's exactly one
+  // definition of "the property tax allocation" on this page.
+  let adValoremRowsPromise = null;
   function loadAdValoremRows(){
+    if (adValoremRowsPromise) return adValoremRowsPromise;
     if (!window.WCBudgetData || typeof window.WCBudgetData.loadBudgetData !== "function"){
       return Promise.reject(new Error("Budget data is not available"));
     }
-    return window.WCBudgetData.loadBudgetData().then(function(data){
+    adValoremRowsPromise = window.WCBudgetData.loadBudgetData().then(function(data){
       const totalsByName = new Map();
       const interfundTransferAmounts = [];
       (data.revenues || []).forEach(function(row){
@@ -543,6 +1062,7 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
         .filter(function(d){ return d.amount > 0; })
         .sort(function(a, b){ return b.amount - a.amount; });
     });
+    return adValoremRowsPromise;
   }
 
   function renderAllocation(departments){
@@ -597,6 +1117,491 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
       '<div class="wc-ptax-flow-list">' + rows + '</div>';
   }
 
+  // Real, already-adopted FY2026 -> FY2027 dollar/percent increases for
+  // departments that are actually funded (in whole or in part) by ad
+  // valorem revenue -- deliberately real budget data, not a
+  // proportional/hypothetical split of anything (an earlier version of
+  // this feature did that and it was inaccurate: e.g. the Sheriff's
+  // budget can be flat while other departments grow, since department
+  // budgets are their own real decisions). Matched by department name
+  // against the same ad valorem revenue list used by the countywide
+  // allocation above; only real matches with a genuine increase are
+  // included. Cached module-wide since it doesn't depend on the
+  // taxpayer's own address/value.
+  let realIncreaseRowsPromise = null;
+  function getRealAdValoremIncreases(){
+    if (realIncreaseRowsPromise) return realIncreaseRowsPromise;
+    realIncreaseRowsPromise = Promise.all([
+      loadAdValoremRows(),
+      (window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function")
+        ? window.WCBudgetData.loadBudgetData()
+        : Promise.resolve(null)
+    ]).then(function(results){
+      const adValoremDepartments = results[0] || [];
+      const data = results[1];
+      const expenditureRows = (data && Array.isArray(data.expenditures)) ? data.expenditures : [];
+      if (!expenditureRows.length) return [];
+
+      const adValoremNames = {};
+      adValoremDepartments.forEach(function(d){ adValoremNames[normalizeMatchName(d.name)] = true; });
+
+      const totalsByDept = {};
+      expenditureRows.forEach(function(row){
+        if (String(row.Dept_Code || "").trim().slice(0, 3) === "503") return;
+        const key = normalizeMatchName(row.Dept_Name);
+        if (!key || !adValoremNames[key]) return;
+        if (!totalsByDept[key]) totalsByDept[key] = { name: row.Dept_Name, fy2026: 0, fy2027: 0 };
+        totalsByDept[key].fy2026 += Number(row.FY2026_Original_Budget) || 0;
+        totalsByDept[key].fy2027 += Number(row.FY2027_Proposed) || 0;
+      });
+
+      return Object.keys(totalsByDept).map(function(key){
+        const d = totalsByDept[key];
+        return { name: d.name, delta: d.fy2027 - d.fy2026, percent: d.fy2026 ? (d.fy2027 - d.fy2026) / d.fy2026 * 100 : 0 };
+      }).filter(function(d){ return d.delta > 0; }).sort(function(a, b){ return b.delta - a.delta; });
+    }).catch(function(){ return []; });
+    return realIncreaseRowsPromise;
+  }
+
+  // Minimal quoted-CSV line splitter (handles "$98,004,256.00"-style
+  // quoted fields with embedded commas) -- same algorithm budget-data.js
+  // uses internally, just not exposed on window.WCBudgetData, so it's
+  // duplicated here in compact form rather than reaching into that
+  // file's closure. Used to parse the local parcel roll below.
+  function parseCsv(text){
+    const rows = [];
+    let row = [];
+    let field = "";
+    let inQuotes = false;
+    const src = String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    for (let i = 0; i < src.length; i++){
+      const ch = src[i];
+      if (inQuotes){
+        if (ch === '"'){
+          if (src[i + 1] === '"'){ field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += ch;
+        }
+        continue;
+      }
+      if (ch === '"'){ inQuotes = true; }
+      else if (ch === ","){ row.push(field); field = ""; }
+      else if (ch === "\n"){ row.push(field); rows.push(row); row = []; field = ""; }
+      else { field += ch; }
+    }
+    if (field !== "" || row.length){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function parseDollarAmount(value){
+    const n = Number(String(value || "").replace(/[$,]/g, ""));
+    return isFinite(n) ? n : 0;
+  }
+
+  // Shared between initPropertyAddressSearch (sets this on selection) and
+  // initTaxCalculator (reads it to decide whether the homestead exemption
+  // scenario applies). Null when the taxable value field was typed in
+  // manually rather than chosen from a search result.
+  let selectedParcelMeta = null;
+
+  // Property Tax Calculator: estimates one taxpayer's own bill using the
+  // countywide millage rate shown above, then breaks that bill down
+  // proportionally across departments by each one's share of total ad
+  // valorem revenue (same data as the allocation list above).
+  function initTaxCalculator(){
+    const valueInput = $("#taxCalcValue");
+    if (!valueInput) return;
+    const resetButton = $("#taxCalcReset");
+    const infoButton = $("#taxInfoOpen");
+    const infoDialog = $("#taxInfoDialog");
+    const infoCloseButton = $("#taxInfoClose");
+    const propertySearchInput = $("#propertyAddressSearch");
+    const propertySearchResults = $("#propertyAddressResults");
+    const propertySearchStatus = $("#propertyAddressStatus");
+    const COUNTYWIDE_MILLAGE = 3.519;
+    const BREAKDOWN_PREVIEW_COUNT = 7;
+    // Departments with a real FY2027 increase worth surfacing even
+    // though their ad valorem dollar share falls outside the default
+    // top-7 cutoff (e.g. South Walton Fire & State Control ranks #11).
+    const ALWAYS_VISIBLE_DEPARTMENTS = ["statutory & other agency funding", "south walton fire & state control"];
+    let lastCountyTax = 0;
+    let breakdownShowAll = false;
+
+    function moneyWithCents(value){
+      return "$" + (Number(value) || 0).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:2 });
+    }
+
+    // One combined table: for every ad valorem-funded department, what
+    // you currently pay it (% of Total alongside the Current dollar
+    // amount), whether it has a real, Board-adopted FY2026->FY2027
+    // budget increase and what that means in personalized dollars
+    // (FY2027 Increase, $0.00 if flat -- shown, not hidden, so growing
+    // and flat departments are directly comparable), and the resulting
+    // total (New Amount).
+    function renderCombinedBreakdown(countyTax){
+      const tbody = $("#personalTaxTableBody");
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="5" class="wc-tax-breakdown-loading">Loading breakdown...</td></tr>';
+      Promise.all([loadAdValoremRows(), getRealAdValoremIncreases()]).then(function(results){
+        const departments = results[0];
+        const increases = results[1];
+        const grandTotal = departments.reduce(function(sum, d){ return sum + d.amount; }, 0);
+        const increaseByName = {};
+        increases.forEach(function(inc){ increaseByName[normalizeMatchName(inc.name)] = inc.percent; });
+
+        let rows = departments.map(function(d){
+          const share = grandTotal ? d.amount / grandTotal : 0;
+          const currentAmount = countyTax * share;
+          const percent = increaseByName[normalizeMatchName(d.name)] || 0;
+          const increaseAmount = currentAmount * (percent / 100);
+          return {
+            name: d.name,
+            currentAmount: currentAmount,
+            percentShare: share,
+            increaseAmount: increaseAmount,
+            newAmount: currentAmount + increaseAmount
+          };
+        // A row that rounds to $0.00 Current at this taxable value
+        // isn't meaningfully "where your tax goes" -- dropped as noise.
+        // A $0.00 FY2027 Increase is kept deliberately (that's the
+        // point: showing flat departments beside growing ones).
+        }).filter(function(d){ return Math.abs(d.currentAmount) >= 0.005; });
+
+        // Largest share of property tax allocation first (departments
+        // already arrive from loadAdValoremRows sorted this way, but
+        // re-sorting here keeps this the explicit, guaranteed order
+        // regardless of upstream changes).
+        rows.sort(function(a, b){ return b.percentShare - a.percentShare; });
+
+        let visible;
+        if (breakdownShowAll){
+          visible = rows;
+        } else {
+          const topRows = rows.slice(0, BREAKDOWN_PREVIEW_COUNT);
+          const topNames = {};
+          topRows.forEach(function(d){ topNames[normalizeMatchName(d.name)] = true; });
+          const forcedRows = rows.filter(function(d){
+            return !topNames[normalizeMatchName(d.name)] && ALWAYS_VISIBLE_DEPARTMENTS.indexOf(normalizeMatchName(d.name)) !== -1;
+          });
+          visible = topRows.concat(forcedRows).sort(function(a, b){ return b.percentShare - a.percentShare; });
+        }
+        const rowsHtml = visible.map(function(d){
+          const hasIncrease = d.increaseAmount >= 0.005;
+          const increaseDisplay = hasIncrease ? "+" + moneyWithCents(d.increaseAmount) : moneyWithCents(0);
+          const increaseClass = hasIncrease ? "" : "wc-tax-zero-value";
+          return "<tr>" +
+            "<td>" + departmentLabelHtml(d.name) + "</td>" +
+            '<td class="wc-num">' + (d.percentShare * 100).toFixed(2) + "%</td>" +
+            '<td class="wc-num">' + moneyWithCents(d.currentAmount) + "</td>" +
+            '<td class="wc-num ' + increaseClass + '">' + increaseDisplay + "</td>" +
+            '<td class="wc-num">' + moneyWithCents(d.newAmount) + "</td>" +
+          "</tr>";
+        }).join("");
+
+        let toggleRowHtml = "";
+        if (rows.length > BREAKDOWN_PREVIEW_COUNT){
+          toggleRowHtml = '<tr class="wc-tax-table-toggle-row"><td colspan="5">' +
+            '<button type="button" id="personalBreakdownToggle" class="wc-millage-reset wc-breakdown-toggle">' +
+            (breakdownShowAll ? "Show Fewer" : "Explore All " + rows.length + " County Services &rarr;") +
+            "</button></td></tr>";
+        }
+
+        tbody.innerHTML = rowsHtml + toggleRowHtml;
+
+        const toggleButton = $("#personalBreakdownToggle");
+        if (toggleButton){
+          toggleButton.addEventListener("click", function(){
+            const shouldReturnToTop = breakdownShowAll;
+            breakdownShowAll = !breakdownShowAll;
+            renderCombinedBreakdown(lastCountyTax);
+            if (shouldReturnToTop){
+              window.setTimeout(function(){
+                const section = $("#taxSupportBreakdownSection");
+                if (section){
+                  section.scrollIntoView({ behavior:"smooth", block:"start" });
+                  section.focus({ preventScroll:true });
+                }
+              }, 0);
+            }
+          });
+        }
+      }).catch(function(){
+        tbody.innerHTML = '<tr><td colspan="5" class="wc-tax-breakdown-error">Property tax breakdown is not available right now.</td></tr>';
+      });
+    }
+
+    function render(){
+      const taxableValue = parseDollarAmount(valueInput.value);
+
+      // Both columns stay hidden (with a plain prompt in their place)
+      // until a resident actually enters their own address or a
+      // taxable value -- nothing personalized is shown for a value
+      // nobody typed in.
+      const columnsEl = $("#taxColumns");
+      const promptEl = $("#taxColumnsPrompt");
+      const hasValue = taxableValue > 0;
+      if (columnsEl) columnsEl.hidden = !hasValue;
+      if (promptEl) promptEl.hidden = hasValue;
+      if (!hasValue){
+        lastCountyTax = 0;
+        return;
+      }
+
+      const countywideAmount = taxableValue * COUNTYWIDE_MILLAGE / 1000;
+
+      lastCountyTax = countywideAmount;
+      renderCombinedBreakdown(countywideAmount);
+    }
+
+    valueInput.addEventListener("input", function(event){
+      if (!event.detail || !event.detail.preserveParcelMeta){
+        selectedParcelMeta = null;
+      }
+      render();
+    });
+    function openInfoDialog(){
+      if (!infoDialog) return;
+      if (typeof infoDialog.showModal === "function"){
+        infoDialog.showModal();
+      } else {
+        infoDialog.setAttribute("open", "");
+      }
+    }
+    if (infoButton && infoDialog){
+      infoButton.addEventListener("click", openInfoDialog);
+    }
+    // The first time a resident actually goes to enter their own address
+    // or value, "How This Is Calculated" opens automatically (once per
+    // visit) so they see the methodology before their first
+    // personalized result, rather than only finding it via a button
+    // they might never click. Native <dialog> focus-trapping means they
+    // must close it before continuing, and focus returns to this same
+    // field afterward so they can pick up typing right where they left
+    // off.
+    let hasPromptedInfoDialog = false;
+    if (propertySearchInput && infoDialog){
+      propertySearchInput.addEventListener("focus", function(){
+        if (hasPromptedInfoDialog) return;
+        hasPromptedInfoDialog = true;
+        openInfoDialog();
+      });
+    }
+    if (infoCloseButton && infoDialog){
+      infoCloseButton.addEventListener("click", function(){
+        if (typeof infoDialog.close === "function"){
+          infoDialog.close();
+        } else {
+          infoDialog.removeAttribute("open");
+        }
+      });
+    }
+    if (resetButton){
+      resetButton.addEventListener("click", function(){
+        selectedParcelMeta = null;
+        breakdownShowAll = false;
+        valueInput.value = "";
+        if (propertySearchInput) propertySearchInput.value = "";
+        if (propertySearchResults){
+          propertySearchResults.hidden = true;
+          propertySearchResults.innerHTML = "";
+        }
+        if (propertySearchStatus){
+          propertySearchStatus.textContent = "";
+          propertySearchStatus.hidden = true;
+        }
+        render();
+      });
+    }
+    render();
+  }
+
+  // Property address search: looks up ../data/walton-parcels.csv (columns
+  // parcel,parcelno,address,city,zip,homestead,justValue,assessedValue,
+  // taxableValue). It's the full county parcel roll (~93k rows, ~7MB), so
+  // it's only fetched once the user actually focuses the search box, not
+  // on every page load.
+  function initPropertyAddressSearch(){
+    const input = $("#propertyAddressSearch");
+    if (!input) return;
+    const resultsBox = $("#propertyAddressResults");
+    const statusEl = $("#propertyAddressStatus");
+    const valueInput = $("#taxCalcValue");
+    let records = [];
+    let loaded = false;
+    let loading = false;
+
+    function setStatus(text){
+      statusEl.textContent = text || "";
+      statusEl.hidden = !text;
+    }
+
+    function showResults(matches){
+      if (!matches.length){
+        resultsBox.hidden = true;
+        resultsBox.innerHTML = "";
+        return;
+      }
+      resultsBox.innerHTML = matches.slice(0, 8).map(function(record, index){
+        const parcelLine = record.parcelId ? "Parcel " + escapeHtml(String(record.parcelId)) : "";
+        return '<button type="button" class="wc-property-search-result" data-index="' + index + '">' +
+          "<strong>" + escapeHtml(record.address) + "</strong>" +
+          (parcelLine ? "<span>" + parcelLine + "</span>" : "") +
+        "</button>";
+      }).join("");
+      resultsBox.hidden = false;
+
+      Array.prototype.forEach.call(resultsBox.querySelectorAll(".wc-property-search-result"), function(button, index){
+        button.addEventListener("click", function(){
+          selectRecord(matches[index]);
+        });
+      });
+    }
+
+    function selectRecord(record){
+      input.value = record.address;
+      resultsBox.hidden = true;
+      resultsBox.innerHTML = "";
+      selectedParcelMeta = {
+        taxableValue: record.taxableValue,
+        justValue: record.justValue,
+        isHomestead: record.isHomestead
+      };
+      if (valueInput && typeof record.taxableValue === "number"){
+        valueInput.value = String(record.taxableValue);
+        setStatus("Using a taxable value of $" + record.taxableValue.toLocaleString("en-US") + " for this property.");
+        valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:true } }));
+      }
+    }
+
+    // The single field doubles as an address search and a manual
+    // taxable-value entry -- a query with no letters (just digits/$/,)
+    // is treated as a typed-in dollar amount instead of an address, so
+    // there's no separate "manual estimate" field for that path.
+    function isManualValueQuery(raw){
+      const stripped = raw.replace(/[$,\s]/g, "");
+      return stripped.length > 0 && /^[0-9]+$/.test(stripped);
+    }
+
+    function clearManualValue(promptText){
+      valueInput.value = "";
+      selectedParcelMeta = null;
+      setStatus(promptText);
+      valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:false } }));
+    }
+
+    function commitManualValue(digits){
+      showResults([]);
+      selectedParcelMeta = null;
+      const formatted = digits ? "$" + Number(digits).toLocaleString("en-US") : "";
+      if (input.value !== formatted) input.value = formatted;
+      valueInput.value = digits;
+      setStatus("Estimating using a taxable value of " + formatted + ".");
+      valueInput.dispatchEvent(new CustomEvent("input", { detail:{ preserveParcelMeta:false } }));
+    }
+
+    const idlePrompt = "";
+
+    function handleSearchInput(){
+      const raw = input.value;
+
+      if (!raw){
+        clearManualValue(idlePrompt);
+        showResults([]);
+        return;
+      }
+
+      if (isManualValueQuery(raw)){
+        const digits = raw.replace(/[^0-9]/g, "");
+        // A bare run of digits is ambiguous while parcel data is still
+        // loading (or loading failed) -- it could be the start of a
+        // house number ("331 Oak Grove Rd") or a typed-in dollar
+        // amount. Only commit to the dollar-amount reading once we can
+        // confirm no loaded address actually starts with these digits;
+        // otherwise, keep showing it as an in-progress address search
+        // so a house number doesn't get clobbered into "$331" mid-type.
+        if (loaded){
+          const addressMatches = records.filter(function(record){
+            return record.address && record.address.toLowerCase().indexOf(raw.trim().toLowerCase()) === 0;
+          });
+          if (addressMatches.length){
+            showResults(addressMatches);
+            return;
+          }
+          commitManualValue(digits);
+        } else {
+          showResults([]);
+        }
+        return;
+      }
+
+      const query = raw.trim().toLowerCase();
+      if (query.length < 3){
+        showResults([]);
+        return;
+      }
+      const matches = records.filter(function(record){
+        return record.address && record.address.toLowerCase().indexOf(query) !== -1;
+      });
+      showResults(matches);
+    }
+
+    function loadRecords(){
+      if (loaded || loading) return;
+      loading = true;
+      setStatus("Loading county parcel records...");
+      fetch("../data/walton-parcels.csv").then(function(res){
+        if (!res.ok) throw new Error("Failed to load property records");
+        return res.text();
+      }).then(function(text){
+        const rows = parseCsv(text);
+        const header = (rows.shift() || []).map(function(h){ return h.trim(); });
+        const colIndex = {};
+        header.forEach(function(name, i){ colIndex[name] = i; });
+
+        const seen = Object.create(null);
+        records = [];
+        rows.forEach(function(row){
+          if (!row.length) return;
+          const streetAddress = (row[colIndex.address] || "").trim();
+          if (!streetAddress) return;
+          const city = (row[colIndex.city] || "").trim();
+          const zip = (row[colIndex.zip] || "").trim();
+          const parcelId = (row[colIndex.parcel] || "").trim();
+          if (parcelId && seen[parcelId]) return;
+          if (parcelId) seen[parcelId] = true;
+          records.push({
+            address: [streetAddress, city, zip].filter(Boolean).join(", "),
+            parcelId: parcelId,
+            taxableValue: Number(row[colIndex.taxableValue]) || 0,
+            justValue: Number(row[colIndex.justValue]) || 0,
+            isHomestead: (row[colIndex.homestead] || "").trim() !== ""
+          });
+        });
+
+        loaded = true;
+        loading = false;
+        input.disabled = false;
+        if (input.value){
+          handleSearchInput();
+        } else {
+          setStatus(idlePrompt);
+        }
+      }).catch(function(){
+        loading = false;
+        setStatus("Property address search is not available right now.");
+      });
+    }
+
+    input.addEventListener("focus", loadRecords);
+    input.addEventListener("input", handleSearchInput);
+    document.addEventListener("click", function(event){
+      if (!resultsBox.contains(event.target) && event.target !== input){
+        resultsBox.hidden = true;
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function(){
     loadAdValoremRows()
       .then(renderAllocation)
@@ -604,6 +1609,8 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
         console.error("Failed to load property tax allocation data", error);
         renderAllocation([]);
       });
+    initTaxCalculator();
+    initPropertyAddressSearch();
   });
 })();
 </script>
