@@ -2772,13 +2772,24 @@ a:where(:visited) {
    with that line's own label and value inline with each other, summed
    county-wide for that fund code rather than just the departments listed
    below. */
+.wc-dept-fund-panel {
+  margin: 28px 0 18px;
+  padding: 18px;
+  border: 1px solid rgba(0, 96, 57, .18);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(0, 96, 57, .08), rgba(0, 96, 57, .045));
+}
+:root[data-theme="dark"] .wc-dept-fund-panel {
+  border-color: rgba(142, 203, 166, .22);
+  background: rgba(0, 96, 57, .18);
+}
 .wc-dept-fund-summary {
   /* auto-fit (rather than a fixed column count) so a page with only a
      few cards (e.g. constitutional-officers.html's 3) stretches them to
      fill the row instead of cramming them into a handful of a 7-column
      grid's tracks and leaving the rest of the row empty. */
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px; margin: 28px 0;
+  gap: 16px; margin: 0;
 }
 .wc-dept-fund-card {
   padding: 14px 16px; border: 1px solid var(--border);
@@ -2852,11 +2863,18 @@ a:where(:visited) {
   .wc-dept-fund-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 767.98px) {
+  .wc-dept-fund-panel {
+    margin: 22px calc(50% - 50vw) 16px;
+    padding: 14px 0 14px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
   .wc-dept-fund-summary {
     display: flex;
     grid-template-columns: none;
     gap: 12px;
-    margin: 20px calc(50% - 50vw) 20px;
+    margin: 0;
     padding: 0 18px 2px;
     overflow-x: auto;
     overflow-y: hidden;

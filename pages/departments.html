@@ -20,7 +20,9 @@
 <h1 class="page-title">Departments</h1>
 <p class="page-intro">Explore Walton County departments, budgets, staffing, performance measures, and services.</p>
 
-<section class="wc-dept-fund-summary" aria-label="Departments by fund, at a glance" id="departmentFundSummary"></section>
+<section class="wc-dept-fund-panel" aria-label="Departments by fund, at a glance">
+  <div class="wc-dept-fund-summary" id="departmentFundSummary"></div>
+</section>
 
 <p class="wc-dept-fund-filter-status" id="departmentFilterStatus"></p>
 
@@ -315,7 +317,7 @@
       }
       var valueHtml = trendDollar ? escapeHtml(trendDollar) : "&mdash;";
       var percentHtml = (trendDollar && trendPercent)
-        ? '<span class="wc-dept-fund-chip-percent">' + escapeHtml(trendPercent) + "</span>"
+        ? '<span class="wc-dept-fund-chip-percent">(' + escapeHtml(trendPercent) + ")</span>"
         : "";
       return '<div class="wc-dept-fund-chip"><span class="wc-dept-fund-chip-label">YoY Change</span>' +
         '<span class="wc-dept-fund-chip-value-wrap"><strong' + (trendClass ? ' class="' + trendClass + '"' : "") + '>' + valueHtml + "</strong>" + percentHtml + "</span></div>";
@@ -340,17 +342,18 @@
       el.innerHTML = fundSummaries.map(function(f, index){
         var trendClass = (f.trendDollar && f.trendDollar !== "Loading") ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var fteTrendClass = (f.fteTrend && f.fteTrend !== "Loading") ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
+        var propertyTaxLabel = f.propertyTax === "Loading" || f.propertyTax ? "Property Tax" : "Not Funded with Property Tax";
         var propertyTaxValueHtml = f.propertyTax === "Loading"
           ? LOADING_DOTS_HTML
-          : escapeHtml(f.propertyTax || "$0");
+          : (f.propertyTax ? escapeHtml(f.propertyTax) : "");
         var group = FUND_SUMMARY_GROUPS[index];
         var isActive = group && activeFundCode === group.code;
         return '<button type="button" class="wc-dept-fund-card wc-dept-fund-card--clickable' + (isActive ? " wc-dept-fund-card--active" : "") + '" data-fund-code="' + escapeHtml(group ? group.code : "") + '" aria-pressed="' + (isActive ? "true" : "false") + '">' +
           '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +
           '<div class="wc-dept-fund-card-chips">' +
             fundChipHtml(valueOrLoadingHtml(f.budget), "Budget") +
-            fundChipHtml(propertyTaxValueHtml, "Property Tax") +
             fundTrendChipHtml(f.trendDollar, f.trend, trendClass) +
+            fundChipHtml(propertyTaxValueHtml, propertyTaxLabel) +
             fundChipHtml(valueOrLoadingHtml(f.fte) + '<span class="wc-dept-fund-staff-change">' + (f.fteTrend === "Loading" ? LOADING_DOTS_HTML : " (" + (f.fteTrend ? escapeHtml(f.fteTrend) + " FTE" : "0") + ")") + '</span>', "Personnel") +
             fundChipHtml(f.fteTrend === "Loading" ? LOADING_DOTS_HTML : (f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;"), "YoY FTE", fteTrendClass) +
           '</div>' +
