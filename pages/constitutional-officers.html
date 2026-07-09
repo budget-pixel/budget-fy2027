@@ -473,7 +473,7 @@
             fundChipHtml(valueOrLoadingHtml(f.budget), "Budget") +
             fundChipHtml(propertyTaxValueHtml, "Property Tax") +
             fundTrendChipHtml(f.trendDollar, f.trend, trendClass) +
-            fundChipHtml(valueOrLoadingHtml(f.fte), "Personnel") +
+            fundChipHtml(valueOrLoadingHtml(f.fte) + '<span class="wc-dept-fund-staff-change">' + (f.fteTrend === "Loading" ? LOADING_DOTS_HTML : " (" + (f.fteTrend ? escapeHtml(f.fteTrend) + " FTE" : "0") + ")") + '</span>', "Personnel") +
             fundChipHtml(f.fteTrend === "Loading" ? LOADING_DOTS_HTML : (f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;"), "YoY FTE", fteTrendClass) +
           '</div>' +
         '</button>';
@@ -485,7 +485,20 @@
           activeSpecIndex = activeSpecIndex === index ? null : index;
           renderFundSummary(lastFundSummaries);
           renderFilteredGroups();
+          scrollDirectoryIntoViewOnMobile();
         });
+      });
+    }
+
+    function scrollDirectoryIntoViewOnMobile(){
+      if(!window.matchMedia || !window.matchMedia("(max-width: 768px)").matches) return;
+      var target = $("#officerFilterStatus") || $("#officerSection") || $("#entitySection");
+      if(!target) return;
+      window.requestAnimationFrame(function(){
+        var nav = document.querySelector("nav#nav-menu.nav-menu");
+        var navHeight = nav ? nav.getBoundingClientRect().height : 0;
+        var top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 14;
+        window.scrollTo({ top:Math.max(0, top), behavior:"smooth" });
       });
     }
 
@@ -506,6 +519,7 @@
           activeSpecIndex = null;
           renderFundSummary(lastFundSummaries);
           renderFilteredGroups();
+          scrollDirectoryIntoViewOnMobile();
         });
       }
     }
@@ -573,7 +587,8 @@
         var budgetStat = statBlockHtml("wc-directory-item-stat--budget", valueOrLoadingHtml(item.budget), "FY 2027 Budget");
         var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(item.trend, item.trendDollar), "YoY Change", trendClassFor(item.trend));
         var hasFte = item.fte && item.fte !== "Not listed";
-        var personnelStat = hasFte ? statBlockHtml("wc-directory-item-stat--personnel", valueOrLoadingHtml(item.fte), "Personnel") : "";
+        var staffChange = item.fteTrend === "Loading" ? LOADING_DOTS_HTML : " (" + (item.fteTrend ? escapeHtml(item.fteTrend) + " FTE" : "0") + ")";
+        var personnelStat = hasFte ? statBlockHtml("wc-directory-item-stat--personnel", valueOrLoadingHtml(item.fte) + '<span class="wc-directory-staff-change">' + staffChange + '</span>', "Personnel") : "";
         var fteTrendStat = hasFte ? statBlockHtml("wc-directory-item-stat--fte-trend", item.fteTrend === "Loading" ? LOADING_DOTS_HTML : (item.fteTrend ? escapeHtml(item.fteTrend) : "&mdash;"), "YoY FTE", trendClassFor(item.fteTrend)) : "";
         return '<li><a class="wc-directory-item" href="' + escapeHtml(item.href) + '">' +
           '<div class="wc-directory-item-main">' +

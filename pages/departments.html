@@ -352,7 +352,7 @@
             fundChipHtml(valueOrLoadingHtml(f.budget), "Budget") +
             fundChipHtml(propertyTaxValueHtml, "Property Tax") +
             fundTrendChipHtml(f.trendDollar, f.trend, trendClass) +
-            fundChipHtml(valueOrLoadingHtml(f.fte), "Personnel") +
+            fundChipHtml(valueOrLoadingHtml(f.fte) + '<span class="wc-dept-fund-staff-change">' + (f.fteTrend === "Loading" ? LOADING_DOTS_HTML : " (" + (f.fteTrend ? escapeHtml(f.fteTrend) + " FTE" : "0") + ")") + '</span>', "Personnel") +
             fundChipHtml(f.fteTrend === "Loading" ? LOADING_DOTS_HTML : (f.fteTrend ? escapeHtml(f.fteTrend) : "&mdash;"), "YoY FTE", fteTrendClass) +
           '</div>' +
         '</button>';
@@ -364,6 +364,7 @@
           activeFundCode = activeFundCode === code ? null : code;
           renderFundSummary(lastFundSummaries);
           renderDepartments();
+          scrollDepartmentListIntoViewOnMobile();
         });
       });
     }
@@ -515,6 +516,18 @@
       return trend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up";
     }
 
+    function scrollDepartmentListIntoViewOnMobile(){
+      if(!window.matchMedia || !window.matchMedia("(max-width: 768px)").matches) return;
+      var target = $("#departmentFilterStatus") || $("#departmentList");
+      if(!target) return;
+      window.requestAnimationFrame(function(){
+        var nav = document.querySelector("nav#nav-menu.nav-menu");
+        var navHeight = nav ? nav.getBoundingClientRect().height : 0;
+        var top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 14;
+        window.scrollTo({ top:Math.max(0, top), behavior:"smooth" });
+      });
+    }
+
     function renderFilterStatus(){
       var status = $("#departmentFilterStatus");
       if(!status) return;
@@ -532,6 +545,7 @@
           activeFundCode = null;
           renderFundSummary(lastFundSummaries);
           renderDepartments();
+          scrollDepartmentListIntoViewOnMobile();
         });
       }
     }
@@ -552,7 +566,8 @@
         var fundStat = statBlockHtml("wc-directory-item-stat--fund", dept.fund === "Loading" ? LOADING_DOTS_HTML : escapeHtml(dept.fund && dept.fund !== "Not listed" ? dept.fund : "Not listed"), "Fund");
         var budgetStat = statBlockHtml("wc-directory-item-stat--budget", valueOrLoadingHtml(dept.budget), "FY 2027 Budget");
         var trendStat = statBlockHtml("wc-directory-item-stat--trend", trendValueHtml(dept.trend, dept.trendDollar), "YoY Change", trendClassFor(dept.trend));
-        var personnelStat = statBlockHtml("wc-directory-item-stat--personnel", valueOrLoadingHtml(dept.fte), "Personnel");
+        var staffChange = dept.fteTrend === "Loading" ? LOADING_DOTS_HTML : " (" + (dept.fteTrend ? escapeHtml(dept.fteTrend) + " FTE" : "0") + ")";
+        var personnelStat = statBlockHtml("wc-directory-item-stat--personnel", valueOrLoadingHtml(dept.fte) + '<span class="wc-directory-staff-change">' + staffChange + '</span>', "Personnel");
         var fteTrendStat = statBlockHtml("wc-directory-item-stat--fte-trend", dept.fteTrend === "Loading" ? LOADING_DOTS_HTML : (dept.fteTrend ? escapeHtml(dept.fteTrend) : "&mdash;"), "YoY FTE", trendClassFor(dept.fteTrend));
         return '<li><a class="wc-directory-item" href="' + escapeHtml(dept.href) + '">' +
           '<div class="wc-directory-item-main">' +

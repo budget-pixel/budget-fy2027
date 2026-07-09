@@ -176,9 +176,48 @@ a:where(:visited) {
 .wc-directory-item-stat--fund-projects { width: 110px; flex: 0 0 110px; }
 .wc-directory-item-stat--fund-inhouse { width: 130px; flex: 0 0 130px; }
 .wc-directory-item-stat strong { display: block; color: var(--green); font-size: .95rem; font-weight: 800; }
+.wc-directory-item-stat--personnel strong {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.wc-directory-staff-change {
+  display: inline;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
 .wc-directory-item-stat span {
   display: block; margin-top: 2px; color: var(--muted); font-size: .65rem;
   font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.wc-directory-item-stat--budget > span,
+.wc-directory-item-stat--trend > span,
+.wc-directory-item-stat--personnel > span,
+.wc-directory-item-stat--fte-trend > span {
+  font-size: 0;
+}
+.wc-directory-item-stat--budget > span::after {
+  content: "Budget";
+  font-size: .68rem;
+}
+.wc-directory-item-stat--trend > span::after {
+  content: "Budget Change";
+  font-size: .68rem;
+}
+.wc-directory-item-stat--personnel > span::after {
+  content: "Staff";
+  font-size: .68rem;
+}
+.wc-directory-item-stat--fte-trend > span::after {
+  content: "FTE";
+  font-size: .68rem;
+}
+.wc-directory-item-stat--trend .wc-directory-item-trend-paren,
+.wc-directory-item-stat--fte-trend {
+  display: none;
 }
 .wc-directory-item-arrow { flex: 0 0 auto; color: var(--green); font-size: 18px; font-weight: 700; }
 /* "Loading" placeholder shown in directory stats and fund-summary callout
@@ -225,16 +264,41 @@ a:where(:visited) {
   .wc-directory-item-desc { font-size: .86rem; line-height: 1.5; }
   .wc-directory-item-meta {
     grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
-    gap: 14px 16px;
     padding-top: 2px;
   }
-  .wc-directory-item-stat {
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    width: 100%;
+  }
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat {
+    display: grid;
+    grid-template-columns: minmax(82px, .55fr) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 10px;
     min-width: 0;
+    width: auto;
+    flex: none;
     text-align: left;
   }
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat strong {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    font-size: .9rem;
+    line-height: 1.25;
+    text-align: right;
+  }
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat > span {
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: 0;
+    font-size: .68rem;
+    line-height: 1.2;
+  }
+  .wc-directory-item-stat { min-width: 0; text-align: left; }
   .wc-directory-item-stat--fund,
   .wc-directory-item-stat--budget,
   .wc-directory-item-stat--trend,
@@ -249,8 +313,6 @@ a:where(:visited) {
   .wc-directory-item-stat--trend {
     grid-column: 1 / -1;
   }
-  .wc-directory-item-stat strong { font-size: 1rem; line-height: 1.2; }
-  .wc-directory-item-stat span { font-size: .62rem; line-height: 1.2; }
   .wc-directory-item-stat--trend strong.wc-directory-item-trend-up,
   .wc-directory-item-stat--trend strong.wc-directory-item-trend-down {
     white-space: normal;
@@ -2668,37 +2730,60 @@ a:where(:visited) {
      few cards (e.g. constitutional-officers.html's 3) stretches them to
      fill the row instead of cramming them into a handful of a 7-column
      grid's tracks and leaving the rest of the row empty. */
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 12px; margin: 24px 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px; margin: 28px 0;
 }
 .wc-dept-fund-card {
-  padding: 18px 16px; border: 1px solid var(--border);
-  border-radius: 16px; background: #fff; min-width: 0;
+  padding: 14px 16px; border: 1px solid var(--border);
+  border-radius: 12px; background: #fff; min-width: 0;
 }
 :root[data-theme="dark"] .wc-dept-fund-card { background: rgba(14,28,22,.92); }
 .wc-dept-fund-card-label {
-  /* Reserves space for 3 lines always, even on labels short enough to fit
-     on one ("Sheriff Fund") or two ("Tourist Development Fund") --
-     otherwise those cards' Budget/YoY Change/etc. rows start higher than
-     a card whose longer fund name actually wraps further (e.g. "General
-     Fund (Constitutional Officers)"). */
-  margin: 0 0 12px; color: var(--navy); font-size: .82rem; font-weight: 800;
-  line-height: 1.3; min-height: 3.9em;
+  margin: 0 0 10px; color: var(--navy); font-size: .9rem; font-weight: 800;
+  line-height: 1.2; min-height: 2.4em;
 }
-.wc-dept-fund-card-chips { display: flex; flex-direction: column; gap: 8px; }
+.wc-dept-fund-card-chips { display: flex; flex-direction: column; gap: 4px; }
 .wc-dept-fund-chip {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: minmax(118px, .75fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding-top: 0;
+  border-top: 0;
 }
-.wc-dept-fund-chip:first-child { padding-top: 0; border-top: 0; }
+.wc-dept-fund-chip:nth-child(2) { order: 3; }
+.wc-dept-fund-chip:nth-child(3) { order: 2; }
+.wc-dept-fund-chip:nth-child(4) { order: 4; }
+.wc-dept-fund-chip:nth-child(5) { display: none; }
 .wc-dept-fund-chip-label {
-  color: var(--muted); font-size: .65rem; font-weight: 800;
-  letter-spacing: .02em; text-transform: uppercase; white-space: nowrap;
-  flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis;
+  color: var(--muted); font-size: .74rem; font-weight: 800;
+  letter-spacing: .03em; line-height: 1.2; text-transform: uppercase; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.wc-dept-fund-chip:nth-child(3) .wc-dept-fund-chip-label,
+.wc-dept-fund-chip:nth-child(4) .wc-dept-fund-chip-label {
+  font-size: 0;
+}
+.wc-dept-fund-chip:nth-child(3) .wc-dept-fund-chip-label::after {
+  content: "Budget Change";
+  font-size: .74rem;
+}
+.wc-dept-fund-chip:nth-child(4) .wc-dept-fund-chip-label::after {
+  content: "Staff";
+  font-size: .74rem;
 }
 .wc-dept-fund-chip strong {
-  flex: 0 0 auto; color: var(--green); font-size: .88rem; font-weight: 800;
-  white-space: nowrap; text-align: right;
+  min-width: 0;
+  justify-self: end;
+  color: var(--green); font-size: .92rem; font-weight: 800;
+  line-height: 1.25; white-space: nowrap; text-align: right;
+}
+.wc-dept-fund-staff-change {
+  display: inline;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .wc-dept-fund-chip strong.wc-directory-item-trend-up { color: var(--green); }
 .wc-dept-fund-chip strong.wc-directory-item-trend-down { color: #b3261e; }
@@ -2707,16 +2792,68 @@ a:where(:visited) {
    keeping them on one line -- see fundTrendChipHtml in departments.html --
    so the label still fits inline beside the $ amount on narrower cards. */
 .wc-dept-fund-chip-value-wrap {
-  flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end;
+  min-width: 0;
+  justify-self: end;
+  display: flex; flex-direction: row; align-items: baseline;
+  gap: 4px; text-align: right; white-space: nowrap;
 }
 .wc-dept-fund-chip-percent {
-  margin-top: 1px; color: var(--muted); font-size: .68rem; font-weight: 700;
+  margin-top: 0; color: var(--muted); font-size: .82rem; font-weight: 700;
+  line-height: 1.2; white-space: nowrap;
 }
 @media (max-width: 1100px) {
-  .wc-dept-fund-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-@media (max-width: 640px) {
   .wc-dept-fund-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+  .wc-dept-fund-summary {
+    display: flex;
+    grid-template-columns: none;
+    gap: 12px;
+    margin: 20px calc(50% - 50vw) 20px;
+    padding: 0 18px 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 18px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .wc-dept-fund-summary::-webkit-scrollbar {
+    display: none;
+  }
+  .wc-dept-fund-card {
+    flex: 0 0 282px;
+    width: 282px;
+    max-width: calc(100vw - 72px);
+    scroll-snap-align: start;
+    padding: 12px 14px;
+  }
+  .wc-dept-fund-card-label {
+    min-height: 0;
+    margin-bottom: 10px;
+    font-size: .78rem;
+  }
+  .wc-dept-fund-card-chips {
+    gap: 3px;
+  }
+  .wc-dept-fund-chip {
+    grid-template-columns: minmax(96px, .75fr) minmax(0, 1fr);
+    gap: 6px;
+  }
+  .wc-dept-fund-chip-label {
+    font-size: .66rem;
+  }
+  .wc-dept-fund-chip:nth-child(3) .wc-dept-fund-chip-label::after,
+  .wc-dept-fund-chip:nth-child(4) .wc-dept-fund-chip-label::after {
+    font-size: .66rem;
+  }
+  .wc-dept-fund-chip strong {
+    font-size: .78rem;
+  }
+  .wc-dept-fund-staff-change,
+  .wc-dept-fund-chip-percent {
+    font-size: .72rem;
+  }
 }
 
 /* Fund cards double as filters (see initFundCardFilter in departments.html
