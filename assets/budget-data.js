@@ -609,6 +609,17 @@
   const REVENUE_FY2026_PLUG_OVERRIDES = new Map([
     ["001329|board of county commissioners|" + BCC_BEACH_VENDING_REVENUE_CODE + "|" + BCC_BEACH_VENDING_PROJECT_CODE, BCC_BEACH_VENDING_FY2026_BUDGET]
   ]);
+  const LIBRARY_GRANT_PROJECT_CODE = "10029";
+
+  function isLibraryProjectRevenueRow(row) {
+    const projectValues = [
+      row && row.Project_Code,
+      row && row.Project_Name,
+      row && row.Note
+    ].map((value) => String(value || "").trim());
+    return normalizeDeptName(row && row.Dept_Name) === "libraries" &&
+      projectValues.includes(LIBRARY_GRANT_PROJECT_CODE);
+  }
 
   function revenueFy2026PlugOverride(row) {
     if (isBccBeachVendingRevenueRow(row)) return BCC_BEACH_VENDING_FY2026_BUDGET;
@@ -1093,9 +1104,10 @@
     }
     if (
       deptNorm === "libraries" &&
-      String(codeValue || "").trim() === "334700"
+      String(codeValue || "").trim() === "334700" &&
+      isLibraryProjectRevenueRow(row)
     ) {
-      return lookups.map((lookup) => ({ ...lookup, projectScope: "10029" }));
+      return lookups.map((lookup) => ({ ...lookup, projectScope: LIBRARY_GRANT_PROJECT_CODE }));
     }
     return lookups;
   }
@@ -1750,8 +1762,17 @@
     return combined;
   }
 
+  function filterLibraryProjectGrantRevenueRows(rows, deptName) {
+    if (normalizeDeptName(deptName) !== "libraries") return rows;
+    return (rows || []).filter((row) => {
+      const name = String((row && row.Revenue_Name) || "");
+      if (!/^State Grant\b/.test(name)) return true;
+      return isLibraryProjectRevenueRow(row);
+    });
+  }
+
   function getDepartmentRevenues(deptName, deptCode) {
-    return suppressMsbuAdValoremRows(
+    return filterLibraryProjectGrantRevenueRows(suppressMsbuAdValoremRows(
       suppressMossyHeadTransferInPriorYears(
         combineStateAttorneyAdValoremRows(
           combineEagleSpringsProShopSalesRows(rowsForDepartment(cache.revenues, deptName, deptCode), deptName),
@@ -1760,7 +1781,7 @@
         deptName
       ),
       deptName
-    );
+    ), deptName);
   }
 
   const ZERO_ROW_FILTER_DEPT_NAMES = new Set([
@@ -1827,7 +1848,7 @@
       return false;
     }
     if (dept === "building construction and maintenance") {
-      return code === "335180" || name === "local government 1 2 cent sales tax";
+      return code === "311000" || name === "ad valorem taxes";
     }
     // Engineering Services' only revenue row (Local Option Fuel Tax,
     // 312410) is intentionally zeroed at the actuals layer -- see
@@ -3294,6 +3315,11 @@
         if (dept.indexOf("north walton") !== -1) return "North Walton Tourist Development Tax";
         return "Tourist Development Taxes";
       }
+      // Library grant revenue should roll up only the project-specific
+      // revenue rows, not every Library row that happens to share a grant
+      // account name.
+      if (isLibraryProjectRevenueRow(row) && /^State Grant\b/.test(name)) return "State Grants";
+      if (isLibraryProjectRevenueRow(row) && /^Federal Grant\b/.test(name)) return "Federal Grants";
       return "";
     }
 
@@ -3301,6 +3327,16 @@
       if (isExpense || combineByName) return rowsToMerge;
       const sumFields = priorYearColumns.map((c) => c.field)
         .concat(["FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
+      // Sums each row's own already-resolved field value -- the same
+      // approach the existing Interest/Tourist Development Tax merges use.
+      // Routing merged-away rows back through budgetLineColumnAmount's live
+      // Supabase lookup was tried and reverted: for a row whose actual
+      // isn't backed by an exact department+code match, that lookup falls
+      // back to an unscoped fund/county-wide total instead of this
+      // department's own figure, inflating the merged sum.
+      function contributionForField(row, field) {
+        return Number(row[field]) || 0;
+      }
       const grouped = new Map();
       const output = [];
       rowsToMerge.forEach((row) => {
@@ -3320,7 +3356,7 @@
             _originalBudgetDeduped: true,
             _suppressRevenueBudgetFallback: true
           });
-          sumFields.forEach((field) => { merged[field] = Number(row[field]) || 0; });
+          sumFields.forEach((field) => { merged[field] = contributionForField(row, field); });
           grouped.set(key, merged);
           output.push(merged);
           return;
@@ -3333,7 +3369,7 @@
           existing[descField] = [existing[descField], description].filter(Boolean).join("; ");
         }
         sumFields.forEach((field) => {
-          existing[field] = (Number(existing[field]) || 0) + (Number(row[field]) || 0);
+          existing[field] = (Number(existing[field]) || 0) + contributionForField(row, field);
         });
       });
       return output;
@@ -3541,6 +3577,7 @@
             Dept_Code: r.Dept_Code || "",
             _actualsBackfilled: r._actualsBackfilled || false,
             _actualsSuppressed: r._actualsSuppressed || false,
+            _actualsDeduped: r._actualsDeduped || false,
             _suppressRevenueBudgetFallback: r._suppressRevenueBudgetFallback || false,
             _groupedBudgetLineSummary: true
           };
@@ -3554,6 +3591,7 @@
         }
         if (r._actualsBackfilled) existing._actualsBackfilled = true;
         if (r._actualsSuppressed) existing._actualsSuppressed = true;
+        if (r._actualsDeduped) existing._actualsDeduped = true;
         if (r._suppressRevenueBudgetFallback) existing._suppressRevenueBudgetFallback = true;
         sumFields.forEach((f) => {
           existing[f] += (!isExpense && f === "FY2026_Original_Budget")
