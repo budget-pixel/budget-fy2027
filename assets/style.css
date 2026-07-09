@@ -250,6 +250,9 @@ a:where(:visited) {
   color: inherit;
   white-space: nowrap;
 }
+.wc-directory-item-stat--trend .wc-directory-item-trend-paren {
+  display: none;
+}
 @media (max-width: 640px) {
   .wc-directory-list li { border-radius: 12px; }
   .wc-directory-item {
@@ -297,6 +300,15 @@ a:where(:visited) {
     margin-top: 0;
     font-size: .68rem;
     line-height: 1.2;
+  }
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat--budget > span,
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat--trend > span,
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat--personnel > span,
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat--fte-trend > span {
+    font-size: 0;
+  }
+  .wc-directory-item-meta:has(.wc-directory-item-stat--trend) .wc-directory-item-stat--fte-trend {
+    display: none;
   }
   .wc-directory-item-stat { min-width: 0; text-align: left; }
   .wc-directory-item-stat--fund,
