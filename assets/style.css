@@ -1468,6 +1468,37 @@ a:where(:visited) {
   background: #ffffff;
 }
 
+.lifeguard-statement-full {
+  margin-bottom: 32px;
+}
+
+.lifeguard-expense-map-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.lifeguard-expense-map-row .wc-budget-lines-card {
+  margin: 0;
+  height: 100%;
+}
+
+.lifeguard-expense-map-row .lifeguard-iframe-link {
+  max-width: none;
+  margin: 0;
+  height: 100%;
+}
+
+.lifeguard-expense-map-row .lifeguard-iframe-preview {
+  height: 100%;
+}
+
+.lifeguard-expense-map-row .lifeguard-iframe-preview iframe {
+  height: 100%;
+  min-height: 260px;
+}
+
 #department-expense-table { margin-top: 32px; }
 .court-innovations-supplemental-tables { margin-top: 32px; }
 .court-innovations-cards {
@@ -2119,6 +2150,10 @@ a:where(:visited) {
 .wc-staffing-notes p:last-child { margin-bottom: 0; }
 .wc-staffing-notes-title { font-weight: 700; }
 .wc-staffing-notes-group + .wc-staffing-notes-group { margin-top: 10px; }
+.wc-budget-lines-note {
+  flex: 1 1 100%;
+  margin-top: 0;
+}
 
 .wc-table-footer-row {
   display: flex;
@@ -2990,6 +3025,20 @@ a:where(:visited) {
 
   .lifeguard-iframe-link {
     margin: 16px auto 0;
+  }
+
+  .lifeguard-expense-map-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .lifeguard-expense-map-row .lifeguard-iframe-link {
+    margin: 0 auto;
+  }
+
+  .lifeguard-expense-map-row .lifeguard-iframe-preview iframe {
+    height: 320px;
+    min-height: 0;
   }
 
   .libraries-iframe-button {

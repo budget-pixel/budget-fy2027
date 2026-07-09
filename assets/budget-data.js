@@ -1150,10 +1150,6 @@
   // departmentDataNote), keyed by normalized Dept_Name.
   const DEPARTMENT_DATA_NOTES = new Map([
     [
-      "walton county health department",
-      "Due to an accounting change actuals for 2020, 2021, and 2022 are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
-    ],
-    [
       "public defender",
       "Prior years do not include funding for court technology needs for the Public Defender. Those years are smaller because future years now capture this accounting change for transparency and accurate reporting."
     ],
@@ -3665,11 +3661,26 @@
     function visiblePriorYearTotal(rowsToTotal, column) {
       return (rowsToTotal || []).reduce((sum, row) => sum + (budgetLineVisibleColumnAmount(row, column) || 0), 0);
     }
+    function formatYearList(years) {
+      if (!years.length) return "";
+      if (years.length === 1) return String(years[0]);
+      if (years.length === 2) return years[0] + " and " + years[1];
+      return years.slice(0, -1).join(", ") + ", and " + years[years.length - 1];
+    }
     const totalFields = priorYearColumns.map((c) => c.field).concat(["FY2027_Proposed"]);
     const totals = {};
     totalFields.forEach((field) => {
       totals[field] = mergedRows.reduce((sum, row) => sum + (row[field] || 0), 0);
     });
+    const hasBudgetValue = (totals.FY2026_Original_Budget || 0) !== 0 || (totals.FY2027_Proposed || 0) !== 0;
+    const missingActualYears = hasBudgetValue
+      ? priorYearColumns
+        .filter((c) => c.actual && visiblePriorYearTotal(summaryRows, c) === 0)
+        .map((c) => c.year)
+      : [];
+    const generatedActualsNoteText = missingActualYears.length
+      ? "Due to an accounting change actuals for " + formatYearList(missingActualYears) + " are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
+      : "";
     const totalLabelCells =
       "<td>Total</td>" +
       (isExpense ? "<td></td>" : "") +
@@ -3786,8 +3797,11 @@
       ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
       : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
-    const departmentDataNote = departmentDataNoteText
-      ? '<p class="wc-revenue-actuals-note">' + escapeHtml(departmentDataNoteText) + "</p>"
+    const dataNoteTexts = [generatedActualsNoteText, departmentDataNoteText].filter(Boolean);
+    const departmentDataNote = dataNoteTexts
+      ? '<div class="wc-staffing-notes wc-budget-lines-note"><p class="wc-staffing-notes-title">Expenditure Notes:</p>' +
+        dataNoteTexts.map((noteText) => "<p>" + escapeHtml(noteText) + "</p>").join("") +
+        "</div>"
       : "";
     const budgetLinesTools = '<div class="wc-budget-lines-tools">' + departmentDataNote + toggleHeader + transactionHelper + "</div>";
 
@@ -9405,6 +9419,19 @@
     );
   }
 
+  function renderTourismLifeguardMapEmbed() {
+    return (
+      '<a class="lifeguard-iframe-link" href="https://www.google.com/maps/d/viewer?mid=1cEvWmwqVy53RIwJ43HT4ein3KUw" target="_blank" rel="noopener noreferrer" aria-label="Open Walton County Map">' +
+        '<div class="lifeguard-iframe-preview">' +
+          '<iframe src="https://www.google.com/maps/d/embed?mid=1cEvWmwqVy53RIwJ43HT4ein3KUw&amp;ehbc=2E312F" title="Walton County Map" loading="lazy" tabindex="-1"></iframe>' +
+          '<div class="lifeguard-iframe-overlay">' +
+            '<div class="lifeguard-iframe-button">Open Walton County Map</div>' +
+          "</div>" +
+        "</div>" +
+      "</a>"
+    );
+  }
+
   function renderTourismLifeguardSections() {
     return TOURISM_LIFEGUARD_SECTIONS.map((spec, index) => {
       // The first program's narrative already renders above (next to the
@@ -9419,9 +9446,13 @@
       const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
       const revenueRows = rowsForExactNames(cache.revenues, spec.revenueNames);
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
+      const expenseHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label);
+      const swfdExpenseHtml = index === 0 && expenseHtml
+        ? '<div class="lifeguard-expense-map-row">' + expenseHtml + renderTourismLifeguardMapEmbed() + "</div>"
+        : expenseHtml;
       const body = [
         narrativeHtml,
-        renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label),
+        swfdExpenseHtml,
         renderTypeSummaryTable(revenueRows, "revenue", "Revenue Summary", spec.label),
         renderStaffingTable(staffingRows)
       ].filter(Boolean).join("");
