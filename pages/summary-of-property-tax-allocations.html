@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Transmittal Letter — Walton County FY 2027 Budget</title>
+<title>Summary of Property Tax Allocations — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260627-prior-years-a11y">
 </head>
-<body class="transmittal-page">
+<body class="property-tax-fund-page">
 
 <!-- nav#nav-menu.nav-menu is the hook nav.js uses for logo + search injection -->
 <nav id="nav-menu" class="nav-menu">
@@ -16,50 +16,53 @@
 <div id="layout">
 <main id="content">
 
-<div class="page-eyebrow">Introduction and Overview</div>
-<h1 class="page-title">Transmittal Letter</h1>
+<div class="page-eyebrow">Financial Summaries</div>
+<h1 class="page-title">Summary of Property Tax Allocations</h1>
 
 <style>
-  body.transmittal-page #content{
+  body.property-tax-fund-page #content{
     max-width:1240px;
     padding:44px 32px 78px;
   }
 
-  .wc-transmittal{
+  .wc-ptax{
     font-family:Arial, Helvetica, sans-serif;
   }
 
-  .wc-transmittal-hero{
+  .wc-ptax-hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:22px;
     margin:0 0 34px;
   }
 
-  .wc-transmittal-hero-copy{
-    padding:42px;
+  .wc-ptax-hero-copy{
+    padding:40px;
     border-radius:30px;
     background:#003f28;
     color:#ffffff;
   }
 
-  .wc-transmittal-kicker{
+  .wc-ptax-kicker{
     display:block;
     margin:0 0 12px;
     color:#d1be78;
     font-size:12px;
     font-weight:900;
-    letter-spacing:.16em;
+    letter-spacing:.14em;
     text-transform:uppercase;
   }
 
-  .wc-transmittal-hero-copy h2{
+  .wc-ptax-hero-copy h2{
     margin:0 0 16px;
     color:#ffffff;
     font-family:Georgia, "Times New Roman", serif;
-    font-size:clamp(42px, 6vw, 72px);
-    line-height:.98;
+    font-size:clamp(36px, 5vw, 60px);
+    line-height:1.05;
     font-weight:500;
   }
 
-  .wc-transmittal-hero-copy p{
+  .wc-ptax-hero-copy p{
     max-width:760px;
     margin:0;
     color:rgba(255,255,255,.86);
@@ -67,237 +70,281 @@
     line-height:1.7;
   }
 
-  .wc-transmittal-letter-grid{
-    margin:0 0 34px;
-  }
-
-  .wc-transmittal-letter{
-    padding:34px;
-    border:1px solid rgba(23,32,51,.11);
-    border-radius:26px;
-    background:#ffffff;
-    box-shadow:0 14px 34px rgba(23,32,51,.06);
-  }
-
-  .wc-transmittal-letter p{
-    margin:0 0 18px;
-    color:#526577;
-    font-size:16px;
-    line-height:1.82;
-  }
-
-  .wc-transmittal-letter h3{
-    margin:34px 0 12px;
-    color:#003f28;
-    font-size:22px;
-    line-height:1.2;
-  }
-
-  .wc-transmittal-letter ul{
-    display:grid;
-    gap:9px;
-    margin:0 0 22px;
-    padding-left:22px;
-    color:#526577;
-    font-size:16px;
-    line-height:1.65;
-  }
-
-  .wc-transmittal-letter p:last-child{
-    margin-bottom:0;
-  }
-
-  .wc-transmittal-salutation,
-  .wc-transmittal-signature{
-    color:#172033 !important;
-    font-weight:800;
-  }
-
-  .wc-transmittal-section{
-    margin:0 0 34px;
-  }
-
-  .wc-transmittal-section-header{
-    max-width:780px;
-    margin:0 0 20px;
-  }
-
-  .wc-transmittal-section-header h2{
-    margin:0 0 10px;
-    color:#172033;
-    font-family:Georgia, "Times New Roman", serif;
-    font-size:clamp(32px, 4vw, 54px);
-    line-height:1.05;
-    font-weight:500;
-  }
-
-  .wc-transmittal-section-header p{
-    margin:0;
-    color:#607184;
-    font-size:16px;
-    line-height:1.7;
-  }
-
-  .wc-transmittal-links{
-    display:grid;
-    grid-template-columns:repeat(3, minmax(0,1fr));
-    gap:14px;
-  }
-
-  .wc-transmittal-link-card{
+  .wc-ptax-millage-card{
     display:flex;
     flex-direction:column;
-    min-height:172px;
+    justify-content:center;
+    gap:18px;
+    padding:26px;
+    border:1px solid var(--border);
+    border-radius:30px;
+    background:var(--light);
+  }
+
+  .wc-ptax-millage-row strong{
+    display:block;
+    color:var(--green);
+    font-size:28px;
+    line-height:1.1;
+  }
+
+  .wc-ptax-millage-row span{
+    display:block;
+    margin-top:6px;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+  }
+
+  .wc-ptax-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:14px;
+    margin:0 0 34px;
+  }
+
+  .wc-ptax-summary-card{
+    min-height:150px;
     padding:22px;
-    border:1px solid rgba(23,32,51,.11);
+    border:1px solid var(--border);
     border-radius:20px;
-    background:#ffffff;
-    color:inherit;
-    text-decoration:none;
-    box-shadow:0 14px 34px rgba(23,32,51,.06);
-    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    background:var(--light);
   }
 
-  .wc-transmittal-link-card:hover{
-    transform:translateY(-2px);
-    border-color:rgba(0,63,40,.22);
-    box-shadow:0 18px 42px rgba(23,32,51,.09);
-  }
-
-  .wc-transmittal-link-card h3{
+  .wc-ptax-summary-card strong{
+    display:block;
     margin:0 0 8px;
-    color:#172033;
-    font-size:18px;
-    line-height:1.2;
+    color:var(--green);
+    font-size:24px;
+    line-height:1.15;
   }
 
-  .wc-transmittal-link-card p{
-    margin:0 0 18px;
-    color:#607184;
-    font-size:14px;
-    line-height:1.6;
-  }
-
-  .wc-transmittal-link-card span{
-    margin-top:auto;
-    color:#003f28;
-    font-size:12px;
+  .wc-ptax-summary-card span{
+    display:block;
+    margin:0 0 8px;
+    color:var(--muted);
+    font-size:11px;
     font-weight:900;
     letter-spacing:.08em;
     text-transform:uppercase;
   }
 
+  .wc-ptax-summary-card p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.55;
+  }
+
+  .wc-ptax-flow{
+    margin:0 0 34px;
+    padding:28px;
+    border:1px solid var(--border);
+    border-radius:28px;
+    background:#ffffff;
+    box-shadow:0 14px 34px rgba(23,32,51,.05);
+  }
+
+  .wc-ptax-flow-head{
+    max-width:760px;
+    margin:0 0 22px;
+  }
+
+  .wc-ptax-flow-head h2{
+    margin:0 0 10px;
+    color:var(--text);
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:clamp(28px, 3.8vw, 44px);
+    line-height:1.08;
+    font-weight:500;
+  }
+
+  .wc-ptax-flow-head p{
+    margin:0;
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.65;
+  }
+
+  .wc-ptax-flow-list{
+    display:grid;
+    gap:10px;
+  }
+
+  .wc-ptax-flow-row{
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--light);
+  }
+
+  .wc-ptax-flow-row-main{
+    display:grid;
+    grid-template-columns:minmax(220px,.36fr) minmax(0,1fr) minmax(140px,.16fr);
+    gap:14px;
+    align-items:center;
+  }
+
+  .wc-ptax-flow-name{
+    color:var(--text);
+    font-size:14px;
+    font-weight:800;
+    line-height:1.3;
+  }
+
+  .wc-ptax-flow-name a{
+    color:var(--text);
+    text-decoration:none;
+  }
+
+  .wc-ptax-flow-name a:hover,
+  .wc-ptax-flow-name a:focus-visible{
+    color:var(--green);
+    text-decoration:underline;
+  }
+
+  .wc-ptax-flow-track{
+    position:relative;
+    height:12px;
+    overflow:hidden;
+    border-radius:999px;
+    background:var(--border);
+  }
+
+  .wc-ptax-flow-bar{
+    position:absolute;
+    inset:0 auto 0 0;
+    width:var(--ptax-share, 0%);
+    min-width:6px;
+    border-radius:999px;
+    background:var(--green);
+  }
+
+  .wc-ptax-flow-amount{
+    color:var(--green);
+    font-size:15px;
+    font-weight:900;
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .wc-ptax-flow-amount span{
+    display:block;
+    margin-top:4px;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:800;
+    text-align:right;
+  }
+
+  .wc-ptax-flow-loading,
+  .wc-ptax-flow-error{
+    padding:20px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--light);
+    color:var(--muted);
+    font-weight:800;
+  }
+
   @media(max-width:960px){
-    body.transmittal-page #content{
+    body.property-tax-fund-page #content{
       padding:34px 22px 64px;
     }
 
-    .wc-transmittal-links{
+    .wc-ptax-hero,
+    .wc-ptax-flow-row-main{
+      grid-template-columns:1fr;
+    }
+
+    .wc-ptax-summary-grid{
       grid-template-columns:repeat(2, minmax(0,1fr));
+    }
+
+    .wc-ptax-flow-amount{
+      text-align:left;
+    }
+
+    .wc-ptax-flow-amount span{
+      text-align:left;
     }
   }
 
   @media(max-width:640px){
-    body.transmittal-page #content{
+    body.property-tax-fund-page #content{
       padding:28px 16px 54px;
     }
 
-    .wc-transmittal-hero-copy,
-    .wc-transmittal-letter{
+    .wc-ptax-hero-copy,
+    .wc-ptax-millage-card,
+    .wc-ptax-flow{
       padding:22px;
       border-radius:22px;
     }
 
-    .wc-transmittal-links{
+    .wc-ptax-summary-grid{
       grid-template-columns:1fr;
     }
   }
 
-  /* The hero banner is always set on a fixed dark-green background, so it
-     reads fine in either theme without changes. The letter card, section
-     text, and link cards below it assume a light page background, so they
-     need explicit dark-theme treatment to stay legible when the site theme
-     switches. */
-  :root[data-theme="dark"] .wc-transmittal-letter,
-  :root[data-theme="dark"] .wc-transmittal-link-card{
-    background:rgba(14,28,22,.92);
-    border-color:var(--border);
-    box-shadow:0 18px 46px rgba(0,0,0,.28);
-  }
-
-  :root[data-theme="dark"] .wc-transmittal-letter p,
-  :root[data-theme="dark"] .wc-transmittal-letter ul,
-  :root[data-theme="dark"] .wc-transmittal-section-header p,
-  :root[data-theme="dark"] .wc-transmittal-letter-status,
-  :root[data-theme="dark"] .wc-transmittal-link-card p{
-    color:var(--muted);
-  }
-
-  :root[data-theme="dark"] .wc-transmittal-letter h3,
-  :root[data-theme="dark"] .wc-transmittal-section-header h2,
-  :root[data-theme="dark"] .wc-transmittal-link-card h3{
-    color:var(--text);
-  }
-
-  :root[data-theme="dark"] .wc-transmittal-salutation,
-  :root[data-theme="dark"] .wc-transmittal-signature{
-    color:var(--text) !important;
-  }
-
-  :root[data-theme="dark"] .wc-transmittal-section .wc-transmittal-kicker,
-  :root[data-theme="dark"] .wc-transmittal-link-card span{
-    color:var(--green);
-  }
-
-  :root[data-theme="dark"] .wc-transmittal-link-card:hover{
-    border-color:rgba(123,211,159,.35);
-    box-shadow:0 22px 50px rgba(0,0,0,.34);
+  :root[data-theme="dark"] .wc-ptax-millage-card,
+  :root[data-theme="dark"] .wc-ptax-summary-card,
+  :root[data-theme="dark"] .wc-ptax-flow,
+  :root[data-theme="dark"] .wc-ptax-flow-row,
+  :root[data-theme="dark"] .wc-ptax-flow-loading,
+  :root[data-theme="dark"] .wc-ptax-flow-error{
+    background: rgba(14,28,22,.92);
+    border-color: var(--border);
   }
 </style>
 
-<section class="wc-transmittal">
-  <div class="wc-transmittal-hero">
-    <div class="wc-transmittal-hero-copy">
-      <span class="wc-transmittal-kicker">Transmittal Letter</span>
-      <h2>A budget message for Walton County.</h2>
-      <p>The transmittal letter introduces the annual budget, explains the financial conditions shaping the plan, and connects the County&rsquo;s priorities to the services, infrastructure, and stewardship residents depend on.</p>
+<section class="wc-ptax">
+  <div class="wc-ptax-hero">
+    <div class="wc-ptax-hero-copy">
+      <span class="wc-ptax-kicker">Property Tax Allocation</span>
+      <h2>Every property tax dollar is levied for a specific County service.</h2>
+      <p>Walton County's countywide ad valorem (property) tax is the largest funding source for core services that aren&rsquo;t paid for by their own dedicated fees &mdash; constitutional offices, public safety, courts, libraries, parks, and general government. This page shows the FY 2027 proposed dollar amount each department receives from that tax.</p>
     </div>
 
-  </div>
-
-  <div class="wc-transmittal-letter-grid">
-    <article class="wc-transmittal-letter">
-      <div id="wc-transmittal-letter-body">
-        <p class="wc-transmittal-letter-status">Loading transmittal letter&hellip;</p>
+    <aside class="wc-ptax-millage-card" aria-label="Walton County millage rates">
+      <div class="wc-ptax-millage-row">
+        <strong>3.519</strong>
+        <span>Countywide Millage</span>
       </div>
-    </article>
-
+      <div class="wc-ptax-millage-row">
+        <strong>0.441</strong>
+        <span>North Walton Mosquito Control Millage</span>
+      </div>
+    </aside>
   </div>
 
-  <section class="wc-transmittal-section">
-    <div class="wc-transmittal-section-header">
-      <span class="wc-transmittal-kicker">Explore the Supporting Detail</span>
-      <h2>Move from the message to the numbers.</h2>
-      <p>The pages below provide the financial schedules, department detail, and capital planning information that support the transmittal letter.</p>
+  <div class="wc-ptax-summary-grid" id="wc-ptax-summary" aria-label="Property tax revenue summary">
+    <div class="wc-ptax-summary-card">
+      <span>Total Countywide Ad Valorem Revenue</span>
+      <strong id="wc-ptax-total">&hellip;</strong>
+      <p>FY 2027 proposed, County-only portion (excludes schools and other taxing authorities).</p>
     </div>
+    <div class="wc-ptax-summary-card">
+      <span>Departments Funded</span>
+      <strong id="wc-ptax-count">&hellip;</strong>
+      <p>Offices and departments that receive at least some of their budget from this tax.</p>
+    </div>
+    <div class="wc-ptax-summary-card">
+      <strong>1 Mill</strong>
+      <span>= $1 per $1,000</span>
+      <p>Of a property&rsquo;s taxable value, after exemptions such as homestead.</p>
+    </div>
+    <div class="wc-ptax-summary-card">
+      <strong>Separate Levy</strong>
+      <span>Mosquito Control</span>
+      <p>North Walton Mosquito Control sets its own millage outside this countywide tax. <a href="mosquito-control.html">See its budget &rarr;</a></p>
+    </div>
+  </div>
 
-    <div class="wc-transmittal-links">
-      <a class="wc-transmittal-link-card" href="budget-overview.html">
-        <h3>Budget Overview</h3>
-        <p>Review the budget hub, process, policies, fund structure, and major financial context.</p>
-        <span>Open Overview</span>
-      </a>
-      <a class="wc-transmittal-link-card" href="financials.html">
-        <h3>Financials</h3>
-        <p>Explore revenues, expenses, fund schedules, transfers, personnel, equipment, debt, and forecast information.</p>
-        <span>View Financials</span>
-      </a>
-      <a class="wc-transmittal-link-card" href="capital-projects.html">
-        <h3>Capital Projects</h3>
-        <p>Browse the capital overview, fund schedules, and searchable project index for planned investments.</p>
-        <span>View Capital Plan</span>
-      </a>
-    </div>
+  <section class="wc-ptax-flow" id="wc-ptax-flow" aria-live="polite">
+    <div class="wc-ptax-flow-loading">Loading property tax allocation...</div>
   </section>
 </section>
 </main>
@@ -388,7 +435,178 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Statistical & Supplemental Information",section:"Our County",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
 ];
 </script>
+<script src="../assets/budget-data.js?v=20260707-beach-vending-fy2026-fix"></script>
+<script>
+(function(){
+  function escapeHtml(value){
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function compactCurrency(value){
+    const amount = Number(value) || 0;
+    const abs = Math.abs(amount);
+    if (abs >= 1000000000) return "$" + (amount / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+    if (abs >= 1000000) return "$" + (amount / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (abs >= 1000) return "$" + (amount / 1000).toFixed(0) + "K";
+    return "$" + amount.toLocaleString();
+  }
+
+  function normalizeMatchName(name){
+    return String(name || "")
+      .replace(/\(.*?\)/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // A few department names on the revenue sheet don't exactly match the
+  // title used for that department's own page in wcBudgetPages -- resolved
+  // here so a row can still link to the right page.
+  const PAGE_NAME_ALIASES = {
+    "clerk of court": "clerk of courts & county comptroller",
+    "environmental services": "environmental resources",
+    "south walton fire": "south walton fire & state control",
+    "statutory & other": "statutory & other agency funding"
+  };
+  let pageHrefByName = null;
+  function getPageHref(norm){
+    if (!pageHrefByName){
+      pageHrefByName = {};
+      (window.wcBudgetPages || []).forEach(function(page){
+        if (page && page.title && page.href){
+          pageHrefByName[normalizeMatchName(page.title)] = page.href.replace(/^.*\/pages\//, "");
+        }
+      });
+    }
+    const lookup = PAGE_NAME_ALIASES[norm] || norm;
+    return pageHrefByName[lookup] || "";
+  }
+
+  const AD_VALOREM_REVENUE_CODES = ["311000", "311001"];
+  // Mosquito Control (fund 105) levies its own separate millage, shown in
+  // its own summary card above rather than folded into this countywide
+  // breakdown.
+  const MOSQUITO_CONTROL_FUND_CODE = "105";
+  // Large ad valorem lines that fund interfund transfers to the Sheriff
+  // Fund (107) and Capital Projects Fund (300) are booked on the revenue
+  // sheet under this one generic bookkeeping Dept_Name rather than either
+  // fund's own name, with no other field distinguishing which row is
+  // which. There are exactly two such rows every year; the larger one is
+  // always the Sheriff Fund transfer (it's by far the County's largest
+  // ad valorem-funded budget) and the other is the Capital Projects Fund
+  // transfer -- split apart below by amount rather than left as one
+  // unlabeled lump sum.
+  const INTERFUND_TRANSFER_DEPT_NAME = "interfund group transfer out";
+  const INTERFUND_TRANSFER_LABELS = ["Sheriff's Office", "Capital Projects"];
+
+  function fundCodeForRow(row){
+    return String((row && row.Dept_Code) || "").trim().slice(0, 3);
+  }
+
+  // Reads the same live revenues sheet (window.WCBudgetData) used
+  // everywhere else on the site -- the FY2027 Ad Valorem Taxes revenue
+  // rows recorded directly against each department, not a separately
+  // curated allocation sheet.
+  function loadAdValoremRows(){
+    if (!window.WCBudgetData || typeof window.WCBudgetData.loadBudgetData !== "function"){
+      return Promise.reject(new Error("Budget data is not available"));
+    }
+    return window.WCBudgetData.loadBudgetData().then(function(data){
+      const totalsByName = new Map();
+      const interfundTransferAmounts = [];
+      (data.revenues || []).forEach(function(row){
+        if (AD_VALOREM_REVENUE_CODES.indexOf(String(row.Revenue_Code || "").trim()) === -1) return;
+        if (fundCodeForRow(row) === MOSQUITO_CONTROL_FUND_CODE) return;
+        const rawName = String(row.Dept_Name || "").trim();
+        if (!rawName) return;
+        const amount = Number(row.FY2027_Proposed) || 0;
+        if (normalizeMatchName(rawName) === INTERFUND_TRANSFER_DEPT_NAME){
+          if (amount > 0) interfundTransferAmounts.push(amount);
+          return;
+        }
+        totalsByName.set(rawName, (totalsByName.get(rawName) || 0) + amount);
+      });
+
+      interfundTransferAmounts.sort(function(a, b){ return b - a; });
+      interfundTransferAmounts.forEach(function(amount, index){
+        const name = INTERFUND_TRANSFER_LABELS[index] || "Interfund Group Transfer Out";
+        totalsByName.set(name, (totalsByName.get(name) || 0) + amount);
+      });
+
+      return Array.from(totalsByName.entries())
+        .map(function(entry){ return { name: entry[0], amount: entry[1] }; })
+        .filter(function(d){ return d.amount > 0; })
+        .sort(function(a, b){ return b.amount - a.amount; });
+    });
+  }
+
+  function renderAllocation(departments){
+    const flowMount = document.getElementById("wc-ptax-flow");
+    const totalEl = document.getElementById("wc-ptax-total");
+    const countEl = document.getElementById("wc-ptax-count");
+    if (!flowMount) return;
+
+    if (!departments.length){
+      flowMount.innerHTML = '<div class="wc-ptax-flow-error">Property tax allocation data is not available right now.</div>';
+      if (totalEl) totalEl.textContent = "—";
+      if (countEl) countEl.textContent = "—";
+      return;
+    }
+
+    const total = departments.reduce(function(sum, d){ return sum + d.amount; }, 0);
+    const maxAmount = Math.max.apply(null, departments.map(function(d){ return d.amount; }));
+
+    if (totalEl) totalEl.textContent = compactCurrency(total);
+    if (countEl) countEl.textContent = String(departments.length);
+
+    const rows = departments.map(function(d){
+      const share = maxAmount ? Math.max(2, (d.amount / maxAmount) * 100) : 0;
+      const norm = normalizeMatchName(d.name);
+      const displayName = String(d.name).replace(/\s*\([^)]*\)\s*/g, "").trim();
+      const href = getPageHref(norm);
+      const nameHtml = href
+        ? '<a href="' + escapeHtml(href) + '">' + escapeHtml(displayName) + '</a>'
+        : escapeHtml(displayName);
+      const percent = total ? (d.amount / total) * 100 : 0;
+      return (
+        '<div class="wc-ptax-flow-row">' +
+          '<div class="wc-ptax-flow-row-main">' +
+            '<div class="wc-ptax-flow-name">' + nameHtml + '</div>' +
+            '<div class="wc-ptax-flow-track">' +
+              '<div class="wc-ptax-flow-bar" style="--ptax-share:' + share.toFixed(2) + '%"></div>' +
+            '</div>' +
+            '<div class="wc-ptax-flow-amount" title="$' + Math.round(d.amount).toLocaleString() + '">' +
+              compactCurrency(d.amount) +
+              '<span>' + percent.toFixed(1) + '% of total</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+
+    flowMount.innerHTML =
+      '<div class="wc-ptax-flow-head">' +
+        '<h2>Property tax allocation by department.</h2>' +
+        '<p>Each row is the FY 2027 proposed dollar amount of countywide ad valorem tax revenue that department receives, largest first.</p>' +
+      '</div>' +
+      '<div class="wc-ptax-flow-list">' + rows + '</div>';
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    loadAdValoremRows()
+      .then(renderAllocation)
+      .catch(function(error){
+        console.error("Failed to load property tax allocation data", error);
+        renderAllocation([]);
+      });
+  });
+})();
+</script>
 <script src="../assets/nav.js?v=20260627-prior-years-a11y"></script>
-<script src="../assets/transmittal-narrative.js?v=20260623-sheet-driven-letter"></script>
 </body>
 </html>

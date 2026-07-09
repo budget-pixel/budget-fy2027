@@ -671,6 +671,7 @@
     font-weight:800;
     text-decoration:none;
     box-shadow:0 12px 26px rgba(0,0,0,.18);
+    cursor:pointer;
   }
   .wc-button.secondary{
     background:rgba(255,255,255,.14);
@@ -1111,6 +1112,145 @@
     font-size:11px;
     font-style:italic;
   }
+  .wc-budget-guide-dialog{
+    width:min(94vw, 760px);
+    border:1px solid var(--wc-line);
+    border-radius:22px;
+    background:#ffffff;
+    color:var(--wc-ink);
+    box-shadow:0 28px 80px rgba(23,32,51,.3);
+    padding:0;
+  }
+  .wc-budget-guide-dialog::backdrop{
+    background:rgba(4,16,11,.58);
+  }
+  .wc-budget-guide-inner{
+    padding:26px;
+  }
+  .wc-budget-guide-head{
+    display:flex;
+    align-items:start;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:18px;
+  }
+  .wc-budget-guide-head h2{
+    margin:0;
+    color:var(--wc-ink);
+    font-size:24px;
+    line-height:1.15;
+    letter-spacing:0;
+  }
+  .wc-budget-guide-head p{
+    margin:8px 0 0;
+    color:var(--wc-muted);
+    font-size:14px;
+    line-height:1.55;
+  }
+  .wc-budget-guide-close{
+    width:38px;
+    height:38px;
+    flex:0 0 auto;
+    border:1px solid var(--wc-line);
+    border-radius:999px;
+    background:#ffffff;
+    color:var(--wc-ink);
+    font-size:24px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .wc-budget-guide-form{
+    display:grid;
+    gap:18px;
+  }
+  .wc-budget-guide-field label,
+  .wc-budget-guide-field legend{
+    display:block;
+    margin:0 0 8px;
+    color:var(--wc-ink);
+    font-size:13px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .wc-budget-guide-options{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+    margin:0;
+    padding:0;
+    border:0;
+  }
+  .wc-budget-guide-choice{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-height:48px;
+    padding:12px 13px;
+    border:1px solid var(--wc-line);
+    border-radius:14px;
+    background:#fbfcfa;
+    color:var(--wc-ink);
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .wc-budget-guide-choice input{
+    flex:0 0 auto;
+    accent-color:var(--wc-green);
+  }
+  .wc-budget-guide-choice:has(input:checked){
+    border-color:rgba(0,98,49,.55);
+    background:rgba(0,98,49,.08);
+  }
+  .wc-budget-guide-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .wc-budget-guide-submit,
+  .wc-budget-guide-reset,
+  .wc-budget-guide-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:44px;
+    padding:0 16px;
+    border-radius:999px;
+    font-weight:900;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .wc-budget-guide-submit,
+  .wc-budget-guide-link{
+    border:1px solid var(--wc-green);
+    background:var(--wc-green);
+    color:#ffffff;
+  }
+  .wc-budget-guide-reset{
+    border:1px solid var(--wc-line);
+    background:#ffffff;
+    color:var(--wc-ink);
+  }
+  .wc-budget-guide-result{
+    margin-top:2px;
+    padding:18px;
+    border:1px solid rgba(0,98,49,.22);
+    border-radius:16px;
+    background:linear-gradient(180deg, rgba(0,98,49,.08), rgba(0,98,49,.04));
+  }
+  .wc-budget-guide-result h3{
+    margin:0;
+    color:var(--wc-ink);
+    font-size:18px;
+    line-height:1.25;
+  }
+  .wc-budget-guide-result p{
+    margin:8px 0 14px;
+    color:var(--wc-muted);
+    font-size:14px;
+    line-height:1.55;
+  }
   .wc-tax-info-warning{
     color:#b3261e;
   }
@@ -1191,6 +1331,23 @@
   }
   html[data-theme="dark"] .wc-tax-info-dialog p{
     color:var(--wc-muted);
+  }
+  html[data-theme="dark"] .wc-budget-guide-dialog,
+  html[data-theme="dark"] .wc-budget-guide-close,
+  html[data-theme="dark"] .wc-budget-guide-reset{
+    background:#0a1410;
+    border-color:var(--wc-line);
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-budget-guide-choice{
+    background:rgba(255,255,255,.04);
+    border-color:var(--wc-line);
+    color:var(--wc-ink);
+  }
+  html[data-theme="dark"] .wc-budget-guide-choice:has(input:checked),
+  html[data-theme="dark"] .wc-budget-guide-result{
+    border-color:rgba(142,203,166,.32);
+    background:rgba(0,98,49,.22);
   }
   html[data-theme="dark"] .wc-property-search-results{
     background:rgba(10,20,16,.96);
@@ -1660,6 +1817,27 @@
     nav#nav-menu .wc-nav-search-result span{
       text-align:left;
     }
+    .wc-budget-guide-dialog{
+      width:min(94vw, 560px);
+      max-height:88vh;
+    }
+    .wc-budget-guide-inner{
+      padding:20px;
+    }
+    .wc-budget-guide-head h2{
+      font-size:21px;
+    }
+    .wc-budget-guide-options{
+      grid-template-columns:1fr;
+    }
+    .wc-budget-guide-actions{
+      flex-direction:column;
+    }
+    .wc-budget-guide-submit,
+    .wc-budget-guide-reset,
+    .wc-budget-guide-link{
+      width:100%;
+    }
     .wc-top-links{
       order:4;
       display:none;
@@ -1755,12 +1933,41 @@
       <h1>Fiscal Year 2027 Proposed Budget</h1>
       <p class="wc-hero-copy">Investing in infrastructure, public safety, and quality of life for a better Walton County.</p>
       <div class="wc-hero-actions">
-        <a class="wc-button" href="pages/budget-overview.html">Explore the Budget</a>
+        <button class="wc-button" type="button" id="budgetGuideOpen" aria-haspopup="dialog" aria-controls="budgetGuideDialog">Explore the Budget</button>
         <a class="wc-button secondary" href="pages/capital-projects.html">View Capital Plan</a>
       </div>
     </div>
   </div>
 </section>
+
+<dialog class="wc-budget-guide-dialog" id="budgetGuideDialog" aria-labelledby="budgetGuideTitle">
+  <div class="wc-budget-guide-inner">
+    <div class="wc-budget-guide-head">
+      <div>
+        <h2 id="budgetGuideTitle">What are you trying to find?</h2>
+        <p>Choose a topic and we’ll point you to the best budget page.</p>
+      </div>
+      <button class="wc-budget-guide-close" type="button" aria-label="Close budget guide" id="budgetGuideClose">&times;</button>
+    </div>
+    <form class="wc-budget-guide-form" id="budgetGuideForm">
+      <fieldset class="wc-budget-guide-options wc-budget-guide-field">
+        <legend>Choose a topic</legend>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="overview"> Budget overview</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="taxes"> Property taxes</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="departments"> Departments</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="officers"> Constitutional officers</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="capital"> Capital projects</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="financials"> Financial schedules</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="process"> Budget process</label>
+        <label class="wc-budget-guide-choice"><input type="radio" name="budgetGuideTopic" value="staffing"> Staffing</label>
+      </fieldset>
+      <div class="wc-budget-guide-actions">
+        <button class="wc-budget-guide-reset" type="button" id="budgetGuideReset">Start Over</button>
+      </div>
+      <div class="wc-budget-guide-result" id="budgetGuideResult" hidden></div>
+    </form>
+  </div>
+</dialog>
 
 <div class="wc-home-shell">
   <main id="main-content" tabindex="-1">
@@ -2076,6 +2283,123 @@
           nav.classList.remove("is-menu-open");
           toggle.setAttribute("aria-expanded", "false");
           toggle.focus({ preventScroll:true });
+        }
+      });
+    }
+
+    function initBudgetGuide(){
+      var openButton = $("#budgetGuideOpen");
+      var dialog = $("#budgetGuideDialog");
+      var closeButton = $("#budgetGuideClose");
+      var form = $("#budgetGuideForm");
+      var result = $("#budgetGuideResult");
+      var resetButton = $("#budgetGuideReset");
+      if(!openButton || !dialog || !form || !result) return;
+
+      var recommendations = {
+        overview: {
+          title: "Start with Budget Overview",
+          href: "pages/budget-overview.html",
+          answer: "This is the best starting point for the FY 2027 proposed budget, major sections, and how the budget site is organized."
+        },
+        taxes: {
+          title: "See Summary of Property Tax Allocations",
+          href: "pages/summary-of-property-tax-allocations.html",
+          answer: "For property tax questions, start with Summary of Property Tax Allocations. It shows the FY 2027 dollar amount each department receives from the countywide ad valorem tax."
+        },
+        departments: {
+          title: "Browse Departments",
+          href: "pages/departments.html",
+          answer: "The Departments directory lets you compare department budgets, budget changes, staffing, funds, and department detail pages."
+        },
+        officers: {
+          title: "View Constitutional Officers & Other Agencies",
+          href: "pages/constitutional-officers.html",
+          answer: "This page is the best match for the Sheriff, Clerk, Tax Collector, Property Appraiser, Supervisor of Elections, courts, and outside agencies."
+        },
+        capital: {
+          title: "Explore Capital Projects",
+          href: "pages/capital-projects.html",
+          answer: "Capital Projects is the best place to see infrastructure, roads, facilities, project funding, and project-level detail."
+        },
+        financials: {
+          title: "Open Financials",
+          href: "pages/financials.html",
+          answer: "Financials gathers the detailed schedules, fund summaries, revenues, expenses, personnel, equipment, and interfund transfers."
+        },
+        process: {
+          title: "See Budget Process & Calendar",
+          href: "pages/budget-process-and-calendar.html",
+          answer: "This explains how the budget is developed, reviewed, heard publicly, amended, and adopted."
+        },
+        staffing: {
+          title: "Go to Summary of Personnel",
+          href: "pages/summary-of-personnel.html",
+          answer: "For staffing questions, the Summary of Personnel shows positions and staffing changes across the budget."
+        }
+      };
+
+      function getSelectedTopic(){
+        var selected = form.querySelector('input[name="budgetGuideTopic"]:checked');
+        return selected ? selected.value : "";
+      }
+
+      function renderRecommendation(topic){
+        var rec = recommendations[topic] || recommendations.overview;
+        result.hidden = false;
+        result.innerHTML = '<h3>' + escapeHtml(rec.title) + '</h3>' +
+          '<p>' + escapeHtml(rec.answer) + '</p>' +
+          '<a class="wc-budget-guide-link" href="' + escapeHtml(rec.href) + '">Open This Page</a>';
+      }
+
+      function openGuide(event){
+        if(event) event.preventDefault();
+        if(typeof dialog.showModal === "function"){
+          dialog.showModal();
+        }else{
+          dialog.setAttribute("open", "");
+        }
+        setTimeout(function(){
+          var firstChoice = form.querySelector('input[name="budgetGuideTopic"]');
+          if(firstChoice) firstChoice.focus();
+        }, 30);
+      }
+
+      function closeGuide(){
+        if(typeof dialog.close === "function"){
+          dialog.close();
+        }else{
+          dialog.removeAttribute("open");
+        }
+        openButton.focus({ preventScroll:true });
+      }
+
+      openButton.addEventListener("click", openGuide);
+      if(closeButton) closeButton.addEventListener("click", closeGuide);
+      dialog.addEventListener("click", function(event){
+        if(event.target === dialog) closeGuide();
+      });
+      form.addEventListener("submit", function(event){
+        event.preventDefault();
+        renderRecommendation(getSelectedTopic());
+      });
+      form.querySelectorAll('input[name="budgetGuideTopic"]').forEach(function(input){
+        input.addEventListener("change", function(){
+          renderRecommendation(input.value);
+        });
+      });
+      if(resetButton){
+        resetButton.addEventListener("click", function(){
+          form.reset();
+          result.hidden = true;
+          result.innerHTML = "";
+          var firstChoice = form.querySelector('input[name="budgetGuideTopic"]');
+          if(firstChoice) firstChoice.focus();
+        });
+      }
+      document.addEventListener("keydown", function(event){
+        if(event.key === "Escape" && dialog.open){
+          closeGuide();
         }
       });
     }
@@ -2926,6 +3250,7 @@
       initLogo();
       initSearch();
       initMenu();
+      initBudgetGuide();
       updateRevenueCards();
       updateExpenseCards();
       initProjects();

@@ -30,6 +30,7 @@ var wcCoreBudgetPages = [
   { title:"Summary of Interfund Transfers", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0c507ca05e715043" },
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
   { title:"Summary of Machinery, Vehicles & Equipment", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfdb1a2c2915743e4" },
+  { title:"Summary of Property Tax Allocations", section:"Financial Summaries", href:"summary-of-property-tax-allocations.html" },
   { title:"Financials", section:"Financials", href:"financials.html" },
   { title:"Supporting Budget Documentation", section:"Financials", href:"supporting-budget-documentation.html" },
   { title:"Board of County Commissioners", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc6947be859271a418" },
@@ -160,6 +161,10 @@ var wcHiddenBudgetPageTitles = new Set([
 
     "Department to Fund Relationship": [
       "department fund", "which fund", "fund relationship", "department funding", "funded by", "department to fund", "general fund departments", "special revenue departments"
+    ],
+
+    "Summary of Property Tax Allocations": [
+      "property tax", "property taxes", "ad valorem", "millage", "what does my property tax fund", "what does my property tax pay for", "tax allocation", "tax breakdown", "where do my taxes go"
     ],
 
     "Financial Policies": [
@@ -471,6 +476,7 @@ var wcHiddenBudgetPageTitles = new Set([
     "Budget Calendar": "budget-calendar.html",
     "Fund Descriptions and Structure": "fund-descriptions-and-structure.html",
     "Department to Fund Relationship": "department-to-fund-relationship.html",
+    "Summary of Property Tax Allocations": "summary-of-property-tax-allocations.html",
     "Financial Policies": "financial-policies.html",
     "Consolidated Financial Schedules": "consolidated-financial-schedules.html",
     "Fund Financial Schedules": "fund-financial-schedules.html",
