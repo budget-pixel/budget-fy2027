@@ -1066,6 +1066,15 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     return adValoremRowsPromise;
   }
 
+  // Shown collapsed to this many rows by default -- the full list runs to
+  // ~25+ departments (every office/division that receives any countywide
+  // ad valorem revenue), which is a lot of scrolling before a reader ever
+  // reaches the personalized calculator below. Same "Explore All" pattern
+  // already used by the personalized breakdown table further down this
+  // page (see BREAKDOWN_PREVIEW_COUNT/toggleRowHtml in initTaxCalculator).
+  const FLOW_PREVIEW_COUNT = 6;
+  let flowShowAll = false;
+
   function renderAllocation(departments){
     const flowMount = document.getElementById("wc-ptax-flow");
     const totalEl = document.getElementById("wc-ptax-total");
@@ -1085,7 +1094,9 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     if (totalEl) totalEl.textContent = compactCurrency(total);
     if (countEl) countEl.textContent = String(departments.length);
 
-    const rows = departments.map(function(d){
+    const visible = flowShowAll ? departments : departments.slice(0, FLOW_PREVIEW_COUNT);
+
+    const rows = visible.map(function(d){
       const share = maxAmount ? Math.max(2, (d.amount / maxAmount) * 100) : 0;
       const norm = normalizeMatchName(d.name);
       const displayName = String(d.name).replace(/\s*\([^)]*\)\s*/g, "").trim();
@@ -1110,12 +1121,27 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
       );
     }).join("");
 
+    const toggleHtml = departments.length > FLOW_PREVIEW_COUNT
+      ? '<button type="button" id="ptaxFlowToggle" class="wc-millage-reset wc-breakdown-toggle">' +
+          (flowShowAll ? "Show Fewer" : "Show All " + departments.length + " Departments &rarr;") +
+        '</button>'
+      : "";
+
     flowMount.innerHTML =
       '<div class="wc-ptax-flow-head">' +
         '<h2>Property tax allocation by department.</h2>' +
         '<p>Each row is the FY 2027 proposed dollar amount of countywide ad valorem tax revenue that department receives, largest first.</p>' +
       '</div>' +
-      '<div class="wc-ptax-flow-list">' + rows + '</div>';
+      '<div class="wc-ptax-flow-list">' + rows + '</div>' +
+      toggleHtml;
+
+    const toggleButton = document.getElementById("ptaxFlowToggle");
+    if (toggleButton){
+      toggleButton.addEventListener("click", function(){
+        flowShowAll = !flowShowAll;
+        renderAllocation(departments);
+      });
+    }
   }
 
   // Real, already-adopted FY2026 -> FY2027 dollar/percent increases for
