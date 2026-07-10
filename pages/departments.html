@@ -634,6 +634,10 @@
         return { label:group.label, budget:"Loading", trend:"Loading", trendDollar:"Loading", fte:"Loading", fteTrend:"Loading", propertyTax:"Loading" };
       }));
 
+      if(shouldScrollToDepartmentListFromUrl){
+        scrollDepartmentListIntoViewOnMobile();
+      }
+
       if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
         window.WCBudgetData.loadBudgetData()
           .then(function(data){

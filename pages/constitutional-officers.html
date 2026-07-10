@@ -666,6 +666,11 @@
         return { label:spec.label, budget:"Loading", trend:"Loading", trendDollar:"Loading", fte:"Loading", fteTrend:"Loading", propertyTax:"Loading" };
       }));
 
+      if(shouldScrollToDirectoryFromUrl){
+        renderFilteredGroups();
+        scrollDirectoryIntoViewOnMobile();
+      }
+
       if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
         window.WCBudgetData.loadBudgetData()
           .then(function(data){

@@ -952,6 +952,15 @@
     border-color:rgba(0,98,49,.28);
     box-shadow:0 22px 48px rgba(23,32,51,.12);
   }
+  .wc-budget-card:focus,
+  .wc-investment-card:focus{
+    outline:0;
+  }
+  .wc-budget-card:focus-visible,
+  .wc-investment-card:focus-visible{
+    border-color:rgba(0,98,49,.44);
+    box-shadow:0 0 0 4px rgba(209,190,120,.34), 0 22px 48px rgba(23,32,51,.12);
+  }
   .wc-budget-card small,
   .wc-investment-card small{
     display:block;
@@ -989,6 +998,9 @@
     box-shadow:0 24px 70px rgba(23,32,51,.28);
     padding:0;
   }
+  .wc-fund-picker-dialog:focus{
+    outline:0;
+  }
   .wc-fund-picker-dialog::backdrop{
     background:rgba(4,16,11,.52);
   }
@@ -1022,6 +1034,13 @@
   .wc-fund-picker-close:hover{
     border-color:rgba(0,98,49,.28);
     color:var(--wc-green);
+  }
+  .wc-fund-picker-close:focus{
+    outline:0;
+  }
+  .wc-fund-picker-close:focus-visible{
+    border-color:rgba(0,98,49,.38);
+    box-shadow:0 0 0 3px rgba(209,190,120,.38);
   }
   .wc-fund-picker-list{
     display:grid;
@@ -2139,6 +2158,8 @@
       var titleEl = $("#fundPickerDialogTitle");
       var listEl = $("#fundPickerList");
       var closeButton = $("#fundPickerClose");
+      var fundPickerReturnFocusTarget = null;
+      var fundPickerOpenedByKeyboard = false;
 
       function normalizeName(value){
         return String(value || "")
@@ -2191,9 +2212,11 @@
         return parts.join(" · ");
       }
 
-      function openPicker(key){
+      function openPicker(key, trigger, openedByKeyboard){
         var config = FUND_PICKER_OPTIONS[key];
         if(!config) return;
+        fundPickerReturnFocusTarget = trigger || null;
+        fundPickerOpenedByKeyboard = !!openedByKeyboard;
         titleEl.textContent = config.title;
         listEl.innerHTML = config.options.map(function(opt){
           var meta = opt.metaText ? '<span class="wc-fund-picker-option-meta">' + escapeHtml(opt.metaText) + "</span>" : "";
@@ -2211,7 +2234,7 @@
           var key = trigger.getAttribute("data-fund-picker");
           if(!FUND_PICKER_OPTIONS[key]) return;
           event.preventDefault();
-          openPicker(key);
+          openPicker(key, trigger, event.detail === 0);
         });
       });
 
@@ -2221,6 +2244,28 @@
         } else {
           dialog.removeAttribute("open");
         }
+        function clearPointerFocus(){
+          if(fundPickerOpenedByKeyboard) return;
+          var active = document.activeElement;
+          if(active && typeof active.blur === "function"){
+            active.blur();
+          }
+          if(fundPickerReturnFocusTarget && typeof fundPickerReturnFocusTarget.blur === "function"){
+            fundPickerReturnFocusTarget.blur();
+          }
+          if(closeButton && typeof closeButton.blur === "function"){
+            closeButton.blur();
+          }
+          if(typeof dialog.blur === "function"){
+            dialog.blur();
+          }
+        }
+        window.requestAnimationFrame(clearPointerFocus);
+        window.setTimeout(function(){
+          clearPointerFocus();
+          fundPickerReturnFocusTarget = null;
+          fundPickerOpenedByKeyboard = false;
+        }, 80);
       }
       if(closeButton) closeButton.addEventListener("click", closeDialog);
       dialog.addEventListener("click", function(event){
