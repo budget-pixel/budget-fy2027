@@ -18,7 +18,6 @@
     "dalton-drive.png",
     "hewett-bayou-connector-rd-e-lamb-drive-extension.jpg",
     "huckaba-road-604114-bridge-replacement.jpg",
-    "huckaba_road_604114_bridge_replacement.jpg",
     "iris-lane-resurfacing.jpg",
     "laurel-lane-dirt-to-pave.jpg",
     "marigold-avenue-dirt-to-pave.jpg",
@@ -155,7 +154,6 @@
       .map(projectImageKey)
       .filter(Boolean);
     const searchableText = candidates.join(" ");
-    const normalizedTitle = projectImageKey(get(row, "Budget Project Name(s)") || values[0]);
     const match = imageOptions.find((image) => {
       return candidates.some((candidate) => {
         return candidate === image.slug ||
@@ -164,18 +162,7 @@
       }) || image.slug.split("-").every((token) => searchableText.includes(token));
     });
 
-    const imageUrl = match ? projectImagePath(match.fileName) : "";
-
-    if(/hu(?:ck|ch)aba/.test(searchableText)){
-      console.log("[CIP project image debug]", {
-        projectTitle:get(row, "Budget Project Name(s)") || values[0] || "",
-        normalizedKey:normalizedTitle,
-        matchedImageFilename:match ? match.fileName : "",
-        image_url:imageUrl
-      });
-    }
-
-    return imageUrl;
+    return match ? projectImagePath(match.fileName) : "";
   }
 
   function compactNarrative(value, fallback) {
