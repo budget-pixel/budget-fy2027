@@ -138,13 +138,19 @@
     font-size:15px;
     line-height:1.65;
   }
-  .wc-public-card a{
+  .wc-public-card > a{
     display:inline-flex;
     margin-top:14px;
     color:var(--green);
     font-size:13px;
     font-weight:900;
     text-decoration:none;
+  }
+  .wc-public-card p a{
+    color:var(--green);
+    font-weight:700;
+    text-decoration:underline;
+    text-underline-offset:2px;
   }
   @media(max-width:980px){
     .wc-timeline-strip,
@@ -207,7 +213,7 @@
     </article>
     <article class="wc-public-card">
       <h3>Community feedback</h3>
-      <p>Citizens are encouraged to ask questions, express concerns, provide recommendations, and offer feedback as the budget is refined.</p>
+      <p>Citizens are encouraged to ask questions, express concerns, provide recommendations, and offer feedback as the budget is refined. Contact the Office of Management and Budget at <a href="mailto:budget@mywaltonfl.gov">budget@mywaltonfl.gov</a> to get your budget questions answered.</p>
     </article>
     <article class="wc-public-card">
       <h3>Meeting notifications</h3>
