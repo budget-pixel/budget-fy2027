@@ -333,7 +333,22 @@
     // buttons' click handler in initDirectory); clicking the active card
     // again clears the filter back to showing every department.
     var activeFundCode = null;
+    var shouldScrollToDepartmentListFromUrl = false;
     var lastFundSummaries = null;
+
+    // Lets a link from elsewhere on the site (e.g. the homepage's General
+    // Fund picker) land here with the General Fund card already selected,
+    // instead of always landing on the unfiltered, every-fund view.
+    (function initActiveFundCodeFromUrl(){
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var code = params.get("fund");
+        if(code && FUND_SUMMARY_GROUPS.some(function(g){ return g.code === code; })){
+          activeFundCode = code;
+          shouldScrollToDepartmentListFromUrl = true;
+        }
+      } catch (e) {}
+    })();
 
     function renderFundSummary(fundSummaries){
       lastFundSummaries = fundSummaries;
@@ -519,7 +534,6 @@
     }
 
     function scrollDepartmentListIntoViewOnMobile(){
-      if(!window.matchMedia || !window.matchMedia("(max-width: 768px)").matches) return;
       var target = $("#departmentFilterStatus") || $("#departmentList");
       if(!target) return;
       window.requestAnimationFrame(function(){
@@ -626,6 +640,10 @@
             enrichDepartments(data);
             renderDepartments();
             renderFundSummary(computeFundSummaries(data));
+            if(shouldScrollToDepartmentListFromUrl){
+              shouldScrollToDepartmentListFromUrl = false;
+              scrollDepartmentListIntoViewOnMobile();
+            }
           })
           .catch(function(){
             departments = departments.map(function(dept){

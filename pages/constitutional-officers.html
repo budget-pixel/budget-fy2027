@@ -455,8 +455,27 @@
     // fund code, and hides the section for the *other* group entirely
     // while active).
     var activeSpecIndex = null;
+    var shouldScrollToDirectoryFromUrl = false;
     var lastFundSummaries = null;
     var lastGroupItems = null;
+
+    // Lets a link from elsewhere on the site (e.g. the homepage's General
+    // Fund picker) land here with the Constitutional Officers or Agencies
+    // & State Mandates card already selected, instead of always landing
+    // on the unfiltered, both-groups view.
+    (function initActiveSpecIndexFromUrl(){
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var card = params.get("card");
+        if(card === "constitutional"){
+          activeSpecIndex = 0;
+          shouldScrollToDirectoryFromUrl = true;
+        } else if(card === "agencies"){
+          activeSpecIndex = 1;
+          shouldScrollToDirectoryFromUrl = true;
+        }
+      } catch (e) {}
+    })();
 
     function renderFundSummary(fundSummaries){
       lastFundSummaries = fundSummaries;
@@ -494,7 +513,6 @@
     }
 
     function scrollDirectoryIntoViewOnMobile(){
-      if(!window.matchMedia || !window.matchMedia("(max-width: 768px)").matches) return;
       var target = $("#officerFilterStatus") || $("#officerSection") || $("#entitySection");
       if(!target) return;
       window.requestAnimationFrame(function(){
@@ -656,6 +674,10 @@
             });
             renderFundSummary(computeFundSummaries(data));
             renderFilteredGroups();
+            if(shouldScrollToDirectoryFromUrl){
+              shouldScrollToDirectoryFromUrl = false;
+              scrollDirectoryIntoViewOnMobile();
+            }
           })
           .catch(function(){
             groupItems.forEach(function(entry, groupIndex){

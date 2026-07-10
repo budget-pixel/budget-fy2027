@@ -971,6 +971,113 @@
     font-size:clamp(28px, 3vw, 42px);
     line-height:1;
   }
+  .wc-investment-card-meta{
+    display:block;
+    margin-top:6px;
+    color:var(--wc-muted);
+    font-size:12px;
+    font-weight:700;
+    line-height:1.4;
+  }
+  .wc-fund-picker-dialog{
+    width:min(92vw, 480px);
+    margin:auto;
+    border:1px solid var(--wc-line);
+    border-radius:16px;
+    background:#fff;
+    color:var(--wc-ink);
+    box-shadow:0 24px 70px rgba(23,32,51,.28);
+    padding:0;
+  }
+  .wc-fund-picker-dialog::backdrop{
+    background:rgba(4,16,11,.52);
+  }
+  .wc-fund-picker-dialog-inner{
+    padding:22px;
+  }
+  .wc-fund-picker-dialog-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+  }
+  .wc-fund-picker-dialog-head h3{
+    margin:0;
+    color:var(--wc-ink);
+    font-size:18px;
+    font-weight:900;
+  }
+  .wc-fund-picker-close{
+    border:1px solid var(--wc-line);
+    background:#fff;
+    border-radius:999px;
+    width:30px;
+    height:30px;
+    color:var(--wc-muted);
+    font-size:18px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .wc-fund-picker-close:hover{
+    border-color:rgba(0,98,49,.28);
+    color:var(--wc-green);
+  }
+  .wc-fund-picker-list{
+    display:grid;
+    gap:8px;
+  }
+  .wc-fund-picker-list a{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 14px;
+    border:1px solid var(--wc-line);
+    border-radius:12px;
+    color:var(--wc-ink);
+    font-size:14px;
+    font-weight:700;
+    text-decoration:none;
+    transition:border-color .15s ease, background-color .15s ease;
+  }
+  .wc-fund-picker-list a > span:first-child{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .wc-fund-picker-option-meta{
+    color:var(--wc-muted);
+    font-size:12px;
+    font-weight:700;
+  }
+  .wc-fund-picker-list a:hover,
+  .wc-fund-picker-list a:focus-visible{
+    border-color:rgba(0,98,49,.32);
+    background:rgba(0,98,49,.06);
+  }
+  .wc-fund-picker-list a::after{
+    content:"\2192";
+    flex:0 0 auto;
+    color:var(--wc-green);
+  }
+  html[data-theme="dark"] .wc-fund-picker-dialog{
+    background:#0a1410;
+    border-color:var(--wc-line);
+    color:var(--wc-ink);
+    box-shadow:0 24px 70px rgba(0,0,0,.5);
+  }
+  html[data-theme="dark"] .wc-fund-picker-close{
+    background:rgba(10,20,16,.7);
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-fund-picker-list a{
+    border-color:var(--wc-line);
+  }
+  html[data-theme="dark"] .wc-fund-picker-list a:hover,
+  html[data-theme="dark"] .wc-fund-picker-list a:focus-visible{
+    background:rgba(123,211,159,.12);
+  }
   .wc-budget-card p,
   .wc-investment-card p{
     margin:16px 0 0;
@@ -1537,12 +1644,22 @@
         <a class="wc-section-link" href="pages/summary-of-expenses.html">View Summary of Expenses &rarr;</a>
       </div>
       <div class="wc-investment-grid">
-        <a class="wc-investment-card" href="pages/sheriffs-office.html" data-expense-card="sheriff"><small>Sheriff Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Public safety operations and law enforcement services.</p></a>
-        <a class="wc-investment-card" href="pages/tourism-administration.html" data-expense-card="tourism"><small>Tourist Development Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Tourism operations, beach services, destination support, and visitor impacts.</p></a>
-        <a class="wc-investment-card" href="pages/public-works.html" data-expense-card="transportation"><small>Transportation Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Road maintenance, construction, and transportation priorities.</p></a>
-        <a class="wc-investment-card" href="pages/cip-capital-projects.html" data-expense-card="capital"><small>Capital Projects Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Roads, facilities, public infrastructure, and major improvements.</p></a>
-        <div class="wc-investment-card" data-expense-card="general"><small>General Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><p>Funding for constitutional offices, county departments, and programs not covered in a special revenue fund.</p></div>
+        <a class="wc-investment-card" href="pages/sheriffs-office.html" data-expense-card="sheriff"><small>Sheriff Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><span class="wc-investment-card-meta" data-expense-card-meta="sheriff"></span><p>Public safety operations and law enforcement services.</p></a>
+        <a class="wc-investment-card" href="pages/tourism-administration.html" data-expense-card="tourism" data-fund-picker="tourism"><small>Tourist Development Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><span class="wc-investment-card-meta" data-expense-card-meta="tourism"></span><p>Tourism operations, beach services, destination support, and visitor impacts.</p></a>
+        <a class="wc-investment-card" href="pages/public-works.html" data-expense-card="transportation" data-fund-picker="transportation"><small>Transportation Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><span class="wc-investment-card-meta" data-expense-card-meta="transportation"></span><p>Road maintenance, construction, and transportation priorities.</p></a>
+        <a class="wc-investment-card" href="pages/cip-capital-projects.html" data-expense-card="capital"><small>Capital Projects Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><span class="wc-investment-card-meta" data-expense-card-meta="capital"></span><p>Roads, facilities, public infrastructure, and major improvements.</p></a>
+        <a class="wc-investment-card" href="pages/departments.html" data-expense-card="general" data-fund-picker="general"><small>General Fund</small><strong><span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong><span class="wc-investment-card-meta" data-expense-card-meta="general"></span><p>Funding for constitutional offices, county departments, and programs not covered in a special revenue fund.</p></a>
       </div>
+
+      <dialog class="wc-fund-picker-dialog" id="fundPickerDialog" aria-labelledby="fundPickerDialogTitle">
+        <div class="wc-fund-picker-dialog-inner">
+          <div class="wc-fund-picker-dialog-head">
+            <h3 id="fundPickerDialogTitle">Choose a department</h3>
+            <button type="button" class="wc-fund-picker-close" id="fundPickerClose" aria-label="Close">&times;</button>
+          </div>
+          <div class="wc-fund-picker-list" id="fundPickerList"></div>
+        </div>
+      </dialog>
     </section>
 
     <section class="wc-section wc-reveal" id="projects">
@@ -1604,6 +1721,11 @@
         return "$" + (n / 1000000).toLocaleString("en-US", { maximumFractionDigits:1, minimumFractionDigits: abs < 10000000 ? 1 : 0 }) + "M";
       }
       return "$" + Math.round(n).toLocaleString("en-US");
+    }
+
+    function formatNumber0(value){
+      var n = Number(value) || 0;
+      return n.toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: n % 1 === 0 ? 0 : 1 });
     }
 
     function parseMoney(value){
@@ -1915,6 +2037,251 @@
       }).catch(function(){});
     }
 
+    // Same department-to-fund breakdown shown on Department to Fund
+    // Relationship (see its "Separate Fund Paths" section) -- surfaced
+    // here as a quick picker so a reader landing on one of these
+    // multi-department funds can jump straight to the specific
+    // department/division they're after instead of always landing on the
+    // fund's single largest department.
+    // expenseMatch/staffingMatch are separate because the expenditure and
+    // staffing sheets sometimes name the same division differently (e.g.
+    // "Engineering Services" vs. "Engineering Department", or "Marketing"
+    // vs. "Tourism Marketing").
+    var FUND_PICKER_OPTIONS = {
+      tourism: {
+        title: "Tourist Development Fund — choose a department",
+        options: [
+          { label: "Tourism Administration", href: "pages/tourism-administration.html#tourism-administration", expenseMatch: ["Tourism Administration"], staffingMatch: ["Tourism Administration"] },
+          { label: "Tourism Marketing", href: "pages/tourism-administration.html#marketing", expenseMatch: ["Marketing"], staffingMatch: ["Marketing", "Tourism Marketing"] },
+          { label: "Tourism Sales and Visitors Center", href: "pages/tourism-administration.html#sales-and-visitor-center", expenseMatch: ["Sales and Visitors Center"], staffingMatch: ["Sales and Visitors Center", "Tourism Sales and Visitors Center"] },
+          { label: "Tourism Communications", href: "pages/tourism-administration.html#communications", expenseMatch: ["Communications"], staffingMatch: ["Communications", "Tourism Communications"] },
+          { label: "North Walton Tourist Development Tax", href: "pages/tourism-administration.html#north-walton", expenseMatch: ["North Walton Tourist Development Tax"], staffingMatch: [] },
+          { label: "Tourism Beach Operations", href: "pages/tourism-beach-operations.html#beach-operations", expenseMatch: ["Beach Operations"], staffingMatch: ["Tourism Beach Operations"] },
+          { label: "Beach Renourishment", href: "pages/tourism-beach-operations.html#beach-renourishment", expenseMatch: ["Beach Renourishment"], staffingMatch: [] },
+          { label: "Tourism Beach Tram", href: "pages/tourism-beach-operations.html#beach-tram", expenseMatch: ["Beach Tram"], staffingMatch: ["Tourism Beach Tram"] },
+          { label: "Tourism Lifeguard Services and Beach Safety", href: "pages/tourism-lifeguard-services-and-beach-safety.html", expenseMatch: ["South Walton Fire Lifeguard Services", "Public Safety", "Tourism Public Safety"], staffingMatch: [] }
+        ]
+      },
+      transportation: {
+        title: "Transportation Fund — choose a department",
+        options: [
+          { label: "Public Works", href: "pages/public-works.html", expenseMatch: ["Public Works"], staffingMatch: ["Public Works"] },
+          { label: "Engineering Department", href: "pages/engineering-department.html", expenseMatch: ["Engineering Services"], staffingMatch: ["Engineering Department"] },
+          { label: "Mossy Head Wastewater Treatment Facility", href: "pages/mossy-head-wastewater-treatment-facility.html", expenseMatch: ["Mossy Head Wastewater Treatment Facility"], staffingMatch: ["Mossy Head Wastewater Treatment Facility"] }
+        ]
+      },
+      general: {
+        title: "General Fund — choose a view",
+        options: [
+          { label: "General Fund (Board Departments)", href: "pages/departments.html?fund=001", generalGroup: "board" },
+          { label: "General Fund (Constitutional Officers)", href: "pages/constitutional-officers.html?card=constitutional", generalGroup: "constitutional" },
+          { label: "General Fund (Agencies & State Mandates)", href: "pages/constitutional-officers.html?card=agencies", generalGroup: "statutory" }
+        ]
+      }
+    };
+
+    // Within the General Fund, every dollar/FTE falls into exactly one of
+    // these three buckets: the four elected Constitutional Officers (the
+    // Sheriff is excluded -- Sheriff Fund is its own separate card),
+    // Statutory & Other Agency Funding (identified by Note, same as
+    // assets/budget-data.js's own "Statutory & Other" filter), and
+    // everything else (Board of County Commissioners and every county
+    // department) as "Board Departments". Agencies & State Mandates names
+    // match constitutional-officers.html's own "Autonomous Entities" group
+    // (its Statutory & Other Agency Funding entry is itemized by Note
+    // rather than Dept_Name -- see STATUTORY_OTHER_NOTE below).
+    var GENERAL_FUND_BOARD_DEPARTMENT_NAMES = [
+      "Building Construction and Maintenance", "Building Department", "Code Compliance",
+      "County Administration", "Eagle Springs Golf and Recreation Center", "Eagle Springs Grill",
+      "Emergency Management", "Engineering Department", "Environmental Resources", "Extension Office",
+      "Geographic Info Systems", "Housing & Urban Development", "Human Resources", "Libraries",
+      "Mosquito Control", "Mossy Head Wastewater Treatment Facility", "Office of Management and Budget",
+      "Office of the County Attorney", "Planning", "Probation", "Public Works", "Purchasing",
+      "Recreation", "Soil Conservation", "Solid Waste", "Tourism Administration",
+      "Tourism Beach Operations", "Tourism Lifeguard Services and Beach Safety", "Veteran Services"
+    ];
+    var GENERAL_FUND_CONSTITUTIONAL_NAMES = [
+      "Board of County Commissioners", "Clerk of Courts and County Comptroller",
+      "Property Appraiser", "Supervisor of Elections", "Tax Collector"
+    ];
+    var GENERAL_FUND_AGENCY_NAMES = [
+      "Circuit Court", "County Court", "Court Technology & Innovations", "Court Innovations",
+      "Guardian Ad Litem", "Medical Examiner", "Non-Profit Funding Program", "Public Defender",
+      "South Walton Fire & State Control", "South Walton Fire", "State Fire", "Volunteer Fire",
+      "State Attorney", "Statutory & Other Agency Funding", "Walton County Health Department"
+    ];
+    var GENERAL_FUND_EXPENSE_ALIASES = {
+      "clerk of courts and county comptroller": ["clerk of court", "clerk of circuit court"],
+      "engineering department": ["public works engineering services", "engineering services"],
+      "environmental resources": ["environmental services"],
+      "probation": ["probation services"],
+      "purchasing": ["procurement"],
+      "code compliance": ["code compliance beach", "code compliance street"],
+      "libraries": ["county libraries"],
+      "planning": ["planning short term rental"],
+      "tourism administration": [
+        "sales and visitor center", "sales and visitors center",
+        "tourism sales and visitor center", "tourism sales and visitors center",
+        "communications", "tourism communications", "marketing", "tourism marketing",
+        "north walton", "north walton tourist development tax"
+      ],
+      "tourism beach operations": ["beach operations", "beach renourishment", "beach tram", "tourism beach tram"],
+      "tourism lifeguard services and beach safety": ["south walton fire lifeguard services", "public safety", "tourism public safety"],
+      "court technology and innovations": ["court technology innovations", "court technology court administration", "court technology state attorney", "court technology public defender", "court technology", "court innovations"],
+      "south walton fire and state control": ["south walton fire", "state fire", "volunteer fire"],
+      "statutory and other agency funding": ["statutory and other", "culture and recreation senior centers", "culture and recreation senior centers and mainstreet", "senior centers", "senior centers and mainstreet"]
+    };
+    var STATUTORY_OTHER_NOTE = "Statutory & Other";
+
+    function initFundPickerDialog(){
+      var dialog = $("#fundPickerDialog");
+      if(!dialog) return;
+      var titleEl = $("#fundPickerDialogTitle");
+      var listEl = $("#fundPickerList");
+      var closeButton = $("#fundPickerClose");
+
+      function normalizeName(value){
+        return String(value || "")
+          .toLowerCase()
+          .replace(/&/g, " and ")
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+      }
+
+      function expandedExpenseNames(names){
+        var output = [];
+        names.forEach(function(name){
+          var norm = normalizeName(name);
+          output.push(norm);
+          (GENERAL_FUND_EXPENSE_ALIASES[norm] || []).forEach(function(alias){ output.push(normalizeName(alias)); });
+        });
+        return output;
+      }
+
+      function sumExpenseForNames(expenseRows, names, requiredFundCode){
+        var normNames = expandedExpenseNames(names);
+        return expenseRows.reduce(function(total, row){
+          if(requiredFundCode && String(row.Dept_Code || "").trim().slice(0, 3) !== requiredFundCode) return total;
+          return normNames.indexOf(normalizeName(row.Dept_Name)) !== -1 ? total + parseMoney(row.FY2027_Proposed) : total;
+        }, 0);
+      }
+
+      function sumAgencyExpense(expenseRows){
+        var normNames = expandedExpenseNames(GENERAL_FUND_AGENCY_NAMES);
+        return expenseRows.reduce(function(total, row){
+          if(String(row.Dept_Code || "").trim().slice(0, 3) !== "001") return total;
+          if(String(row.Note || "").trim() === STATUTORY_OTHER_NOTE || normNames.indexOf(normalizeName(row.Dept_Name)) !== -1){
+            return total + parseMoney(row.FY2027_Proposed);
+          }
+          return total;
+        }, 0);
+      }
+
+      function sumFteForNames(staffingRows, names){
+        var normNames = names.map(normalizeName);
+        return staffingRows.reduce(function(total, row){
+          return normNames.indexOf(normalizeName(row.Dept_Name)) !== -1 ? total + (Number(row[2027]) || 0) : total;
+        }, 0);
+      }
+
+      function fteAndBudgetLabel(amount, fte){
+        var parts = [];
+        if(amount > 0) parts.push(formatCurrencyShort(amount));
+        if(fte > 0) parts.push(formatNumber0(fte) + " FTE");
+        return parts.join(" · ");
+      }
+
+      function openPicker(key){
+        var config = FUND_PICKER_OPTIONS[key];
+        if(!config) return;
+        titleEl.textContent = config.title;
+        listEl.innerHTML = config.options.map(function(opt){
+          var meta = opt.metaText ? '<span class="wc-fund-picker-option-meta">' + escapeHtml(opt.metaText) + "</span>" : "";
+          return '<a href="' + escapeHtml(opt.href) + '"><span><span class="wc-fund-picker-option-label">' + escapeHtml(opt.label) + "</span>" + meta + "</span></a>";
+        }).join("");
+        if(typeof dialog.showModal === "function"){
+          dialog.showModal();
+        } else {
+          dialog.setAttribute("open", "");
+        }
+      }
+
+      document.querySelectorAll("[data-fund-picker]").forEach(function(trigger){
+        trigger.addEventListener("click", function(event){
+          var key = trigger.getAttribute("data-fund-picker");
+          if(!FUND_PICKER_OPTIONS[key]) return;
+          event.preventDefault();
+          openPicker(key);
+        });
+      });
+
+      function closeDialog(){
+        if(typeof dialog.close === "function"){
+          dialog.close();
+        } else {
+          dialog.removeAttribute("open");
+        }
+      }
+      if(closeButton) closeButton.addEventListener("click", closeDialog);
+      dialog.addEventListener("click", function(event){
+        if(event.target === dialog) closeDialog();
+      });
+
+      // Fills in each option's metaText (budget + FTE) once data loads,
+      // so it's ready by the time a card is actually clicked.
+      if(window.WCBudgetData && typeof window.WCBudgetData.loadBudgetData === "function"){
+        window.WCBudgetData.loadBudgetData().then(function(data){
+          var expenseRows = Array.isArray(data.expenditures) ? data.expenditures : [];
+          var staffingRows = Array.isArray(data.staffing) ? data.staffing : [];
+
+          FUND_PICKER_OPTIONS.tourism.options.concat(FUND_PICKER_OPTIONS.transportation.options).forEach(function(opt){
+            var amount = sumExpenseForNames(expenseRows, opt.expenseMatch || opt.match || []);
+            var fte = sumFteForNames(staffingRows, opt.staffingMatch || opt.match || []);
+            opt.metaText = fteAndBudgetLabel(amount, fte);
+          });
+
+          var boardAmount = sumExpenseForNames(expenseRows, GENERAL_FUND_BOARD_DEPARTMENT_NAMES, "001");
+          var constitutionalAmount = sumExpenseForNames(expenseRows, GENERAL_FUND_CONSTITUTIONAL_NAMES, "001");
+          var agencyAmount = sumAgencyExpense(expenseRows);
+
+          // FTE: Clerk of Court, Tax Collector, Property Appraiser, and
+          // Supervisor of Elections' staffing rows carry no Dept_Code at
+          // all (unlike their expenditure rows), so General Fund's total
+          // FTE is summed via the same named fund-grouping the expense
+          // cards' own FTE counts use, then split the same three ways as
+          // the dollar totals above.
+          var personnelCallouts = [];
+          var totalGeneralFte = 0;
+          if(typeof window.WCBudgetData.getPersonnelFundCallouts === "function"){
+            personnelCallouts = window.WCBudgetData.getPersonnelFundCallouts(staffingRows);
+            personnelCallouts.forEach(function(c){
+              if(c.filterLabel.indexOf("General Fund (") === 0) totalGeneralFte += c.total;
+            });
+          }
+          function personnelCalloutTotal(filterLabels){
+            return personnelCallouts.reduce(function(total, c){
+              return filterLabels.indexOf(c.filterLabel) !== -1 ? total + c.total : total;
+            }, 0);
+          }
+          var constitutionalFte = personnelCalloutTotal([
+            "General Fund (Board of County Commissioners)",
+            "General Fund (Clerk of Court)",
+            "General Fund (Tax Collector)",
+            "General Fund (Property Appraiser)",
+            "General Fund (Supervisor of Elections)"
+          ]);
+          var agencyFte = personnelCalloutTotal(["General Fund (Circuit Court)"]);
+          var boardFte = totalGeneralFte - constitutionalFte - agencyFte;
+
+          FUND_PICKER_OPTIONS.general.options.forEach(function(opt){
+            if(opt.generalGroup === "constitutional") opt.metaText = fteAndBudgetLabel(constitutionalAmount, constitutionalFte);
+            else if(opt.generalGroup === "statutory") opt.metaText = fteAndBudgetLabel(agencyAmount, agencyFte);
+            else if(opt.generalGroup === "board") opt.metaText = fteAndBudgetLabel(boardAmount, boardFte);
+          });
+        }).catch(function(){});
+      }
+    }
+
     function updateExpenseCards(){
       if(!window.WCBudgetData || typeof window.WCBudgetData.loadBudgetData !== "function") return;
       window.WCBudgetData.loadBudgetData().then(function(data){
@@ -1933,20 +2300,42 @@
           }, 0);
         }
 
-        var values = {
-          sheriff: sumWhere(function(row){ return fundCode(row) === "107"; }),
-          capital: sumWhere(function(row){ return fundCode(row) === "300"; }),
-          transportation: sumWhere(function(row){ return fundCode(row) === "101"; }),
-          tourism: sumWhere(function(row){ return fundCode(row) === "111"; }),
-          general: sumWhere(function(row){
+        // Reuses the Summary of Personnel's own fund grouping (handles
+        // Sheriff, Clerk, Tax Collector, etc. -- whose staffing rows carry
+        // no Dept_Code at all and are matched by Dept_Name instead) rather
+        // than re-deriving fund membership from Dept_Code here.
+        var fteByFund = { sheriff: 0, capital: 0, transportation: 0, tourism: 0, general: 0 };
+        if(typeof window.WCBudgetData.getPersonnelFundCallouts === "function"){
+          window.WCBudgetData.getPersonnelFundCallouts(data.staffing || []).forEach(function(c){
+            var key = c.filterLabel === "Sheriff Fund" ? "sheriff"
+              : c.filterLabel === "Transportation Fund" ? "transportation"
+              : c.filterLabel === "Tourist Development Fund" ? "tourism"
+              : c.filterLabel.indexOf("General Fund (") === 0 ? "general"
+              : null;
+            if(!key) return;
+            fteByFund[key] += c.total;
+          });
+        }
+
+        var predicates = {
+          sheriff: function(row){ return fundCode(row) === "107"; },
+          capital: function(row){ return fundCode(row) === "300"; },
+          transportation: function(row){ return fundCode(row) === "101"; },
+          tourism: function(row){ return fundCode(row) === "111"; },
+          general: function(row){
             return fundCode(row) === "001" && String(row.Object_Code || "").trim() !== "591000";
-          })
+          }
         };
 
-        Object.keys(values).forEach(function(key){
-          if(values[key] <= 0) return;
+        Object.keys(predicates).forEach(function(key){
+          var amount = sumWhere(predicates[key]);
+          if(amount <= 0) return;
           var card = $('[data-expense-card="' + key + '"] strong');
-          if(card) card.textContent = formatCurrencyShort(values[key]);
+          if(card) card.textContent = formatCurrencyShort(amount);
+
+          var fte = fteByFund[key];
+          var meta = $('[data-expense-card-meta="' + key + '"]');
+          if(meta && fte > 0) meta.textContent = formatNumber0(fte) + " FTE";
         });
       }).catch(function(){});
     }
@@ -2104,6 +2493,7 @@
       initBudgetGuide();
       updateRevenueCards();
       updateExpenseCards();
+      initFundPickerDialog();
       initProjects();
       initReveal();
     });

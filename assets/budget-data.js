@@ -10985,9 +10985,11 @@
       const label = personnelFundLabelForRow(r);
       const filterLabel = personnelFundFilterLabelForRow(r);
       if (!totalsByFilterLabel.has(filterLabel)) {
-        totalsByFilterLabel.set(filterLabel, { label, filterLabel, total: 0 });
+        totalsByFilterLabel.set(filterLabel, { label, filterLabel, total: 0, totalPrior: 0 });
       }
-      totalsByFilterLabel.get(filterLabel).total += Number(r[2027]) || 0;
+      const entry = totalsByFilterLabel.get(filterLabel);
+      entry.total += Number(r[2027]) || 0;
+      entry.totalPrior += Number(r[2026]) || 0;
     });
     const callouts = Array.from(totalsByFilterLabel.values());
     return callouts.sort((a, b) => b.total - a.total);
