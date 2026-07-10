@@ -12,7 +12,8 @@
     departmentNarratives: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=445845528&single=true&output=csv",
     funds: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=968844446&single=true&output=csv",
     activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv",
-    fundBalances: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=78843155&single=true&output=csv"
+    fundBalances: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=78843155&single=true&output=csv",
+    contractualServicesContracts: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1118643678&single=true&output=csv"
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
@@ -2246,6 +2247,250 @@
       .filter((row) => row.Amount !== 0);
   }
 
+  // Summary of Contractual Services: this budget's chart of accounts has no
+  // single object code literally named "Contractual Services" -- the
+  // codes that represent outside-vendor/contract spending are 531000
+  // ("Professional Services"), 532000 ("Accounting & Auditing"), and
+  // 534000 ("Other Services", Florida's Uniform Chart of Accounts
+  // standard name for this code is "Other Contractual Services").
+  // Combined here, same shape as buildMachineryRowsFromExpenditures.
+  const CONTRACTUAL_SERVICES_OBJECT_CODES = new Set(["531000", "532000", "534000"]);
+  // One-off inclusions: specific object codes that are real vendor
+  // contracts even though their object code falls outside 531000/534000
+  // -- Procurement's OpenGov Purchasing Software is booked under 554000
+  // ("Books Publications Subscriptions or Memberships"), not one of the
+  // two usual contractual-services codes.
+  const CONTRACTUAL_SERVICES_ADDITIONAL_OBJECT_CODES_BY_DEPT = new Map([
+    ["procurement", new Set(["554000"])]
+  ]);
+  // Departments/rows excluded from this summary at the requester's
+  // direction -- Court Technology and Medical Examiner (court-related,
+  // shown on their own pages), Housing & Urban Development (its own
+  // separate grant-funded program), Mosquito Control and Mosquito Control
+  // State Aid (its own separate levy/budget, not part of this countywide
+  // contract view), MSBU (its own separate special-assessment district),
+  // Self-Insurance Expenses and Tourism Public Safety (Sheriff/Code
+  // Enforcement beach patrol, not a vendor contract), and any row noted
+  // "Statutory & Other" (the Lakeview agency-funding rollup, covered on
+  // its own Statutory & Other page).
+  const CONTRACTUAL_SERVICES_EXCLUDED_DEPTS = new Set([
+    "court technology court administration",
+    "housing and urban development",
+    "medical examiner",
+    "mosquito control",
+    "mosquito control state aid",
+    "msbu",
+    "self insurance expenses",
+    "tourism public safety"
+  ]);
+  // Zehnder, Inc.'s advertising services contract (Project_Code 10655,
+  // Fund 111/TDC) is booked across several object codes (Promotional
+  // Activities 548000, Other Services 534000) and several TDC-fund
+  // departments as many separate sheet rows -- combined into one line per
+  // department below (Marketing, Sales and Visitors Center, North Walton
+  // Tourist Development Tax each keep their own row/total) instead of one
+  // row per Note or one grand-total row across all three.
+  const ZEHNDER_PROJECT_CODE = "10655";
+  const ZEHNDER_FUND_CODE = "111";
+  // Engineering Services' Professional Services contract moved from a
+  // General Fund org code (00120000) to a Transportation Fund org code
+  // (10116002) between FY2026 and FY2027. The old org code's FY2026
+  // budget and prior-year actuals still surface as their own row (see
+  // synthesizeMissingExpenseRows) with $0 FY2027 proposed, which would
+  // otherwise show up as a second, misleadingly-General-Fund "Engineering
+  // Services" line -- combined into the one real (Transportation Fund)
+  // row instead, so its FY2026 budget lines up with the FY2027 amount.
+  const ENGINEERING_SERVICES_DEPT_NAME = "engineering services";
+  // FY2026 budget corrections/detail sourced from the County's own FY2026
+  // account-level worksheet (not reflected in this year's published
+  // sheet, which either left these lines at $0 or bundled several
+  // contracts into one lump figure attached to just one of them).
+  // Matched by dept (exact) + item description (prefix, not exact) --
+  // several of these Notes carry a parenthetical detail (e.g. a cost-split
+  // percentage) that keeps getting edited in the source worksheet, so
+  // matching on just the stable leading text avoids re-syncing this list
+  // every time that detail changes.
+  const CONTRACTUAL_SERVICES_BUDGET2026_OVERRIDES = [
+    { dept: "public works", itemPrefix: "defuniak springs interlocal road maintenance", value: 50000 },
+    { dept: "public works", itemPrefix: "traffic signal services", value: 125000 },
+    { dept: "solid waste", itemPrefix: "iron remediation system remedial action plan modifications", value: 100000 },
+    { dept: "solid waste", itemPrefix: "annual compliance monitoring services", value: 100000 },
+    { dept: "tourism administration", itemPrefix: "tdc attorney", value: 30000 },
+    { dept: "tourism administration", itemPrefix: "south walton turtle watch", value: 85000 },
+    { dept: "tourism administration", itemPrefix: "federal and state lobbying services", value: 75000 },
+    { dept: "planning short term rental", itemPrefix: "south walton fire district short term rental fire code compliance program", value: 220000 },
+    { dept: "planning short term rental", itemPrefix: "call line 24 service and govos", value: 210000 },
+    { dept: "planning short term rental", itemPrefix: "data science services", value: 20000 },
+    { dept: "planning", itemPrefix: "swiftgov ldc update", value: 200000 },
+    { dept: "planning", itemPrefix: "local mitigation strategy lms update", value: 150000 },
+    { dept: "planning", itemPrefix: "cms continuing maintenance services", value: 29900 },
+    { dept: "office of management and budget", itemPrefix: "professional services", value: 0 },
+    { dept: "procurement", itemPrefix: "opengov purchasing software", value: 60000 },
+    { dept: "recreation", itemPrefix: "security for recreation programs", value: 20000 },
+    { dept: "recreation", itemPrefix: "sport officials for recreation programs", value: 30000 },
+    { dept: "board of county commissioners", itemPrefix: "state lobbyist", value: 66000 },
+    { dept: "board of county commissioners", itemPrefix: "federal lobbyist", value: 48000 },
+    { dept: "board of county commissioners", itemPrefix: "cost allocation service study", value: 13000 },
+    { dept: "board of county commissioners", itemPrefix: "opeb gasb", value: 8000 },
+    { dept: "board of county commissioners", itemPrefix: "employee benefits consultant", value: 102000 },
+    { dept: "board of county commissioners", itemPrefix: "financial advisor services for debt issuance", value: 10000 },
+    { dept: "board of county commissioners", itemPrefix: "professional and technical services", value: 135000 },
+    { dept: "board of county commissioners", itemPrefix: "board agenda", value: 150000 },
+    { dept: "board of county commissioners", itemPrefix: "board erp finance software", value: 420000 },
+    { dept: "board of county commissioners", itemPrefix: "enhanced south walton", value: 1330000 },
+    { dept: "board of county commissioners", itemPrefix: "state mandated juvenile justice", value: 200000 },
+    { dept: "building construction and maintenance", itemPrefix: "park field spraying", value: 150000 },
+    { dept: "building construction and maintenance", itemPrefix: "pest management services", value: 45000 },
+    { dept: "environmental services", itemPrefix: "cba choctawhatchee bay water quality contract", value: 36000 },
+    { dept: "environmental services", itemPrefix: "cba coastal dune lake water quality contract", value: 26875 },
+    { dept: "tourism administration", itemPrefix: "state park adminission agreement", value: 190000 }
+  ];
+  function contractualServicesBudget2026Override(deptName, itemDescription) {
+    const dept = normalizeDeptName(deptName);
+    const item = normalizeDeptName(itemDescription);
+    const match = CONTRACTUAL_SERVICES_BUDGET2026_OVERRIDES.find((o) => o.dept === dept && item.indexOf(o.itemPrefix) === 0);
+    return match ? match.value : undefined;
+  }
+  // Contracts with real FY2026 budget but no FY2027 line in the sheet at
+  // all -- added here (at $0 FY2027 proposed) rather than left out, same
+  // as any other year-over-year contract that ended.
+  const CONTRACTUAL_SERVICES_ADDED_ROWS = [
+    { Dept_Name: "Planning", Dept_Code: "00104000", Item_Description: "Mobility Fee Annual Support", Budget2026: 100000 },
+    { Dept_Name: "Planning", Dept_Code: "00104000", Item_Description: "Parks & Rec Master Plan", Budget2026: 300000 },
+    { Dept_Name: "Planning Short-Term Rental", Dept_Code: "00104000", Item_Description: "Marketing", Budget2026: 50000 },
+    { Dept_Name: "Office of Management and Budget", Dept_Code: "00107000", Item_Description: "OpenGov Budget Software", Budget2026: 200000 }
+  ];
+  function buildContractualServicesRowsFromExpenditures(rows) {
+    const baseRows = (rows || [])
+      .filter((row) => {
+        const code = String(row.Object_Code || "").trim();
+        if (CONTRACTUAL_SERVICES_OBJECT_CODES.has(code)) return true;
+        const extraCodes = CONTRACTUAL_SERVICES_ADDITIONAL_OBJECT_CODES_BY_DEPT.get(normalizeDeptName(row.Dept_Name));
+        return !!(extraCodes && extraCodes.has(code));
+      })
+      .filter((row) => !CONTRACTUAL_SERVICES_EXCLUDED_DEPTS.has(normalizeDeptName(row.Dept_Name)))
+      .filter((row) => String(row.Note || "").trim() !== "Statutory & Other")
+      .filter((row) => String(row.Project_Code || "").trim() !== ZEHNDER_PROJECT_CODE)
+      .filter((row) => normalizeDeptName(row.Dept_Name) !== ENGINEERING_SERVICES_DEPT_NAME)
+      // Procurement's 554000 (Books Publications Subscriptions or
+      // Memberships) has a generic, un-noted catch-all line alongside its
+      // real OpenGov Purchasing Software contract -- only the latter
+      // belongs on a contractual-services page.
+      .filter((row) => !(
+        normalizeDeptName(row.Dept_Name) === "procurement" &&
+        String(row.Object_Code || "").trim() === "554000" &&
+        !String(row.Note || "").trim()
+      ))
+      .filter((row) => !(
+        normalizeDeptName(row.Dept_Name) === "environmental services" &&
+        normalizeDeptName(row.Note) === "choctawhatchee bay estuary program"
+      ))
+      .map((row) => {
+        const fundCode = fundCodeForRow(row);
+        const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+        const itemDescription = row.Note || row.Project_Name || row.Object_Name || "Contractual Services";
+        const budget2026Override = contractualServicesBudget2026Override(row.Dept_Name, itemDescription);
+        return {
+          Dept_Code: row.Dept_Code || "",
+          Dept_Name: row.Dept_Name || "",
+          Fund_Code: fundCode,
+          Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
+          Item_Description: itemDescription,
+          Budget2026: budget2026Override !== undefined ? budget2026Override : (row.FY2026_Original_Budget || 0),
+          Amount: row.FY2027_Proposed || 0
+        };
+      })
+      .filter((row) => row.Amount !== 0 || row.Budget2026 !== 0);
+
+    const zehnderRows = (rows || []).filter((row) =>
+      String(row.Project_Code || "").trim() === ZEHNDER_PROJECT_CODE && fundCodeForRow(row) === ZEHNDER_FUND_CODE
+    );
+    const zehnderByDept = new Map();
+    zehnderRows.forEach((row) => {
+      const deptName = row.Dept_Name || "";
+      const entry = zehnderByDept.get(deptName) || { row, total: 0, budget2026: 0 };
+      entry.total += row.FY2027_Proposed || 0;
+      entry.budget2026 += row.FY2026_Original_Budget || 0;
+      zehnderByDept.set(deptName, entry);
+    });
+    zehnderByDept.forEach((entry) => {
+      if (!entry.total && !entry.budget2026) return;
+      const fundCode = fundCodeForRow(entry.row);
+      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+      baseRows.push({
+        Dept_Code: entry.row.Dept_Code || "",
+        Dept_Name: entry.row.Dept_Name || "",
+        Fund_Code: fundCode,
+        Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
+        Item_Description: entry.row.Project_Name || "Advertising Services (Zehnder, INC)",
+        Budget2026: entry.budget2026,
+        Amount: entry.total
+      });
+    });
+
+    const engineeringRows = (rows || []).filter((row) =>
+      normalizeDeptName(row.Dept_Name) === ENGINEERING_SERVICES_DEPT_NAME &&
+      CONTRACTUAL_SERVICES_OBJECT_CODES.has(String(row.Object_Code || "").trim())
+    );
+    if (engineeringRows.length) {
+      const engineeringBudget2026 = engineeringRows.reduce((sum, row) => sum + (row.FY2026_Original_Budget || 0), 0);
+      const engineeringAmount = engineeringRows.reduce((sum, row) => sum + (row.FY2027_Proposed || 0), 0);
+      if (engineeringBudget2026 || engineeringAmount) {
+        // File under whichever org code carries the current (FY2027)
+        // dollars -- that's the department's real, present-day fund.
+        const primary = engineeringRows.find((row) => (row.FY2027_Proposed || 0) !== 0) || engineeringRows[0];
+        const fundCode = fundCodeForRow(primary);
+        const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+        baseRows.push({
+          Dept_Code: primary.Dept_Code || "",
+          Dept_Name: primary.Dept_Name || "",
+          Fund_Code: fundCode,
+          Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
+          Item_Description: primary.Note || primary.Project_Name || primary.Object_Name || "Contractual Services",
+          Budget2026: engineeringBudget2026,
+          Amount: engineeringAmount
+        });
+      }
+    }
+
+    CONTRACTUAL_SERVICES_ADDED_ROWS.forEach((added) => {
+      const fundCode = fundCodeForRow({ Dept_Code: added.Dept_Code });
+      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+      baseRows.push({
+        Dept_Code: added.Dept_Code,
+        Dept_Name: added.Dept_Name,
+        Fund_Code: fundCode,
+        Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
+        Item_Description: added.Item_Description,
+        Budget2026: added.Budget2026,
+        Amount: 0
+      });
+    });
+
+    const contractsByKey = new Map();
+    (cache.contractualServicesContracts || []).forEach((c) => {
+      const key = normalizeDeptName(c.Dept_Name) + "|" + normalizeDeptName(c.Item_Description);
+      contractsByKey.set(key, c);
+    });
+    baseRows.forEach((row) => {
+      const key = normalizeDeptName(row.Dept_Name) + "|" + normalizeDeptName(row.Item_Description);
+      const contract = contractsByKey.get(key);
+      row.Vendor = (contract && contract.Vendor) || "";
+      row.Contract_No = (contract && contract.Contract_No) || "";
+      row.Contract_Status = (contract && contract.Contract_Status) || "";
+      row.Last_BCC_Action = (contract && contract.Last_BCC_Action) || "";
+      // The contract tab's own "2026" column is now the authoritative
+      // FY2026 figure (vendor-confirmed) when present, taking priority
+      // over the expenditures sheet's raw FY2026 figure and the
+      // hardcoded CONTRACTUAL_SERVICES_BUDGET2026_OVERRIDES list above.
+      if (contract && contract.Budget2026 !== null && contract.Budget2026 !== undefined) {
+        row.Budget2026 = contract.Budget2026;
+      }
+    });
+
+    return baseRows;
+  }
+
   function normalizePerformanceRow(row) {
     return {
       Dept_Code: (row.Dept_Code || "").trim(),
@@ -2301,6 +2546,24 @@
       Fund_Description: (row["Fund Description"] || "").trim(),
       Object_Description: (row["Object Description"] || "").trim(),
       Fund_Balance: toNumber(row["Fund Balance"])
+    };
+  }
+
+  // Summary of Contractual Services' vendor/contract detail tab --
+  // Dept_Name + Item_Description join key back to that page's own rows
+  // (see buildContractualServicesRowsFromExpenditures).
+  function normalizeContractualServicesContractRow(row) {
+    // Blank kept as null (not 0) so a row with no "2026" entry falls back
+    // to the expenditures sheet's own FY2026 figure instead of zeroing it.
+    const rawBudget2026 = String(row["2026"] || "").trim();
+    return {
+      Dept_Name: (row.Dept_Name || "").trim(),
+      Item_Description: (row.Item_Description || "").trim(),
+      Vendor: (row.Vendor || "").trim(),
+      Contract_No: (row.Contract_No || "").trim(),
+      Contract_Status: (row.Contract_Status || "").trim(),
+      Last_BCC_Action: (row.Last_BCC_Action || "").trim(),
+      Budget2026: rawBudget2026 ? toNumber(rawBudget2026) : null
     };
   }
 
@@ -2743,7 +3006,8 @@
       ["departmentNarratives", DATA_SOURCES.departmentNarratives, normalizeNarrativeRow],
       ["funds", DATA_SOURCES.funds, normalizeFundRow],
       ["activities", DATA_SOURCES.activities, normalizeActivityRow],
-      ["fundBalances", DATA_SOURCES.fundBalances, normalizeFundBalanceRow]
+      ["fundBalances", DATA_SOURCES.fundBalances, normalizeFundBalanceRow],
+      ["contractualServicesContracts", DATA_SOURCES.contractualServicesContracts, normalizeContractualServicesContractRow]
     ];
 
     cache.datasetCount = specs.length;
@@ -2813,6 +3077,7 @@
       cache.dedupedExpenseRows = buildDedupedHistoricalExpenseRows(cache);
 
       cache.machinery = buildMachineryRowsFromExpenditures(cache.expenditures);
+      cache.contractualServices = buildContractualServicesRowsFromExpenditures(cache.expenditures);
 
       auditDepartmentExpenseRevenueParity();
 
@@ -9340,13 +9605,20 @@
         ? splitIntoParagraphs(narrativeRows[0].Narrative).map((p) => "<p>" + formatNarrativeText(p) + "</p>").join("")
         : "";
 
-      const expenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
+      // Zehnder, Inc.'s advertising services contract (Project_Code 10655)
+      // gets its own card -- see Summary of Contractual Services, which
+      // combines this same project across divisions the same way -- so
+      // it's pulled out of each division's own Expenditure Summary here
+      // too, rather than counted in both places.
+      const allExpenseRows = rowsForExactNames(cache.expenditures, spec.expenseNames);
+      const advertisingRows = allExpenseRows.filter((r) => String(r.Project_Code || "").trim() === "10655");
+      const expenseRows = allExpenseRows.filter((r) => String(r.Project_Code || "").trim() !== "10655");
       const staffingRows = rowsForExactNames(cache.staffing, spec.staffingNames);
+      const advertisingCardHtml = renderTypeSummaryTable(advertisingRows, "expense", "Advertising Services (Zehnder, INC)", spec.label);
       const expenseCardHtml = renderTypeSummaryTable(expenseRows, "expense", "Expenditure Summary", spec.label);
-      const revenueCardHtml = "";
-      const financialCardsHtml = expenseCardHtml && revenueCardHtml
-        ? '<div class="tourism-admin-financial-pair">' + expenseCardHtml + revenueCardHtml + "</div>"
-        : expenseCardHtml + revenueCardHtml;
+      const financialCardsHtml = advertisingCardHtml
+        ? '<div class="tourism-admin-financial-pair">' + expenseCardHtml + advertisingCardHtml + "</div>"
+        : expenseCardHtml;
       const body = [
         narrativeHtml,
         spec.label === "Tourism Administration" ? performanceHtml : "",
@@ -10410,6 +10682,135 @@
       });
   }
 
+  // Summary of Contractual Services: same department-picker pattern as the
+  // machinery summary above, just backed by cache.contractualServices
+  // (Object_Code 531000 Professional Services + 534000 Other Services).
+  function renderContractualServicesSummary(container) {
+    if (!container) return;
+    const rows = cache.contractualServices || [];
+    if (!rows.length) {
+      container.innerHTML = '<div class="wc-data-empty">No contractual services data is available.</div>';
+      return;
+    }
+
+    const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
+
+    container.innerHTML =
+      '<div class="wc-filter-bar wc-machinery-picker">' +
+      '<label class="wc-filter-field"><span>Department</span>' +
+      '<select id="wcContractualServicesDeptSelect"><option value="">All</option>' +
+      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
+      "</select></label>" +
+      "</div>" +
+      '<div class="wc-financial-summary-table"></div>';
+
+    const deptSelect = container.querySelector("#wcContractualServicesDeptSelect");
+    const tableEl = container.querySelector(".wc-financial-summary-table");
+
+    function showFiltered() {
+      const deptName = deptSelect.value;
+      const items = rows.filter((r) => !deptName || r.Dept_Name === deptName);
+      const showDeptColumn = !deptName;
+      // Department?, Service, Vendor, Contract No. -- then the two numeric
+      // columns, then Contract Status.
+      const leadingCols = showDeptColumn ? 4 : 3;
+      const trailingCols = 1;
+      const colCount = leadingCols + 2 + trailingCols;
+
+      const funds = uniqueSorted(items.map((r) => r.Fund_Name));
+      const bodyRows = [];
+      let grandBudget2026 = 0;
+      let grandAmount = 0;
+
+      funds.forEach((fundName) => {
+        const fundItems = items
+          .filter((r) => r.Fund_Name === fundName)
+          .slice()
+          .sort((a, b) => String(a.Dept_Name || "").localeCompare(String(b.Dept_Name || "")));
+        if (!fundItems.length) return;
+
+        bodyRows.push('<tr class="wc-table-group-row"><td colspan="' + colCount + '">' + escapeHtml(fundName) + "</td></tr>");
+
+        let fundBudget2026 = 0;
+        let fundAmount = 0;
+        fundItems.forEach((r) => {
+          fundBudget2026 += r.Budget2026 || 0;
+          fundAmount += r.Amount || 0;
+          bodyRows.push(
+            "<tr>" +
+            (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
+            "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
+            "<td>" + escapeHtml(r.Vendor || "") + "</td>" +
+            "<td>" + escapeHtml(r.Contract_No || "") + "</td>" +
+            '<td class="wc-num">' + formatCurrency(r.Budget2026 || 0) + "</td>" +
+            '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td>" +
+            "<td>" + escapeHtml(r.Contract_Status || "") + "</td></tr>"
+          );
+        });
+        grandBudget2026 += fundBudget2026;
+        grandAmount += fundAmount;
+
+        bodyRows.push(
+          '<tr class="wc-table-subtotal-row"><td colspan="' + leadingCols + '">Subtotal — ' + escapeHtml(fundName) +
+          '</td><td class="wc-num">' + formatCurrency(fundBudget2026) + '</td><td class="wc-num">' + formatCurrency(fundAmount) +
+          '</td><td colspan="' + trailingCols + '"></td></tr>'
+        );
+      });
+
+      bodyRows.push(
+        '<tr class="wc-table-total-row"><td colspan="' + leadingCols + '">Total</td><td class="wc-num">' +
+        formatCurrency(grandBudget2026) + '</td><td class="wc-num">' + formatCurrency(grandAmount) +
+        '</td><td colspan="' + trailingCols + '"></td></tr>'
+      );
+
+      const columns = (showDeptColumn ? [{ label: "Department" }] : [])
+        .concat([
+          { label: "Service" },
+          { label: "Current Vendor" },
+          { label: "Contract No." },
+          { label: "FY 2026", num: true },
+          { label: "FY 2027", num: true },
+          { label: "Contract Status" }
+        ]);
+
+      mountOrHide(
+        tableEl,
+        renderTable({
+          caption: deptName || "All Departments",
+          columns: columns,
+          bodyRows: bodyRows
+        })
+      );
+      if (!items.length) {
+        tableEl.hidden = false;
+        tableEl.innerHTML = '<div class="wc-data-empty">No rows match the current filters.</div>';
+      }
+    }
+
+    deptSelect.addEventListener("change", showFiltered);
+    showFiltered();
+  }
+
+  function initContractualServicesSummaryPage() {
+    const container = document.getElementById("contractual-services-summary");
+    if (!container) return;
+
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        renderContractualServicesSummary(container);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load contractual services summary", err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
   // Summary of Personnel: same department-picker pattern as the machinery
   // summary. "All" shows each department's total FTE per year; selecting
   // one department drills into its position-level staffing table.
@@ -10959,6 +11360,7 @@
     initFinancialSummaryPage();
     initConsolidatedFundTablesPage();
     initMachinerySummaryPage();
+    initContractualServicesSummaryPage();
     initPersonnelSummaryPage();
     initInterfundTransfersPage();
     initConsolidatedRevenueSummaryPage();
@@ -10989,6 +11391,7 @@
     renderConsolidatedRevenueBudgetTable,
     renderConsolidatedExpenditureBudgetTable,
     renderMachinerySummary,
+    renderContractualServicesSummary,
     renderPersonnelSummary,
     getPersonnelFundCallouts,
     renderInterfundTransfersOutTable,

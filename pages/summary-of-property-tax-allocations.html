@@ -113,6 +113,23 @@
     background:var(--light);
   }
 
+  a.wc-ptax-summary-card{
+    display:block;
+    text-decoration:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+
+  a.wc-ptax-summary-card:hover,
+  a.wc-ptax-summary-card:focus-visible{
+    border-color:var(--green);
+    box-shadow:0 10px 26px rgba(23,32,51,.08);
+  }
+
+  a.wc-ptax-summary-card .wc-ptax-summary-card-link{
+    color:var(--green);
+    font-weight:800;
+  }
+
   .wc-ptax-summary-card strong{
     display:block;
     margin:0 0 8px;
@@ -224,7 +241,7 @@
 
   .wc-ptax-flow-amount{
     color:var(--green);
-    font-size:15px;
+    font-size:20px;
     font-weight:900;
     text-align:right;
     white-space:nowrap;
@@ -741,11 +758,11 @@
       <span>= $1 per $1,000</span>
       <p>Of a property&rsquo;s taxable value, after exemptions such as homestead.</p>
     </div>
-    <div class="wc-ptax-summary-card">
+    <a class="wc-ptax-summary-card" href="mosquito-control.html">
       <strong>Separate Levy</strong>
       <span>Mosquito Control</span>
-      <p>North Walton Mosquito Control sets its own millage outside this countywide tax. <a href="mosquito-control.html">See its budget &rarr;</a></p>
-    </div>
+      <p>North Walton Mosquito Control sets its own millage outside this countywide tax. <span class="wc-ptax-summary-card-link">See its budget &rarr;</span></p>
+    </a>
   </div>
 
   <section class="wc-ptax-flow" id="wc-ptax-flow" aria-live="polite">
@@ -839,6 +856,7 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Summary of Personnel",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-personnel.html"},
   {title:"Summary of Machinery, Vehicles & Equipment",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-machinery-vehicles-and-equipment.html"},
   {title:"Summary of Property Tax Allocations",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-property-tax-allocations.html"},
+  {title:"Summary of Contractual Services",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-contractual-services.html"},
   {title:"Financials",section:"Financials",href:"https://budget-pixel.github.io/budget-fy2027/../pages/financials.html"},
   {title:"Board of County Commissioners",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/board-of-county-commissioners.html"},
   {title:"Clerk of Courts & County Comptroller",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/clerk-of-courts-and-county-comptroller.html"},

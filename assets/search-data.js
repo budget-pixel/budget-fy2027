@@ -10,7 +10,6 @@ var wcCoreBudgetPages = [
   { title:"Table of Contents", section:"Introduction and Overview", href:"table-of-contents.html" },
   { title:"GFOA Distinguished Budget Presentation Award", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd25815ed4e2fe49b4" },
   { title:"Transmittal Letter", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdc3a5aa570050fba9" },
-  { title:"Budget-in-Brief", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=69e8ae83a93da8d66dc5e248" },
   { title:"Our County", section:"Our County", href:"our-county.html" },
   { title:"Overview of Walton County", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd2e29b2249e0a5b99" },
   { title:"Organizational Structure", section:"Our County", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd1af21806371d68e7" },
@@ -31,6 +30,7 @@ var wcCoreBudgetPages = [
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
   { title:"Summary of Machinery, Vehicles & Equipment", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfdb1a2c2915743e4" },
   { title:"Summary of Property Tax Allocations", section:"Financial Summaries", href:"summary-of-property-tax-allocations.html" },
+  { title:"Summary of Contractual Services", section:"Financial Summaries", href:"summary-of-contractual-services.html" },
   { title:"Financials", section:"Financials", href:"financials.html" },
   { title:"Supporting Budget Documentation", section:"Financials", href:"supporting-budget-documentation.html" },
   { title:"Board of County Commissioners", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc6947be859271a418" },
@@ -119,10 +119,6 @@ var wcHiddenBudgetPageTitles = new Set([
       "letter", "budget message", "county administrator message", "executive message", "introduction", "overview letter", "budget highlights", "recommended budget"
     ],
 
-    "Budget-in-Brief": [
-      "budget brief", "summary", "quick summary", "highlights", "overview", "taxes", "millage", "property taxes", "ad valorem taxes", "ad valoram taxes", "revenues", "expenses", "public safety", "capital projects", "total budget"
-    ],
-
     "Our County": [
       "our county", "county overview", "county profile", "overview of walton county", "organizational structure", "governance", "demographics", "community profile", "statistical", "supplemental", "glossary", "faq", "frequently asked questions", "acronyms", "strategic initiatives", "priorities", "goals"
     ],
@@ -165,6 +161,10 @@ var wcHiddenBudgetPageTitles = new Set([
 
     "Summary of Property Tax Allocations": [
       "property tax", "property taxes", "ad valorem", "millage", "what does my property tax fund", "what does my property tax pay for", "tax allocation", "tax breakdown", "where do my taxes go"
+    ],
+
+    "Summary of Contractual Services": [
+      "contractual services", "contracts", "professional services", "other services", "outside vendor", "vendor spending", "contract spending"
     ],
 
     "Financial Policies": [
