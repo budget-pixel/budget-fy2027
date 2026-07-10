@@ -98,7 +98,8 @@ var wcCoreBudgetPages = [
 
 // Temporarily hidden while pages are in draft. Remove the title here to restore.
 var wcHiddenBudgetPageTitles = new Set([
-  "Transmittal Letter"
+  "Transmittal Letter",
+  "Summary of Contractual Services"
 ]);
 
 (function(){
