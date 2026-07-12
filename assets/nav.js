@@ -137,7 +137,7 @@
   function loadWaltonBudgetSearchModules(onReady){
     loadWcScriptOnce(
       "wc-budget-search-data-script",
-      wcBudgetAssetBaseUrl + "search-data.js?v=1",
+      wcBudgetAssetBaseUrl + "search-data.js?v=20260711-hide-personnel-cost-contractual",
       function(){
         loadWcScriptOnce(
           "wc-budget-search-script",
