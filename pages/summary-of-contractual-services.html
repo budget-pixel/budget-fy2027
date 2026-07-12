@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Summary of Contractual Services — Walton County FY 2027 Budget</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260627-prior-years-a11y">
+<link rel="stylesheet" href="../assets/style.css?v=20260711-dept-name-left-align">
 </head>
 <body>
 
@@ -20,16 +20,61 @@
 <h1 class="page-title">Summary of Contractual Services</h1>
 
 <section class="page-text wc-equipment-narrative">
-  <p>Included below is a summary of budgeted Contractual Services by department &mdash; outside-vendor and contract-based spending across departments directly managed by the Board of County Commissioners. This is not an all-inclusive list: it does not include contractual services approved by Constitutional Officers (the Sheriff, Clerk of Courts, Property Appraiser, Tax Collector, and Supervisor of Elections), the Medical Examiner, the Health Department, or other agencies funded by the County but not directly managed by the Board.</p>
-  <p>The County budgets for services, not for specific vendors. All contractual agreements are procured through the County's approved procurement policies and practices and are approved by the Board of County Commissioners. The current vendor is shown for transparency only and does not imply that funding is approved to any specific vendor. The Board retains ultimate authority to cancel, terminate, modify, or approve any contractual agreement, interlocal agreement, or memorandum of understanding.</p>
+  <h2>About This Summary</h2>
+  <p>This page summarizes budgeted Contractual Services included in the adopted budget for departments managed by the Board of County Commissioners. Contractual Services include work performed by outside vendors and contractors to support County operations, such as professional services, maintenance, technology, engineering, and construction. The information is provided to increase transparency into planned contracted services at the time the budget was adopted.</p>
+  <p>This summary is a snapshot of the adopted budget and is not intended to serve as a current listing of active County contracts.</p>
+
+  <h2>What&rsquo;s Included</h2>
+  <p>This summary includes operating services and Capital Improvement Plan (CIP) projects funded in the adopted budget. CIP projects are shown as anticipated procurements rather than awarded contracts and may include engineering, design, construction engineering and inspection (CEI), and construction services. For complete information on capital projects, refer to the <a href="capital-improvement-plan.html">Capital Improvement Plan</a>.</p>
+  <p>This summary does not include contractual services managed by the Constitutional Officers (Sheriff, Clerk of Courts, Property Appraiser, Tax Collector, and Supervisor of Elections), the Medical Examiner, the Health Department, or other agencies funded by the County but not directly managed by the Board of County Commissioners.</p>
+
+  <h2>Understanding the Information</h2>
+  <p>The County budgets for services&mdash;not specific vendors. Vendor names, where shown, identify the current service provider under an existing agreement approved by the Board of County Commissioners and are provided for informational purposes only. Inclusion of a vendor does not constitute approval of funding for or the award, renewal, or extension of a contract to that vendor. Because contracts may be competitively procured, amended, renewed, or terminated throughout the fiscal year, the information on this page may not reflect current contractual arrangements. Where no service provider is listed, the service is anticipated to be procured in the future or does not have an assigned vendor at the time the budget was adopted.</p>
+  <p>Budgeted amounts represent planned funding for the fiscal year and are estimates based on the best information available when the budget was developed. They do not necessarily represent the total value of a contract or the amount ultimately spent. Actual expenditures may vary based on procurement results, contract amendments, project scope, and operational needs.</p>
+  <p>All contracts are procured in accordance with County procurement policies and are approved by the Board of County Commissioners.</p>
 </section><style>
   .wc-equipment-narrative p{
     font-family:Arial, Helvetica, sans-serif;
     text-align:justify;
   }
+  .wc-contract-summary-gate{
+    margin:1.5rem 0;
+    text-align:center;
+  }
+  .wc-contract-summary-gate button{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:14px;
+    font-weight:700;
+    min-height:46px;
+    padding:0 22px;
+    border:none;
+    border-radius:999px;
+    background:#003f28;
+    color:#ffffff;
+    cursor:pointer;
+  }
+  .wc-contract-summary-gate button:hover{
+    background:#005236;
+  }
 </style>
 
-<div id="contractual-services-summary"></div>
+<div class="wc-contract-summary-gate" id="contractualServicesGate">
+  <button type="button" id="contractualServicesGateButton">I&rsquo;ve Read the Notes Above &mdash; Show Summary</button>
+</div>
+<div id="contractual-services-summary" hidden></div>
+<script>
+  (function(){
+    var gate = document.getElementById("contractualServicesGate");
+    var button = document.getElementById("contractualServicesGateButton");
+    var summary = document.getElementById("contractual-services-summary");
+    if(!gate || !button || !summary) return;
+    button.addEventListener("click", function(){
+      summary.hidden = false;
+      gate.hidden = true;
+      summary.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  })();
+</script>
 </main>
 </div>
 
@@ -119,7 +164,8 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Statistical & Supplemental Information",section:"Our County",href:"https://budget-pixel.github.io/budget-fy2027/../pages/statistical-and-supplemental-information.html"}
 ];
 </script>
-<script src="../assets/budget-data.js?v=20260709-mobile-line-columns-3"></script>
+<script src="../assets/cip-projects-data.js?v=20260710-dept-name-fix"></script>
+<script src="../assets/budget-data.js?v=20260711-hi-retiree-column"></script>
 <script src="../assets/nav.js?v=20260627-prior-years-a11y"></script>
 </body>
 </html>

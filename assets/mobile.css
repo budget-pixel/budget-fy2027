@@ -545,7 +545,7 @@
     min-width:118px !important;
     max-width:150px !important;
     white-space:normal !important;
-    overflow-wrap:anywhere !important;
+    overflow-wrap:break-word !important;
     word-break:normal !important;
     background:#ffffff !important;
     background-clip:border-box !important;

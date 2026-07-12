@@ -727,6 +727,9 @@
   .wc-section-link:hover{
     text-decoration:underline;
   }
+  #main-content:focus{
+    outline:0;
+  }
   .wc-investment-heading{
     margin-top:54px;
   }
@@ -877,6 +880,9 @@
     border:1px solid var(--wc-green);
     background:var(--wc-green);
     color:#ffffff;
+  }
+  .wc-budget-guide-link + .wc-budget-guide-link{
+    margin-left:10px;
   }
   .wc-budget-guide-reset{
     border:1px solid var(--wc-line);
@@ -1508,6 +1514,10 @@
     .wc-budget-guide-link{
       width:100%;
     }
+    .wc-budget-guide-link + .wc-budget-guide-link{
+      margin-left:0;
+      margin-top:10px;
+    }
     .wc-top-links{
       order:4;
       display:none;
@@ -1726,7 +1736,7 @@
 <script src="assets/brand-logo.js?v=20260627-axe-a11y"></script>
 <script src="assets/search-data.js"></script>
 <script src="assets/search.js?v=20260627-lighthouse-a11y"></script>
-<script src="assets/budget-data.js?v=20260709-mobile-line-columns-3"></script>
+<script src="assets/budget-data.js?v=20260711-position-cola-column"></script>
 <script src="assets/cip-projects-data.js?v=20260622-project-images-v3"></script>
 <script>
   (function(){
@@ -1916,7 +1926,7 @@
         overview: {
           title: "Start with Budget Overview",
           href: "pages/budget-overview.html",
-          answer: "This is the best starting point for the FY 2027 proposed budget, major sections, and how the budget site is organized."
+          answer: "This is the best starting point for the budget, major sections, and how the budget site is organized."
         },
         taxes: {
           title: "See Summary of Property Tax Allocations",
@@ -1951,7 +1961,9 @@
         staffing: {
           title: "Go to Summary of Personnel",
           href: "pages/summary-of-personnel.html",
-          answer: "For staffing questions, the Summary of Personnel shows positions and staffing changes across the budget."
+          answer: "For staffing questions, the Summary of Personnel shows positions and staffing changes across the budget.",
+          secondaryTitle: "Also See Summary of Personnel Cost",
+          secondaryHref: "pages/summary-of-personnel-cost.html"
         }
       };
 
@@ -1962,10 +1974,14 @@
 
       function renderRecommendation(topic){
         var rec = recommendations[topic] || recommendations.overview;
+        var secondaryLink = rec.secondaryHref
+          ? '<a class="wc-budget-guide-link" href="' + escapeHtml(rec.secondaryHref) + '">' + escapeHtml(rec.secondaryTitle || "Open This Page") + '</a>'
+          : "";
         result.hidden = false;
         result.innerHTML = '<h3>' + escapeHtml(rec.title) + '</h3>' +
           '<p>' + escapeHtml(rec.answer) + '</p>' +
-          '<a class="wc-budget-guide-link" href="' + escapeHtml(rec.href) + '">Open This Page</a>';
+          '<a class="wc-budget-guide-link" href="' + escapeHtml(rec.href) + '">Open This Page</a>' +
+          secondaryLink;
       }
 
       function openGuide(event){

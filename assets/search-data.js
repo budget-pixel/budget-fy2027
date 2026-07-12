@@ -28,6 +28,7 @@ var wcCoreBudgetPages = [
   { title:"Summary of Expenses", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdf2d67fd0fb063ce6" },
   { title:"Summary of Interfund Transfers", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0c507ca05e715043" },
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
+  { title:"Summary of Personnel Cost", section:"Financial Summaries", href:"summary-of-personnel-cost.html" },
   { title:"Summary of Machinery, Vehicles & Equipment", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfdb1a2c2915743e4" },
   { title:"Summary of Property Tax Allocations", section:"Financial Summaries", href:"summary-of-property-tax-allocations.html" },
   { title:"Summary of Contractual Services", section:"Financial Summaries", href:"summary-of-contractual-services.html" },
@@ -98,8 +99,7 @@ var wcCoreBudgetPages = [
 
 // Temporarily hidden while pages are in draft. Remove the title here to restore.
 var wcHiddenBudgetPageTitles = new Set([
-  "Transmittal Letter",
-  "Summary of Contractual Services"
+  "Transmittal Letter"
 ]);
 
 (function(){
@@ -194,6 +194,10 @@ var wcHiddenBudgetPageTitles = new Set([
 
     "Summary of Personnel": [
       "personnel", "positions", "fte", "full time equivalent", "staffing", "headcount", "employees", "authorized positions", "new positions", "vacancies", "payroll", "salary", "benefits"
+    ],
+
+    "Summary of Personnel Cost": [
+      "personnel cost", "payroll cost", "salaries", "wages", "benefits", "fica", "medicare", "retirement", "health insurance", "workers compensation", "personnel services", "salary cost", "cost of personnel"
     ],
 
     "Summary of Machinery, Vehicles & Equipment": [

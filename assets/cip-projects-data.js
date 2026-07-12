@@ -178,8 +178,29 @@
     return "wc-status-planning";
   }
 
+  // The sheet's own Dept column is the source of truth -- map its values
+  // straight to the bucket labels used across the CIP pages/filters.
+  // Keyword-guessing off the title/fund/manager/location text is only a
+  // fallback for a row with no (or unrecognized) Dept value -- it used to
+  // run unconditionally, which misclassified real Engineering-dept road
+  // projects like "CR 30A Sidewalk..." and "CR 83 N (Blue Mountain Rd)..."
+  // as Beach Operations just because "30a"/"blue mountain" appeared in the
+  // title.
+  const CIP_DEPT_MAP = {
+    "sheriff": "Sheriff",
+    "beach operations": "Beach Operations",
+    "building & construction maintenance": "Building Construction and Maintenance",
+    "building and construction maintenance": "Building Construction and Maintenance",
+    "engineering": "Public Works/Engineering",
+    "public works": "Public Works/Engineering",
+    "administration": "Administration"
+  };
+
   function normalizeDepartment(row, title, fund, projectManager) {
     const rawDept = get(row, "Dept");
+    const mapped = CIP_DEPT_MAP[cleanText(rawDept).toLowerCase()];
+    if (mapped) return mapped;
+
     const source = [
       rawDept,
       title,
@@ -198,7 +219,7 @@
     // first and get misclassified (see the Roof Replacement Fire Station 4
     // project, which only ever showed up under the Administration filter
     // because of this).
-    if (/\bfm\b|building.{0,4}(construction|contruction|maintenance)|\bfacilit|county buildings|renovation|rehab/.test(source)) return "Building Construction & Maintenance";
+    if (/\bfm\b|building.{0,4}(construction|contruction|maintenance)|\bfacilit|county buildings|renovation|rehab/.test(source)) return "Building Construction and Maintenance";
     if (/admin|library/.test(source)) return "Administration";
     return rawDept || "Capital Projects";
   }

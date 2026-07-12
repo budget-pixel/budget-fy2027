@@ -13,7 +13,8 @@
     funds: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=968844446&single=true&output=csv",
     activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv",
     fundBalances: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=78843155&single=true&output=csv",
-    contractualServicesContracts: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1118643678&single=true&output=csv"
+    personnelPositionCosts: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1934273460&single=true&output=csv",
+    personnelCostFormulaInputs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1205082856&single=true&output=csv"
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
@@ -1454,7 +1455,7 @@
 
   // RFC4180-style CSV parser: handles quoted fields, embedded commas/newlines,
   // and escaped quotes ("").
-  function parseCSV(text) {
+  function parseCSVRows(text) {
     const rows = [];
     let row = [];
     let field = "";
@@ -1494,6 +1495,16 @@
       row.push(field);
       rows.push(row);
     }
+    return rows;
+  }
+
+  // Standard shape used by every other sheet on the site: first row is a
+  // header, every row after it becomes one object keyed by that header.
+  // Doesn't fit an irregular, multi-section reference sheet like the
+  // Personnel Cost formula inputs -- see parseCSVRows/
+  // parsePersonnelCostFormulaInputs for that one.
+  function parseCSV(text) {
+    const rows = parseCSVRows(text);
     if (!rows.length) return [];
 
     const headers = rows[0].map((h) => h.trim());
@@ -2120,6 +2131,9 @@
       Dept_Code: (row.Dept_Code || "").trim(),
       Dept_Name: (row.Dept_Name || "").trim(),
       Note: (row.Note || "").trim(),
+      Contract_Status: (row.Contract_Status || "").trim(),
+      Vendor: (row.Vendor || "").trim(),
+      Contract_No: (row.Contract_No || "").trim(),
       Project_Code: (row.Project_Code || "").trim(),
       Project_Name: (row.Project_Name || "").trim(),
       Object_Code: (row.Object_Code || "").trim(),
@@ -2247,22 +2261,6 @@
       .filter((row) => row.Amount !== 0);
   }
 
-  // Summary of Contractual Services: this budget's chart of accounts has no
-  // single object code literally named "Contractual Services" -- the
-  // codes that represent outside-vendor/contract spending are 531000
-  // ("Professional Services"), 532000 ("Accounting & Auditing"), and
-  // 534000 ("Other Services", Florida's Uniform Chart of Accounts
-  // standard name for this code is "Other Contractual Services").
-  // Combined here, same shape as buildMachineryRowsFromExpenditures.
-  const CONTRACTUAL_SERVICES_OBJECT_CODES = new Set(["531000", "532000", "534000"]);
-  // One-off inclusions: specific object codes that are real vendor
-  // contracts even though their object code falls outside 531000/534000
-  // -- Procurement's OpenGov Purchasing Software is booked under 554000
-  // ("Books Publications Subscriptions or Memberships"), not one of the
-  // two usual contractual-services codes.
-  const CONTRACTUAL_SERVICES_ADDITIONAL_OBJECT_CODES_BY_DEPT = new Map([
-    ["procurement", new Set(["554000"])]
-  ]);
   // Departments/rows excluded from this summary at the requester's
   // direction -- Court Technology and Medical Examiner (court-related,
   // shown on their own pages), Housing & Urban Development (its own
@@ -2338,7 +2336,6 @@
     { dept: "board of county commissioners", itemPrefix: "board agenda", value: 150000 },
     { dept: "board of county commissioners", itemPrefix: "board erp finance software", value: 420000 },
     { dept: "board of county commissioners", itemPrefix: "enhanced south walton", value: 1330000 },
-    { dept: "board of county commissioners", itemPrefix: "state mandated juvenile justice", value: 200000 },
     { dept: "building construction and maintenance", itemPrefix: "park field spraying", value: 150000 },
     { dept: "building construction and maintenance", itemPrefix: "pest management services", value: 45000 },
     { dept: "environmental services", itemPrefix: "cba choctawhatchee bay water quality contract", value: 36000 },
@@ -2351,56 +2348,77 @@
     const match = CONTRACTUAL_SERVICES_BUDGET2026_OVERRIDES.find((o) => o.dept === dept && item.indexOf(o.itemPrefix) === 0);
     return match ? match.value : undefined;
   }
-  // Contracts with real FY2026 budget but no FY2027 line in the sheet at
-  // all -- added here (at $0 FY2027 proposed) rather than left out, same
-  // as any other year-over-year contract that ended.
-  const CONTRACTUAL_SERVICES_ADDED_ROWS = [
-    { Dept_Name: "Planning", Dept_Code: "00104000", Item_Description: "Mobility Fee Annual Support", Budget2026: 100000 },
-    { Dept_Name: "Planning", Dept_Code: "00104000", Item_Description: "Parks & Rec Master Plan", Budget2026: 300000 },
-    { Dept_Name: "Planning Short-Term Rental", Dept_Code: "00104000", Item_Description: "Marketing", Budget2026: 50000 },
-    { Dept_Name: "Office of Management and Budget", Dept_Code: "00107000", Item_Description: "OpenGov Budget Software", Budget2026: 200000 }
-  ];
+  // "Procurement" is the sheet's Dept_Name, but the department's actual
+  // page/public-facing name is "Purchasing" -- renamed here for display on
+  // these derived summary rows (doesn't touch cache.expenditures/Dept_Name
+  // used elsewhere).
+  function departmentDisplayName(deptName) {
+    const name = String(deptName || "").trim();
+    return normalizeDeptName(name) === "procurement" ? "Purchasing" : name;
+  }
+
+  // Tourist Development Fund departments don't all carry "Tourism" in their
+  // sheet name (Beach Operations, Marketing, Sales and Visitors Center,
+  // etc.), which scatters them across the department filter's alphabetical
+  // list instead of grouping together. Prefixed here (display-only, on this
+  // page's own derived rows -- doesn't touch cache.expenditures/Dept_Name
+  // used elsewhere) so they all sort and read together.
+  function tourismDeptLabel(deptName, fundName) {
+    const name = departmentDisplayName(deptName).trim();
+    if (!name || fundName !== "Tourist Development Fund") return name;
+    // Strip any existing leading "Tourism" word so a sheet name like
+    // "Tourism Administration" becomes "Tourism - Administration" instead
+    // of double-prefixing.
+    const stripped = name.replace(/^tourism\s*[-:]?\s*/i, "").trim();
+    return "Tourism - " + (stripped || name);
+  }
+
   function buildContractualServicesRowsFromExpenditures(rows) {
     const baseRows = (rows || [])
-      .filter((row) => {
-        const code = String(row.Object_Code || "").trim();
-        if (CONTRACTUAL_SERVICES_OBJECT_CODES.has(code)) return true;
-        const extraCodes = CONTRACTUAL_SERVICES_ADDITIONAL_OBJECT_CODES_BY_DEPT.get(normalizeDeptName(row.Dept_Name));
-        return !!(extraCodes && extraCodes.has(code));
-      })
+      // A row belongs on this page if it's been tagged with a Contract
+      // Status in the sheet -- not by object code. The chart of accounts
+      // has no single object code that means "contractual service" (the
+      // closest are 531000 Professional Services, 532000 Accounting &
+      // Auditing, and 534000 Other Services), and real vendor contracts
+      // show up under other codes too (e.g. Procurement's OpenGov
+      // Purchasing Software under 554000) -- Contract Status is the
+      // authoritative, department-confirmed signal instead.
+      .filter((row) => String(row.Contract_Status || "").trim() !== "")
       .filter((row) => !CONTRACTUAL_SERVICES_EXCLUDED_DEPTS.has(normalizeDeptName(row.Dept_Name)))
       .filter((row) => String(row.Note || "").trim() !== "Statutory & Other")
       .filter((row) => String(row.Project_Code || "").trim() !== ZEHNDER_PROJECT_CODE)
       .filter((row) => normalizeDeptName(row.Dept_Name) !== ENGINEERING_SERVICES_DEPT_NAME)
-      // Procurement's 554000 (Books Publications Subscriptions or
-      // Memberships) has a generic, un-noted catch-all line alongside its
-      // real OpenGov Purchasing Software contract -- only the latter
-      // belongs on a contractual-services page.
-      .filter((row) => !(
-        normalizeDeptName(row.Dept_Name) === "procurement" &&
-        String(row.Object_Code || "").trim() === "554000" &&
-        !String(row.Note || "").trim()
-      ))
       .filter((row) => !(
         normalizeDeptName(row.Dept_Name) === "environmental services" &&
         normalizeDeptName(row.Note) === "choctawhatchee bay estuary program"
       ))
+      // State Mandated Juvenile Justice is a statutory pass-through
+      // payment, not a procured contractual service -- excluded from this
+      // page.
+      .filter((row) => normalizeDeptName(row.Note).indexOf("state mandated juvenile justice") !== 0)
       .map((row) => {
         const fundCode = fundCodeForRow(row);
         const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+        const fundName = (fund && fund.Fund_Name) || ("Fund " + fundCode);
         const itemDescription = row.Note || row.Project_Name || row.Object_Name || "Contractual Services";
         const budget2026Override = contractualServicesBudget2026Override(row.Dept_Name, itemDescription);
         return {
           Dept_Code: row.Dept_Code || "",
-          Dept_Name: row.Dept_Name || "",
+          Dept_Name: tourismDeptLabel(row.Dept_Name, fundName),
           Fund_Code: fundCode,
-          Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
+          Fund_Name: fundName,
           Item_Description: itemDescription,
           Budget2026: budget2026Override !== undefined ? budget2026Override : (row.FY2026_Original_Budget || 0),
-          Amount: row.FY2027_Proposed || 0
+          Amount: row.FY2027_Proposed || 0,
+          Vendor: row.Vendor || "",
+          Contract_No: row.Contract_No || "",
+          Contract_Status: row.Contract_Status || ""
         };
       })
-      .filter((row) => row.Amount !== 0 || row.Budget2026 !== 0);
+      // Only rows with a real FY2027 line belong on this page -- FY2026-only
+      // carryovers (a contract that ended and has no FY2027 funding) are
+      // dropped rather than shown as a $0 row.
+      .filter((row) => row.Amount !== 0);
 
     const zehnderRows = (rows || []).filter((row) =>
       String(row.Project_Code || "").trim() === ZEHNDER_PROJECT_CODE && fundCodeForRow(row) === ZEHNDER_FUND_CODE
@@ -2414,28 +2432,32 @@
       zehnderByDept.set(deptName, entry);
     });
     zehnderByDept.forEach((entry) => {
-      if (!entry.total && !entry.budget2026) return;
+      if (!entry.total) return;
       const fundCode = fundCodeForRow(entry.row);
       const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+      const fundName = (fund && fund.Fund_Name) || ("Fund " + fundCode);
       baseRows.push({
         Dept_Code: entry.row.Dept_Code || "",
-        Dept_Name: entry.row.Dept_Name || "",
+        Dept_Name: tourismDeptLabel(entry.row.Dept_Name, fundName),
         Fund_Code: fundCode,
-        Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
+        Fund_Name: fundName,
         Item_Description: entry.row.Project_Name || "Advertising Services (Zehnder, INC)",
         Budget2026: entry.budget2026,
-        Amount: entry.total
+        Amount: entry.total,
+        Vendor: entry.row.Vendor || "",
+        Contract_No: entry.row.Contract_No || "",
+        Contract_Status: entry.row.Contract_Status || ""
       });
     });
 
     const engineeringRows = (rows || []).filter((row) =>
       normalizeDeptName(row.Dept_Name) === ENGINEERING_SERVICES_DEPT_NAME &&
-      CONTRACTUAL_SERVICES_OBJECT_CODES.has(String(row.Object_Code || "").trim())
+      String(row.Contract_Status || "").trim() !== ""
     );
     if (engineeringRows.length) {
       const engineeringBudget2026 = engineeringRows.reduce((sum, row) => sum + (row.FY2026_Original_Budget || 0), 0);
       const engineeringAmount = engineeringRows.reduce((sum, row) => sum + (row.FY2027_Proposed || 0), 0);
-      if (engineeringBudget2026 || engineeringAmount) {
+      if (engineeringAmount) {
         // File under whichever org code carries the current (FY2027)
         // dollars -- that's the department's real, present-day fund.
         const primary = engineeringRows.find((row) => (row.FY2027_Proposed || 0) !== 0) || engineeringRows[0];
@@ -2448,45 +2470,13 @@
           Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
           Item_Description: primary.Note || primary.Project_Name || primary.Object_Name || "Contractual Services",
           Budget2026: engineeringBudget2026,
-          Amount: engineeringAmount
+          Amount: engineeringAmount,
+          Vendor: primary.Vendor || "",
+          Contract_No: primary.Contract_No || "",
+          Contract_Status: primary.Contract_Status || ""
         });
       }
     }
-
-    CONTRACTUAL_SERVICES_ADDED_ROWS.forEach((added) => {
-      const fundCode = fundCodeForRow({ Dept_Code: added.Dept_Code });
-      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
-      baseRows.push({
-        Dept_Code: added.Dept_Code,
-        Dept_Name: added.Dept_Name,
-        Fund_Code: fundCode,
-        Fund_Name: (fund && fund.Fund_Name) || ("Fund " + fundCode),
-        Item_Description: added.Item_Description,
-        Budget2026: added.Budget2026,
-        Amount: 0
-      });
-    });
-
-    const contractsByKey = new Map();
-    (cache.contractualServicesContracts || []).forEach((c) => {
-      const key = normalizeDeptName(c.Dept_Name) + "|" + normalizeDeptName(c.Item_Description);
-      contractsByKey.set(key, c);
-    });
-    baseRows.forEach((row) => {
-      const key = normalizeDeptName(row.Dept_Name) + "|" + normalizeDeptName(row.Item_Description);
-      const contract = contractsByKey.get(key);
-      row.Vendor = (contract && contract.Vendor) || "";
-      row.Contract_No = (contract && contract.Contract_No) || "";
-      row.Contract_Status = (contract && contract.Contract_Status) || "";
-      row.Last_BCC_Action = (contract && contract.Last_BCC_Action) || "";
-      // The contract tab's own "2026" column is now the authoritative
-      // FY2026 figure (vendor-confirmed) when present, taking priority
-      // over the expenditures sheet's raw FY2026 figure and the
-      // hardcoded CONTRACTUAL_SERVICES_BUDGET2026_OVERRIDES list above.
-      if (contract && contract.Budget2026 !== null && contract.Budget2026 !== undefined) {
-        row.Budget2026 = contract.Budget2026;
-      }
-    });
 
     return baseRows;
   }
@@ -2549,21 +2539,27 @@
     };
   }
 
-  // Summary of Contractual Services' vendor/contract detail tab --
-  // Dept_Name + Item_Description join key back to that page's own rows
-  // (see buildContractualServicesRowsFromExpenditures).
-  function normalizeContractualServicesContractRow(row) {
-    // Blank kept as null (not 0) so a row with no "2026" entry falls back
-    // to the expenditures sheet's own FY2026 figure instead of zeroing it.
-    const rawBudget2026 = String(row["2026"] || "").trim();
+  // Summary of Personnel Cost's per-position detail tab (a work in
+  // progress -- being built out position by position, see
+  // buildPersonnelPositionCostsByDept). Columns carry a trailing "*" in the
+  // sheet header on the required fields.
+  function normalizePersonnelPositionCostRow(row) {
+    // The sheet's "Dept_Name" column actually holds the 8-digit Dept_Code
+    // (e.g. "00104000"), not a department name -- resolved back to a real
+    // name via cache.expenditures in buildPersonnelPositionCostsByDept.
     return {
-      Dept_Name: (row.Dept_Name || "").trim(),
-      Item_Description: (row.Item_Description || "").trim(),
-      Vendor: (row.Vendor || "").trim(),
-      Contract_No: (row.Contract_No || "").trim(),
-      Contract_Status: (row.Contract_Status || "").trim(),
-      Last_BCC_Action: (row.Last_BCC_Action || "").trim(),
-      Budget2026: rawBudget2026 ? toNumber(rawBudget2026) : null
+      Position_Name: (row["Position_Name"] || row["Position Name*"] || "").trim(),
+      Dept_Code: (row["Dept_Name"] || row["Dept_Code"] || "").trim(),
+      Hourly_Base_Wage: toNumber(String(row["Hourly_Base_Wage"] || row["Hourly Base Wage*"] || "").replace(/[$,]/g, "")),
+      Standard_Hours: toNumber(row["Standard_Hours_per_Year"] || row["Standard Hours per Year*"]),
+      Allocation_Pct: toNumber(String(row["Allocation"] || row["Allocation %*"] || "").replace(/[%,]/g, "")) / 100,
+      Fund_Code: (row["Fund"] || row["Funds"] || "").trim(),
+      Commissioner_Vehicle_Allowance: toNumber(String(row["Commissioner_Vehicle_Allowance"] || "").replace(/[$,]/g, "")),
+      Health_Plan: (row["Health_Plan"] || "").trim(),
+      Coverage: (row["Coverage"] || "").trim(),
+      Pension_Plan: (row["Pension_Plan"] || "").trim(),
+      Risk_Code: (row["Risk_Code"] || "").trim(),
+      Weekend_Pay: toNumber(row["Weekend_Pay"])
     };
   }
 
@@ -3007,15 +3003,17 @@
       ["funds", DATA_SOURCES.funds, normalizeFundRow],
       ["activities", DATA_SOURCES.activities, normalizeActivityRow],
       ["fundBalances", DATA_SOURCES.fundBalances, normalizeFundBalanceRow],
-      ["contractualServicesContracts", DATA_SOURCES.contractualServicesContracts, normalizeContractualServicesContractRow]
+      ["personnelPositionCosts", DATA_SOURCES.personnelPositionCosts, normalizePersonnelPositionCostRow]
     ];
 
     cache.datasetCount = specs.length;
 
     loadPromise = Promise.all([
       Promise.allSettled(specs.map((spec) => fetchCSV(spec[1]).then((rows) => rows.map(spec[2])))),
-      loadSupabaseActualLookups()
-    ]).then(([results, actuals]) => {
+      loadSupabaseActualLookups(),
+      fetchPersonnelCostFormulaInputs()
+    ]).then(([results, actuals, personnelCostFormula]) => {
+      cache.personnelCostFormula = personnelCostFormula;
       results.forEach((result, i) => {
         const key = specs[i][0];
         if (result.status === "fulfilled") {
@@ -3080,6 +3078,7 @@
       cache.contractualServices = buildContractualServicesRowsFromExpenditures(cache.expenditures);
 
       auditDepartmentExpenseRevenueParity();
+      auditPersonnelCostPositionParity();
 
       return cache;
     });
@@ -3113,6 +3112,53 @@
 
   let budgetLinesDetailCounter = 0;
   let fundScheduleActivityCounter = 0;
+
+  // Shared CSV download helper. Values are stringified and quoted only
+  // when needed (comma/quote/newline present), with embedded quotes
+  // doubled per the standard CSV escaping rule.
+  function csvField(value) {
+    const s = String(value === undefined || value === null ? "" : value);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function downloadCsv(filename, rows) {
+    const csv = rows.map((row) => row.map(csvField).join(",")).join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Mirrors the workforce position-cost sheet's own column layout exactly
+  // (same header names/order, same "$25.33"/"100.00%" string formatting),
+  // so this export can be pasted straight back into that sheet -- the
+  // whole point being to carry the auto-assigned Position ID back in as a
+  // stable join key, not to reformat the data into a financial report.
+  const PERSONNEL_POSITION_CSV_HEADER = [
+    "Dept_Name", "Position_ID*", "Position_Name", "Hourly_Base_Wage",
+    "Standard_Hours_per_Year", "Allocation", "Fund", "Commissioner_Vehicle_Allowance",
+    "Health_Plan", "Coverage", "Pension_Plan", "Risk_Code", "Weekend_Pay"
+  ];
+
+  function personnelPositionCsvRow(p) {
+    const row = p.SourceRow || {};
+    const dollars2 = (n) => "$" + Number(n || 0).toFixed(2);
+    const dollarsPlain = (n) => "$" + Math.round(Number(n || 0));
+    const pct = (n) => (Number(n || 0) * 100).toFixed(2) + "%";
+    return [
+      row.Dept_Code || "", p.PositionId, p.Position_Name,
+      dollars2(row.Hourly_Base_Wage), row.Standard_Hours || "", pct(row.Allocation_Pct),
+      row.Fund_Code || "", dollarsPlain(row.Commissioner_Vehicle_Allowance),
+      row.Health_Plan || "", row.Coverage || "", row.Pension_Plan || "", row.Risk_Code || "",
+      dollarsPlain(row.Weekend_Pay)
+    ];
+  }
+
 
   // The expandable "View Budget Lines" detail under an Expenditure Summary
   // table: every individual object-code line behind that table's rolled-up
@@ -10694,11 +10740,14 @@
     }
 
     const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
+    const ALL_DEPARTMENTS_VALUE = "__ALL__";
 
     container.innerHTML =
       '<div class="wc-filter-bar wc-machinery-picker">' +
       '<label class="wc-filter-field"><span>Department</span>' +
-      '<select id="wcContractualServicesDeptSelect"><option value="">All</option>' +
+      '<select id="wcContractualServicesDeptSelect">' +
+      '<option value="" selected disabled>Select a department&hellip;</option>' +
+      '<option value="' + ALL_DEPARTMENTS_VALUE + '">All Departments</option>' +
       departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
       "</select></label>" +
       "</div>" +
@@ -10708,19 +10757,31 @@
     const tableEl = container.querySelector(".wc-financial-summary-table");
 
     function showFiltered() {
-      const deptName = deptSelect.value;
+      const selected = deptSelect.value;
+      if (!selected) {
+        tableEl.hidden = false;
+        tableEl.innerHTML = '<div class="wc-data-empty">Select a department above to view the schedule.</div>';
+        return;
+      }
+      const deptName = selected === ALL_DEPARTMENTS_VALUE ? "" : selected;
       const items = rows.filter((r) => !deptName || r.Dept_Name === deptName);
       const showDeptColumn = !deptName;
-      // Department?, Service, Vendor, Contract No. -- then the two numeric
-      // columns, then Contract Status.
-      const leadingCols = showDeptColumn ? 4 : 3;
-      const trailingCols = 1;
-      const colCount = leadingCols + 2 + trailingCols;
+      // Department?, Service -- then the FY 2027 numeric column, then
+      // Contract Status, Vendor, Contract No.
+      const leadingCols = showDeptColumn ? 2 : 1;
+      const trailingCols = 3;
+      const colCount = leadingCols + 1 + trailingCols;
 
-      const funds = uniqueSorted(items.map((r) => r.Fund_Name));
+      // Capital Projects Fund is where CIP procurement rows land -- push it
+      // to the end so the fund groups people expect to reconcile against
+      // (department operating funds) come first.
+      const funds = uniqueSorted(items.map((r) => r.Fund_Name)).sort((a, b) => {
+        const aCap = a === "Capital Projects Fund";
+        const bCap = b === "Capital Projects Fund";
+        if (aCap === bCap) return 0;
+        return aCap ? 1 : -1;
+      });
       const bodyRows = [];
-      let grandBudget2026 = 0;
-      let grandAmount = 0;
 
       funds.forEach((fundName) => {
         const fundItems = items
@@ -10731,46 +10792,33 @@
 
         bodyRows.push('<tr class="wc-table-group-row"><td colspan="' + colCount + '">' + escapeHtml(fundName) + "</td></tr>");
 
-        let fundBudget2026 = 0;
         let fundAmount = 0;
         fundItems.forEach((r) => {
-          fundBudget2026 += r.Budget2026 || 0;
           fundAmount += r.Amount || 0;
           bodyRows.push(
             "<tr>" +
             (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
             "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
-            "<td>" + escapeHtml(r.Vendor || "") + "</td>" +
-            "<td>" + escapeHtml(r.Contract_No || "") + "</td>" +
-            '<td class="wc-num">' + formatCurrency(r.Budget2026 || 0) + "</td>" +
             '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td>" +
-            "<td>" + escapeHtml(r.Contract_Status || "") + "</td></tr>"
+            "<td>" + escapeHtml(r.Contract_Status || "") + "</td>" +
+            "<td>" + escapeHtml(r.Vendor || "") + "</td>" +
+            "<td>" + escapeHtml(r.Contract_No || "") + "</td></tr>"
           );
         });
-        grandBudget2026 += fundBudget2026;
-        grandAmount += fundAmount;
-
         bodyRows.push(
           '<tr class="wc-table-subtotal-row"><td colspan="' + leadingCols + '">Subtotal — ' + escapeHtml(fundName) +
-          '</td><td class="wc-num">' + formatCurrency(fundBudget2026) + '</td><td class="wc-num">' + formatCurrency(fundAmount) +
+          '</td><td class="wc-num">' + formatCurrency(fundAmount) +
           '</td><td colspan="' + trailingCols + '"></td></tr>'
         );
       });
 
-      bodyRows.push(
-        '<tr class="wc-table-total-row"><td colspan="' + leadingCols + '">Total</td><td class="wc-num">' +
-        formatCurrency(grandBudget2026) + '</td><td class="wc-num">' + formatCurrency(grandAmount) +
-        '</td><td colspan="' + trailingCols + '"></td></tr>'
-      );
-
       const columns = (showDeptColumn ? [{ label: "Department" }] : [])
         .concat([
           { label: "Service" },
-          { label: "Current Vendor" },
-          { label: "Contract No." },
-          { label: "FY 2026", num: true },
           { label: "FY 2027", num: true },
-          { label: "Contract Status" }
+          { label: "Procurement / Contract Status" },
+          { label: "Current Service Provider" },
+          { label: "Contract No." }
         ]);
 
       mountOrHide(
@@ -10791,18 +10839,87 @@
     showFiltered();
   }
 
+  // Capital Improvement Plan projects are folded into the same schedule as
+  // renderContractualServicesSummary's awarded-vendor rows -- each FY2027-
+  // funded CIP project becomes a row for its own "Capital Improvement Plan"
+  // fund group, flagged as a future/unawarded procurement (no vendor/contract
+  // number yet, since these haven't been procured). A single generic label is
+  // used instead of naming every service type (engineering, design, CEI,
+  // construction) -- not every project needs all of them, and some are
+  // designed in-house rather than contracted, so listing them all per row
+  // would overstate what's actually being procured for a given project.
+  const CIP_PROCUREMENT_SCOPE = "Capital Project Services (as applicable)";
+
+  // Matches a CIP project's raw "Budget Fund(s)" text to the same Fund_Name
+  // string used by the awarded-vendor rows (cache.funds), so a project falls
+  // into -- and subtotals with -- its actual fund rather than a synthetic
+  // "Capital Improvement Plan" bucket.
+  function fundNameForCipProject(project) {
+    const raw = String(project.funding || "").trim();
+    if (!raw) return "Capital Improvement Plan";
+    const match = (cache.funds || []).find((f) => String(f.Fund_Name || "").trim().toLowerCase() === raw.toLowerCase());
+    return match ? match.Fund_Name : raw;
+  }
+
+  function buildCipContractualServiceRows() {
+    return (window.wcCipProjects || [])
+      // Sheriff CIP projects are excluded, same as the awarded-vendor rows
+      // above -- this page doesn't cover Constitutional Officer contracts.
+      .filter((project) => project.department !== "Sheriff")
+      // Legacy placeholder rows exist solely to carry an in-house
+      // engineering dollar amount -- they're not a real capital project and
+      // don't belong on a contractual services page.
+      .filter((project) => !project.is_legacy_in_house_engineering_row)
+      // US 331 Bridge Lighting is a state (FDOT) project, not a County
+      // contracted service.
+      .filter((project) => project.title !== "US 331 Bridge Lighting")
+      // Grant-funded projects are excluded -- their procurement/vendor
+      // requirements are driven by the granting agency, not this page's
+      // Board-managed contractual services.
+      .filter((project) => String(project.funding || "").trim().toLowerCase() !== "grant funded")
+      .map((project) => ({
+        project: project,
+        fy2027: (project.funding_by_year || []).find((item) => item.year === "FY2027")
+      }))
+      .filter((entry) => entry.fy2027 && entry.fy2027.amount_value)
+      .map(({ project, fy2027 }) => {
+        // Net out the portion of the project done by County staff
+        // in-house -- that work isn't a contracted service, so it
+        // shouldn't count toward the amount shown here even when the rest
+        // of the project (design, CEI, construction) is contracted out.
+        const inHouseValue = project.has_in_house_engineering ? project.in_house_engineering_value : 0;
+        const amount = Math.max(0, fy2027.amount_value - inHouseValue);
+        return {
+          project: project,
+          amount: amount
+        };
+      })
+      .filter((entry) => entry.amount)
+      .map(({ project, amount }) => ({
+        Dept_Name: tourismDeptLabel(project.department, fundNameForCipProject(project)),
+        Fund_Name: fundNameForCipProject(project),
+        Item_Description: project.title + " — " + CIP_PROCUREMENT_SCOPE,
+        Vendor: "",
+        Contract_No: "N/A",
+        Budget2026: 0,
+        Amount: amount,
+        Contract_Status: "New Procurement"
+      }));
+  }
+
   function initContractualServicesSummaryPage() {
     const container = document.getElementById("contractual-services-summary");
     if (!container) return;
 
     container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
 
-    loadBudgetData()
-      .then((data) => {
+    Promise.all([loadBudgetData(), window.wcCipProjectsReady || Promise.resolve([])])
+      .then(([data]) => {
         if (Object.keys(data.errors || {}).length >= data.datasetCount) {
           container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
           return;
         }
+        cache.contractualServices = (cache.contractualServices || []).concat(buildCipContractualServiceRows());
         renderContractualServicesSummary(container);
       })
       .catch((err) => {
@@ -11287,6 +11404,1071 @@
       });
   }
 
+  // Summary of Personnel Cost: dollar companion to Summary of Personnel's
+  // FTE-count table above -- same department/fund filter pattern, but
+  // driven by cache.expenditures' Object_Type "Personnel Services" rows
+  // instead of cache.staffing, and split into cost categories instead of a
+  // position headcount. Retirement (522000) and Health Insurance (523000)
+  // get their own columns rather than being folded into a generic
+  // "Benefits" bucket; FICA/Medicare, Workers' Comp, and Unemployment are
+  // small and stay combined as "Other Benefits & Taxes" on this main table
+  // (Unemployment, 525000, is broken back out as its own line on Board of
+  // County Commissioners' own popup -- see buildPersonnelPositionCostsByDept
+  // -- since that's the only department it's ever booked under).
+  const PERSONNEL_COST_SALARY_CODES = new Set(["511000", "512000", "512007", "513000", "514000"]);
+  const PERSONNEL_COST_RETIREMENT_CODE = "522000";
+  const PERSONNEL_COST_HEALTH_INSURANCE_CODE = "523000";
+  const PERSONNEL_COST_OTHER_BENEFIT_CODES = new Set(["521000", "524000", "525000"]);
+  const PERSONNEL_COST_UNEMPLOYMENT_CODE = "525000";
+  // Salaries & Wages already has this 3% Cost of Living Adjustment baked
+  // into it -- not an additional increase to apply on top.
+  const PERSONNEL_COST_COLA_RATE = 0.03;
+  // Informational only, unlike COLA -- not baked into Health Insurance
+  // today. Shows what a 5% premium increase would add on top of the
+  // current Health Insurance figure, so it's not counted in Total.
+  const PERSONNEL_COST_HEALTH_INSURANCE_INCREASE_RATE = 0.05;
+
+  // Independently elected Constitutional Officers set and manage their own
+  // personnel budgets -- excluded here, same as Contractual Services'
+  // Constitutional Officer exclusion, so users are pointed to those
+  // offices directly instead of reading an incomplete/out-of-context
+  // number on a Board-managed page.
+  const PERSONNEL_COST_EXCLUDED_DEPTS = new Set([
+    "clerk of court",
+    "property appraiser",
+    "supervisor of elections",
+    "tax collector",
+    "walton county sheriffs office"
+  ]);
+
+  // Personnel Cost-only department merge, on top of the shared
+  // personnelDeptDisplayName (Code Compliance Beach/Street -> Code
+  // Compliance) that Summary of Personnel's FTE page also uses. Planning
+  // Short-Term Rental shares its Dept_Code with plain Planning in the
+  // expenditures sheet (a real data ambiguity, not a display choice), so
+  // it's folded into one "Planning" row here -- scoped to this page only,
+  // not the FTE page, since that page doesn't have this ambiguity problem.
+  function personnelCostDeptDisplayName(deptName) {
+    const norm = normalizeDeptName(deptName);
+    if (norm === "planning short term rental") return "Planning";
+    return personnelDeptDisplayName(deptName);
+  }
+
+  function buildPersonnelCostRows() {
+    const byKey = new Map();
+    (cache.expenditures || []).forEach((row) => {
+      if (String(row.Object_Type || "").trim() !== "Personnel Services") return;
+      if (PERSONNEL_COST_EXCLUDED_DEPTS.has(normalizeDeptName(row.Dept_Name))) return;
+      const amount = row.FY2027_Proposed || 0;
+      if (!amount) return;
+      const code = String(row.Object_Code || "").trim();
+      const isSalary = PERSONNEL_COST_SALARY_CODES.has(code);
+      const isRetirement = code === PERSONNEL_COST_RETIREMENT_CODE;
+      const isHealthInsurance = code === PERSONNEL_COST_HEALTH_INSURANCE_CODE;
+      const isOtherBenefit = PERSONNEL_COST_OTHER_BENEFIT_CODES.has(code);
+      if (!isSalary && !isRetirement && !isHealthInsurance && !isOtherBenefit) return;
+
+      const fundCode = fundCodeForRow(row);
+      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+      const fundName = (fund && fund.Fund_Name) || ("Fund " + fundCode);
+      // "Court Innovation FTE" (Project_Code 1040) is a Circuit Court
+      // position, but its dollars are booked under Board of County
+      // Commissioners' Dept_Code in the expenditures sheet -- rerouted
+      // here so Circuit Court's own department total (and therefore its
+      // popup reconciliation) actually includes it, instead of it silently
+      // padding BOCC's total and leaving Circuit Court's gap negative.
+      const isCourtInnovationProject = String(row.Project_Code || "").trim() === "1040";
+      const rawDeptNameForRow = isCourtInnovationProject ? "Circuit Court" : row.Dept_Name;
+      // Code Compliance Beach/Street merged into one "Code Compliance" line
+      // on this table -- same treatment Summary of Personnel's FTE table
+      // already gives them (see personnelDeptDisplayName), applied here
+      // only, not anywhere else.
+      const deptName = tourismDeptLabel(personnelCostDeptDisplayName(rawDeptNameForRow), fundName);
+      const key = deptName + "|" + fundName;
+      if (!byKey.has(key)) {
+        byKey.set(key, { Dept_Name: deptName, Fund_Name: fundName, Salaries: 0, Retirement: 0, HealthInsurance: 0, OtherBenefits: 0 });
+      }
+      const entry = byKey.get(key);
+      if (isSalary) entry.Salaries += amount;
+      else if (isRetirement) entry.Retirement += amount;
+      else if (isHealthInsurance) entry.HealthInsurance += amount;
+      else entry.OtherBenefits += amount;
+    });
+    return Array.from(byKey.values()).filter((r) => r.Salaries || r.Retirement || r.HealthInsurance || r.OtherBenefits);
+  }
+
+  // FTE count per department, from cache.staffing (the same source
+  // Summary of Personnel's own FTE table uses) -- grouped under the exact
+  // same display department name buildPersonnelCostRows uses (Code
+  // Compliance Beach/Street merge, Tourism prefix, Procurement/Purchasing
+  // rename) so a row here lines up with its dollar-cost counterpart.
+  // The staffing sheet doesn't always spell a department the same way the
+  // expenditures sheet does (e.g. staffing's "Engineering Department" vs.
+  // expenditures' "Engineering Services", "County Libraries" vs.
+  // "Libraries") -- a small, purpose-built 1:1 alias list, NOT the site's
+  // broader DEPT_ALIAS_CANONICAL table. That table intentionally groups
+  // several distinct tourism sub-programs (Marketing, Communications,
+  // Sales and Visitors Center, North Walton TDT) under one "Tourism
+  // Administration" canonical key for other pages' purposes -- reusing it
+  // here made Tourism - Administration's popup swallow every one of those
+  // other tourism departments' staffing positions too, since they're kept
+  // as separate rows on this page (see tourismDeptLabel) rather than
+  // merged like DEPT_ALIASES does elsewhere.
+  const PERSONNEL_COST_DEPT_ALIAS_MAP = {
+    "engineering services": "engineering department",
+    "environmental services": "environmental resources",
+    "county libraries": "libraries",
+    "probation services": "probation",
+    "procurement": "purchasing"
+  };
+  function personnelCostFteMatchKey(deptName) {
+    const norm = normalizeDeptName(deptName);
+    return PERSONNEL_COST_DEPT_ALIAS_MAP[norm] || norm;
+  }
+
+  function buildPersonnelCostFteByDept() {
+    const totals = new Map();
+    (cache.staffing || []).forEach((row) => {
+      const fundName = fundNameForStaffingRow(row);
+      const deptName = tourismDeptLabel(personnelCostDeptDisplayName(row.Dept_Name), fundName);
+      const key = personnelCostFteMatchKey(deptName);
+      totals.set(key, (totals.get(key) || 0) + (row[2027] || 0));
+    });
+    return totals;
+  }
+
+  // Position Name/FTE only, straight from the staffing sheet -- no dollar
+  // amounts, since the point is letting the user visually cross-check this
+  // list against the workforce/cost sheet's own position list for that
+  // department to spot who's missing from the workforce sheet, not to
+  // report cost. Keyed the same alias-canonical way as
+  // buildPersonnelCostFteByDept so it looks up under the same department
+  // name a popup uses.
+  function buildStaffingPositionListByDept() {
+    const byDept = new Map();
+    (cache.staffing || []).forEach((row) => {
+      if (!row.Position_Name || !(row[2027] || 0)) return;
+      const fundName = fundNameForStaffingRow(row);
+      const deptName = tourismDeptLabel(personnelCostDeptDisplayName(row.Dept_Name), fundName);
+      const key = personnelCostFteMatchKey(deptName);
+      if (!byDept.has(key)) byDept.set(key, []);
+      byDept.get(key).push({ Position_Name: row.Position_Name, Fte: row[2027] || 0 });
+    });
+    return byDept;
+  }
+
+  // Fallback only -- used if the live Formula Inputs sheet fetch fails
+  // (see fetchPersonnelCostFormulaInputs/cache.personnelCostFormula), so a
+  // network hiccup doesn't blank out every position's cost.
+  const PERSONNEL_COST_FORMULA_DEFAULTS = {
+    colaRate: 0.03,
+    ficaRate: 0.062,
+    medicareRate: 0.0145,
+    basicLifeAnnualCost: 25.00,
+    healthiestYouAnnualCost: 80.00,
+    defaultLtdRate: 0.0031,
+    healthPlanAnnualCost: {
+      "FB1|EE": 13073.16, "FB1|FAM": 21208.20,
+      "FB2|EE": 12833.40, "FB2|FAM": 20664.72,
+      "FB3|EE": 12837.60, "FB3|FAM": 20673.48,
+      "FB4|FAM": 12837.60,
+      "FB5|FAM": 12226.32,
+      "FB6|FAM": 12593.16,
+      "FB7|FAM": 12858.72
+    },
+    pensionPlanRate: {
+      "7200": 0.1403, "7231": 0.5868, "7205": 0.2202, "7210": 0.1403,
+      "7215": 0.5868, "7225": 0.1403, "7230": 0.5868, "7235": 0.3469,
+      "7245": 0.0684, "7250": 0.4623, "7251": 0.2590, "7262": 0.0684,
+      "7255": 0.1239, "7261": 0.0856, "7220": 0.3324
+    },
+    riskCodeRate: {
+      "1463": 0.0872, "5190": 0.0321, "5213": 0.0476, "5222": 0.0596,
+      "5509": 0.0687, "5606": 0.0065, "5651": 0.0524, "6217": 0.0353,
+      "7380": 0.0459, "7720": 0.0283, "8380": 0.0172, "8601": 0.0032,
+      "8603": 0.0008, "8810": 0.0011, "8820": 0.0008, "9015": 0.0268,
+      "9060": 0.0122, "9082": 0.0124, "9102": 0.0275, "9178": 0.0386,
+      "9182": 0.0151, "9402": 0.0409, "9410": 0.0207, "9501": 0.0224
+    }
+  };
+
+  // The Formula Inputs sheet is a small settings/reference sheet, not a
+  // uniform per-record table -- it's shaped as several stacked
+  // key/value + lookup sections (COLA/FICA/etc. rates, then a "Health
+  // Key -> Annual Cost" table, then "Pension Plan -> Rate", then
+  // "Risk Code -> Rate"), so it can't go through the standard
+  // fetchCSV/parseCSV row-per-header pipeline every other sheet uses.
+  // Parsed here directly from parseCSVRows' raw rows instead, section by
+  // section, falling back to PERSONNEL_COST_FORMULA_DEFAULTS for anything
+  // missing or unparseable.
+  function parsePersonnelCostFormulaInputs(rows) {
+    const result = JSON.parse(JSON.stringify(PERSONNEL_COST_FORMULA_DEFAULTS));
+    const pct = (v) => {
+      const n = toNumber(String(v || "").replace(/[%,]/g, ""));
+      return n ? n / 100 : undefined;
+    };
+    const dollars = (v) => {
+      const n = toNumber(String(v || "").replace(/[$,]/g, ""));
+      return v ? n : undefined;
+    };
+    const SIMPLE_KEYS = {
+      "cola rate": (v) => { const n = pct(v); if (n !== undefined) result.colaRate = n; },
+      "fica rate": (v) => { const n = pct(v); if (n !== undefined) result.ficaRate = n; },
+      "medicare rate": (v) => { const n = pct(v); if (n !== undefined) result.medicareRate = n; },
+      "basic life annual cost": (v) => { const n = dollars(v); if (n !== undefined) result.basicLifeAnnualCost = n; },
+      "healthiest you annual cost": (v) => { const n = dollars(v); if (n !== undefined) result.healthiestYouAnnualCost = n; },
+      "default ltd rate": (v) => { const n = pct(v); if (n !== undefined) result.defaultLtdRate = n; }
+    };
+
+    let section = "simple";
+    let sectionHasData = false;
+    rows.forEach((r) => {
+      const label = String(r[0] || "").trim();
+      const value = r[1];
+      const isBlank = !label && !String(value || "").trim();
+
+      if (/^health key$/i.test(label)) { section = "health"; sectionHasData = false; return; }
+      if (/^pension plan$/i.test(label)) { section = "pension"; sectionHasData = false; return; }
+      if (/^risk code$/i.test(label)) { section = "risk"; sectionHasData = false; return; }
+      if (/^formula map$/i.test(label)) { section = "done"; return; }
+      if (section === "done") return;
+
+      if (isBlank) {
+        // A blank row ends a lookup-table section (but not the leading
+        // "simple" key/value section, which has its own blanks between
+        // the header row and the first rate).
+        if (section !== "simple" && sectionHasData) section = "simple";
+        return;
+      }
+      if (!label) return;
+
+      if (section === "simple") {
+        const handler = SIMPLE_KEYS[label.toLowerCase()];
+        if (handler) handler(value);
+        return;
+      }
+      if (section === "health") {
+        const n = dollars(value);
+        if (n !== undefined) { result.healthPlanAnnualCost[label] = n; sectionHasData = true; }
+        return;
+      }
+      if (section === "pension") {
+        const n = pct(value);
+        if (n !== undefined) { result.pensionPlanRate[label] = n; sectionHasData = true; }
+        return;
+      }
+      if (section === "risk") {
+        const n = pct(value);
+        if (n !== undefined) { result.riskCodeRate[label] = n; sectionHasData = true; }
+      }
+    });
+    return result;
+  }
+
+  function fetchPersonnelCostFormulaInputs() {
+    return fetch(DATA_SOURCES.personnelCostFormulaInputs, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Request failed with status " + res.status);
+        return res.text();
+      })
+      .then((text) => parsePersonnelCostFormulaInputs(parseCSVRows(text)))
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load personnel cost formula inputs, using defaults", err);
+        return PERSONNEL_COST_FORMULA_DEFAULTS;
+      });
+  }
+
+  // Full per-position cost, following the County's own formula map:
+  // Q base wage, R COLA (Q x COLA rate), S commissioner vehicle allowance
+  // (only counted when the annual allowance exceeds $1,000), T FICA,
+  // U Medicare, V health insurance, W basic life, X long-term disability,
+  // Y retirement, Z workers' comp, AA "Healthiest You", AB weekend pay
+  // (only counted when it exceeds $100). Rolled up into this page's own
+  // four display categories: Salaries & Wages (Q+R+S+AB), Retirement (Y),
+  // Health Insurance (V+W+AA), Other Benefits & Taxes (T+U+X+Z). Rates
+  // come from cache.personnelCostFormula (live from the Formula Inputs
+  // sheet -- see fetchPersonnelCostFormulaInputs), so editing a rate there
+  // (e.g. an FRS retirement rate change) updates every position's cost on
+  // the next page load without a code change.
+  function computePersonnelPositionCost(row) {
+    const f = cache.personnelCostFormula || PERSONNEL_COST_FORMULA_DEFAULTS;
+    const q = (row.Hourly_Base_Wage || 0) * (row.Standard_Hours || 0) * (row.Allocation_Pct || 0);
+    // County Commissioners' own salary is set by the State of Florida, not
+    // the County -- no county COLA applies to them (their Aides still get
+    // it normally).
+    const isCountyCommissioner = normalizeDeptName(row.Position_Name) === "county commissioner";
+    const r = isCountyCommissioner ? 0 : q * f.colaRate;
+    const s = row.Commissioner_Vehicle_Allowance > 1000 ? row.Commissioner_Vehicle_Allowance * (row.Allocation_Pct || 0) : 0;
+    const wageBase = q + r + s;
+    const t = wageBase * f.ficaRate;
+    const u = wageBase * f.medicareRate;
+    const healthKey = row.Health_Plan + "|" + row.Coverage;
+    const v = (f.healthPlanAnnualCost[healthKey] || 0) * (row.Allocation_Pct || 0);
+    const w = f.basicLifeAnnualCost * (row.Allocation_Pct || 0);
+    // Only one LTD rate was provided (no per-Pension-Plan breakout), so it
+    // applies uniformly.
+    const x = wageBase * f.defaultLtdRate;
+    const y = wageBase * (f.pensionPlanRate[row.Pension_Plan] || 0);
+    const z = wageBase * (f.riskCodeRate[row.Risk_Code] || 0);
+    const aa = f.healthiestYouAnnualCost * (row.Allocation_Pct || 0);
+    const ab = row.Weekend_Pay > 100 ? row.Weekend_Pay * (row.Allocation_Pct || 0) : 0;
+    return {
+      // Salaries & Wages includes the COLA amount (matching the main
+      // department table's own "already baked in" treatment) -- Cola is
+      // kept alongside as an informational breakout of how much of that
+      // Salaries figure COLA accounts for, not an additional amount.
+      Salaries: q + r + s + ab,
+      Cola: r,
+      Retirement: y,
+      HealthInsurance: v + w + aa,
+      OtherBenefits: t + u + x + z,
+      Total: q + r + s + t + u + v + w + x + y + z + aa + ab
+    };
+  }
+
+  // Per-position cost detail tab is being built out gradually (see
+  // normalizePersonnelPositionCostRow) -- keyed here by the same display
+  // department name the rest of this page uses, so it can be looked up
+  // directly against a department's popup.
+  // Reconciliation: the position roster's bottom-up total won't exactly
+  // match the department's own top-down total from the expenditures sheet
+  // (different data sources, roster still being filled in, etc.) -- rather
+  // than show two different numbers in two different places, whatever gap
+  // remains is spread evenly across that department's positions' Other
+  // Benefits & Taxes (and therefore their Total), so the popup always
+  // foots to the department table. The pre-reconciliation gap is kept on
+  // each department's position array (as .reconciliationDifference) so
+  // auditPersonnelCostPositionParity can still flag departments where that
+  // gap is large -- reconciling the display doesn't erase the signal that
+  // something (e.g. a missing position, a shared Dept_Code) needs fixing
+  // at the source.
+  // Overtime (Object_Code 514000) is budgeted per department but isn't
+  // tracked per position anywhere in the position-cost roster -- summed
+  // here per department (same display-name grouping as everything else on
+  // this page) so the reconciliation step below can spread it evenly
+  // across that department's positions' own Salaries & Wages specifically,
+  // instead of it just disappearing into the generic Other Benefits &
+  // Taxes catch-all along with every other unexplained gap.
+  function buildPersonnelCostTotalsByDeptForObjectCode(objectCode) {
+    const totals = new Map();
+    (cache.expenditures || []).forEach((row) => {
+      if (String(row.Object_Code || "").trim() !== objectCode) return;
+      const amount = row.FY2027_Proposed || 0;
+      if (!amount) return;
+      const fundCode = fundCodeForRow(row);
+      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === fundCode);
+      const fundName = (fund && fund.Fund_Name) || ("Fund " + fundCode);
+      const deptName = tourismDeptLabel(personnelCostDeptDisplayName(row.Dept_Name), fundName);
+      totals.set(deptName, (totals.get(deptName) || 0) + amount);
+    });
+    return totals;
+  }
+
+  function buildPersonnelCostOvertimeByDept() {
+    return buildPersonnelCostTotalsByDeptForObjectCode("514000");
+  }
+
+  // Object_Code 513000 (Other Salaries & Wages) covers seasonal/temporary
+  // positions that aren't on the position-cost roster at all -- they draw
+  // FICA/Medicare like anyone else, but no retirement or health insurance.
+  // Same "explained" treatment as overtime, but shown as its own line (like
+  // Board of County Commissioners' Retiree Health Insurance Subsidies)
+  // rather than folded into existing positions' Salaries, since these
+  // aren't real roster positions to spread across.
+  function buildPersonnelCostSeasonalByDept() {
+    return buildPersonnelCostTotalsByDeptForObjectCode("513000");
+  }
+
+  // Object_Code 525000 (Unemployment) is only ever booked under Board of
+  // County Commissioners in the expenditures sheet -- a countywide cost,
+  // not something tied to any individual position -- so it's carved out
+  // of BOCC's Other Benefits & Taxes gap and shown as its own popup line
+  // (like Retiree Health Insurance Subsidies) instead of being spread
+  // evenly across BOCC's own roster along with everything else.
+  function buildPersonnelCostUnemploymentByDept() {
+    return buildPersonnelCostTotalsByDeptForObjectCode(PERSONNEL_COST_UNEMPLOYMENT_CODE);
+  }
+
+  function buildPersonnelPositionCostsByDept() {
+    const deptNameByCode = new Map();
+    (cache.expenditures || []).forEach((row) => {
+      const code = String(row.Dept_Code || "").trim();
+      if (code && !deptNameByCode.has(code)) deptNameByCode.set(code, row.Dept_Name);
+    });
+    const overtimeByDept = buildPersonnelCostOvertimeByDept();
+    const seasonalByDept = buildPersonnelCostSeasonalByDept();
+    const unemploymentByDept = buildPersonnelCostUnemploymentByDept();
+
+    const byDept = new Map();
+    (cache.personnelPositionCosts || []).forEach((row, index) => {
+      if (!row.Position_Name) return;
+      const rawDeptName = deptNameByCode.get(row.Dept_Code) || "";
+      if (!rawDeptName) return;
+      const cost = computePersonnelPositionCost(row);
+      if (!cost.Total) return;
+      const fund = (cache.funds || []).find((f) => String(f.Fund_Code || "").trim() === row.Fund_Code);
+      const fundName = (fund && fund.Fund_Name) || ("Fund " + row.Fund_Code);
+      // Same Code Compliance Beach/Street merge as the department rows
+      // above, so a position's popup lands under the same merged "Code
+      // Compliance" key its department row uses.
+      const deptName = tourismDeptLabel(personnelCostDeptDisplayName(rawDeptName), fundName);
+      // This position is actually paid for out of Tourism Administration's
+      // budget, not Human Resources' -- kept on Human Resources' list for
+      // visibility (see the note personnelCostDeptDetailHtml adds to that
+      // popup), but zeroed out here so it doesn't double-count against
+      // Human Resources' real cost. Zeroing it (rather than skipping the
+      // row) also lets the normal reconciliation step correctly spread
+      // Human Resources' real gap across its real positions instead of
+      // silently absorbing this one's cost into that gap.
+      let excludeFromReconciliation = false;
+      if (normalizeDeptName(deptName) === "human resources" && normalizeDeptName(row.Position_Name) === "human resources generalist tourism") {
+        cost.Salaries = 0;
+        cost.Cola = 0;
+        cost.Retirement = 0;
+        cost.HealthInsurance = 0;
+        cost.OtherBenefits = 0;
+        cost.Total = 0;
+        excludeFromReconciliation = true;
+      }
+      if (!byDept.has(deptName)) byDept.set(deptName, []);
+      // Land Use Attorney is one real FTE, split 75%/25% Planning/Code
+      // Compliance for COST purposes only (see PERSONNEL_COST_DEPT_NOTES'
+      // Code Compliance note) -- for headcount purposes it's counted as one
+      // full FTE in Planning, and blanked out entirely on Code Compliance's
+      // copy, rather than the Allocation_Pct split double-counting it as
+      // 0.75 + 0.25 = 1 FTE spread across two departments' headcounts.
+      const isLandUseAttorney = normalizeDeptName(row.Position_Name) === "land use attorney";
+      const isCodeCompliance = normalizeDeptName(deptName) === "code compliance";
+      const isPlanning = normalizeDeptName(deptName) === "planning";
+      const hideFte = isLandUseAttorney && isCodeCompliance;
+      // A handful of positions carry Standard_Hours_per_Year of 1040
+      // instead of the usual full-time 2080 -- part-time roles at 100%
+      // Allocation but only half the standard annual hours, so their real
+      // FTE contribution is half what Allocation_Pct alone would suggest.
+      const fte = (isLandUseAttorney && isPlanning) ? 1 : (row.Allocation_Pct || 0) * ((row.Standard_Hours || 2080) / 2080);
+      // Stable, auto-assigned Position ID -- the position-cost sheet's own
+      // "Position ID*" column is blank, and this is 1-based on that
+      // sheet's row order (not re-numbered per department), so it can be
+      // pasted straight back into the sheet as a lookup key when
+      // reloading reconciled dollar amounts.
+      byDept.get(deptName).push({ PositionId: index + 1, Position_Name: row.Position_Name, Fte: fte, Cost: cost, SourceRow: row, excludeFromReconciliation: excludeFromReconciliation, hideFte: hideFte });
+    });
+
+    // The "Custodian - Building" position is costed under Building
+    // Department -- real dollars there, Fund 103/the Building Fund -- but
+    // its FTE belongs to Building Construction and Maintenance's headcount
+    // (per the split discussed earlier). Cross-listed here at $0 under
+    // Building Construction and Maintenance too, purely for visibility, and
+    // excluded from that department's reconciliation so it doesn't affect
+    // real dollars there. Matched by title, not a hardcoded Position ID --
+    // Position ID is just 1-based row order on the workforce sheet, so a
+    // fixed ID silently starts pointing at a different row every time
+    // someone inserts/removes a row above it on the sheet.
+    byDept.forEach((deptPositions) => {
+      const custodianBuilding = deptPositions.find((p) => normalizeDeptName(p.Position_Name) === "custodian building");
+      if (!custodianBuilding) return;
+      const buildingConstructionKey = Array.from(byDept.keys()).find((k) => normalizeDeptName(k) === "building construction and maintenance");
+      if (!buildingConstructionKey || deptPositions === byDept.get(buildingConstructionKey)) return;
+      // FTE belongs to Building Construction and Maintenance's headcount, not
+      // Building Department's -- blank it out on this original (real-cost)
+      // row so it doesn't look like Building Department's own headcount,
+      // and show it on the cross-listed ($0) copy below instead, which is
+      // where it actually counts.
+      custodianBuilding.hideFte = true;
+      byDept.get(buildingConstructionKey).push({
+        PositionId: custodianBuilding.PositionId,
+        Position_Name: custodianBuilding.Position_Name,
+        Fte: custodianBuilding.Fte,
+        Cost: { Salaries: 0, Cola: 0, Retirement: 0, HealthInsurance: 0, OtherBenefits: 0, Total: 0 },
+        SourceRow: custodianBuilding.SourceRow,
+        excludeFromReconciliation: true
+      });
+    });
+
+    // Per-category department totals (not just a collapsed grand total) --
+    // reconciliation below matches each category (Salaries, Retirement,
+    // Health Insurance, Other Benefits & Taxes) independently against its
+    // own department-table figure, not just the sum of all four. Multiple
+    // fund-rows for the same display department are summed together.
+    const deptCategoryTotals = new Map();
+    buildPersonnelCostRows().forEach((r) => {
+      if (!deptCategoryTotals.has(r.Dept_Name)) {
+        deptCategoryTotals.set(r.Dept_Name, { Salaries: 0, Retirement: 0, HealthInsurance: 0, OtherBenefits: 0 });
+      }
+      const t = deptCategoryTotals.get(r.Dept_Name);
+      t.Salaries += r.Salaries;
+      t.Retirement += r.Retirement;
+      t.HealthInsurance += r.HealthInsurance;
+      t.OtherBenefits += r.OtherBenefits;
+    });
+
+    byDept.forEach((positions, deptName) => {
+      const deptTotal = deptCategoryTotals.get(deptName);
+      if (!deptTotal || !positions.length) return;
+      const raw = { Salaries: 0, Retirement: 0, HealthInsurance: 0, OtherBenefits: 0 };
+      positions.forEach((p) => {
+        raw.Salaries += p.Cost.Salaries;
+        raw.Retirement += p.Cost.Retirement;
+        raw.HealthInsurance += p.Cost.HealthInsurance;
+        raw.OtherBenefits += p.Cost.OtherBenefits;
+      });
+
+      // Overtime (514000) and seasonal/temporary salary (513000) are real,
+      // explained dollars within the Salaries category -- carved out
+      // before the remaining Salaries gap gets spread, same as seasonal's
+      // own FICA/Medicare estimate is carved out of Other Benefits & Taxes.
+      const overtimeTotal = overtimeByDept.get(deptName) || 0;
+      const seasonalTotal = seasonalByDept.get(deptName) || 0;
+      let seasonalTaxes = 0;
+      if (seasonalTotal) {
+        const formula = cache.personnelCostFormula || PERSONNEL_COST_FORMULA_DEFAULTS;
+        seasonalTaxes = seasonalTotal * (formula.ficaRate + formula.medicareRate);
+        positions.seasonalPositions = { Salaries: seasonalTotal, OtherBenefits: seasonalTaxes, Total: seasonalTotal + seasonalTaxes };
+      }
+
+      // Board of County Commissioners carries real Retiree Health Insurance
+      // Subsidy costs that aren't tied to any current position -- shown as
+      // its own explicit line instead of being spread across (and
+      // inflating) individual positions' Health Insurance the way every
+      // other department's Health Insurance gap is handled.
+      const isBocc = normalizeDeptName(deptName) === "board of county commissioners";
+
+      // Unemployment (525000) is only ever booked under Board of County
+      // Commissioners in the expenditures sheet -- a countywide cost, not
+      // something tied to any individual position -- so it's carved out of
+      // BOCC's Other Benefits & Taxes gap here and shown as its own popup
+      // line (like Retiree Health Insurance Subsidies below) instead of
+      // being spread evenly across BOCC's own roster along with everything
+      // else. Every other department's Unemployment total is $0, so this
+      // has no effect on them.
+      const unemploymentTotal = isBocc ? (unemploymentByDept.get(deptName) || 0) : 0;
+
+      const salariesGap = deptTotal.Salaries - raw.Salaries - overtimeTotal - seasonalTotal;
+      const retirementGap = deptTotal.Retirement - raw.Retirement;
+      const healthInsuranceGap = deptTotal.HealthInsurance - raw.HealthInsurance;
+      const otherBenefitsGap = deptTotal.OtherBenefits - raw.OtherBenefits - seasonalTaxes - unemploymentTotal;
+
+      // Positions zeroed out above (e.g. Human Resources Generalist -
+      // Tourism, actually paid for elsewhere) don't share in the spread --
+      // they're not real cost to reconcile, just a name kept on the list
+      // for visibility, so they should stay at exactly $0.
+      const reconcilablePositions = positions.filter((p) => !p.excludeFromReconciliation);
+      const reconcilableCount = reconcilablePositions.length || 1;
+      // BOCC's own unexplained Salaries gap doesn't inflate its
+      // Aides/Commissioners' Salaries figures -- instead it's spread across
+      // their Retirement/Health Insurance/Other Benefits & Taxes columns
+      // (folded into perPositionOtherBenefits below) right alongside every
+      // other department's usual per-category gaps, rather than bumping up
+      // individual salaries or piling into the Retiree Health Insurance
+      // Subsidies line.
+      const perPositionSalaries = isBocc ? (overtimeTotal / reconcilableCount) : (salariesGap + overtimeTotal) / reconcilableCount;
+      const perPositionRetirement = retirementGap / reconcilableCount;
+      const perPositionHealthInsurance = isBocc ? 0 : healthInsuranceGap / reconcilableCount;
+      const perPositionOtherBenefits = isBocc ? (otherBenefitsGap + salariesGap) / reconcilableCount : otherBenefitsGap / reconcilableCount;
+      reconcilablePositions.forEach((p) => {
+        p.Cost.Salaries += perPositionSalaries;
+        p.Cost.Retirement += perPositionRetirement;
+        p.Cost.HealthInsurance += perPositionHealthInsurance;
+        p.Cost.OtherBenefits += perPositionOtherBenefits;
+        p.Cost.Total = p.Cost.Salaries + p.Cost.Retirement + p.Cost.HealthInsurance + p.Cost.OtherBenefits;
+      });
+      if (isBocc) {
+        positions.retireeHealthInsuranceSubsidy = healthInsuranceGap;
+        if (unemploymentTotal) positions.unemploymentTotal = unemploymentTotal;
+      }
+
+      // Overtime, seasonal/temp pay, and (for BOCC) the Retiree Health
+      // Insurance Subsidy and Unemployment are real, already-explained
+      // dollars that just aren't tied to any individual roster row --
+      // folded into the audit's own "Position_Total" here too, so its
+      // Difference column reflects only genuinely unexplained gaps (e.g.
+      // missing positions) instead of re-flagging known, already-handled
+      // amounts every time.
+      const explainedTotal = overtimeTotal + seasonalTotal + seasonalTaxes +
+        (isBocc ? healthInsuranceGap + unemploymentTotal : 0);
+      positions.reconciliationDifference =
+        (deptTotal.Salaries + deptTotal.Retirement + deptTotal.HealthInsurance + deptTotal.OtherBenefits) -
+        (raw.Salaries + raw.Retirement + raw.HealthInsurance + raw.OtherBenefits) - explainedTotal;
+      positions.overtimeTotal = overtimeTotal;
+      positions.rawTotal = raw.Salaries + raw.Retirement + raw.HealthInsurance + raw.OtherBenefits + explainedTotal;
+      positions.deptTotal = deptTotal.Salaries + deptTotal.Retirement + deptTotal.HealthInsurance + deptTotal.OtherBenefits;
+    });
+
+    return byDept;
+  }
+
+  // Debug console tool: for every department that has position-level data
+  // (see buildPersonnelPositionCostsByDept), compares that bottom-up
+  // position total against the department's own top-down total on the
+  // Summary of Personnel Cost table (from cache.expenditures' Personnel
+  // Services lines) -- flags where they disagree by more than the
+  // tolerance, so gaps as the position sheet gets built out (a missing
+  // position, a vacant position not yet on the roster, a dept-code
+  // mismatch, etc.) show up instead of silently reading two different
+  // numbers in two different places. Run automatically after every data
+  // load (see loadBudgetData) and callable manually as
+  // WCBudgetData.auditPersonnelCostPositionParity().
+  function auditPersonnelCostPositionParity(options) {
+    const tolerance = (options && options.tolerance) || 1;
+
+    // The popup itself always foots to the department total now (see
+    // buildPersonnelPositionCostsByDept's reconciliation step, which
+    // spreads any gap across Other Benefits & Taxes) -- this audit reads
+    // the pre-reconciliation gap each department's positions carry
+    // (.reconciliationDifference/.rawTotal/.deptTotal) so a real problem
+    // (missing positions, a shared/ambiguous Dept_Code, etc.) still shows
+    // up here even though it's invisible on the live page.
+    const positionsByDept = buildPersonnelPositionCostsByDept();
+    const mismatches = [];
+    let comparedCount = 0;
+    positionsByDept.forEach((positions, deptName) => {
+      if (positions.deptTotal === undefined) return;
+      comparedCount += 1;
+      const difference = positions.reconciliationDifference;
+      if (Math.abs(difference) > tolerance) {
+        mismatches.push({
+          Dept_Name: deptName,
+          Positions_On_Roster: positions.length,
+          Department_Total: positions.deptTotal,
+          Position_Total: positions.rawTotal,
+          Difference: difference
+        });
+      }
+    });
+    mismatches.sort((a, b) => Math.abs(b.Difference) - Math.abs(a.Difference));
+
+    if (!(options && options.log === false)) {
+      console.group("Personnel Cost: department vs. position-breakdown parity audit");
+      console.table(mismatches);
+      console.log(
+        mismatches.length + " of " + comparedCount + " department(s) with position data do not match their department total (each is reconciled on the live page by spreading the gap across Other Benefits & Taxes -- this list is what that's papering over). " +
+        (positionsByDept.size - comparedCount) + " department(s) on the position roster aren't recognized on the Personnel Cost table (name/dept-code mismatch)."
+      );
+      console.groupEnd();
+    }
+
+    return mismatches;
+  }
+
+  // Summary of Personnel Cost's per-department "View Budget Lines" popup --
+  // same wc-view-budget-lines-toggle/openBudgetDetailModal machinery used
+  // throughout the site (see ensureBudgetDetailModal). Leads with a
+  // cost-by-position table when the position-cost sheet has data for this
+  // department, followed by the full Personnel Services line-item
+  // breakdown (salary lines, retirement, insurance, etc.) that the
+  // department-level total is actually built from.
+  // Free-text notes shown at the top of a specific department's popup --
+  // keyed by normalizeDeptName(deptName).
+  const PERSONNEL_COST_DEPT_NOTES = {
+    "human resources": [
+      "The Human Resources Generalist - Tourism position is paid for in the Tourism Administration budget, so it's shown here at $0 to avoid double-counting -- it's kept on this list for visibility only."
+    ],
+    "building construction and maintenance": [
+      "The Custodian - Building position listed here is funded by the Building Fund (Building Department), so it's shown here at $0 to avoid double-counting -- it's kept on this list for FTE visibility only."
+    ],
+    "circuit court": [
+      "The Administrative Assistant II - Circuit Court position is partially funded with Court Innovation funds."
+    ],
+    "code compliance": [
+      "The Land Use Attorney position is 25% paid through the Code Compliance department, with the remaining 75% in Planning."
+    ],
+    "tourism administration": [
+      "The Human Resources Generalist - Tourism position is shown here because it's paid for out of this budget, but its FTE count is reported under Human Resources."
+    ],
+    "extension office": [
+      "Personnel costs for the Extension Office are shared with the University of Florida."
+    ]
+  };
+
+  function personnelCostDeptDetailHtml(deptName, positions, staffingPositions) {
+    budgetLinesDetailCounter += 1;
+    const detailId = "wc-personnel-cost-dept-detail-" + budgetLinesDetailCounter;
+
+    const deptNotes = PERSONNEL_COST_DEPT_NOTES[normalizeDeptName(deptName)];
+    const deptNotesHtml = deptNotes && deptNotes.length
+      ? '<div class="wc-staffing-notes" style="margin-bottom:16px;"><p class="wc-staffing-notes-title">Note:</p>' +
+        deptNotes.map((n) => "<p>" + escapeHtml(n) + "</p>").join("") +
+        "</div>"
+      : "";
+
+    let positionsHtml = "";
+    if (positions && positions.length) {
+      // One row per roster entry, generally -- not merged/summed by title,
+      // since two rows sharing a title are usually two different people
+      // (e.g. several 100%-allocated "Code Compliance Technician" rows).
+      // The one exception: a *pair* of rows under the same title whose
+      // allocations add up to 100% (50/50, 90/10, etc.) is a single
+      // position split across two funding lines (e.g. Director of Code
+      // Compliance split Street/Beach, or a Shift Supervisor split 90/10)
+      // -- those two get combined into one row. A title can have several
+      // different people at 100% each *and* one or more such split pairs
+      // at the same time (e.g. Code Compliance Shift Supervisor has both),
+      // so pairing happens within each title group, not just when the
+      // whole group is exactly two rows.
+      function combinePositionPair(a, b) {
+        return {
+          Position_Name: a.Position_Name,
+          Fte: a.Fte + b.Fte,
+          hideFte: Boolean(a.hideFte || b.hideFte),
+          Cost: {
+            Salaries: a.Cost.Salaries + b.Cost.Salaries,
+            Cola: a.Cost.Cola + b.Cost.Cola,
+            Retirement: a.Cost.Retirement + b.Cost.Retirement,
+            HealthInsurance: a.Cost.HealthInsurance + b.Cost.HealthInsurance,
+            OtherBenefits: a.Cost.OtherBenefits + b.Cost.OtherBenefits,
+            Total: a.Cost.Total + b.Cost.Total
+          }
+        };
+      }
+      const positionsByTitle = new Map();
+      positions.forEach((p) => {
+        const key = normalizeDeptName(p.Position_Name);
+        if (!positionsByTitle.has(key)) positionsByTitle.set(key, []);
+        positionsByTitle.get(key).push(p);
+      });
+      const mergedPositions = [];
+      positionsByTitle.forEach((group) => {
+        // Whole (~100%) rows are always their own person -- only rows
+        // under 100% are candidates for pairing into a split position.
+        const whole = group.filter((p) => p.Fte >= 0.999);
+        let fractional = group.filter((p) => p.Fte < 0.999).slice().sort((a, b) => a.Fte - b.Fte);
+        const paired = [];
+        while (fractional.length >= 2) {
+          let lo = 0;
+          let hi = fractional.length - 1;
+          let match = -1;
+          while (lo < hi) {
+            const sum = fractional[lo].Fte + fractional[hi].Fte;
+            if (Math.abs(sum - 1) < 0.001) { match = hi; break; }
+            if (sum < 1) lo++; else hi--;
+          }
+          if (match === -1) break;
+          paired.push(combinePositionPair(fractional[lo], fractional[match]));
+          fractional = fractional.filter((_, idx) => idx !== lo && idx !== match);
+        }
+        mergedPositions.push(...whole, ...paired, ...fractional);
+      });
+      const sortedPositions = mergedPositions.slice().sort((a, b) => String(a.Position_Name).localeCompare(String(b.Position_Name)));
+      // Retirement, Health Insurance, and Other Benefits & Taxes are shown
+      // as one combined "Retirement, Health Insurance & Other Benefits"
+      // column on this per-position breakdown (unlike the main department
+      // table, which keeps them split) -- Health Insurance Increase stays
+      // its own optional column since it's an informational what-if
+      // estimate, not part of this position's actual current cost.
+      const positionsGrand = { Fte: 0, Salaries: 0, Cola: 0, Benefits: 0, HealthInsuranceIncrease: 0, Total: 0 };
+      const positionRows = sortedPositions.map((p) => {
+        const healthInsuranceIncrease = p.Cost.HealthInsurance * PERSONNEL_COST_HEALTH_INSURANCE_INCREASE_RATE;
+        const benefits = p.Cost.Retirement + p.Cost.HealthInsurance + p.Cost.OtherBenefits;
+        if (!p.hideFte) positionsGrand.Fte += p.Fte;
+        positionsGrand.Salaries += p.Cost.Salaries;
+        positionsGrand.Cola += p.Cost.Cola;
+        positionsGrand.Benefits += benefits;
+        positionsGrand.HealthInsuranceIncrease += healthInsuranceIncrease;
+        positionsGrand.Total += p.Cost.Total;
+        return (
+          "<tr><td>" + escapeHtml(p.Position_Name) + "</td>" +
+          '<td class="wc-num">' + (p.hideFte ? "" : formatNumber(p.Fte)) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(p.Cost.Salaries) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(p.Cost.Cola) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(benefits) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(healthInsuranceIncrease) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(p.Cost.Total) + "</td></tr>"
+        );
+      });
+      if (positions.seasonalPositions) {
+        const sp = positions.seasonalPositions;
+        positionsGrand.Salaries += sp.Salaries;
+        positionsGrand.Benefits += sp.OtherBenefits;
+        positionsGrand.Total += sp.Total;
+        positionRows.push(
+          "<tr><td>Seasonal/Temporary Positions</td>" +
+          '<td class="wc-num"></td>' +
+          '<td class="wc-num">' + formatCurrency(sp.Salaries) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col"></td>' +
+          '<td class="wc-num">' + formatCurrency(sp.OtherBenefits) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col"></td>' +
+          '<td class="wc-num">' + formatCurrency(sp.Total) + "</td></tr>"
+        );
+      }
+      if (positions.retireeHealthInsuranceSubsidy) {
+        const healthInsurancePortion = positions.retireeHealthInsuranceSubsidy;
+        positionsGrand.Benefits += healthInsurancePortion;
+        positionsGrand.Total += healthInsurancePortion;
+        positionRows.push(
+          "<tr><td>Retiree Health Insurance Subsidies</td>" +
+          '<td class="wc-num"></td>' +
+          '<td class="wc-num"></td>' +
+          '<td class="wc-num wc-personnel-cost-optional-col"></td>' +
+          '<td class="wc-num">' + formatCurrency(healthInsurancePortion) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col"></td>' +
+          '<td class="wc-num">' + formatCurrency(healthInsurancePortion) + "</td></tr>"
+        );
+      }
+      if (positions.unemploymentTotal) {
+        positionsGrand.Benefits += positions.unemploymentTotal;
+        positionsGrand.Total += positions.unemploymentTotal;
+        positionRows.push(
+          "<tr><td>Unemployment</td>" +
+          '<td class="wc-num"></td>' +
+          '<td class="wc-num"></td><td class="wc-num wc-personnel-cost-optional-col"></td>' +
+          '<td class="wc-num">' + formatCurrency(positions.unemploymentTotal) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col"></td>' +
+          '<td class="wc-num">' + formatCurrency(positions.unemploymentTotal) + "</td></tr>"
+        );
+      }
+      positionRows.push(
+        '<tr class="wc-table-total-row"><td>Total</td>' +
+        '<td class="wc-num">' + formatNumber(positionsGrand.Fte) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(positionsGrand.Salaries) + "</td>" +
+        '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(positionsGrand.Cola) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(positionsGrand.Benefits) + "</td>" +
+        '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(positionsGrand.HealthInsuranceIncrease) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(positionsGrand.Total) + "</td></tr>"
+      );
+      positionsHtml =
+        '<p class="wc-staffing-notes-title">Cost by Position</p>' +
+        '<div class="wc-data-table-scroll">' +
+        '<table class="wc-data-table wc-staffing-table">' +
+        "<thead><tr><th>Position</th><th class=\"wc-num\">FTE</th><th class=\"wc-num\">Salaries &amp; Wages</th><th class=\"wc-num wc-personnel-cost-optional-col\">COLA</th><th class=\"wc-num\">Retirement, Health Insurance &amp; Other Benefits</th><th class=\"wc-num wc-personnel-cost-optional-col\">Health Insurance Increase</th><th class=\"wc-num\">Total</th></tr></thead>" +
+        "<tbody>" + positionRows.join("") + "</tbody></table></div>";
+    } else {
+      positionsHtml = '<div class="wc-data-empty">No position-level cost data is available yet for this department.</div>';
+    }
+
+    // Staffing sheet's own position list for this department -- name and
+    // FTE only, no dollar amounts -- the whole point is spotting which of
+    // these names don't yet have a matching row in the workforce/cost sheet
+    // above. Debug-only: logged to the console (see
+    // auditPersonnelCostPositionParity for the same pattern) rather than
+    // shown on the popup itself, since it's a data-entry gap-finding tool
+    // for maintaining the workforce sheet, not something site visitors need
+    // to see.
+    if (staffingPositions && staffingPositions.length) {
+      // Only positions whose name has no match (case/punctuation-insensitive)
+      // in this department's own workforce/cost list above -- i.e. the
+      // staffing sheet's positions that still need to be added to the
+      // workforce sheet, not the full staffing roster.
+      const workforceNames = new Set((positions || []).map((p) => normalizeDeptName(p.Position_Name)));
+      const missingStaffing = staffingPositions.filter((s) => !workforceNames.has(normalizeDeptName(s.Position_Name)));
+      if (missingStaffing.length) {
+        const sortedStaffing = missingStaffing.slice().sort((a, b) => String(a.Position_Name).localeCompare(String(b.Position_Name)));
+        console.log(
+          "WCBudgetData: staffing sheet positions missing from workforce sheet -- " + deptName
+        );
+        console.table(sortedStaffing.map((s) => ({ Position: s.Position_Name, FTE: s.Fte })));
+      }
+    }
+
+    const detailHtml =
+      '<div class="wc-budget-lines-detail wc-budget-lines-card wc-finance-card" data-print-title="' + escapeHtml(deptName || "") + '" id="' + detailId + '" hidden>' +
+        deptNotesHtml +
+        positionsHtml +
+      "</div>";
+    return { detailId, detailHtml };
+  }
+
+  function renderPersonnelCostSummary(container) {
+    if (!container) return;
+    const rows = buildPersonnelCostRows();
+    if (!rows.length) {
+      container.innerHTML = '<div class="wc-data-empty">No personnel cost data is available.</div>';
+      return;
+    }
+    const positionsByDept = buildPersonnelPositionCostsByDept();
+    const fteByDept = buildPersonnelCostFteByDept();
+    const staffingPositionsByDept = buildStaffingPositionListByDept();
+
+    const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
+    const funds = uniqueSorted(rows.map((r) => r.Fund_Name));
+
+    container.innerHTML =
+      '<div class="wc-filter-bar wc-machinery-picker">' +
+      '<label class="wc-filter-field"><span>Department</span>' +
+      '<select id="wcPersonnelCostDeptSelect"><option value="">All</option>' +
+      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
+      "</select></label>" +
+      '<label class="wc-filter-field"><span>Fund</span>' +
+      '<select id="wcPersonnelCostFundSelect"><option value="">All</option>' +
+      funds.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
+      "</select></label>" +
+      '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelCostIncreasesToggle" aria-pressed="false">Show COLA, Health Insurance &amp; Increase</button>' +
+      '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelCostExportAllButton">Export All Positions (CSV)</button>' +
+      "</div>" +
+      '<div class="wc-financial-summary-table"></div>';
+
+    const deptSelect = container.querySelector("#wcPersonnelCostDeptSelect");
+    const fundSelect = container.querySelector("#wcPersonnelCostFundSelect");
+    const tableEl = container.querySelector(".wc-financial-summary-table");
+    const increasesToggle = container.querySelector("#wcPersonnelCostIncreasesToggle");
+    container.querySelector("#wcPersonnelCostExportAllButton").addEventListener("click", () => {
+      // Flattened and sorted by Position ID -- i.e. the position-cost
+      // sheet's own original row order -- rather than grouped by
+      // department, so this lines up row-for-row with that sheet for a
+      // clean paste-back.
+      const allPositions = [];
+      positionsByDept.forEach((positions) => allPositions.push(...positions));
+      allPositions.sort((a, b) => a.PositionId - b.PositionId);
+      const csvRows = [PERSONNEL_POSITION_CSV_HEADER].concat(allPositions.map((p) => personnelPositionCsvRow(p)));
+      downloadCsv("workforce.csv", csvRows);
+    });
+    // Global (not scoped to this container) because the position-cost
+    // popup is appended to document.body by ensureBudgetDetailModal, not
+    // nested under #personnel-cost-summary -- .wc-personnel-cost-optional-col
+    // only ever exists on this page's own cells, so this is safe.
+    increasesToggle.addEventListener("click", () => {
+      const showing = document.body.classList.toggle("wc-show-personnel-cost-optional-cols");
+      increasesToggle.setAttribute("aria-pressed", showing ? "true" : "false");
+      increasesToggle.textContent = showing ? "Hide COLA, Health Insurance & Increase" : "Show COLA, Health Insurance & Increase";
+      // Re-render so the combined column's own header label can drop
+      // "Health Insurance" from its name once Health Insurance has its own
+      // visible column right next to it -- otherwise the same dollar
+      // figure would look like it's named twice.
+      showFiltered();
+    });
+
+    function showFiltered() {
+      const deptName = deptSelect.value;
+      const fundName = fundSelect.value;
+      const items = rows.filter((r) =>
+        (!deptName || r.Dept_Name === deptName) && (!fundName || r.Fund_Name === fundName)
+      );
+
+      if (!items.length) {
+        tableEl.hidden = false;
+        tableEl.innerHTML = '<div class="wc-data-empty">No rows match the current filters.</div>';
+        return;
+      }
+
+      const totals = new Map();
+      items.forEach((r) => {
+        if (!totals.has(r.Dept_Name)) totals.set(r.Dept_Name, { Salaries: 0, Retirement: 0, HealthInsurance: 0, OtherBenefits: 0 });
+        const t = totals.get(r.Dept_Name);
+        t.Salaries += r.Salaries;
+        t.Retirement += r.Retirement;
+        t.HealthInsurance += r.HealthInsurance;
+        t.OtherBenefits += r.OtherBenefits;
+      });
+
+      const deptsInView = uniqueSorted(Array.from(totals.keys()));
+      const grand = { Salaries: 0, Fte: 0, Cola: 0, Benefits: 0, HealthInsurance: 0, HealthInsuranceIncrease: 0 };
+      // Each department name is a "View Budget Lines" toggle, opening the
+      // same budget-detail modal used elsewhere on the site (see
+      // openBudgetDetailModal) with that department's own Personnel
+      // Services line items instead of leaving users stuck at the
+      // department-level rollup.
+      const detailMarkup = [];
+      const bodyRows = deptsInView.map((d) => {
+        const t = totals.get(d);
+        // Salaries & Wages already has the 3% COLA baked in -- backed out
+        // here for display as Salaries - Salaries / 1.03, i.e. the portion
+        // of the current total attributable to that 3% increase, not an
+        // additional amount on top of it.
+        const cola = t.Salaries * (PERSONNEL_COST_COLA_RATE / (1 + PERSONNEL_COST_COLA_RATE));
+        const fte = fteByDept.get(personnelCostFteMatchKey(d)) || 0;
+        const deptPositions = positionsByDept.get(d);
+        // Board of County Commissioners' Retiree Health Insurance
+        // Subsidies aren't active-employee premiums, so a hypothetical 5%
+        // active-employee premium increase shouldn't apply to that portion
+        // of Health Insurance -- excluded from the base before applying
+        // the rate, same as the popup's own per-position calculation
+        // already does (that row has no Health Insurance Increase value).
+        const retireeHealthInsuranceSubsidy = (deptPositions && deptPositions.retireeHealthInsuranceSubsidy) || 0;
+        const healthInsuranceIncrease = (t.HealthInsurance - retireeHealthInsuranceSubsidy) * PERSONNEL_COST_HEALTH_INSURANCE_INCREASE_RATE;
+        // Retirement, Health Insurance, and Other Benefits & Taxes are
+        // combined into one column here, same as the per-position popup --
+        // Health Insurance only breaks back out on its own (as an optional
+        // column) when the COLA/Health Insurance Increase toggle is on. The
+        // standalone Health Insurance column excludes Board of County
+        // Commissioners' Retiree Health Insurance Subsidies (a pooled,
+        // non-active-employee cost) -- the combined column still includes
+        // it, so the row's Total still reconciles.
+        const benefits = t.Retirement + t.HealthInsurance + t.OtherBenefits;
+        const activeHealthInsurance = t.HealthInsurance - retireeHealthInsuranceSubsidy;
+        grand.Salaries += t.Salaries;
+        grand.Fte += fte;
+        grand.Cola += cola;
+        grand.Benefits += benefits;
+        grand.HealthInsurance += activeHealthInsurance;
+        grand.HealthInsuranceIncrease += healthInsuranceIncrease;
+        const total = t.Salaries + benefits;
+        const { detailId, detailHtml } = personnelCostDeptDetailHtml(d, deptPositions, staffingPositionsByDept.get(personnelCostFteMatchKey(d)));
+        detailMarkup.push(detailHtml);
+        return (
+          "<tr><td>" +
+          '<button type="button" class="wc-view-budget-lines-toggle wc-table-row-link" data-target="' + detailId + '" data-closed-label="' + escapeHtml(d) + '" aria-expanded="false">' +
+          escapeHtml(d) + "</button>" +
+          "</td>" +
+          '<td class="wc-num">' + formatNumber(fte) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(t.Salaries) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(cola) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(benefits) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(activeHealthInsurance) + "</td>" +
+          '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(healthInsuranceIncrease) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(total) + "</td></tr>"
+        );
+      });
+      const grandTotal = grand.Salaries + grand.Benefits;
+      bodyRows.push(
+        '<tr class="wc-table-total-row"><td>Total</td>' +
+        '<td class="wc-num">' + formatNumber(grand.Fte) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(grand.Salaries) + "</td>" +
+        '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(grand.Cola) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(grand.Benefits) + "</td>" +
+        '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(grand.HealthInsurance) + "</td>" +
+        '<td class="wc-num wc-personnel-cost-optional-col">' + formatCurrency(grand.HealthInsuranceIncrease) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(grandTotal) + "</td></tr>"
+      );
+
+      // Once Health Insurance has its own visible column (the toggle is
+      // on), the combined column's label drops "Health Insurance" from its
+      // name -- otherwise the same figure looks like it's named in both
+      // columns at once.
+      const showingOptionalCols = document.body.classList.contains("wc-show-personnel-cost-optional-cols");
+      const combinedColumnLabel = showingOptionalCols ? "Retirement & Other Benefits" : "Retirement, Health Insurance & Other Benefits";
+      mountOrHide(
+        tableEl,
+        renderTable({
+          caption: deptName || "All Departments",
+          columns: [
+            { label: "Department" },
+            { label: "FTE", num: true },
+            { label: "Salaries & Wages", num: true },
+            { label: "3% COLA", num: true, classes: ["wc-personnel-cost-optional-col"] },
+            { label: combinedColumnLabel, num: true },
+            { label: "Health Insurance", num: true, classes: ["wc-personnel-cost-optional-col"] },
+            { label: "Health Insurance Increase", num: true, classes: ["wc-personnel-cost-optional-col"] },
+            { label: "Total", num: true }
+          ],
+          bodyRows: bodyRows
+        }) + detailMarkup.join("")
+      );
+    }
+
+    deptSelect.addEventListener("change", showFiltered);
+    fundSelect.addEventListener("change", showFiltered);
+    showFiltered();
+  }
+
+  function initPersonnelCostSummaryPage() {
+    const container = document.getElementById("personnel-cost-summary");
+    if (!container) return;
+
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        renderPersonnelCostSummary(container);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load personnel cost summary", err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
   function initFinancialSummaryPage() {
     const container = document.getElementById("financial-summary");
     if (!container) return;
@@ -11364,6 +12546,7 @@
     initMachinerySummaryPage();
     initContractualServicesSummaryPage();
     initPersonnelSummaryPage();
+    initPersonnelCostSummaryPage();
     initInterfundTransfersPage();
     initConsolidatedRevenueSummaryPage();
     initRevenueTopicCardsPage();
@@ -11401,6 +12584,7 @@
     renderConsolidatedRevenueSummaryTable,
     renderRevenueTopicCards,
     renderFinancialForecast,
-    auditDepartmentExpenseRevenueParity
+    auditDepartmentExpenseRevenueParity,
+    auditPersonnelCostPositionParity
   };
 })();

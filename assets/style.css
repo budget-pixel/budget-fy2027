@@ -2249,6 +2249,12 @@ a:where(:visited) {
   background: none; font: inherit; letter-spacing: normal;
   color: #003f28; font-weight: 800;
   text-decoration: none; text-underline-offset: 3px;
+  /* <button> defaults to text-align:center in the browser's own
+     stylesheet -- display:inline above doesn't reset that, so a
+     department name long enough to wrap onto a second line (the narrow
+     sticky first column on mobile) centers each line inside the button's
+     own width instead of staying flush left like the rest of the column. */
+  text-align: left;
 }
 .wc-data-table .wc-view-budget-lines-toggle.wc-table-row-link:hover {
   background: none; color: #003f28; text-decoration: underline;

@@ -330,7 +330,7 @@ function renderProjects(){
     "Public Works/Engineering",
     "Beach Operations",
     "Sheriff",
-    "Building Construction & Maintenance",
+    "Building Construction and Maintenance",
     "Administration",
     "Capital Projects"
   ]);

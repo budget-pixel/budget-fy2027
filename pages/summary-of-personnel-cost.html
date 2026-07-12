@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>State Attorney — Walton County FY 2027 Budget</title>
+<title>Summary of Personnel Cost — Walton County FY 2027 Budget</title>
 <link rel="stylesheet" href="../assets/style.css?v=20260711-dept-name-left-align">
 </head>
 <body>
@@ -16,14 +16,32 @@
 <div id="layout">
 <main id="content">
 
-<div class="page-eyebrow">Autonomous Entities</div>
-<h1 class="page-title">State Attorney</h1>
+<div class="page-eyebrow">Financial Summaries</div>
+<h1 class="page-title">Summary of Personnel Cost</h1>
 
-<div id="department-narrative"></div>
-<div id="department-performance-table"></div>
-<div id="department-expense-table"></div>
-<div id="department-revenue-table"></div>
-<div id="department-staffing-table"></div>
+<section class="page-text wc-personnel-narrative">
+  <p>Presented below is a summary of budgeted Personnel Services costs by department for the proposed fiscal year, split into Salaries &amp; Wages (regular salaries, other salaries, and overtime), Retirement, Health Insurance, and Other Benefits &amp; Taxes (FICA/Medicare, workers' compensation, and unemployment compensation). This is a dollar-cost companion to the <a href="summary-of-personnel.html">Summary of Personnel</a> page, which shows Full-Time Equivalent (FTE) position counts rather than budgeted cost.</p>
+  <p>This summary does not include personnel costs for the Clerk of Courts, Property Appraiser, Supervisor of Elections, Tax Collector, or Sheriff's Office. These are independently elected Constitutional Officers who set and manage their own personnel budgets; please contact those offices directly for information regarding their personnel costs.</p>
+</section><style>
+  .wc-personnel-narrative p{
+    font-family:Arial, Helvetica, sans-serif;
+    text-align:justify;
+  }
+  .wc-personnel-cost-optional-col{
+    display:none;
+  }
+  body.wc-show-personnel-cost-optional-cols .wc-personnel-cost-optional-col{
+    display:table-cell;
+  }
+  #wcPersonnelCostExportAllButton{
+    display:none;
+  }
+  :root[data-theme="dark"] #wcPersonnelCostExportAllButton{
+    display:inline-block;
+  }
+</style>
+
+<div id="personnel-cost-summary"></div>
 </main>
 </div>
 
@@ -50,8 +68,10 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   {title:"Summary of Expenses",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-expenses.html"},
   {title:"Summary of Interfund Transfers",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-interfund-transfers.html"},
   {title:"Summary of Personnel",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-personnel.html"},
+  {title:"Summary of Personnel Cost",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-personnel-cost.html"},
   {title:"Summary of Machinery, Vehicles & Equipment",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-machinery-vehicles-and-equipment.html"},
   {title:"Summary of Property Tax Allocations",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-property-tax-allocations.html"},
+  {title:"Summary of Contractual Services",section:"Financial Summaries",href:"https://budget-pixel.github.io/budget-fy2027/../pages/summary-of-contractual-services.html"},
   {title:"Financials",section:"Financials",href:"https://budget-pixel.github.io/budget-fy2027/../pages/financials.html"},
   {title:"Board of County Commissioners",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/board-of-county-commissioners.html"},
   {title:"Clerk of Courts & County Comptroller",section:"Constitutional Officers",href:"https://budget-pixel.github.io/budget-fy2027/../pages/clerk-of-courts-and-county-comptroller.html"},
