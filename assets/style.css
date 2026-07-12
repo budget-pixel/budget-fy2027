@@ -146,6 +146,14 @@ a:where(:visited) {
 .wc-metric-card .wc-metric-value.is-positive { color: var(--green); }
 .wc-metric-card .wc-metric-value.is-negative { color: #9c3b3b; }
 
+/* Summary of Personnel Cost / Summary of Contractual Services are
+   temporarily unpublished -- reusable across list items, links, and spans
+   since display:revert restores whatever that element's own natural
+   default is (list-item for li, inline for a/span) instead of a single
+   hardcoded value that would only be right for one of them. */
+.wc-dark-mode-only { display: none; }
+:root[data-theme="dark"] .wc-dark-mode-only { display: revert; }
+
 /* ── directory list (our-county / departments / budget-overview / financials) ── */
 .wc-directory-list { list-style: none; margin: 0; padding: 0; }
 .wc-directory-list li {

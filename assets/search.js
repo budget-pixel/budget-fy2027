@@ -218,7 +218,7 @@
       input.blur();
     }
 
-    function addSearchLink(title, section, href, extraSearchText){
+    function addSearchLink(title, section, href, extraSearchText, darkModeOnly){
       title = title ? String(title).trim() : "";
       section = section ? String(section).trim() : "Budget Book";
       href = href ? String(href).trim() : "";
@@ -234,7 +234,8 @@
         title:title,
         section:section,
         href:href,
-        searchText:normalizeSearchText(title + " " + section + " " + extraSearchText)
+        searchText:normalizeSearchText(title + " " + section + " " + extraSearchText),
+        darkModeOnly:Boolean(darkModeOnly)
       });
     }
 
@@ -399,6 +400,9 @@
       items.forEach(function(item){
         var resultLink = document.createElement("a");
         resultLink.className = "wc-nav-search-result";
+        if(item.darkModeOnly){
+          resultLink.classList.add("wc-dark-mode-only-result");
+        }
         resultLink.href = item.href;
         resultLink.setAttribute("role", "option");
         resultLink.setAttribute("aria-selected", "false");
@@ -537,7 +541,7 @@
         page.searchText
       ].filter(Boolean).join(" ");
 
-      addSearchLink(page.title, page.section, page.href, pageSearchText);
+      addSearchLink(page.title, page.section, page.href, pageSearchText, page.darkModeOnly);
     });
 
     function loadProjectsWhenReady(){

@@ -881,6 +881,16 @@
     background:var(--wc-green);
     color:#ffffff;
   }
+  /* Summary of Personnel Cost is temporarily unpublished -- its "Also
+     See" pill only shows up when the site is in dark mode. More specific
+     than the plain .wc-budget-guide-link rule above (which sets
+     display:inline-flex) so this wins without needing !important. */
+  .wc-budget-guide-link.wc-dark-mode-only{
+    display:none;
+  }
+  html[data-theme="dark"] .wc-budget-guide-link.wc-dark-mode-only{
+    display:inline-flex;
+  }
   .wc-budget-guide-reset{
     border:1px solid var(--wc-line);
     background:#ffffff;
@@ -1954,7 +1964,9 @@
         staffing: {
           title: "Go to Summary of Personnel",
           href: "pages/summary-of-personnel.html",
-          answer: "For staffing questions, the Summary of Personnel shows positions and staffing changes across the budget."
+          answer: "For staffing questions, the Summary of Personnel shows positions and staffing changes across the budget.",
+          secondaryTitle: "Also See Summary of Personnel Cost",
+          secondaryHref: "pages/summary-of-personnel-cost.html"
         }
       };
 
@@ -1966,7 +1978,7 @@
       function renderRecommendation(topic){
         var rec = recommendations[topic] || recommendations.overview;
         var secondaryLink = rec.secondaryHref
-          ? '<a class="wc-budget-guide-link" href="' + escapeHtml(rec.secondaryHref) + '">' + escapeHtml(rec.secondaryTitle || "Open This Page") + '</a>'
+          ? '<a class="wc-budget-guide-link wc-dark-mode-only" href="' + escapeHtml(rec.secondaryHref) + '">' + escapeHtml(rec.secondaryTitle || "Open This Page") + '</a>'
           : "";
         result.hidden = false;
         result.innerHTML = '<h3>' + escapeHtml(rec.title) + '</h3>' +

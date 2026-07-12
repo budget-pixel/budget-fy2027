@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Financials — Walton County FY 2027 Budget</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260711-dept-name-left-align">
+<link rel="stylesheet" href="../assets/style.css?v=20260711-dark-mode-only-pages">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
 
 <script src="../assets/search-data.js"></script>
 <script src="../assets/budget-data.js?v=20260711-hi-retiree-column"></script>
-<script src="../assets/nav.js?v=20260627-prior-years-a11y"></script>
+<script src="../assets/nav.js?v=20260711-dark-mode-only-pages"></script>
 <script src="../assets/budget-pdf.js"></script>
 <script>
   (function(){
@@ -59,6 +59,13 @@
         description:"Browse expenditure summaries by function, fund, and budget category for the proposed fiscal year."
       },
       {
+        title:"Summary of Contractual Services",
+        href:"summary-of-contractual-services.html",
+        label:"Contracts",
+        description:"Review budgeted contractual services and outside-vendor spending by department.",
+        darkModeOnly:true
+      },
+      {
         title:"Summary of Interfund Transfers",
         href:"summary-of-interfund-transfers.html",
         label:"Transfers",
@@ -70,6 +77,13 @@
         label:"Personnel",
         description:"See staffing summaries and position counts supporting County services, programs, and operations.",
         showFteCallouts:true
+      },
+      {
+        title:"Summary of Personnel Cost",
+        href:"summary-of-personnel-cost.html",
+        label:"Personnel Cost",
+        description:"Review budgeted personnel costs by department, split into salaries & wages and benefits & taxes.",
+        darkModeOnly:true
       },
       {
         title:"Summary of Machinery, Vehicles & Equipment",
@@ -157,7 +171,8 @@
         var calloutsHtml = page.showFteCallouts
           ? (isLoading ? personnelCalloutsLoadingHtml() : personnelCalloutsHtml(page.href, personnelCallouts))
           : "";
-        return '<li>' +
+        var liClass = page.darkModeOnly ? ' class="wc-dark-mode-only"' : "";
+        return '<li' + liClass + '>' +
           '<a class="wc-directory-item" href="' + escapeHtml(page.href) + '">' +
             '<div class="wc-directory-item-main">' +
               '<span class="wc-directory-item-title">' + escapeHtml(page.title) + '</span>' +

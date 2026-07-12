@@ -137,11 +137,11 @@
   function loadWaltonBudgetSearchModules(onReady){
     loadWcScriptOnce(
       "wc-budget-search-data-script",
-      wcBudgetAssetBaseUrl + "search-data.js?v=20260711-hide-personnel-cost-contractual",
+      wcBudgetAssetBaseUrl + "search-data.js?v=20260711-dark-mode-only-pages",
       function(){
         loadWcScriptOnce(
           "wc-budget-search-script",
-          wcBudgetAssetBaseUrl + "search.js?v=20260627-lighthouse-a11y",
+          wcBudgetAssetBaseUrl + "search.js?v=20260711-dark-mode-only-pages",
           function(){
             var fallbackSlot = document.querySelector(".wc-nav-search-slot-fallback");
             if(fallbackSlot && fallbackSlot.parentNode){
@@ -935,6 +935,16 @@
     background-image:none !important;
     outline:0 !important;
     transition:color .2s ease, border-color .2s ease !important;
+  }
+  /* Summary of Personnel Cost / Summary of Contractual Services are
+     temporarily unpublished -- their search result rows only show up when
+     the site is in dark mode (see search.js's darkModeOnly handling and
+     financials.html's own dark-mode-only cards). */
+  nav#nav-menu .wc-nav-search-result.wc-dark-mode-only-result{
+    display:none !important;
+  }
+  :root[data-theme="dark"] nav#nav-menu .wc-nav-search-result.wc-dark-mode-only-result{
+    display:grid !important;
   }
   nav#nav-menu .wc-nav-search-result::before,
   nav#nav-menu .wc-nav-search-result::after,
