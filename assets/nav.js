@@ -531,7 +531,7 @@
     }
     loadWcScriptOnce(
       "wc-budget-pdf-script",
-      wcBudgetAssetBaseUrl + "budget-pdf.js?v=20260630-print"
+      wcBudgetAssetBaseUrl + "budget-pdf.js?v=20260712-personnel-cost-print-summary-only"
     );
   }
   var css = `

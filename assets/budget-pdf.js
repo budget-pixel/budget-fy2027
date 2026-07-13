@@ -67,6 +67,19 @@ var PRINT_CSS = `
     visibility:hidden !important;
   }
 
+  /* Summary of Personnel and Summary of Personnel Cost use a department
+     name rendered as a "View Budget Lines" toggle button (see
+     .wc-table-row-link in style.css, which already strips its button
+     chrome so it reads as plain text on screen) rather than a plain <td>
+     -- the blanket button-hiding rule above was blanking out the entire
+     Department column in print. Higher specificity than the plain
+     .wc-view-budget-lines-toggle rule above (an attribute selector counts
+     as a second class), so this wins without needing to touch that rule. */
+  .wc-table-row-link[data-closed-label]{
+    display:inline !important;
+    visibility:visible !important;
+  }
+
   details{
     display:block !important;
   }
@@ -1250,6 +1263,21 @@ var PRINT_CSS = `
     opacity:1 !important;
   }
 
+  /* Summary of Personnel Cost prints as just the department-level rollup
+     table -- every department's own "Cost by Position" detail card (and
+     the Department/Fund filter dropdowns above the table) are dropped
+     from print entirely, rather than the several-hundred-page position-by-
+     position printout the generic .wc-budget-lines-detail unhide rule
+     above would otherwise produce. Scoped to #personnel-cost-summary (an
+     ID, so it wins over that rule's plain classes regardless of
+     !important) so no other page's own detail cards are affected. */
+  #personnel-cost-summary .wc-filter-bar,
+  #personnel-cost-summary .wc-budget-lines-detail,
+  #personnel-cost-summary .wc-budget-lines-detail[hidden]{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
   /* A staffing card's notes sit between the (print-hidden) summary footer
      and the position-detail table in the source markup -- fine on-screen,
      where the notes are meant to always show regardless of whether the
@@ -1601,9 +1629,42 @@ var PRINT_CSS = `
     });
   }
 
+  // Printed pages should always read as light mode, even when the site
+  // itself is currently in dark mode -- there are dozens of
+  // :root[data-theme="dark"] color rules across style.css/mobile.css, many
+  // with higher CSS specificity than the print stylesheet's own generic
+  // :root{...} light-color reset (see injectStyles' PRINT_CSS), so those
+  // dark backgrounds/text colors were bleeding through onto the printed
+  // page instead of resetting to light. Rather than fight that selector
+  // war one rule at a time, this just removes the data-theme="dark"
+  // attribute itself for the duration of printing, so none of those rules
+  // match in the first place -- robust against every current rule and any
+  // future one, without needing a matching print override added every
+  // time a new dark-mode style is introduced.
+  var PRINT_THEME_ATTR = "data-wc-print-restore-theme";
+  function forceLightThemeForPrint() {
+    var root = document.documentElement;
+    if (root.hasAttribute(PRINT_THEME_ATTR)) return;
+    var current = root.getAttribute("data-theme");
+    root.setAttribute(PRINT_THEME_ATTR, current === null ? "" : current);
+    root.setAttribute("data-theme", "light");
+  }
+  function restoreThemeAfterPrint() {
+    var root = document.documentElement;
+    if (!root.hasAttribute(PRINT_THEME_ATTR)) return;
+    var previous = root.getAttribute(PRINT_THEME_ATTR);
+    root.removeAttribute(PRINT_THEME_ATTR);
+    if (previous) {
+      root.setAttribute("data-theme", previous);
+    } else {
+      root.removeAttribute("data-theme");
+    }
+  }
+
   function syncPrintPreparation() {
     if (window.matchMedia && window.matchMedia("print").matches) {
       openPrintDetails();
+      forceLightThemeForPrint();
     }
   }
 
@@ -1632,9 +1693,11 @@ var PRINT_CSS = `
     ensureStatementPanel();
     ensurePrintFinanceTitles();
     openPrintDetails();
+    forceLightThemeForPrint();
   });
   window.addEventListener("afterprint", function () {
     restorePrintDetails();
+    restoreThemeAfterPrint();
   });
   if (window.matchMedia) {
     var printQuery = window.matchMedia("print");
@@ -1642,16 +1705,20 @@ var PRINT_CSS = `
       printQuery.addEventListener("change", function (event) {
         if (event.matches) {
           openPrintDetails();
+          forceLightThemeForPrint();
         } else {
           restorePrintDetails();
+          restoreThemeAfterPrint();
         }
       });
     } else if (typeof printQuery.addListener === "function") {
       printQuery.addListener(function (event) {
         if (event.matches) {
           openPrintDetails();
+          forceLightThemeForPrint();
         } else {
           restorePrintDetails();
+          restoreThemeAfterPrint();
         }
       });
     }
