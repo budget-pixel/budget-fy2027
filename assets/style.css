@@ -2469,19 +2469,6 @@ a:where(:visited) {
   color: var(--muted);
   font-size: .9rem;
 }
-.wc-forecast-baseline-note {
-  margin: 16px 0 8px;
-  padding: 14px 16px;
-  border: 1px solid rgba(36,52,77,.16);
-  border-left: 4px solid var(--green);
-  border-radius: 8px;
-  background: #f7faf8;
-  color: var(--text);
-  font-size: .9rem;
-}
-.wc-forecast-baseline-note strong {
-  color: var(--navy);
-}
 .wc-forecast-health-grid,
 .wc-forecast-driver-grid,
 .wc-forecast-visual-grid {
@@ -2734,7 +2721,6 @@ a:where(:visited) {
 }
 :root[data-theme="dark"] .wc-forecast-chart-row,
 :root[data-theme="dark"] .wc-forecast-fund,
-:root[data-theme="dark"] .wc-forecast-baseline-note,
 :root[data-theme="dark"] .wc-forecast-health-card,
 :root[data-theme="dark"] .wc-forecast-driver-panel,
 :root[data-theme="dark"] .wc-forecast-visual-panel,
@@ -2746,8 +2732,7 @@ a:where(:visited) {
 :root[data-theme="dark"] .wc-forecast-health-card h3,
 :root[data-theme="dark"] .wc-forecast-driver-panel h3,
 :root[data-theme="dark"] .wc-forecast-visual-panel h3,
-:root[data-theme="dark"] .wc-forecast-comparison-row > strong,
-:root[data-theme="dark"] .wc-forecast-baseline-note strong {
+:root[data-theme="dark"] .wc-forecast-comparison-row > strong {
   color: var(--text);
 }
 :root[data-theme="dark"] .wc-forecast-bar {

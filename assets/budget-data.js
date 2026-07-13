@@ -1181,6 +1181,15 @@
     ]
   ]);
 
+  // Departments/programs excluded from the auto-generated "actuals aren't
+  // captured due to an accounting change" note (see renderBudgetLinesToggle's
+  // generatedActualsNoteText) -- that wording is wrong for a program that
+  // simply didn't exist yet in those early years, as opposed to one whose
+  // historical actuals were genuinely lost to a later accounting change.
+  const GENERATED_ACTUALS_NOTE_EXCLUDED_DEPT_NAMES = new Set(
+    ["Eagle Springs Grill"].map(normalizeDeptName)
+  );
+
   function applyActualsToRows(rows, rawActualRows) {
     if (!rawActualRows || !rawActualRows.length) return rows;
 
@@ -4011,7 +4020,9 @@
         .filter((c) => c.actual && visiblePriorYearTotal(summaryRows, c) === 0)
         .map((c) => c.year)
       : [];
-    const generatedActualsNoteText = missingActualYears.length
+    const generatedActualsNoteExcluded = mergedRows.length &&
+      GENERATED_ACTUALS_NOTE_EXCLUDED_DEPT_NAMES.has(normalizeDeptName(mergedRows[0].Dept_Name));
+    const generatedActualsNoteText = (missingActualYears.length && !generatedActualsNoteExcluded)
       ? "Due to an accounting change actuals for " + formatYearList(missingActualYears) + " are not captured in this report, please reach out to the Office of Management and Budget if you wish to view those years."
       : "";
     const totalLabelCells =
@@ -7079,7 +7090,7 @@
   function renderForecastFundScheduleDetail(item) {
     return (
       renderForecastDetailTable(item) +
-      '<details class="wc-forecast-detail" open><summary>Category Forecast Detail</summary>' +
+      '<details class="wc-forecast-detail"><summary>Category Forecast Detail</summary>' +
         renderForecastDetailBreakdownTable(item, "revenue", item.revenueDetails) +
         renderForecastDetailBreakdownTable(item, "expense", item.expenseDetails) +
       '</details>'
@@ -7228,9 +7239,6 @@
   function renderFinancialForecast(cipProjectList) {
     const model = buildFinancialForecastModel(cipProjectList);
     return (
-      '<section class="wc-forecast-baseline-note">' +
-        '<strong>How to read this page:</strong> FY 2027 is the proposed budget baseline. Future years apply growth assumptions to that baseline.' +
-      '</section>' +
       renderForecastOverviewCards(model) +
       renderForecastAssumptionSummary(model) +
       renderForecastFundDetailTemplates(model) +
