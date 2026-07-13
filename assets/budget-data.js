@@ -2134,6 +2134,7 @@
       Contract_Status: (row.Contract_Status || "").trim(),
       Vendor: (row.Vendor || "").trim(),
       Contract_No: (row.Contract_No || "").trim(),
+      Contract_Link: (row.Contract_Link || "").trim(),
       Project_Code: (row.Project_Code || "").trim(),
       Project_Name: (row.Project_Name || "").trim(),
       Object_Code: (row.Object_Code || "").trim(),
@@ -2412,6 +2413,7 @@
           Amount: row.FY2027_Proposed || 0,
           Vendor: row.Vendor || "",
           Contract_No: row.Contract_No || "",
+          Contract_Link: row.Contract_Link || "",
           Contract_Status: row.Contract_Status || ""
         };
       })
@@ -2446,6 +2448,7 @@
         Amount: entry.total,
         Vendor: entry.row.Vendor || "",
         Contract_No: entry.row.Contract_No || "",
+        Contract_Link: entry.row.Contract_Link || "",
         Contract_Status: entry.row.Contract_Status || ""
       });
     });
@@ -2473,6 +2476,7 @@
           Amount: engineeringAmount,
           Vendor: primary.Vendor || "",
           Contract_No: primary.Contract_No || "",
+          Contract_Link: primary.Contract_Link || "",
           Contract_Status: primary.Contract_Status || ""
         });
       }
@@ -10767,9 +10771,9 @@
       const items = rows.filter((r) => !deptName || r.Dept_Name === deptName);
       const showDeptColumn = !deptName;
       // Department?, Service -- then the FY 2027 numeric column, then
-      // Contract Status, Vendor, Contract No.
+      // Contract Status, Vendor, Contract No., Link.
       const leadingCols = showDeptColumn ? 2 : 1;
-      const trailingCols = 3;
+      const trailingCols = 4;
       const colCount = leadingCols + 1 + trailingCols;
 
       // Capital Projects Fund is where CIP procurement rows land -- push it
@@ -10802,7 +10806,8 @@
             '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td>" +
             "<td>" + escapeHtml(r.Contract_Status || "") + "</td>" +
             "<td>" + escapeHtml(r.Vendor || "") + "</td>" +
-            "<td>" + escapeHtml(r.Contract_No || "") + "</td></tr>"
+            "<td>" + escapeHtml(r.Contract_No || "") + "</td>" +
+            "<td>" + (r.Contract_Link ? '<a href="' + escapeHtml(r.Contract_Link) + '" target="_blank" rel="noopener">Link</a>' : "") + "</td></tr>"
           );
         });
         bodyRows.push(
@@ -10818,7 +10823,8 @@
           { label: "FY 2027", num: true },
           { label: "Procurement / Contract Status" },
           { label: "Current Service Provider" },
-          { label: "Contract No." }
+          { label: "Contract No." },
+          { label: "Document Link" }
         ]);
 
       mountOrHide(
