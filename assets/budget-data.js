@@ -1738,7 +1738,8 @@
   }
 
   function combineStateAttorneyAdValoremRows(rows, deptName) {
-    if (normalizeDeptName(deptName) !== "state attorney") return rows;
+    const normalizedDeptName = normalizeDeptName(deptName);
+    if (normalizedDeptName !== "state attorney" && normalizedDeptName !== "mosquito control") return rows;
     const amountFields = HISTORICAL_ACTUAL_YEARS.map((year) => "FY" + year + "_Actual")
       .concat(["FY2026_Original_Budget", "FY2026_Budget", "FY2026_Plug", "FY2027_Proposed"]);
     const combined = [];
@@ -2621,7 +2622,7 @@
   // every generic "Interest & Other Earnings" or "Federal Grant (Other)"
   // code) since the county never gave them their own line either.
   const REVENUE_CODE_OVERRIDES = new Map([
-    ["324001", { name: "Road Impact Fees", type: "Permits Fees and Special Assessments" }],
+    ["324001", { name: "Sign Fees", type: "Permits Fees and Special Assessments" }],
     ["331900", { name: "Federal Grant (Other)", type: "Intergovernmental Revenues" }],
     ["334340", { name: "State Grant (Transportation)", type: "Intergovernmental Revenues" }],
     ["334500", { name: "State Grant (Other)", type: "Intergovernmental Revenues" }],
@@ -3437,51 +3438,12 @@
       .replace(/^-+|-+$/g, "");
   }
 
-  // Office of Management and Budget (the original pilot) plus every
-  // Constitutional Officers & Other Agencies page except Board of County
-  // Commissioners -- both the "Constitutional Officers" section (Clerk,
-  // Property Appraiser, Sheriff, Supervisor of Elections, Tax Collector)
-  // and the "Autonomous Entities" section. Dept_Name values below are the
-  // actual sheet values confirmed against the live data, not the page
-  // titles -- several pages don't match 1:1: the Clerk's page is titled
-  // "Clerk of Courts & County Comptroller" but the sheet rows are Dept_Name
-  // "Clerk of Court"; the Sheriff's page rows are "Walton County Sheriff's
-  // Office"; "Court Technology & Innovations" is split across two sheet
-  // Dept_Names ("Court Innovations" and "Court Technology - Court
-  // Administration"); "South Walton Fire & State Control" is split across
-  // three ("South Walton Fire", "State Fire", "Volunteer Fire" -- not
-  // "South Walton Fire Lifeguard Services", which the activities sheet
-  // classifies under Tourism Administration, not Autonomous Entities, and
-  // belongs to the separate Tourism Lifeguard Services and Beach Safety
-  // page instead).
-  // Set to true to re-enable transaction links from budget/revenue line tables.
-  const TRANSACTION_DRILLDOWN_ENABLED = false;
-
-  const TRANSACTION_DRILLDOWN_DEPT_NAMES = new Set(
-    [
-      "Clerk of Court",
-      "Property Appraiser",
-      "Supervisor of Elections",
-      "Tax Collector",
-      "Walton County Sheriff's Office",
-      "Circuit Court",
-      "County Court",
-      "Court Innovations",
-      "Court Technology - Court Administration",
-      "Guardian Ad Litem",
-      "Medical Examiner",
-      "Mosquito Control",
-      "Mosquito Control State Aid",
-      "Non-Profit Funding Program",
-      "Public Defender",
-      "South Walton Fire",
-      "State Fire",
-      "Volunteer Fire",
-      "State Attorney",
-      "Statutory & Other",
-      "Walton County Health Department"
-    ].map(normalizeDeptName)
-  );
+  // Transaction links from budget/revenue line tables are always rendered
+  // in the markup, but are only visible/clickable in dark mode -- see the
+  // `:root[data-theme="dark"] .wc-actual-drilldown-link` override in
+  // style.css, which is what actually gates them (this flag stays true so
+  // the underlying <a> exists for CSS to turn on).
+  const TRANSACTION_DRILLDOWN_ENABLED = true;
 
   function transactionDrilldownEnabledForRow(row, fields) {
     if (!TRANSACTION_DRILLDOWN_ENABLED) {
@@ -3496,7 +3458,15 @@
         !(fields && fields.combineByName)
       );
     }
-    return TRANSACTION_DRILLDOWN_DEPT_NAMES.has(normalizeDeptName(row && row.Dept_Name));
+    // Every department's expenditure rows carry the same Dept_Code/Object_Code
+    // shape (see transactionHrefForBudgetLine), so drilldown applies
+    // department-agnostically here, same as the revenue branch above.
+    return !!(
+      row &&
+      row.Dept_Code &&
+      row[(fields && fields.codeField) || "Object_Code"] &&
+      !(fields && fields.combineByName)
+    );
   }
 
   function currentBudgetLinesReturnUrl(detailId) {
@@ -6891,7 +6861,7 @@
     "001|non-profit funding program",
     "001|recreation - fbip boating allocation",
     "001|capital projects",
-    "101|road impact fees",
+    "101|sign fees",
     "111|sales & promotions",
     "111|sales & promotions out of state",
     "111|beach renourishment",
@@ -11430,9 +11400,9 @@
   // into it -- not an additional increase to apply on top.
   const PERSONNEL_COST_COLA_RATE = 0.03;
   // Informational only, unlike COLA -- not baked into Health Insurance
-  // today. Shows what a 5% premium increase would add on top of the
+  // today. Shows what a 5.5% premium increase would add on top of the
   // current Health Insurance figure, so it's not counted in Total.
-  const PERSONNEL_COST_HEALTH_INSURANCE_INCREASE_RATE = 0.05;
+  const PERSONNEL_COST_HEALTH_INSURANCE_INCREASE_RATE = 0.055;
 
   // Independently elected Constitutional Officers set and manage their own
   // personnel budgets -- excluded here, same as Contractual Services'

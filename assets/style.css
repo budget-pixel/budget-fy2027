@@ -2311,14 +2311,16 @@ a:where(:visited) {
   text-align: right;
 }
 .wc-actual-drilldown-link {
-  color: #003f28;
-  font-weight: 900;
+  color: inherit;
+  font-weight: inherit;
   text-decoration: none;
   text-underline-offset: 3px;
+  cursor: default;
+  pointer-events: none;
 }
 .wc-actual-drilldown-link:hover,
 .wc-actual-drilldown-link:focus {
-  text-decoration: underline;
+  text-decoration: none;
 }
 .wc-transaction-page {
   max-width: 1320px;
@@ -3481,6 +3483,13 @@ a:where(:visited) {
 
 :root[data-theme="dark"] .wc-actual-drilldown-link {
   color: var(--green) !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+:root[data-theme="dark"] .wc-actual-drilldown-link:hover,
+:root[data-theme="dark"] .wc-actual-drilldown-link:focus {
+  text-decoration: underline !important;
 }
 
 :root[data-theme="dark"] .wc-transaction-back-link {

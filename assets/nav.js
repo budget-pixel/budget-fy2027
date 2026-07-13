@@ -979,6 +979,10 @@
     line-height:1.35 !important;
     font-weight:600 !important;
     text-align:right !important;
+    max-width:140px !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
   }
   nav#nav-menu .wc-nav-search-empty{
     padding:20px 0 36px !important;

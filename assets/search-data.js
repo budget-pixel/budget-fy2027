@@ -379,7 +379,8 @@ var wcHiddenBudgetPageTitles = new Set([
     ],
 
     "Planning": [
-      "planning", "planning department", "land use", "zoning", "development review", "comprehensive plan", "growth management", "permits", "planning applications"
+      "planning", "planning department", "land use", "zoning", "development review", "comprehensive plan", "growth management", "permits", "planning applications",
+      "short-term rental", "short term rental", "vacation rental", "str"
     ],
 
     "Probation": [

@@ -389,6 +389,7 @@
   }
   nav#nav-menu .wc-nav-search-result span{
     text-align:left !important;
+    max-width:none !important;
   }
   /* MOBILE REPORT TABLES */
 

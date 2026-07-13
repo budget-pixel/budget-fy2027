@@ -218,7 +218,7 @@
       input.blur();
     }
 
-    function addSearchLink(title, section, href, extraSearchText, darkModeOnly){
+    function addSearchLink(title, section, href, extraSearchText, darkModeOnly, keywordTerms){
       title = title ? String(title).trim() : "";
       section = section ? String(section).trim() : "Budget Book";
       href = href ? String(href).trim() : "";
@@ -235,8 +235,48 @@
         section:section,
         href:href,
         searchText:normalizeSearchText(title + " " + section + " " + extraSearchText),
+        keywordTerms:Array.isArray(keywordTerms) ? keywordTerms.filter(Boolean) : [],
         darkModeOnly:Boolean(darkModeOnly)
       });
+    }
+
+    function formatMatchLabel(term){
+      term = String(term || "").trim();
+      if(!term){
+        return "";
+      }
+      var words = term.split(/\s+/);
+      if(words.length === 1 && words[0].length <= 4 && /^[a-z0-9]+$/.test(words[0])){
+        return words[0].toUpperCase();
+      }
+      return words.map(function(word){
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }).join(" ");
+    }
+
+    function findMatchedKeyword(item, normalizedQuery){
+      if(!normalizedQuery || !item.keywordTerms || !item.keywordTerms.length){
+        return null;
+      }
+      var titleNormalized = normalizeSearchText(item.title);
+      var candidates = item.keywordTerms.filter(function(term){
+        var normTerm = normalizeSearchText(term);
+        return normTerm && normTerm.indexOf(normalizedQuery) !== -1 && normTerm !== titleNormalized;
+      });
+      if(!candidates.length){
+        return null;
+      }
+      candidates.sort(function(a, b){
+        return a.length - b.length;
+      });
+      return candidates[0];
+    }
+
+    function escapeHtml(value){
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
     function getProjectValue(project, keys){
@@ -388,7 +428,7 @@
       return SECTION_GROUP_MAP[key] || section || "More";
     }
 
-    function renderResultGroup(label, items){
+    function renderResultGroup(label, items, normalizedQuery){
       var group = document.createElement("div");
       group.className = "wc-search-group";
 
@@ -406,14 +446,16 @@
         resultLink.href = item.href;
         resultLink.setAttribute("role", "option");
         resultLink.setAttribute("aria-selected", "false");
-        resultLink.innerHTML = `<strong>${item.title}</strong>`;
+        var matchedKeyword = findMatchedKeyword(item, normalizedQuery);
+        resultLink.innerHTML = `<strong>${escapeHtml(item.title)}</strong>` +
+          (matchedKeyword ? `<span>${escapeHtml(formatMatchLabel(matchedKeyword))}</span>` : "");
         group.appendChild(resultLink);
       });
 
       resultsInner.appendChild(group);
     }
 
-    function renderGroupedResults(items){
+    function renderGroupedResults(items, normalizedQuery){
       var groups = {};
       var order = [];
 
@@ -435,7 +477,7 @@
       });
 
       order.forEach(function(label){
-        renderResultGroup(label, groups[label]);
+        renderResultGroup(label, groups[label], normalizedQuery);
       });
     }
 
@@ -474,7 +516,7 @@
         var defaultLinks = links.filter(function(item){
           return groupLabelFor(item.section) !== "Departments";
         }).slice(0, 3);
-        renderGroupedResults(defaultLinks);
+        renderGroupedResults(defaultLinks, normalizedQuery);
         results.classList.add("is-active");
         return;
       }
@@ -506,7 +548,7 @@
         return;
       }
 
-      renderGroupedResults(matches);
+      renderGroupedResults(matches, normalizedQuery);
       results.classList.add("is-active");
     }
 
@@ -541,7 +583,7 @@
         page.searchText
       ].filter(Boolean).join(" ");
 
-      addSearchLink(page.title, page.section, page.href, pageSearchText, page.darkModeOnly);
+      addSearchLink(page.title, page.section, page.href, pageSearchText, page.darkModeOnly, page.keywords);
     });
 
     function loadProjectsWhenReady(){
