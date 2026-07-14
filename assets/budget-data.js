@@ -11133,6 +11133,7 @@
       fundFilterNames.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
       "</select></label>" +
       '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelSortToggle" aria-pressed="false">Sort: Largest to Smallest</button>' +
+      '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelResetFilters">Reset</button>' +
       "</div>" +
       '<p class="wc-personnel-table-hint">Click on a department name to view individual position detail.</p>' +
       '<div class="wc-financial-summary-table"></div>';
@@ -11140,6 +11141,7 @@
     const deptSelect = container.querySelector("#wcPersonnelDeptSelect");
     const fundSelect = container.querySelector("#wcPersonnelFundSelect");
     const sortToggle = container.querySelector("#wcPersonnelSortToggle");
+    const resetButton = container.querySelector("#wcPersonnelResetFilters");
     const tableEl = container.querySelector(".wc-financial-summary-table");
     let sortByFte = false;
 
@@ -11220,8 +11222,14 @@
       mountOrHide(notesContainer, buildPersonnelSummaryFteNotes(filtered));
     }
 
-    deptSelect.addEventListener("change", applyFilters);
-    fundSelect.addEventListener("change", applyFilters);
+    deptSelect.addEventListener("change", () => {
+      if (deptSelect.value) fundSelect.value = "";
+      applyFilters();
+    });
+    fundSelect.addEventListener("change", () => {
+      if (fundSelect.value) deptSelect.value = "";
+      applyFilters();
+    });
     sortToggle.addEventListener("click", () => {
       sortByFte = !sortByFte;
       sortToggle.textContent = sortByFte ? "Sort: A to Z" : "Sort: Largest to Smallest";
@@ -11238,12 +11246,19 @@
     deptSelect.addEventListener("change", syncActiveCallout);
     calloutButtons.forEach((button) => {
       button.addEventListener("click", () => {
+        const isActive = !deptSelect.value && fundSelect.value === button.dataset.personnelFundFilter;
         deptSelect.value = "";
-        fundSelect.value = button.dataset.personnelFundFilter;
+        fundSelect.value = isActive ? "" : button.dataset.personnelFundFilter;
         applyFilters();
         syncActiveCallout();
         tableEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
       });
+    });
+    resetButton.addEventListener("click", () => {
+      deptSelect.value = "";
+      fundSelect.value = "";
+      applyFilters();
+      syncActiveCallout();
     });
 
     // Arriving from a Financials directory callout link (?fund=...) lands
