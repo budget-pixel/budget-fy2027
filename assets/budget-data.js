@@ -2150,6 +2150,10 @@
       Object_Code: (row.Object_Code || "").trim(),
       Object_Name: isTourismAdminFee ? "Administrative Fee" : (row.Object_Name || "").trim(),
       Object_Type: isTourismAdminFee ? "Operating Expenditures" : (row.Object_Type || "").trim(),
+      // Machinery, Vehicles & Equipment (Object_Code 564000) rows only --
+      // "Vehicle" or "Equipment", used by the Summary of Machinery page's
+      // Type filter (see buildMachineryRowsFromExpenditures).
+      ME_Type: (row["M&E_type"] || "").trim(),
       FY2020_Actual: toNumber(row.FY2020_Actual),
       FY2021_Actual: toNumber(row.FY2021_Actual),
       FY2022_Actual: toNumber(row.FY2022_Actual),
@@ -2267,7 +2271,8 @@
         Dept_Code: row.Dept_Code || "",
         Dept_Name: row.Dept_Name || "",
         Item_Description: row.Note || row.Project_Name || row.Object_Name || "Machinery & Equipment",
-        Amount: row.FY2027_Proposed || 0
+        Amount: row.FY2027_Proposed || 0,
+        ME_Type: row.ME_Type || ""
       }))
       .filter((row) => row.Amount !== 0);
   }
@@ -3126,6 +3131,7 @@
 
   let budgetLinesDetailCounter = 0;
   let fundScheduleActivityCounter = 0;
+  let budgetChangeDeptCounter = 0;
 
   // Shared CSV download helper. Values are stringified and quoted only
   // when needed (comma/quote/newline present), with embedded quotes
@@ -8109,6 +8115,311 @@
     );
   }
 
+  // "Summary of Budget Changes and Adjustments": how each Department's
+  // FY2027 Proposed expenditures compare to its FY2026 Original Budget,
+  // split into Personnel, Operating, and Capital changes (both increases
+  // and decreases), plus an "Other" catch-all (debt service, grants, and
+  // any other non-Personnel/Operating/Capital object type) so every
+  // dollar is accounted for and each department's row -- and the table's
+  // Total row -- foots to the same FY2026/FY2027 totals as the
+  // Consolidated Expense Summary, not just a subset of spending. Capital
+  // is what pulls in funds like Capital Improvement/Capital Projects,
+  // whose spending is almost entirely Capital Outlay. Reuses the same
+  // fund/financing filter and FY2026/FY2027 dedup rules as the
+  // Consolidated Expense Summary above, grouped by department (via the
+  // same representative-name resolution as the "View Budget Lines" detail
+  // table) and by Object_Type instead of by Activity.
+  function renderConsolidatedBudgetChangesTable(container) {
+    if (!container) return;
+    const matchesFundAndFinancing = (r) =>
+      !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(r)) &&
+      !isOtherFinancingExpenseRow(r);
+    const rows = (cache.expenditures || []).filter(matchesFundAndFinancing);
+    if (!rows.length) {
+      container.innerHTML = '<div class="wc-data-empty">No budget change data is available.</div>';
+      return;
+    }
+
+    const dedupedRows = (cache.dedupedExpenseRows || []).filter(matchesFundAndFinancing);
+
+    function columnSum(matchingRaw, matchingDeduped, field) {
+      const source = HISTORICAL_EXPENSE_DEDUP_FIELD_SET.has(field) ? matchingDeduped : matchingRaw;
+      return source.reduce((s, r) => s + (r[field] || 0), 0);
+    }
+
+    // Built from the full, unfiltered rows/dedupedRows so a department's
+    // representative name stays consistent regardless of which Department
+    // or Fund filter is currently selected below.
+    const repByCodeAndName = clusterDeptNamesByCode(rows.concat(dedupedRows));
+    function representativeName(r) {
+      return collapsedDeptRowName(expenseDisplayDeptName(repByCodeAndName, r));
+    }
+    // Groups departments the same way the site's own directory does --
+    // Constitutional Officers first, then Statutory & Other Agency Funding
+    // (the "Autonomous Entities" section), then regular County Departments,
+    // then anything else (special-revenue/other funds not on the
+    // Departments directory) -- by reusing the same wcBudgetPages section
+    // lookup departmentPageHref already relies on, instead of hardcoding a
+    // second department list here.
+    const DEPARTMENT_GROUP_ORDER = { "Constitutional Officers": 0, "Autonomous Entities": 1, "Departments": 2 };
+    function departmentGroupOrder(deptName) {
+      const norm = normalizeDeptName(deptName);
+      const pages = window.wcBudgetPages || [];
+      const title = DEPARTMENT_PAGE_TITLE_ALIASES.get(norm) || deptName;
+      const match =
+        pages.find((p) => normalizeDeptName(p.title) === normalizeDeptName(title)) ||
+        pages.find((p) => p.section === "Departments" && normalizeDeptName(p.title) === norm);
+      const order = match && DEPARTMENT_GROUP_ORDER[match.section];
+      return typeof order === "number" ? order : 3;
+    }
+    // Object_Type values in the sheet aren't perfectly consistent (a few
+    // synthesized rows say "Operating Expenditures" instead of "Operating
+    // Expenses"), so Operating/Capital are matched loosely while Personnel
+    // stays an exact match -- everything else (debt service, grants,
+    // blank) is bucketed as "Other" rather than dropped, so each
+    // department's row -- and this table's Total row -- foots to its real
+    // FY2026/FY2027 totals instead of silently excluding non-Personnel/
+    // Operating/Capital spending.
+    function categoryForRow(r) {
+      const type = String(r.Object_Type || "").trim();
+      if (type === "Personnel Services") return "Personnel";
+      if (/operating/i.test(type)) return "Operating";
+      if (/capital/i.test(type)) return "Capital";
+      return "Other";
+    }
+    const CATEGORY_ORDER = { Personnel: 0, Operating: 1, Capital: 2, Other: 3 };
+
+    const departments = uniqueSorted(rows.map(representativeName));
+    // Expenditure rows carry no Fund_Name field of their own (only some
+    // synthesized/derived rows elsewhere do) -- fundNameForRow looks it up
+    // from fundCodeForRow(r) against cache.funds instead, same as every
+    // other fund-scoped filter/label on the site.
+    const funds = uniqueSorted(rows.map(fundNameForRow));
+
+    container.innerHTML =
+      '<div class="wc-budget-lines-card">' +
+      '<div class="wc-table-wrap">' +
+      '<div class="wc-table-label-row">' +
+      '<p class="wc-table-label">Summary of Budget Changes and Adjustments</p>' +
+      "</div>" +
+      '<div class="wc-filter-bar wc-machinery-picker">' +
+      filterComboFieldHtml({ idPrefix: "wcBudgetChangeDept", label: "Department", options: departments }) +
+      filterComboFieldHtml({ idPrefix: "wcBudgetChangeFund", label: "Fund", options: funds }) +
+      "</div>" +
+      '<div class="wc-data-table-scroll wc-financial-summary-table"></div>' +
+      "</div>" +
+      "</div>";
+
+    const tableEl = container.querySelector(".wc-financial-summary-table");
+    let selectedDept = "";
+    let selectedFund = "";
+
+    // Each department+category combination (e.g. "Sheriff's Office" /
+    // "Personnel") is grouped separately so a department with both a
+    // personnel increase and an operating decrease shows as two rows,
+    // rather than netting them into one misleading total.
+    function buildEntries(filteredRows, filteredDedupedRows) {
+      const labelByKey = new Map();
+      function keyFor(r) {
+        const category = categoryForRow(r);
+        const dept = representativeName(r);
+        const key = normalizeDeptName(dept) + "|" + category;
+        if (!labelByKey.has(key)) labelByKey.set(key, { dept, category });
+        return key;
+      }
+      function groupByKey(source) {
+        const byKey = new Map();
+        source.forEach((r) => {
+          const key = keyFor(r);
+          if (!byKey.has(key)) byKey.set(key, []);
+          byKey.get(key).push(r);
+        });
+        return byKey;
+      }
+      const rawByKey = groupByKey(filteredRows);
+      const dedupedByKey = groupByKey(filteredDedupedRows);
+
+      const entries = [];
+      let totalPrior = 0;
+      let totalProposed = 0;
+      labelByKey.forEach((label, key) => {
+        const matching = rawByKey.get(key) || [];
+        const matchingDeduped = dedupedByKey.get(key) || [];
+        const prior = columnSum(matching, matchingDeduped, "FY2026_Original_Budget");
+        const proposed = columnSum(matching, matchingDeduped, "FY2027_Proposed");
+        totalPrior += prior;
+        totalProposed += proposed;
+        const change = proposed - prior;
+        // Rows with no year-over-year change are dropped -- this table is
+        // about what changed, not a full department budget breakdown.
+        if (change === 0) return;
+        entries.push({ dept: label.dept, category: label.category, prior, proposed, change });
+      });
+      return { entries, totalPrior, totalProposed };
+    }
+
+    function showFiltered() {
+      const deptName = selectedDept;
+      const fundName = selectedFund;
+      // Department and Fund are mutually exclusive filters (see the
+      // combo onSelect handlers below, which clear whichever filter isn't
+      // being used) -- at most one of these predicates is ever active.
+      const filteredRows = fundName
+        ? rows.filter((r) => fundNameForRow(r) === fundName)
+        : deptName
+        ? rows.filter((r) => representativeName(r) === deptName)
+        : rows;
+      const filteredDedupedRows = fundName
+        ? dedupedRows.filter((r) => fundNameForRow(r) === fundName)
+        : deptName
+        ? dedupedRows.filter((r) => representativeName(r) === deptName)
+        : dedupedRows;
+
+      const { entries, totalPrior, totalProposed } = buildEntries(filteredRows, filteredDedupedRows);
+      if (!entries.length) {
+        mountOrHide(tableEl, '<div class="wc-data-empty">No rows match the current filters.</div>');
+        return;
+      }
+
+      // Grouped by department -- each department is one row/toggle in the
+      // outer table, with its Personnel/Operating/Capital/Other split
+      // revealed as a nested breakdown table when clicked (see the
+      // wc-fund-activity-toggle click handler, shared with the Fund
+      // Financial Schedules page).
+      const byDept = new Map();
+      entries.forEach((entry) => {
+        if (!byDept.has(entry.dept)) byDept.set(entry.dept, []);
+        byDept.get(entry.dept).push(entry);
+      });
+      const depts = Array.from(byDept.keys()).sort((a, b) =>
+        departmentGroupOrder(a) - departmentGroupOrder(b) || a.localeCompare(b)
+      );
+
+      const bodyRows = depts.map((dept) => {
+        const deptEntries = byDept.get(dept).sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category]);
+        const prior = deptEntries.reduce((s, e) => s + e.prior, 0);
+        const proposed = deptEntries.reduce((s, e) => s + e.proposed, 0);
+        const change = proposed - prior;
+        const pct = prior !== 0 ? change / prior : 0;
+        const deptHref = departmentPageHref(dept);
+        const deptLabel = escapeHtml(dept);
+
+        budgetChangeDeptCounter += 1;
+        const detailId = "wc-budget-change-detail-" + budgetChangeDeptCounter;
+        const detailTable =
+          '<div class="wc-fund-activity-detail">' +
+          '<table class="wc-data-table wc-fund-activity-detail-table">' +
+          "<thead><tr><th>Category</th>" +
+          '<th class="wc-num">FY 2026 Budget</th>' +
+          '<th class="wc-num">FY 2027 Budget</th>' +
+          '<th class="wc-num">Change</th>' +
+          '<th class="wc-num">% Change</th>' +
+          "</tr></thead><tbody>" +
+          deptEntries.map((e) => {
+            const ePct = e.prior !== 0 ? e.change / e.prior : 0;
+            return (
+              "<tr><td>" + escapeHtml(e.category) + "</td>" +
+              '<td class="wc-num">' + formatCurrency(e.prior) + "</td>" +
+              '<td class="wc-num">' + formatCurrency(e.proposed) + "</td>" +
+              '<td class="wc-num">' + formatCurrency(e.change) + "</td>" +
+              '<td class="wc-num">' + (ePct >= 0 ? "+" : "") + (ePct * 100).toFixed(1) + "%</td>" +
+              "</tr>"
+            );
+          }).join("") +
+          "</tbody></table></div>";
+
+        return (
+          '<tr class="wc-fund-activity-row wc-fund-activity-toggle" data-target="' + detailId + '" tabindex="0" role="button" aria-expanded="false">' +
+          "<td>" + (deptHref ? '<a class="wc-department-row-link" href="' + escapeHtml(deptHref) + '">' + deptLabel + "</a>" : deptLabel) +
+          '<span class="wc-fund-activity-chevron" aria-hidden="true"></span></td>' +
+          '<td class="wc-num">' + formatCurrency(prior) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(proposed) + "</td>" +
+          '<td class="wc-num">' + formatCurrency(change) + "</td>" +
+          '<td class="wc-num">' + (pct >= 0 ? "+" : "") + (pct * 100).toFixed(1) + "%</td>" +
+          "</tr>" +
+          '<tr class="wc-fund-activity-detail-row" id="' + detailId + '" hidden><td colspan="5">' + detailTable + "</td></tr>"
+        );
+      });
+
+      const totalChange = totalProposed - totalPrior;
+      const totalPct = totalPrior !== 0 ? totalChange / totalPrior : 0;
+      bodyRows.push(
+        '<tr class="wc-table-total-row"><td>Total</td>' +
+        '<td class="wc-num">' + formatCurrency(totalPrior) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(totalProposed) + "</td>" +
+        '<td class="wc-num">' + formatCurrency(totalChange) + "</td>" +
+        '<td class="wc-num">' + (totalPct >= 0 ? "+" : "") + (totalPct * 100).toFixed(1) + "%</td>" +
+        "</tr>"
+      );
+
+      mountOrHide(
+        tableEl,
+        '<table class="wc-data-table">' +
+        "<thead><tr><th>Department</th>" +
+        '<th class="wc-num">FY 2026 Budget</th>' +
+        '<th class="wc-num">FY 2027 Budget</th>' +
+        '<th class="wc-num">Change</th>' +
+        '<th class="wc-num">% Change</th>' +
+        "</tr></thead>" +
+        "<tbody>" + bodyRows.join("") + "</tbody>" +
+        "</table>"
+      );
+    }
+
+    // Department and Fund are mutually exclusive -- picking one clears
+    // whatever was selected in the other, rather than combining both as an
+    // AND filter.
+    const deptCombo = setupFilterCombo({
+      input: container.querySelector("#wcBudgetChangeDeptInput"),
+      results: container.querySelector("#wcBudgetChangeDeptResults"),
+      options: departments,
+      getCurrentValue: () => selectedDept,
+      onSelect: (value) => {
+        selectedDept = value;
+        if (value) {
+          selectedFund = "";
+          fundCombo.setValue("");
+        }
+        showFiltered();
+      }
+    });
+    const fundCombo = setupFilterCombo({
+      input: container.querySelector("#wcBudgetChangeFundInput"),
+      results: container.querySelector("#wcBudgetChangeFundResults"),
+      options: funds,
+      getCurrentValue: () => selectedFund,
+      onSelect: (value) => {
+        selectedFund = value;
+        if (value) {
+          selectedDept = "";
+          deptCombo.setValue("");
+        }
+        showFiltered();
+      }
+    });
+    showFiltered();
+  }
+
+  function initConsolidatedBudgetChangesPage() {
+    const container = document.getElementById("consolidated-budget-changes-table");
+    if (!container) return;
+
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
+
+    loadBudgetData()
+      .then((data) => {
+        if (Object.keys(data.errors || {}).length >= data.datasetCount) {
+          container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+          return;
+        }
+        renderConsolidatedBudgetChangesTable(container);
+      })
+      .catch((err) => {
+        console.error("WCBudgetData: failed to load consolidated budget changes and adjustments", err);
+        container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+      });
+  }
+
   // A few of this table's rows are named after their underlying fund
   // (e.g. a row falling back to "Sheriff Fund" instead of a real
   // department) even though a differently-named row for the actual
@@ -10532,29 +10843,108 @@
       });
   }
 
+  // Type-to-filter combobox: a plain text input with a contained,
+  // scrollable results list, used in place of a native <select> for
+  // Department/Fund (and similar) filters across the site. A native
+  // <select>'s own long options popup (Department alone runs to ~70
+  // entries) can let scrolling through it bleed into scrolling the page
+  // behind it on some browsers/trackpads -- this avoids that native popup
+  // entirely.
+  function filterComboFieldHtml(config) {
+    const allLabel = config.allLabel || "All";
+    const initialLabel = config.initialLabel || allLabel;
+    return (
+      '<div class="wc-filter-combo">' +
+      '<label class="wc-filter-field"><span>' + escapeHtml(config.label) + "</span>" +
+      '<input type="text" class="wc-filter-combo-input" id="' + config.idPrefix + 'Input" autocomplete="off" placeholder="' +
+      escapeHtml(allLabel) + '" value="' + escapeHtml(initialLabel) + '">' +
+      "</label>" +
+      '<div class="wc-filter-combo-results" id="' + config.idPrefix + 'Results" hidden></div>' +
+      "</div>"
+    );
+  }
+
+  // Pair with filterComboFieldHtml -- config: { input, results, options,
+  // allValue = "", allLabel = "All", labelForValue?, getCurrentValue,
+  // onSelect }. Returns { setValue(value) } so callers that programmatically
+  // change the filter (reset buttons, callout chips, a mutually-exclusive
+  // sibling filter, a URL-driven initial value) can keep the input's
+  // displayed text in sync without re-triggering onSelect.
+  function setupFilterCombo(config) {
+    const allValue = config.allValue || "";
+    const allLabel = config.allLabel || "All";
+    function labelForValue(value) {
+      if (config.labelForValue) return config.labelForValue(value);
+      return value === allValue ? allLabel : value;
+    }
+    function optionsMatching(query) {
+      const q = query.trim().toLowerCase();
+      return q ? config.options.filter((o) => o.toLowerCase().includes(q)) : config.options;
+    }
+    function renderResults(query) {
+      const matches = optionsMatching(query);
+      config.results.innerHTML =
+        '<button type="button" class="wc-filter-combo-option" data-value="' + escapeHtml(allValue) + '">' + escapeHtml(allLabel) + "</button>" +
+        matches.map((o) => '<button type="button" class="wc-filter-combo-option" data-value="' + escapeHtml(o) + '">' + escapeHtml(o) + "</button>").join("");
+      config.results.hidden = false;
+    }
+    config.input.addEventListener("focus", () => {
+      config.input.select();
+      renderResults("");
+    });
+    config.input.addEventListener("input", () => {
+      renderResults(config.input.value);
+    });
+    config.input.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        config.results.hidden = true;
+        config.input.blur();
+      }
+    });
+    config.results.addEventListener("click", (event) => {
+      const button = event.target.closest(".wc-filter-combo-option");
+      if (!button) return;
+      const value = button.dataset.value;
+      config.input.value = labelForValue(value);
+      config.results.hidden = true;
+      config.onSelect(value);
+    });
+    document.addEventListener("click", (event) => {
+      if (config.input.contains(event.target) || config.results.contains(event.target)) return;
+      config.results.hidden = true;
+      config.input.value = labelForValue(config.getCurrentValue());
+    });
+    return {
+      setValue(value) {
+        config.input.value = labelForValue(value);
+        config.results.hidden = true;
+      }
+    };
+  }
+
   // ---- financial summary pages (Summary of Expenses / Summary of Revenues) ----
 
   function renderFilterControls(container, fields, state, onChange) {
     if (!container) return;
-    const selects = fields
-      .map(
-        (f) =>
-          '<label class="wc-filter-field"><span>' + escapeHtml(f.label) + "</span>" +
-          '<select data-filter-key="' + escapeHtml(f.key) + '"><option value="">All</option>' +
-          f.options.map((o) => '<option value="' + escapeHtml(o) + '">' + escapeHtml(o) + "</option>").join("") +
-          "</select></label>"
-      )
+    const combos = fields
+      .map((f) => filterComboFieldHtml({ idPrefix: "wcFinancialFilter" + f.key, label: f.label, options: f.options }))
       .join("");
 
     container.innerHTML =
-      selects +
+      combos +
       '<label class="wc-filter-field wc-filter-search"><span>Search</span>' +
       '<input type="search" data-filter-key="search" placeholder="Search by name or code" /></label>';
 
-    container.querySelectorAll("select[data-filter-key]").forEach((sel) => {
-      sel.addEventListener("change", () => {
-        state[sel.dataset.filterKey] = sel.value;
-        onChange();
+    fields.forEach((f) => {
+      setupFilterCombo({
+        input: container.querySelector("#wcFinancialFilter" + f.key + "Input"),
+        results: container.querySelector("#wcFinancialFilter" + f.key + "Results"),
+        options: f.options,
+        getCurrentValue: () => state[f.key],
+        onSelect: (value) => {
+          state[f.key] = value;
+          onChange();
+        }
       });
     });
     const searchInput = container.querySelector('input[data-filter-key="search"]');
@@ -10643,38 +11033,47 @@
     }
 
     const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
+    const types = uniqueSorted(rows.map((r) => r.ME_Type));
 
     container.innerHTML =
       '<div class="wc-filter-bar wc-machinery-picker">' +
-      '<label class="wc-filter-field"><span>Department</span>' +
-      '<select id="wcMachineryDeptSelect"><option value="">All</option>' +
-      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
-      "</select></label>" +
+      filterComboFieldHtml({ idPrefix: "wcMachineryDept", label: "Department", options: departments }) +
+      filterComboFieldHtml({ idPrefix: "wcMachineryType", label: "Type", options: types }) +
       "</div>" +
       '<div class="wc-financial-summary-table"></div>';
 
-    const select = container.querySelector("#wcMachineryDeptSelect");
     const tableEl = container.querySelector(".wc-financial-summary-table");
+    let selectedDept = "";
+    let selectedType = "";
 
-    function showDepartment(deptName) {
-      const items = deptName
-        ? rows.filter((r) => r.Dept_Name === deptName)
-        : rows.slice().sort((a, b) => String(a.Dept_Name || "").localeCompare(String(b.Dept_Name || "")));
+    function showFiltered() {
+      const deptName = selectedDept;
+      const typeName = selectedType;
+      const items = rows
+        .filter((r) => (!deptName || r.Dept_Name === deptName) && (!typeName || r.ME_Type === typeName))
+        .slice()
+        .sort((a, b) => String(a.Dept_Name || "").localeCompare(String(b.Dept_Name || "")));
       const total = items.reduce((s, r) => s + (r.Amount || 0), 0);
       const showDeptColumn = !deptName;
 
       const bodyRows = items.map((r) =>
         "<tr>" +
         (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
-        "<td>" + escapeHtml(r.Item_Description || "") + '</td><td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
+        "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
+        "<td>" + escapeHtml(r.ME_Type || "") + "</td>" +
+        '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
       );
       bodyRows.push(
-        '<tr class="wc-table-total-row"><td' + (showDeptColumn ? ' colspan="2"' : "") + ">Total</td><td class=\"wc-num\">" + formatCurrency(total) + "</td></tr>"
+        '<tr class="wc-table-total-row"><td' + (showDeptColumn ? ' colspan="3"' : ' colspan="2"') + ">Total</td><td class=\"wc-num\">" + formatCurrency(total) + "</td></tr>"
       );
 
-      const columns = showDeptColumn
-        ? [{ label: "Department" }, { label: "Item Description" }, { label: "Amount", num: true }]
-        : [{ label: "Item Description" }, { label: "Amount", num: true }];
+      const columns = (showDeptColumn ? [{ label: "Department" }] : [])
+        .concat([{ label: "Item Description" }, { label: "Type" }, { label: "Amount", num: true }]);
+
+      if (!items.length) {
+        mountOrHide(tableEl, '<div class="wc-data-empty">No rows match the current filters.</div>');
+        return;
+      }
 
       mountOrHide(
         tableEl,
@@ -10686,8 +11085,27 @@
       );
     }
 
-    select.addEventListener("change", () => showDepartment(select.value));
-    showDepartment("");
+    setupFilterCombo({
+      input: container.querySelector("#wcMachineryDeptInput"),
+      results: container.querySelector("#wcMachineryDeptResults"),
+      options: departments,
+      getCurrentValue: () => selectedDept,
+      onSelect: (value) => {
+        selectedDept = value;
+        showFiltered();
+      }
+    });
+    setupFilterCombo({
+      input: container.querySelector("#wcMachineryTypeInput"),
+      results: container.querySelector("#wcMachineryTypeResults"),
+      options: types,
+      getCurrentValue: () => selectedType,
+      onSelect: (value) => {
+        selectedType = value;
+        showFiltered();
+      }
+    });
+    showFiltered();
   }
 
   function initMachinerySummaryPage() {
@@ -10726,20 +11144,22 @@
 
     container.innerHTML =
       '<div class="wc-filter-bar wc-machinery-picker">' +
-      '<label class="wc-filter-field"><span>Department</span>' +
-      '<select id="wcContractualServicesDeptSelect">' +
-      '<option value="" selected disabled>Select a department&hellip;</option>' +
-      '<option value="' + ALL_DEPARTMENTS_VALUE + '">All Departments</option>' +
-      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
-      "</select></label>" +
+      filterComboFieldHtml({
+        idPrefix: "wcContractualServicesDept",
+        label: "Department",
+        options: departments,
+        allValue: ALL_DEPARTMENTS_VALUE,
+        allLabel: "All Departments",
+        initialLabel: "Select a department…"
+      }) +
       "</div>" +
       '<div class="wc-financial-summary-table"></div>';
 
-    const deptSelect = container.querySelector("#wcContractualServicesDeptSelect");
     const tableEl = container.querySelector(".wc-financial-summary-table");
+    let selectedDept = "";
 
     function showFiltered() {
-      const selected = deptSelect.value;
+      const selected = selectedDept;
       if (!selected) {
         tableEl.hidden = false;
         tableEl.innerHTML = '<div class="wc-data-empty">Select a department above to view the schedule.</div>';
@@ -10819,7 +11239,19 @@
       }
     }
 
-    deptSelect.addEventListener("change", showFiltered);
+    setupFilterCombo({
+      input: container.querySelector("#wcContractualServicesDeptInput"),
+      results: container.querySelector("#wcContractualServicesDeptResults"),
+      options: departments,
+      allValue: ALL_DEPARTMENTS_VALUE,
+      allLabel: "All Departments",
+      labelForValue: (v) => (v === ALL_DEPARTMENTS_VALUE ? "All Departments" : v || "Select a department…"),
+      getCurrentValue: () => selectedDept,
+      onSelect: (value) => {
+        selectedDept = value;
+        showFiltered();
+      }
+    });
     showFiltered();
   }
 
@@ -11124,30 +11556,24 @@
     container.innerHTML =
       renderPersonnelFundCallouts(rows) +
       '<div class="wc-filter-bar wc-machinery-picker">' +
-      '<label class="wc-filter-field"><span>Department</span>' +
-      '<select id="wcPersonnelDeptSelect"><option value="">All</option>' +
-      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
-      "</select></label>" +
-      '<label class="wc-filter-field"><span>Fund</span>' +
-      '<select id="wcPersonnelFundSelect"><option value="">All</option>' +
-      fundFilterNames.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
-      "</select></label>" +
+      filterComboFieldHtml({ idPrefix: "wcPersonnelDept", label: "Department", options: departments }) +
+      filterComboFieldHtml({ idPrefix: "wcPersonnelFund", label: "Fund", options: fundFilterNames }) +
       '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelSortToggle" aria-pressed="false">Sort: Largest to Smallest</button>' +
       '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelResetFilters">Reset</button>' +
       "</div>" +
       '<p class="wc-personnel-table-hint">Click on a department name to view individual position detail.</p>' +
       '<div class="wc-financial-summary-table"></div>';
 
-    const deptSelect = container.querySelector("#wcPersonnelDeptSelect");
-    const fundSelect = container.querySelector("#wcPersonnelFundSelect");
     const sortToggle = container.querySelector("#wcPersonnelSortToggle");
     const resetButton = container.querySelector("#wcPersonnelResetFilters");
     const tableEl = container.querySelector(".wc-financial-summary-table");
     let sortByFte = false;
+    let selectedDept = "";
+    let selectedFund = "";
 
     function applyFilters() {
-      const deptName = deptSelect.value;
-      const fundName = fundSelect.value;
+      const deptName = selectedDept;
+      const fundName = selectedFund;
       const filtered = rows.filter((r) =>
         (!deptName || r.Dept_Name === deptName) && (!fundName || personnelFundFilterLabelForRow(r) === fundName)
       );
@@ -11222,41 +11648,67 @@
       mountOrHide(notesContainer, buildPersonnelSummaryFteNotes(filtered));
     }
 
-    deptSelect.addEventListener("change", () => {
-      if (deptSelect.value) fundSelect.value = "";
-      applyFilters();
+    const calloutButtons = container.querySelectorAll("[data-personnel-fund-filter]");
+    function syncActiveCallout() {
+      calloutButtons.forEach((button) => {
+        button.classList.toggle("is-active", !selectedDept && button.dataset.personnelFundFilter === selectedFund);
+      });
+    }
+
+    const deptCombo = setupFilterCombo({
+      input: container.querySelector("#wcPersonnelDeptInput"),
+      results: container.querySelector("#wcPersonnelDeptResults"),
+      options: departments,
+      getCurrentValue: () => selectedDept,
+      onSelect: (value) => {
+        selectedDept = value;
+        if (value) {
+          selectedFund = "";
+          fundCombo.setValue("");
+        }
+        applyFilters();
+        syncActiveCallout();
+      }
     });
-    fundSelect.addEventListener("change", () => {
-      if (fundSelect.value) deptSelect.value = "";
-      applyFilters();
+    const fundCombo = setupFilterCombo({
+      input: container.querySelector("#wcPersonnelFundInput"),
+      results: container.querySelector("#wcPersonnelFundResults"),
+      options: fundFilterNames,
+      getCurrentValue: () => selectedFund,
+      onSelect: (value) => {
+        selectedFund = value;
+        if (value) {
+          selectedDept = "";
+          deptCombo.setValue("");
+        }
+        applyFilters();
+        syncActiveCallout();
+      }
     });
+
     sortToggle.addEventListener("click", () => {
       sortByFte = !sortByFte;
       sortToggle.textContent = sortByFte ? "Sort: A to Z" : "Sort: Largest to Smallest";
       sortToggle.setAttribute("aria-pressed", String(sortByFte));
       applyFilters();
     });
-    const calloutButtons = container.querySelectorAll("[data-personnel-fund-filter]");
-    function syncActiveCallout() {
-      calloutButtons.forEach((button) => {
-        button.classList.toggle("is-active", !deptSelect.value && button.dataset.personnelFundFilter === fundSelect.value);
-      });
-    }
-    fundSelect.addEventListener("change", syncActiveCallout);
-    deptSelect.addEventListener("change", syncActiveCallout);
     calloutButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        const isActive = !deptSelect.value && fundSelect.value === button.dataset.personnelFundFilter;
-        deptSelect.value = "";
-        fundSelect.value = isActive ? "" : button.dataset.personnelFundFilter;
+        const isActive = !selectedDept && selectedFund === button.dataset.personnelFundFilter;
+        selectedDept = "";
+        deptCombo.setValue("");
+        selectedFund = isActive ? "" : button.dataset.personnelFundFilter;
+        fundCombo.setValue(selectedFund);
         applyFilters();
         syncActiveCallout();
         tableEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
       });
     });
     resetButton.addEventListener("click", () => {
-      deptSelect.value = "";
-      fundSelect.value = "";
+      selectedDept = "";
+      deptCombo.setValue("");
+      selectedFund = "";
+      fundCombo.setValue("");
       applyFilters();
       syncActiveCallout();
     });
@@ -11271,11 +11723,13 @@
       requestedFund = "";
     }
     if (requestedFund && fundFilterNames.includes(requestedFund)) {
-      fundSelect.value = requestedFund;
+      selectedFund = requestedFund;
+      fundCombo.setValue(requestedFund);
     } else if (requestedFund) {
       const requestedCallout = getPersonnelFundCallouts(rows).find((c) => c.label === requestedFund);
       if (requestedCallout && fundFilterNames.includes(requestedCallout.filterLabel)) {
-        fundSelect.value = requestedCallout.filterLabel;
+        selectedFund = requestedCallout.filterLabel;
+        fundCombo.setValue(requestedCallout.filterLabel);
       }
     }
 
@@ -12282,22 +12736,16 @@
 
     container.innerHTML =
       '<div class="wc-filter-bar wc-machinery-picker">' +
-      '<label class="wc-filter-field"><span>Department</span>' +
-      '<select id="wcPersonnelCostDeptSelect"><option value="">All</option>' +
-      departments.map((d) => '<option value="' + escapeHtml(d) + '">' + escapeHtml(d) + "</option>").join("") +
-      "</select></label>" +
-      '<label class="wc-filter-field"><span>Fund</span>' +
-      '<select id="wcPersonnelCostFundSelect"><option value="">All</option>' +
-      funds.map((f) => '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + "</option>").join("") +
-      "</select></label>" +
+      filterComboFieldHtml({ idPrefix: "wcPersonnelCostDept", label: "Department", options: departments }) +
+      filterComboFieldHtml({ idPrefix: "wcPersonnelCostFund", label: "Fund", options: funds }) +
       '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelCostIncreasesToggle" aria-pressed="false">Show COLA, Health Insurance &amp; Increase</button>' +
       '<button type="button" class="wc-view-budget-lines-toggle" id="wcPersonnelCostExportAllButton">Export All Positions (CSV)</button>' +
       "</div>" +
       '<div class="wc-financial-summary-table"></div>';
 
-    const deptSelect = container.querySelector("#wcPersonnelCostDeptSelect");
-    const fundSelect = container.querySelector("#wcPersonnelCostFundSelect");
     const tableEl = container.querySelector(".wc-financial-summary-table");
+    let selectedDept = "";
+    let selectedFund = "";
     const increasesToggle = container.querySelector("#wcPersonnelCostIncreasesToggle");
     container.querySelector("#wcPersonnelCostExportAllButton").addEventListener("click", () => {
       // Flattened and sorted by Position ID -- i.e. the position-cost
@@ -12326,8 +12774,8 @@
     });
 
     function showFiltered() {
-      const deptName = deptSelect.value;
-      const fundName = fundSelect.value;
+      const deptName = selectedDept;
+      const fundName = selectedFund;
       const items = rows.filter((r) =>
         (!deptName || r.Dept_Name === deptName) && (!fundName || r.Fund_Name === fundName)
       );
@@ -12443,8 +12891,37 @@
       );
     }
 
-    deptSelect.addEventListener("change", showFiltered);
-    fundSelect.addEventListener("change", showFiltered);
+    // Department and Fund are mutually exclusive -- picking one clears
+    // whatever was selected in the other, rather than combining both as an
+    // AND filter.
+    const deptCombo = setupFilterCombo({
+      input: container.querySelector("#wcPersonnelCostDeptInput"),
+      results: container.querySelector("#wcPersonnelCostDeptResults"),
+      options: departments,
+      getCurrentValue: () => selectedDept,
+      onSelect: (value) => {
+        selectedDept = value;
+        if (value) {
+          selectedFund = "";
+          fundCombo.setValue("");
+        }
+        showFiltered();
+      }
+    });
+    const fundCombo = setupFilterCombo({
+      input: container.querySelector("#wcPersonnelCostFundInput"),
+      results: container.querySelector("#wcPersonnelCostFundResults"),
+      options: funds,
+      getCurrentValue: () => selectedFund,
+      onSelect: (value) => {
+        selectedFund = value;
+        if (value) {
+          selectedDept = "";
+          deptCombo.setValue("");
+        }
+        showFiltered();
+      }
+    });
     showFiltered();
   }
 
@@ -12551,6 +13028,7 @@
     initRevenueTopicCardsPage();
     initFundFinancialSchedulesPage();
     initConsolidatedExpenseSummaryPage();
+    initConsolidatedBudgetChangesPage();
     initExpenseActivityChartsPage();
     initFinancialForecastPage();
   });

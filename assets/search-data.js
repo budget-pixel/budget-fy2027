@@ -26,6 +26,7 @@ var wcCoreBudgetPages = [
   { title:"Fund Financial Schedules", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=69efabd38621d8866c0990bc" },
   { title:"Summary of Revenues", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd901dc122f957d450" },
   { title:"Summary of Expenses", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdf2d67fd0fb063ce6" },
+  { title:"Summary of Budget Changes and Adjustments", section:"Financial Summaries", href:"summary-of-budget-changes-and-adjustments.html" },
   { title:"Summary of Interfund Transfers", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0c507ca05e715043" },
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
   { title:"Summary of Personnel Cost", section:"Financial Summaries", href:"summary-of-personnel-cost.html", darkModeOnly:true },
