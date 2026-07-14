@@ -72,35 +72,78 @@ function renderProjectTitle(project, year){
 function renderYearScheduleTable(year, label, projects, totalLabel, options){
   const total = projects.reduce((sum, project) => sum + project.year_amount_value, 0);
   const showFundingColumn = Boolean(options && options.showFundingColumn);
+  const showDistrictColumn = Boolean(options && options.showDistrictColumn);
+  const toggleHtml = (options && options.toggleHtml) || "";
 
   if(!projects.length){
     return "";
   }
 
   const yearLabel = displayYear(year);
+  const leadColumns = 1 + (showDistrictColumn ? 1 : 0) + (showFundingColumn ? 1 : 0);
+
+  const rowsHtml = [];
+  let currentDistrict = null;
+  let districtSubtotal = 0;
+
+  function flushDistrictSubtotal(){
+    if(currentDistrict === null){
+      return;
+    }
+
+    rowsHtml.push(`
+      <tr class="wc-cip-district-subtotal-row">
+        <td${leadColumns > 1 ? ` colspan="${leadColumns}"` : ""}>${escapeHtml(currentDistrict)} Subtotal</td>
+        <td class="wc-num">${money(districtSubtotal)}</td>
+      </tr>
+    `);
+  }
+
+  projects.forEach(project => {
+    if(showDistrictColumn){
+      const district = project.district || "Not specified";
+      if(district !== currentDistrict){
+        flushDistrictSubtotal();
+        currentDistrict = district;
+        districtSubtotal = 0;
+      }
+      districtSubtotal += project.year_amount_value;
+    }
+
+    rowsHtml.push(`
+      <tr>
+        <td>${renderProjectTitle(project, year)}</td>
+        ${showDistrictColumn ? `<td>${escapeHtml(project.district || "Not specified")}</td>` : ""}
+        ${showFundingColumn ? `<td>${escapeHtml(project.funding || "Not listed")}</td>` : ""}
+        <td class="wc-num">${money(project.year_amount_value)}</td>
+      </tr>
+    `);
+  });
+
+  if(showDistrictColumn){
+    flushDistrictSubtotal();
+  }
 
   return `
     <div class="wc-table-wrap wc-cip-year-table">
-      <p class="wc-table-label">${escapeHtml(yearLabel)} ${escapeHtml(label)}</p>
+      <div class="wc-cip-table-label-row">
+        <p class="wc-table-label">${escapeHtml(yearLabel)} ${escapeHtml(label)}</p>
+        ${toggleHtml}
+      </div>
       <div class="wc-data-table-scroll">
         <table class="wc-data-table">
           <thead>
             <tr>
               <th>Project</th>
+              ${showDistrictColumn ? "<th>Commissioner District</th>" : ""}
               ${showFundingColumn ? "<th>Fund</th>" : ""}
               <th class="wc-num">${escapeHtml(yearLabel)}</th>
             </tr>
           </thead>
           <tbody>
-            ${projects.map(project => `
-              <tr>
-                <td>${renderProjectTitle(project, year)}</td>
-                ${showFundingColumn ? `<td>${escapeHtml(project.funding || "Not listed")}</td>` : ""}
-                <td class="wc-num">${money(project.year_amount_value)}</td>
-              </tr>
-            `).join("")}
+            ${rowsHtml.join("")}
             <tr class="wc-table-total-row">
-              <td${showFundingColumn ? ' colspan="2"' : ""}>Total ${escapeHtml(yearLabel)} ${escapeHtml(totalLabel || label)}</td>
+              <td${leadColumns > 1 ? ` colspan="${leadColumns}"` : ""}>Total ${escapeHtml(yearLabel)} ${escapeHtml(totalLabel || label)}</td>
               <td class="wc-num">${money(total)}</td>
             </tr>
           </tbody>
@@ -218,6 +261,68 @@ function renderFundSchedule(config){
         transform:translateY(-1px);
       }
 
+      .wc-cip-table-label-row{
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px 12px;
+        margin-bottom:10px;
+      }
+
+      .wc-cip-table-label-row .wc-table-label{
+        margin:0;
+      }
+
+      .wc-cip-table-label-row .wc-cip-district-toggle{
+        margin-top:-2px;
+      }
+
+      .wc-cip-district-toggle{
+        display:inline-flex;
+        align-items:center;
+        gap:5px;
+        height:22px;
+        padding:0 10px;
+        border:1px solid rgba(0,63,40,.35);
+        border-radius:999px;
+        background:#ffffff;
+        color:#24344d;
+        font-family:Arial, Helvetica, sans-serif;
+        font-size:11px;
+        font-weight:600;
+        font-style:italic;
+        line-height:1;
+        white-space:nowrap;
+        cursor:pointer;
+        transition:background .2s ease, border-color .2s ease, color .2s ease;
+      }
+
+      .wc-cip-district-toggle:hover,
+      .wc-cip-district-toggle.is-active{
+        border-color:#003f28;
+        background:#003f28;
+        color:#ffffff;
+      }
+
+      .wc-cip-district-toggle-indicator{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:11px;
+        height:11px;
+        border:2px solid currentColor;
+        border-radius:4px;
+        font-size:9px;
+        font-weight:800;
+        line-height:1;
+      }
+
+      .wc-cip-district-subtotal-row td{
+        background:rgba(0,63,40,.06);
+        font-weight:800;
+      }
+
       .wc-cip-year-body{
         display:grid;
         gap:22px;
@@ -283,6 +388,10 @@ function renderFundSchedule(config){
         .wc-cip-year-summary{
           grid-template-columns:1fr;
         }
+
+        .wc-cip-table-label-row{
+          align-items:flex-start;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -347,13 +456,42 @@ function renderFundSchedule(config){
     let activeYear = availableYears.includes(requestedYear)
       ? requestedYear
       : availableYears[0];
+    let sortByDistrict = false;
+
+    function districtSortRank(district){
+      return String(district || "").trim().toLowerCase() === "countywide" ? 0 : 1;
+    }
+
+    function sortProjects(list){
+      const sorted = list.slice();
+
+      if(sortByDistrict){
+        sorted.sort((a, b) =>
+          districtSortRank(a.district) - districtSortRank(b.district) ||
+          String(a.district || "").localeCompare(String(b.district || ""), undefined, { numeric: true }) ||
+          b.year_amount_value - a.year_amount_value ||
+          a.title.localeCompare(b.title)
+        );
+      } else {
+        sorted.sort((a, b) => b.year_amount_value - a.year_amount_value || a.title.localeCompare(b.title));
+      }
+
+      return sorted;
+    }
 
     function renderActiveYear(){
       const data = yearData[activeYear] || yearData.FY2027;
       const yearLabel = displayYear(activeYear);
+      const tableOptions = Object.assign({}, config, { showDistrictColumn: sortByDistrict });
+      const districtToggleHtml = `
+        <button type="button" class="wc-cip-district-toggle${sortByDistrict ? " is-active" : ""}" id="wcCipDistrictToggle" aria-pressed="${sortByDistrict ? "true" : "false"}">
+          <span class="wc-cip-district-toggle-indicator" aria-hidden="true">${sortByDistrict ? "✓" : ""}</span>
+          <span>${sortByDistrict ? "District Subtotals" : "Sort by District"}</span>
+        </button>
+      `;
       const tables = [
-        renderYearScheduleTable(activeYear, config.label + " Schedule", data.projects, config.label, config),
-        renderYearScheduleTable(activeYear, "In-House Engineering Schedule", data.inHouseProjects, "In-House Engineering", config)
+        renderYearScheduleTable(activeYear, config.label + " Schedule", sortProjects(data.projects), config.label, Object.assign({}, tableOptions, { toggleHtml: districtToggleHtml })),
+        renderYearScheduleTable(activeYear, "In-House Engineering Schedule", sortProjects(data.inHouseProjects), "In-House Engineering", tableOptions)
       ].join("");
 
       mount.innerHTML = `
@@ -406,6 +544,14 @@ function renderFundSchedule(config){
           renderActiveYear();
         });
       });
+
+      const districtToggle = mount.querySelector("#wcCipDistrictToggle");
+      if(districtToggle){
+        districtToggle.addEventListener("click", () => {
+          sortByDistrict = !sortByDistrict;
+          renderActiveYear();
+        });
+      }
     }
 
     renderActiveYear();
