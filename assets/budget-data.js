@@ -2154,6 +2154,9 @@
       // "Vehicle" or "Equipment", used by the Summary of Machinery page's
       // Type filter (see buildMachineryRowsFromExpenditures).
       ME_Type: (row["M&E_type"] || "").trim(),
+      // The asset number of the existing BCC-owned item this purchase
+      // replaces -- blank when it's a new (non-replacement) purchase.
+      BCC_Replacement: (row.BCC_Replacement || "").trim(),
       FY2020_Actual: toNumber(row.FY2020_Actual),
       FY2021_Actual: toNumber(row.FY2021_Actual),
       FY2022_Actual: toNumber(row.FY2022_Actual),
@@ -2272,7 +2275,8 @@
         Dept_Name: row.Dept_Name || "",
         Item_Description: row.Note || row.Project_Name || row.Object_Name || "Machinery & Equipment",
         Amount: row.FY2027_Proposed || 0,
-        ME_Type: row.ME_Type || ""
+        ME_Type: row.ME_Type || "",
+        BCC_Replacement: row.BCC_Replacement || ""
       }))
       .filter((row) => row.Amount !== 0);
   }
@@ -8213,6 +8217,10 @@
     const tableEl = container.querySelector(".wc-financial-summary-table");
     let selectedDept = "";
     let selectedFund = "";
+    // null = default department-group order; once the % Change header is
+    // clicked, toggles highest-to-lowest / lowest-to-highest on every
+    // subsequent click.
+    let pctSortDirection = null;
 
     // Each department+category combination (e.g. "Sheriff's Office" /
     // "Personnel") is grouped separately so a department with both a
@@ -8291,16 +8299,26 @@
         if (!byDept.has(entry.dept)) byDept.set(entry.dept, []);
         byDept.get(entry.dept).push(entry);
       });
-      const depts = Array.from(byDept.keys()).sort((a, b) =>
-        departmentGroupOrder(a) - departmentGroupOrder(b) || a.localeCompare(b)
-      );
-
-      const bodyRows = depts.map((dept) => {
+      const deptSummaries = Array.from(byDept.keys()).map((dept) => {
         const deptEntries = byDept.get(dept).sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category]);
         const prior = deptEntries.reduce((s, e) => s + e.prior, 0);
         const proposed = deptEntries.reduce((s, e) => s + e.proposed, 0);
         const change = proposed - prior;
         const pct = prior !== 0 ? change / prior : 0;
+        return { dept, deptEntries, prior, proposed, change, pct };
+      });
+      if (pctSortDirection === "desc") {
+        deptSummaries.sort((a, b) => b.pct - a.pct);
+      } else if (pctSortDirection === "asc") {
+        deptSummaries.sort((a, b) => a.pct - b.pct);
+      } else {
+        deptSummaries.sort((a, b) =>
+          departmentGroupOrder(a.dept) - departmentGroupOrder(b.dept) || a.dept.localeCompare(b.dept)
+        );
+      }
+
+      const bodyRows = deptSummaries.map((summary) => {
+        const { dept, deptEntries, prior, proposed, change, pct } = summary;
         const deptHref = departmentPageHref(dept);
         const deptLabel = escapeHtml(dept);
 
@@ -8352,6 +8370,7 @@
         "</tr>"
       );
 
+      const pctArrow = pctSortDirection === "asc" ? " ▲" : pctSortDirection === "desc" ? " ▼" : "";
       mountOrHide(
         tableEl,
         '<table class="wc-data-table">' +
@@ -8359,12 +8378,18 @@
         '<th class="wc-num">FY 2026 Budget</th>' +
         '<th class="wc-num">FY 2027 Budget</th>' +
         '<th class="wc-num">Change</th>' +
-        '<th class="wc-num">% Change</th>' +
+        '<th class="wc-num"><button type="button" class="wc-sortable-column-header" data-budget-change-pct-sort aria-label="Sort by percent change">% Change' + pctArrow + "</button></th>" +
         "</tr></thead>" +
         "<tbody>" + bodyRows.join("") + "</tbody>" +
         "</table>"
       );
     }
+
+    tableEl.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-budget-change-pct-sort]")) return;
+      pctSortDirection = pctSortDirection === "desc" ? "asc" : "desc";
+      showFiltered();
+    });
 
     // Department and Fund are mutually exclusive -- picking one clears
     // whatever was selected in the other, rather than combining both as an
@@ -11061,14 +11086,15 @@
         (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
         "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
         "<td>" + escapeHtml(r.ME_Type || "") + "</td>" +
+        "<td>" + escapeHtml(r.BCC_Replacement || "—") + "</td>" +
         '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
       );
       bodyRows.push(
-        '<tr class="wc-table-total-row"><td' + (showDeptColumn ? ' colspan="3"' : ' colspan="2"') + ">Total</td><td class=\"wc-num\">" + formatCurrency(total) + "</td></tr>"
+        '<tr class="wc-table-total-row"><td' + (showDeptColumn ? ' colspan="4"' : ' colspan="3"') + ">Total</td><td class=\"wc-num\">" + formatCurrency(total) + "</td></tr>"
       );
 
       const columns = (showDeptColumn ? [{ label: "Department" }] : [])
-        .concat([{ label: "Item Description" }, { label: "Type" }, { label: "Amount", num: true }]);
+        .concat([{ label: "Item Description" }, { label: "Type" }, { label: "BCC Replacement #" }, { label: "Amount", num: true }]);
 
       if (!items.length) {
         mountOrHide(tableEl, '<div class="wc-data-empty">No rows match the current filters.</div>');
