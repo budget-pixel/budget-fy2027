@@ -14,7 +14,8 @@
     activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv",
     fundBalances: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=78843155&single=true&output=csv",
     personnelPositionCosts: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1934273460&single=true&output=csv",
-    personnelCostFormulaInputs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1205082856&single=true&output=csv"
+    personnelCostFormulaInputs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1205082856&single=true&output=csv",
+    machineryUnfunded: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=708613103&single=true&output=csv"
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
@@ -350,6 +351,7 @@
     staffing: [],
     performanceMeasures: [],
     machinery: [],
+    machineryUnfunded: [],
     departmentNarratives: [],
     funds: [],
     activities: [],
@@ -2281,6 +2283,23 @@
       .filter((row) => row.Amount !== 0);
   }
 
+  // Machinery, vehicles & equipment that departments requested but that
+  // isn't included/funded in the FY2027 Proposed budget -- a separate
+  // small sheet (not part of cache.expenditures) with the same shape as
+  // the funded machinery rows above, shown as its own section on the
+  // Summary of Machinery page so an unfunded request isn't mistaken for a
+  // funded one.
+  function normalizeMachineryUnfundedRow(row) {
+    return {
+      Dept_Code: (row.Dept_Code || "").trim(),
+      Dept_Name: (row.Dept_Name || "").trim(),
+      Item_Description: (row.Note || "").trim() || "Machinery & Equipment",
+      Amount: toNumber(row.FY2027_Proposed),
+      ME_Type: (row["M&E_type"] || "").trim(),
+      BCC_Replacement: (row.BCC_Replacement || "").trim()
+    };
+  }
+
   // Departments/rows excluded from this summary at the requester's
   // direction -- Court Technology and Medical Examiner (court-related,
   // shown on their own pages), Housing & Urban Development (its own
@@ -3026,7 +3045,8 @@
       ["funds", DATA_SOURCES.funds, normalizeFundRow],
       ["activities", DATA_SOURCES.activities, normalizeActivityRow],
       ["fundBalances", DATA_SOURCES.fundBalances, normalizeFundBalanceRow],
-      ["personnelPositionCosts", DATA_SOURCES.personnelPositionCosts, normalizePersonnelPositionCostRow]
+      ["personnelPositionCosts", DATA_SOURCES.personnelPositionCosts, normalizePersonnelPositionCostRow],
+      ["machineryUnfunded", DATA_SOURCES.machineryUnfunded, normalizeMachineryUnfundedRow]
     ];
 
     cache.datasetCount = specs.length;
@@ -11060,14 +11080,26 @@
     const departments = uniqueSorted(rows.map((r) => r.Dept_Name));
     const types = uniqueSorted(rows.map((r) => r.ME_Type));
 
+    // Requested but not funded in the FY2027 Proposed budget -- a small,
+    // separately-maintained sheet (see normalizeMachineryUnfundedRow) with
+    // the same Department/Item/Type/BCC Replacement shape as the funded
+    // rows above, kept in its own clearly-labeled section so an unfunded
+    // request is never mistaken for a funded one.
+    const unfundedRows = cache.machineryUnfunded || [];
+
     container.innerHTML =
       '<div class="wc-filter-bar wc-machinery-picker">' +
       filterComboFieldHtml({ idPrefix: "wcMachineryDept", label: "Department", options: departments }) +
       filterComboFieldHtml({ idPrefix: "wcMachineryType", label: "Type", options: types }) +
       "</div>" +
-      '<div class="wc-financial-summary-table"></div>';
+      '<div class="wc-financial-summary-table"></div>' +
+      (unfundedRows.length
+        ? '<p class="wc-table-label wc-machinery-unfunded-label">Requested But Not Included in the Budget</p>' +
+          '<div class="wc-machinery-unfunded-table"></div>'
+        : "");
 
     const tableEl = container.querySelector(".wc-financial-summary-table");
+    const unfundedTableEl = container.querySelector(".wc-machinery-unfunded-table");
     let selectedDept = "";
     let selectedType = "";
 
@@ -11098,17 +11130,45 @@
 
       if (!items.length) {
         mountOrHide(tableEl, '<div class="wc-data-empty">No rows match the current filters.</div>');
-        return;
+      } else {
+        mountOrHide(
+          tableEl,
+          renderTable({
+            caption: deptName || "All Departments",
+            columns: columns,
+            bodyRows: bodyRows
+          })
+        );
       }
 
-      mountOrHide(
-        tableEl,
-        renderTable({
-          caption: deptName || "All Departments",
-          columns: columns,
-          bodyRows: bodyRows
-        })
+      if (!unfundedTableEl) return;
+      const unfundedItems = unfundedRows
+        .filter((r) => (!deptName || r.Dept_Name === deptName) && (!typeName || r.ME_Type === typeName))
+        .slice()
+        .sort((a, b) => String(a.Dept_Name || "").localeCompare(String(b.Dept_Name || "")));
+      const unfundedTotal = unfundedItems.reduce((s, r) => s + (r.Amount || 0), 0);
+      const unfundedBodyRows = unfundedItems.map((r) =>
+        "<tr>" +
+        (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
+        "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
+        "<td>" + escapeHtml(r.ME_Type || "") + "</td>" +
+        "<td>" + escapeHtml(r.BCC_Replacement || "—") + "</td>" +
+        '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
       );
+      if (unfundedBodyRows.length) {
+        unfundedBodyRows.push(
+          '<tr class="wc-table-total-row"><td' + (showDeptColumn ? ' colspan="4"' : ' colspan="3"') + ">Total</td><td class=\"wc-num\">" + formatCurrency(unfundedTotal) + "</td></tr>"
+        );
+        mountOrHide(
+          unfundedTableEl,
+          renderTable({
+            columns: columns,
+            bodyRows: unfundedBodyRows
+          })
+        );
+      } else {
+        mountOrHide(unfundedTableEl, '<div class="wc-data-empty">No unfunded requests match the current filters.</div>');
+      }
     }
 
     setupFilterCombo({
