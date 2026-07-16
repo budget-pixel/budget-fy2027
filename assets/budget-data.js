@@ -2159,6 +2159,10 @@
       // The asset number of the existing BCC-owned item this purchase
       // replaces -- blank when it's a new (non-replacement) purchase.
       BCC_Replacement: (row.BCC_Replacement || "").trim(),
+      // Request-specific condition/context shown on the linked asset page.
+      // Accept common header variants so the published sheet can use a
+      // human-readable label without requiring a code change.
+      Fleet_Note: (row.Fleet_Note || row["Fleet Note"] || row.Vehicle_Request_Note || row["Vehicle Request Note"] || "").trim(),
       FY2020_Actual: toNumber(row.FY2020_Actual),
       FY2021_Actual: toNumber(row.FY2021_Actual),
       FY2022_Actual: toNumber(row.FY2022_Actual),
@@ -2278,7 +2282,8 @@
         Item_Description: row.Note || row.Project_Name || row.Object_Name || "Machinery & Equipment",
         Amount: row.FY2027_Proposed || 0,
         ME_Type: row.ME_Type || "",
-        BCC_Replacement: row.BCC_Replacement || ""
+        BCC_Replacement: row.BCC_Replacement || "",
+        Fleet_Note: row.Fleet_Note || ""
       }))
       .filter((row) => row.Amount !== 0);
   }
@@ -2296,7 +2301,8 @@
       Item_Description: (row.Note || "").trim() || "Machinery & Equipment",
       Amount: toNumber(row.FY2027_Proposed),
       ME_Type: (row["M&E_type"] || "").trim(),
-      BCC_Replacement: (row.BCC_Replacement || "").trim()
+      BCC_Replacement: (row.BCC_Replacement || "").trim(),
+      Fleet_Note: (row.Fleet_Note || row["Fleet Note"] || row.Vehicle_Request_Note || row["Vehicle Request Note"] || "").trim()
     };
   }
 
@@ -8223,9 +8229,7 @@
     container.innerHTML =
       '<div class="wc-budget-lines-card">' +
       '<div class="wc-table-wrap">' +
-      '<div class="wc-table-label-row">' +
-      '<p class="wc-table-label">Summary of Budget Changes and Adjustments</p>' +
-      "</div>" +
+      '<section class="wc-budget-executive" aria-label="Budget change overview"></section>' +
       '<div class="wc-filter-bar wc-machinery-picker">' +
       filterComboFieldHtml({ idPrefix: "wcBudgetChangeDept", label: "Department", options: departments }) +
       filterComboFieldHtml({ idPrefix: "wcBudgetChangeFund", label: "Fund", options: funds }) +
@@ -8235,6 +8239,7 @@
       "</div>";
 
     const tableEl = container.querySelector(".wc-financial-summary-table");
+    const executiveEl = container.querySelector(".wc-budget-executive");
     let selectedDept = "";
     let selectedFund = "";
     // null = default department-group order; once the % Change header is
@@ -8286,6 +8291,72 @@
       return { entries, totalPrior, totalProposed };
     }
 
+    function compactCurrency(value) {
+      const amount = Math.abs(value || 0);
+      const sign = value < 0 ? "−" : "";
+      if (amount >= 1000000000) return sign + "$" + (amount / 1000000000).toFixed(amount >= 10000000000 ? 1 : 2).replace(/\.0+$/, "") + "B";
+      if (amount >= 1000000) return sign + "$" + (amount / 1000000).toFixed(amount >= 10000000 ? 1 : 2).replace(/\.0+$/, "") + "M";
+      if (amount >= 1000) return sign + "$" + Math.round(amount / 1000).toLocaleString("en-US") + "K";
+      return sign + formatCurrency(amount);
+    }
+
+    function executiveDepartmentSummaries() {
+      const rawByDept = new Map();
+      const dedupedByDept = new Map();
+      function addTo(map, source) {
+        source.forEach((row) => {
+          const dept = representativeName(row);
+          if (!map.has(dept)) map.set(dept, []);
+          map.get(dept).push(row);
+        });
+      }
+      addTo(rawByDept, rows);
+      addTo(dedupedByDept, dedupedRows);
+      return uniqueSorted(Array.from(rawByDept.keys()).concat(Array.from(dedupedByDept.keys()))).map((dept) => {
+        const raw = rawByDept.get(dept) || [];
+        const deduped = dedupedByDept.get(dept) || [];
+        const prior = columnSum(raw, deduped, "FY2026_Original_Budget");
+        const proposed = columnSum(raw, deduped, "FY2027_Proposed");
+        const change = proposed - prior;
+        const pct = prior !== 0 ? change / prior : 0;
+        return { dept, prior, proposed, change, pct };
+      });
+    }
+
+    function renderExecutiveSummary() {
+      if (!executiveEl) return;
+      const summaries = executiveDepartmentSummaries();
+      const increases = summaries.filter((item) => item.change > 0).sort((a, b) => b.change - a.change);
+      const decreases = summaries.filter((item) => item.change < 0).sort((a, b) => a.change - b.change);
+      const totalPrior = summaries.reduce((sum, item) => sum + item.prior, 0);
+      const totalProposed = summaries.reduce((sum, item) => sum + item.proposed, 0);
+      const netChange = totalProposed - totalPrior;
+      const netPct = totalPrior !== 0 ? netChange / totalPrior : 0;
+      const largestIncrease = increases[0] || null;
+      const maxAbsChange = Math.max.apply(null, summaries.map((item) => Math.abs(item.change)).concat([1]));
+      const chartItems = summaries.filter((item) => item.change !== 0).sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 10);
+
+      function kpiCard(label, value, detail, tone) {
+        return '<article class="wc-budget-kpi ' + (tone || "neutral") + '"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value) + '</strong>' + (detail ? '<small>' + escapeHtml(detail) + "</small>" : "") + "</article>";
+      }
+
+      const chartHtml = chartItems.map((item) => {
+        const width = Math.max(3, Math.abs(item.change) / maxAbsChange * 50);
+        const positive = item.change > 0;
+        return '<button type="button" class="wc-budget-diverging-row ' + (positive ? "increase" : "decrease") + '" data-budget-change-dept="' + escapeHtml(item.dept) + '" title="' + escapeHtml(formatCurrency(item.change)) + '" aria-label="Filter table to ' + escapeHtml(item.dept) + ', change ' + escapeHtml(formatCurrency(item.change)) + '">' +
+          '<span class="wc-budget-diverging-name">' + escapeHtml(item.dept) + '</span><span class="wc-budget-diverging-plot"><span class="wc-budget-diverging-axis" aria-hidden="true"></span><span class="wc-budget-diverging-bar" style="width:' + width.toFixed(2) + '%"></span></span><strong>' + escapeHtml(compactCurrency(item.change)) + "</strong></button>";
+      }).join("");
+
+      executiveEl.innerHTML =
+        '<div class="wc-budget-kpi-grid">' +
+          kpiCard("Total FY2027 proposed budget", compactCurrency(totalProposed), formatCurrency(totalProposed), "neutral") +
+          kpiCard("Net dollar change", compactCurrency(netChange), netChange >= 0 ? "Increase from FY2026" : "Reduction from FY2026", netChange >= 0 ? "increase" : "decrease") +
+          kpiCard("Net percent change", (netPct >= 0 ? "+" : "") + (netPct * 100).toFixed(1) + "%", "Countywide change", netPct >= 0 ? "increase" : "decrease") +
+          kpiCard("Largest budget increase", largestIncrease ? compactCurrency(largestIncrease.change) : "None", largestIncrease ? largestIncrease.dept : "No department increase", "increase") +
+        "</div>" +
+        '<div class="wc-budget-executive-grid"><section class="wc-budget-diverging" aria-labelledby="wcBudgetChartTitle"><div class="wc-budget-diverging-head"><div><h3 id="wcBudgetChartTitle">Largest Budget Changes</h3><p>Select a department to filter the detailed table.</p></div><div class="wc-budget-diverging-legend"><span class="decrease">Decrease</span><span class="increase">Increase</span></div></div><div class="wc-budget-diverging-chart">' + chartHtml + "</div></section></div>";
+    }
+
     function showFiltered() {
       const deptName = selectedDept;
       const fundName = selectedFund;
@@ -8319,7 +8390,7 @@
         if (!byDept.has(entry.dept)) byDept.set(entry.dept, []);
         byDept.get(entry.dept).push(entry);
       });
-      const deptSummaries = Array.from(byDept.keys()).map((dept) => {
+      let deptSummaries = Array.from(byDept.keys()).map((dept) => {
         const deptEntries = byDept.get(dept).sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category]);
         const prior = deptEntries.reduce((s, e) => s + e.prior, 0);
         const proposed = deptEntries.reduce((s, e) => s + e.proposed, 0);
@@ -8442,6 +8513,18 @@
         showFiltered();
       }
     });
+    executiveEl.addEventListener("click", (event) => {
+      const departmentButton = event.target.closest("[data-budget-change-dept]");
+      if (!departmentButton) return;
+      selectedDept = departmentButton.dataset.budgetChangeDept || "";
+      selectedFund = "";
+      deptCombo.setValue(selectedDept);
+      fundCombo.setValue("");
+      showFiltered();
+      const filterBar = container.querySelector(".wc-filter-bar");
+      if (filterBar) filterBar.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    renderExecutiveSummary();
     showFiltered();
   }
 
@@ -11103,6 +11186,23 @@
     let selectedDept = "";
     let selectedType = "";
 
+    function assetNumberHtml(row) {
+      const assetNumber = String(row.BCC_Replacement || "").trim();
+      if (!assetNumber) return "—";
+      if (!/^vehicles?$/i.test(String(row.ME_Type || "").trim())) return escapeHtml(assetNumber);
+      // The asset record page is only published for dark-mode visitors (see
+      // asset-detail.js) -- shown as plain text in light mode rather than a
+      // clickable link that just lands on a "dark mode only" message.
+      if (document.documentElement.getAttribute("data-theme") !== "dark") return escapeHtml(assetNumber);
+      const query = new URLSearchParams({
+        asset: assetNumber,
+        amount: String(row.Amount || 0),
+        replacement: String(row.Item_Description || "Replacement equipment"),
+        fleetNote: String(row.Fleet_Note || "")
+      });
+      return '<a class="wc-asset-record-link" href="asset-detail.html?' + query.toString() + '" aria-label="View equipment record and cost-benefit analysis for BCC asset ' + escapeHtml(assetNumber) + '">' + escapeHtml(assetNumber) + '<span aria-hidden="true"> →</span></a>';
+    }
+
     function showFiltered() {
       const deptName = selectedDept;
       const typeName = selectedType;
@@ -11118,7 +11218,7 @@
         (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
         "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
         "<td>" + escapeHtml(r.ME_Type || "") + "</td>" +
-        "<td>" + escapeHtml(r.BCC_Replacement || "—") + "</td>" +
+        "<td>" + assetNumberHtml(r) + "</td>" +
         '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
       );
       bodyRows.push(
@@ -11152,7 +11252,7 @@
         (showDeptColumn ? "<td>" + escapeHtml(r.Dept_Name || "") + "</td>" : "") +
         "<td>" + escapeHtml(r.Item_Description || "") + "</td>" +
         "<td>" + escapeHtml(r.ME_Type || "") + "</td>" +
-        "<td>" + escapeHtml(r.BCC_Replacement || "—") + "</td>" +
+        "<td>" + assetNumberHtml(r) + "</td>" +
         '<td class="wc-num">' + formatCurrency(r.Amount || 0) + "</td></tr>"
       );
       if (unfundedBodyRows.length) {
