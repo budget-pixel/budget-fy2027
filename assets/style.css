@@ -2033,6 +2033,8 @@ a:where(:visited) {
 .wc-data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .85rem; }
 .wc-data-table th, .wc-data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: normal; }
 .wc-data-table th.wc-num, .wc-data-table td.wc-num { text-align: right; font-variant-numeric: tabular-nums; }
+.wc-data-table td.wc-num.is-increase { color: var(--green); font-weight: 700; }
+.wc-data-table td.wc-num.is-decrease { color: #a33a32; font-weight: 700; }
 /* Forecast Assumptions detail table: a year excluded from a line's
    Historical CAGR basis (see historicalCagrExcludedYears) reads as
    de-emphasized rather than a normal actual, without hiding the figure. */

@@ -11803,6 +11803,16 @@
       // same budget-detail modal used for "View Budget Lines" elsewhere
       // (see openBudgetDetailModal) with that department's own position
       // list instead of leaving users stuck at the department-level total.
+      // FY 2026 -> FY 2027 change, the two years this budget actually
+      // compares -- signed so a department that grew and one that shrank
+      // are visually distinct at a glance, without opening its detail row.
+      function fteChangeCell(before, after) {
+        const delta = after - before;
+        const sign = delta > 0 ? "+" : delta < 0 ? "−" : "";
+        const tone = delta > 0 ? "is-increase" : delta < 0 ? "is-decrease" : "";
+        return '<td class="wc-num ' + tone + '">' + sign + formatNumber(Math.abs(delta)) + "</td>";
+      }
+
       const detailMarkup = [];
       const bodyRows = deptsInView.map((d) => {
         const t = totalsByDept.get(d);
@@ -11814,12 +11824,14 @@
           escapeHtml(d) + "</button>" +
           "</td>" +
           years.map((y) => '<td class="wc-num">' + formatNumber(t[y]) + "</td>").join("") +
+          fteChangeCell(t[2026], t[2027]) +
           "</tr>"
         );
       });
       bodyRows.push(
         '<tr class="wc-table-total-row"><td>Total FTE</td>' +
         years.map((y) => '<td class="wc-num">' + formatNumber(grand[y]) + "</td>").join("") +
+        fteChangeCell(grand[2026], grand[2027]) +
         "</tr>"
       );
 
@@ -11827,7 +11839,7 @@
         tableEl,
         renderTable({
           caption: fundName || "All Departments",
-          columns: [{ label: "Department" }].concat(years.map((y) => ({ label: "FY " + y, num: true }))),
+          columns: [{ label: "Department" }].concat(years.map((y) => ({ label: "FY " + y, num: true }))).concat([{ label: "+/-", num: true }]),
           bodyRows: bodyRows
         }) + detailMarkup.join("")
       );
