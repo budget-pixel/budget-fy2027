@@ -481,27 +481,36 @@
       });
     }
 
+    function getSearchableLinks(){
+      var isDarkMode = document.documentElement.getAttribute("data-theme") === "dark";
+      return links.filter(function(item){
+        return isDarkMode || !item.darkModeOnly;
+      });
+    }
+
     function findBestSearchMatch(query){
       var normalizedQuery = normalizeSearchText(query);
       if(!normalizedQuery){
         return null;
       }
 
-      var exactMatch = links.find(function(item){
+      var searchableLinks = getSearchableLinks();
+
+      var exactMatch = searchableLinks.find(function(item){
         return normalizeSearchText(item.title) === normalizedQuery;
       });
       if(exactMatch){
         return exactMatch;
       }
 
-      var titleMatch = links.find(function(item){
+      var titleMatch = searchableLinks.find(function(item){
         return normalizeSearchText(item.title).indexOf(normalizedQuery) !== -1;
       });
       if(titleMatch){
         return titleMatch;
       }
 
-      return links.find(function(item){
+      return searchableLinks.find(function(item){
         return item.searchText.indexOf(normalizedQuery) !== -1;
       }) || null;
     }
@@ -512,8 +521,10 @@
       activeResultIndex = -1;
       renderRecentSearches();
 
+      var searchableLinks = getSearchableLinks();
+
       if(!normalizedQuery){
-        var defaultLinks = links.filter(function(item){
+        var defaultLinks = searchableLinks.filter(function(item){
           return groupLabelFor(item.section) !== "Departments";
         }).slice(0, 3);
         renderGroupedResults(defaultLinks, normalizedQuery);
@@ -521,7 +532,7 @@
         return;
       }
 
-      var matches = links.filter(function(item){
+      var matches = searchableLinks.filter(function(item){
         return item.searchText.indexOf(normalizedQuery) !== -1;
       }).map(function(item, index){
         var titleNormalized = item.title.toLowerCase();
