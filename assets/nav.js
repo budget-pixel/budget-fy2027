@@ -936,10 +936,10 @@
     outline:0 !important;
     transition:color .2s ease, border-color .2s ease !important;
   }
-  /* Summary of Personnel Cost / Summary of Contractual Services are
-     temporarily unpublished -- their search result rows only show up when
-     the site is in dark mode (see search.js's darkModeOnly handling and
-     financials.html's own dark-mode-only cards). */
+  /* Summary of Contractual Services is temporarily unpublished -- its
+     search result row only shows up when the site is in dark mode (see
+     search.js's darkModeOnly handling and financials.html's own
+     dark-mode-only cards). */
   nav#nav-menu .wc-nav-search-result.wc-dark-mode-only-result{
     display:none !important;
   }

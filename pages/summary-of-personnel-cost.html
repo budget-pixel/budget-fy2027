@@ -49,6 +49,21 @@
   :root[data-theme="dark"] #wcPersonnelCostExportAllButton{
     display:inline-block;
   }
+  /* The per-department "View Budget Lines" popup (see the click-guard
+     script below) is dark-mode only. In light mode the department name
+     should just read as plain text -- no pointer cursor, no hover
+     underline, no trailing arrow glyph -- so it doesn't look clickable
+     when it isn't. */
+  :root:not([data-theme="dark"]) #personnel-cost-summary .wc-view-budget-lines-toggle.wc-table-row-link{
+    cursor:default;
+    pointer-events:none;
+  }
+  :root:not([data-theme="dark"]) #personnel-cost-summary .wc-view-budget-lines-toggle.wc-table-row-link:hover{
+    text-decoration:none;
+  }
+  :root:not([data-theme="dark"]) #personnel-cost-summary .wc-view-budget-lines-toggle.wc-table-row-link::after{
+    content:none;
+  }
 </style>
 
 <div id="personnel-cost-summary"></div>
@@ -57,6 +72,28 @@
 
 <!-- nav.js will inject footer[role="contentinfo"] here -->
 
+<script>
+/* The per-department "View Budget Lines" popup is only available in dark
+   mode -- the department table itself is fine to show in light mode, but
+   drilling into a department's Cost by Position breakdown should stay
+   gated until dark mode ships it for real. Captured (not bubbled) so this
+   runs -- and can stop propagation -- before budget-data.js's own
+   document-level delegated click listener opens the modal. Checked at
+   click time (not just at page load) since the theme toggle doesn't
+   reload the page. */
+(function(){
+  var container = document.getElementById("personnel-cost-summary");
+  if(!container) return;
+  container.addEventListener("click", function(event){
+    var toggle = event.target.closest(".wc-view-budget-lines-toggle");
+    if(!toggle) return;
+    if(document.documentElement.getAttribute("data-theme") !== "dark"){
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, true);
+})();
+</script>
 <script>
 /* set wcBudgetPages before nav script runs so search is fully populated */
 window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",section:"Introduction and Overview",href:"https://budget-pixel.github.io/budget-fy2027/../pages/gfoa-distinguished-budget-presentation-award.html"},

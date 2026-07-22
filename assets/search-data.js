@@ -29,7 +29,7 @@ var wcCoreBudgetPages = [
   { title:"Summary of Budget Changes and Adjustments", section:"Financial Summaries", href:"summary-of-budget-changes-and-adjustments.html" },
   { title:"Summary of Interfund Transfers", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd0c507ca05e715043" },
   { title:"Summary of Personnel", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdacbe9432cc1ec134" },
-  { title:"Summary of Personnel Cost", section:"Financial Summaries", href:"summary-of-personnel-cost.html", darkModeOnly:true },
+  { title:"Summary of Personnel Cost", section:"Financial Summaries", href:"summary-of-personnel-cost.html" },
   { title:"Summary of Machinery, Vehicles & Equipment", section:"Financial Summaries", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdfdb1a2c2915743e4" },
   { title:"Summary of Property Tax Allocations", section:"Financial Summaries", href:"summary-of-property-tax-allocations.html" },
   { title:"Summary of Contractual Services", section:"Financial Summaries", href:"summary-of-contractual-services.html", darkModeOnly:true },
