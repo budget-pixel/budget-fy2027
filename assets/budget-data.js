@@ -338,8 +338,7 @@
     "Judgments, Fines and Forfeits": "Revenue from court judgments, fines, and forfeitures."
   };
 
-  const PRIOR_YEARS_KEY = "wc_show_prior_years";
-  const PERFORMANCE_PRIOR_YEARS_KEY = "wc_show_performance_prior_years";
+  const priorYearsState = { budget: false, performance: false };
 
   const cache = {
     expenditures: [],
@@ -3519,7 +3518,6 @@
     try {
       const url = new URL(window.location.href);
       url.searchParams.set("openBudgetLines", detailId);
-      url.searchParams.set("priorYears", getShowPriorYears("budget") ? "1" : "0");
       return url.href;
     } catch (e) {
       return "";
@@ -3612,8 +3610,8 @@
     }
 
     const priorYearsToggleDisabled = isPriorYearsDisabled;
-    // The "View Prior Years" preference is a single, page-wide localStorage
-    // value shared by every table (see getShowPriorYears), so it isn't
+    // The "View Prior Years" state is shared by every table during the
+    // current page view (see getShowPriorYears), so it isn't
     // enough to just hide this table's own checkbox -- showPrior has to be
     // forced false here too, or toggling it on anywhere else on the page
     // would still expand this table's prior-year columns.
@@ -4313,25 +4311,6 @@
     if (closeButton) closeButton.focus({ preventScroll: true });
   }
 
-  function refreshTransactionDrilldownReturnState(link) {
-    if (!link || !link.href) return;
-    try {
-      const href = new URL(link.href, window.location.href);
-      const returnTo = href.searchParams.get("returnTo");
-      if (!returnTo) return;
-      const returnUrl = new URL(returnTo, window.location.href);
-      returnUrl.searchParams.set("priorYears", getShowPriorYears("budget") ? "1" : "0");
-      href.searchParams.set("returnTo", returnUrl.href);
-      link.href = href.href;
-    } catch (e) {
-      /* Leave the original link intact if URL parsing is unavailable. */
-    }
-  }
-
-  document.addEventListener("click", (event) => {
-    refreshTransactionDrilldownReturnState(event.target.closest(".wc-actual-drilldown-link"));
-  }, true);
-
   // Single delegated listener handles every detail button on the page,
   // regardless of which function rendered the card or table it belongs to.
   document.addEventListener("click", (event) => {
@@ -4352,16 +4331,6 @@
     }
   }
 
-  function restoreRequestedPriorYearsState() {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      if (!params.has("priorYears")) return;
-      setShowPriorYears(params.get("priorYears") === "1", "budget");
-    } catch (e) {
-      /* URLSearchParams unavailable; keep the existing stored preference. */
-    }
-  }
-
   function openRequestedBudgetLinesFromUrl() {
     if (requestedBudgetLinesOpened) return true;
     const target = requestedBudgetLinesTarget();
@@ -4375,7 +4344,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    restoreRequestedPriorYearsState();
     if (!requestedBudgetLinesTarget()) return;
     if (openRequestedBudgetLinesFromUrl()) return;
     const observer = new MutationObserver(() => {
@@ -10302,24 +10270,14 @@
     return '<section class="mosquito-state-aid-tables">' + pieces.join("") + "</section>";
   }
 
-  function priorYearsStorageKey(scope) {
-    return scope === "performance" ? PERFORMANCE_PRIOR_YEARS_KEY : PRIOR_YEARS_KEY;
-  }
-
   function getShowPriorYears(scope) {
-    try {
-      return localStorage.getItem(priorYearsStorageKey(scope)) === "1";
-    } catch (e) {
-      return false;
-    }
+    const priorScope = scope === "performance" ? "performance" : "budget";
+    return priorYearsState[priorScope];
   }
 
   function setShowPriorYears(value, scope) {
-    try {
-      localStorage.setItem(priorYearsStorageKey(scope), value ? "1" : "0");
-    } catch (e) {
-      /* localStorage unavailable; in-memory state still applies */
-    }
+    const priorScope = scope === "performance" ? "performance" : "budget";
+    priorYearsState[priorScope] = !!value;
   }
 
   function runLength(rows, startIndex, keyFn) {
