@@ -27,7 +27,7 @@
   gtag("config", "G-Z7W0K4BTDP");
   var mobileStylesheetId = "wc-budget-mobile-styles";
   var splitLogoScriptId = "wc-split-logo-script";
-  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "brand-logo.js?v=20260627-axe-a11y";
+  var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "brand-logo.js?v=20260723-asset-path-cleanup";
   var wcThemeStorageKey = "waltonBudgetTheme";
   function applyHiddenAdminThemeParam(){
     try{
@@ -531,7 +531,7 @@
     }
     loadWcScriptOnce(
       "wc-budget-pdf-script",
-      wcBudgetAssetBaseUrl + "budget-pdf.js?v=20260712-personnel-cost-print-summary-only"
+      wcBudgetAssetBaseUrl + "budget-pdf.js?v=20260723-asset-path-cleanup"
     );
   }
   var css = `
@@ -2243,6 +2243,7 @@
     }
     var eyebrowText = eyebrow.textContent.trim();
     var titleText = title.textContent.trim();
+    var currentPage = (window.location.pathname.split("/").pop() || "").toLowerCase();
     var sectionCrumb = "";
     if(eyebrowText === titleText){
       sectionCrumb = "";
@@ -2258,7 +2259,7 @@
       sectionCrumb = '<a href="budget-overview.html">Budget Overview</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Financials" || eyebrowText === "Financial Summaries" || eyebrowText === "Debt and Financial Forecast" || eyebrowText === "Glossary, Statistical, and Supplemental Information"){
       sectionCrumb = '<a href="financials.html">Financials</a><span class="wc-breadcrumb-sep">/</span>';
-    }else if(eyebrowText === "Capital Projects" || eyebrowText === "Capital Improvement Plan"){
+    }else if(currentPage === "cip-project.html" || eyebrowText === "Capital Projects" || eyebrowText === "Capital Improvement Plan"){
       sectionCrumb = '<a href="capital-projects.html">Capital Projects</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText){
       sectionCrumb = '<span>' + eyebrowText + '</span><span class="wc-breadcrumb-sep">/</span>';

@@ -5,7 +5,7 @@
     return (window.location.pathname.indexOf("/pages/") !== -1 ? "../" : "") + path;
   }
 
-  var BRAND_LOGO_URL = assetPath("assets/images/Page Images/walton-county-logo-no-background.png");
+  var BRAND_LOGO_URL = assetPath("assets/images/page-images/walton-county-logo-no-background.png");
 
   var EXCLUDED_PRINT_PAGES = {
     "": true,

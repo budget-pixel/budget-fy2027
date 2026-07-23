@@ -10,7 +10,7 @@
       return;
     }
 
-    var logoUrl = assetPath("assets/images/Page Images/walton-county-logo-no-background.png");
+    var logoUrl = assetPath("assets/images/page-images/walton-county-logo-no-background.png");
     var style = document.createElement("style");
     style.id = STYLE_ID;
     style.textContent = `

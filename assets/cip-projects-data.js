@@ -5,8 +5,8 @@
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1388930304&single=true&output=csv";
   const FISCAL_YEARS = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
   const PROJECT_IMAGE_FILES = [
-    "abt-martin-dirt-to-pave.jpg",
-    "amaryllis-lane-dirt-to-pave.jpg",
+    "abt-martin-dirt-to-pave-project.jpg",
+    "amaryllis-lane-dirt-to-pave-project.jpg",
     "arbour-street-dirt-to-pave.jpg",
     "bluebottle-court-dirt-to-pave.jpg",
     "chat-holley-road-resurfacing.png",
