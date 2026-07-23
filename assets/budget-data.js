@@ -4171,11 +4171,6 @@
     });
 
     const toggleHeader = priorYearsToggleDisabled ? "" : priorYearsToggleHtml(showPrior, "wc-budget-lines-detail-header");
-    const transactionDrilldownFields = { kind: isExpense ? "expense" : "revenue", combineByName };
-    const hasTransactionDrilldown = mergedRows.some((row) => transactionDrilldownEnabledForRow(row, transactionDrilldownFields));
-    const transactionHelper = hasTransactionDrilldown
-      ? '<p class="wc-transaction-drilldown-helper">Actual amounts open transaction detail.</p>'
-      : "";
     const departmentDataNoteText = (isExpense && mergedRows.length) ? DEPARTMENT_DATA_NOTES.get(normalizeDeptName(mergedRows[0].Dept_Name)) : "";
     const dataNoteTexts = [generatedActualsNoteText, departmentDataNoteText].filter(Boolean);
     const departmentDataNote = dataNoteTexts.length
@@ -4183,7 +4178,7 @@
         dataNoteTexts.map((noteText) => "<p>" + escapeHtml(noteText) + "</p>").join("") +
         "</div>"
       : "";
-    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + departmentDataNote + toggleHeader + transactionHelper + "</div>";
+    const budgetLinesTools = '<div class="wc-budget-lines-tools">' + departmentDataNote + toggleHeader + "</div>";
 
     return {
       button: '<button type="button" class="wc-view-budget-lines-toggle" data-target="' + detailId + '" data-closed-label="View Budget Lines" data-open-label="Hide Budget Lines" aria-expanded="false">View Budget Lines</button>',
