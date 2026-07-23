@@ -85,7 +85,7 @@
   var container = document.getElementById("personnel-cost-summary");
   if(!container) return;
   container.addEventListener("click", function(event){
-    var toggle = event.target.closest(".wc-view-budget-lines-toggle");
+    var toggle = event.target.closest(".wc-view-budget-lines-toggle.wc-table-row-link");
     if(!toggle) return;
     if(document.documentElement.getAttribute("data-theme") !== "dark"){
       event.preventDefault();
