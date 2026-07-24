@@ -155,6 +155,17 @@
     line-height:1.55;
   }
 
+  .wc-ptax-summary-subamount{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid var(--border);
+  }
+
+  .wc-ptax-summary-subamount strong{
+    margin:0 0 6px;
+    font-size:20px;
+  }
+
   .wc-ptax-flow{
     margin:0 0 34px;
     padding:28px;
@@ -755,6 +766,11 @@
       <span>Total Countywide Ad Valorem Revenue</span>
       <strong id="wc-ptax-total">&hellip;</strong>
       <p>County-only portion (excludes schools and other taxing authorities).</p>
+      <div class="wc-ptax-summary-subamount">
+        <span>North Walton Mosquito Control</span>
+        <strong id="wc-ptax-mosquito-total">&hellip;</strong>
+        <p>Separate district ad valorem levy.</p>
+      </div>
     </div>
     <div class="wc-ptax-summary-card">
       <span>Departments Funded</span>
@@ -1066,6 +1082,7 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   // and the personalized calculator below, so there's exactly one
   // definition of "the property tax allocation" on this page.
   let adValoremRowsPromise = null;
+  let mosquitoAdValoremTotal = 0;
   function loadAdValoremRows(){
     if (adValoremRowsPromise) return adValoremRowsPromise;
     if (!window.WCBudgetData || typeof window.WCBudgetData.loadBudgetData !== "function"){
@@ -1074,9 +1091,13 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     adValoremRowsPromise = window.WCBudgetData.loadBudgetData().then(function(data){
       const totalsByName = new Map();
       const interfundTransferAmounts = [];
+      mosquitoAdValoremTotal = 0;
       (data.revenues || []).forEach(function(row){
         if (AD_VALOREM_REVENUE_CODES.indexOf(String(row.Revenue_Code || "").trim()) === -1) return;
-        if (fundCodeForRow(row) === MOSQUITO_CONTROL_FUND_CODE) return;
+        if (fundCodeForRow(row) === MOSQUITO_CONTROL_FUND_CODE){
+          mosquitoAdValoremTotal += Number(row.FY2027_Proposed) || 0;
+          return;
+        }
         const rawName = String(row.Dept_Name || "").trim();
         if (!rawName) return;
         const amount = Number(row.FY2027_Proposed) || 0;
@@ -1113,12 +1134,14 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
   function renderAllocation(departments){
     const flowMount = document.getElementById("wc-ptax-flow");
     const totalEl = document.getElementById("wc-ptax-total");
+    const mosquitoTotalEl = document.getElementById("wc-ptax-mosquito-total");
     const countEl = document.getElementById("wc-ptax-count");
     if (!flowMount) return;
 
     if (!departments.length){
       flowMount.innerHTML = '<div class="wc-ptax-flow-error">Property tax allocation data is not available right now.</div>';
       if (totalEl) totalEl.textContent = "—";
+      if (mosquitoTotalEl) mosquitoTotalEl.textContent = mosquitoAdValoremTotal ? compactCurrency(mosquitoAdValoremTotal) : "—";
       if (countEl) countEl.textContent = "—";
       return;
     }
@@ -1127,6 +1150,7 @@ window.wcBudgetPages = [  {title:"GFOA Distinguished Budget Presentation Award",
     const maxAmount = Math.max.apply(null, departments.map(function(d){ return d.amount; }));
 
     if (totalEl) totalEl.textContent = compactCurrency(total);
+    if (mosquitoTotalEl) mosquitoTotalEl.textContent = compactCurrency(mosquitoAdValoremTotal);
     if (countEl) countEl.textContent = String(departments.length);
 
     const visible = flowShowAll ? departments : departments.slice(0, FLOW_PREVIEW_COUNT);
