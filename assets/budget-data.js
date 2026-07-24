@@ -333,9 +333,22 @@
     "Intergovernmental Revenues": "Grants, shared revenues, and payments received from federal and state government sources.",
     "Charges for Services": "Fees charged for specific County services rendered to residents and businesses.",
     "Permits Fees and Special Assessments": "Revenue from permits, licenses, and special assessments.",
+    "Permits, Fees, and Special Assessments": "Revenue from permits, licenses, regulatory fees, and special assessments.",
     "Miscellaneous Revenue": "Interest earnings, donations, and other revenue not classified elsewhere.",
     "Other Sources": "Transfers in, debt proceeds, and other non-recurring funding sources.",
-    "Judgments, Fines and Forfeits": "Revenue from court judgments, fines, and forfeitures."
+    "Judgments, Fines and Forfeits": "Revenue from court judgments, fines, and forfeitures.",
+    "Property Taxes (Ad Valorem)": "Taxes levied on the taxable value of real and tangible personal property. This category includes the Countywide and North Walton Mosquito Control property tax levies.",
+    "General Government Taxes (excluding Property Taxes)": "Other locally levied taxes, including tourist development, sales-related, communications, and fuel taxes; property taxes are reported separately above.",
+    "General Government": "Administrative, legislative, financial, judicial, and other services that support the overall operation of County government.",
+    "Public Safety": "Law enforcement, emergency response, detention, code enforcement, and other services that protect people and property.",
+    "Physical Environment": "Services related to natural resources, solid waste, utilities, conservation, and environmental protection.",
+    "Transportation": "Roads, bridges, traffic operations, engineering, maintenance, and other transportation services and infrastructure.",
+    "Economic Environment": "Programs and services supporting economic development, housing, tourism, planning, and community improvement.",
+    "Human Services": "Health, veterans, social assistance, and other services supporting the well-being of residents.",
+    "Culture and Recreation": "Libraries, parks, recreation, cultural programs, and related community facilities and services.",
+    "Court Related Cost": "Court operations, legal services, technology, and other costs associated with the judicial system.",
+    "Other Financial Sources": "Interfund transfers and other financing sources reported separately from operating revenues.",
+    "Other Financial Uses": "Interfund transfers and other financing uses reported separately from functional expenditures."
   };
 
   const priorYearsState = { budget: false, performance: false };
@@ -5067,7 +5080,8 @@
     { code: "107", label: "Sheriff Fund" },
     { code: "111", label: "Tourist Development Fund" },
     { code: "112", label: "Solid Waste Fund" },
-    { code: "300", label: "Capital Projects Fund" }
+    { code: "300", label: "Capital Projects Fund" },
+    { code: "105", label: "Mosquito Control Fund" }
   ];
 
   const CONSOLIDATED_EXPENDITURE_FUND_COLUMNS = [
@@ -5076,11 +5090,30 @@
     { code: "107", label: "Sheriff Fund" },
     { code: "111", label: "Tourist Development Fund" },
     { code: "112", label: "Solid Waste Fund" },
-    { code: "300", label: "Capital Projects Fund" }
+    { code: "300", label: "Capital Projects Fund" },
+    { code: "105", label: "Mosquito Control Fund" }
   ];
 
   const CONSOLIDATED_REVENUE_TYPE_ROWS = [
-    { key: "General Government Taxes", label: "General Government Taxes" },
+    {
+      key: "Property Taxes",
+      label: "Property Taxes (Ad Valorem)",
+      predicate: (r) => {
+        const code = String(r.Revenue_Code || "").trim();
+        const name = String(r.Revenue_Name || "").trim().toLowerCase();
+        return code === "311000" || code === "311001" || name.indexOf("ad valorem") !== -1;
+      }
+    },
+    {
+      key: "General Government Taxes",
+      label: "General Government Taxes (excluding Property Taxes)",
+      predicate: (r) => {
+        const code = String(r.Revenue_Code || "").trim();
+        const name = String(r.Revenue_Name || "").trim().toLowerCase();
+        return String(r.Revenue_Type || "").trim().toLowerCase() === "general government taxes" &&
+          code !== "311000" && code !== "311001" && name.indexOf("ad valorem") === -1;
+      }
+    },
     { key: "Permits Fees and Special Assessments", label: "Permits, Fees, and Special Assessments" },
     { key: "Intergovernmental Revenues", label: "Intergovernmental Revenues" },
     { key: "Charges for Services", label: "Charges for Services" },
@@ -5421,7 +5454,7 @@
 
     const typeRowRecords = config.typeRows.map((spec) => {
       const keyNorm = spec.key.toLowerCase();
-      const predicate = (r) => String(config.categoryFor(r) || "").toLowerCase() === keyNorm && !config.isOtherFinancing(r);
+      const predicate = (r) => (spec.predicate ? spec.predicate(r) : String(config.categoryFor(r) || "").toLowerCase() === keyNorm) && !config.isOtherFinancing(r);
       return { label: spec.label, cells: cellsFor(predicate), values: numericValuesFor(predicate), predicate };
     });
 
@@ -5453,7 +5486,7 @@
     const bodyRows = [];
     bodyRows.push('<tr class="wc-table-group-row"><td>' + escapeHtml(config.groupRowLabel) + "</td>" + headerCells.slice(1).map(() => "<td></td>").join("") + "</tr>");
     typeRowRecords.forEach((tr) => {
-      bodyRows.push("<tr><td>" + escapeHtml(tr.label) + "</td>" + tr.cells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") + "</tr>");
+      bodyRows.push("<tr>" + categoryCellHtml(tr.label) + tr.cells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") + "</tr>");
     });
     bodyRows.push(
       '<tr class="wc-table-total-row"><td>' + escapeHtml(config.totalRowLabel) + "</td>" +
@@ -5461,7 +5494,7 @@
       "</tr>"
     );
     bodyRows.push(
-      "<tr><td>" + escapeHtml(config.otherLineLabel) + "</td>" +
+      "<tr>" + categoryCellHtml(config.otherLineLabel) +
       otherFinancingCells.map((c) => '<td class="wc-num">' + escapeHtml(c) + "</td>").join("") +
       "</tr>"
     );
@@ -5493,7 +5526,7 @@
   }
 
   function renderConsolidatedRevenueBudgetTable() {
-    return buildConsolidatedFundTable({
+    const html = buildConsolidatedFundTable({
       rows: cache.revenues,
       fundColumns: CONSOLIDATED_REVENUE_FUND_COLUMNS,
       typeRows: CONSOLIDATED_REVENUE_TYPE_ROWS,
@@ -5508,6 +5541,15 @@
       otherLineLabel: "Other Financial Sources",
       grandTotalLabel: "Total Revenue and Other Financial Sources"
     });
+    if (!html) return html;
+    const millageCells = CONSOLIDATED_REVENUE_FUND_COLUMNS.map((fund) => {
+      if (fund.code === "001") return "3.4347";
+      if (fund.code === "105") return "0.4410";
+      return "&ndash;";
+    }).concat(["&ndash;", "&ndash;"]);
+    const row = '<tr class="wc-table-millage-row"><td>Millage per $1,000</td>' +
+      millageCells.map((value) => '<td class="wc-num">' + value + '</td>').join("") + '</tr>';
+    return html.replace("<tbody>", "<tbody>" + row);
   }
 
   function renderConsolidatedExpenditureBudgetTable() {
@@ -5526,6 +5568,145 @@
       otherLineLabel: "Other Financial Uses",
       grandTotalLabel: "Total Expenditure and Other Financial Uses"
     });
+  }
+
+  // Shared countywide FY2026-to-FY2027 expenditure change used by both
+  // the Summary of Budget Changes and the statutory Budget Summary ad.
+  // This preserves the same exclusions and historical deduplication rules
+  // on both pages so their displayed percentages cannot drift apart.
+  function consolidatedBudgetChangePercent() {
+    const matchesFundAndFinancing = (row) =>
+      !CONSOLIDATED_SCHEDULE_EXCLUDED_FUND_CODES.has(fundCodeForRow(row)) &&
+      !isOtherFinancingExpenseRow(row);
+    const proposed = (cache.expenditures || [])
+      .filter(matchesFundAndFinancing)
+      .reduce((sum, row) => sum + (row.FY2027_Proposed || 0), 0);
+    const prior = (cache.dedupedExpenseRows || [])
+      .filter(matchesFundAndFinancing)
+      .reduce((sum, row) => sum + (row.FY2026_Original_Budget || row.FY2026_Budget || 0), 0);
+    return prior ? (proposed - prior) / prior : 0;
+  }
+
+  // Florida TRIM newspaper-ad presentation: revenues and expenditures share
+  // one table, and only the two funds that levy property tax show millage.
+  function renderConsolidatedFinancialBudgetTable() {
+    if (!(cache.funds || []).length) return "";
+    const directOperationalColumns = [
+      { key: "general", label: "General Fund", codes: ["001"] },
+      { key: "transportation", label: "Transportation Fund", codes: ["101"] },
+      { key: "sheriff", label: "Fine & Forfeiture Fund", codes: ["107"] },
+      { key: "tourist", label: "Tourist Development Fund", codes: ["111"] },
+      { key: "solidWaste", label: "Solid Waste Fund", codes: ["112"] },
+      { key: "building", label: "Building Fund", codes: ["103"] },
+      { key: "mosquito", label: "Mosquito Control Fund", codes: ["105"] },
+      { key: "msbu", label: "MSBU Fund", codes: ["102"] },
+      { key: "special", label: "Special Revenue Funds", codes: [] }
+    ];
+    const explicitlyPresentedCodes = new Set(["001", "111", "101", "107", "103", "105", "112", "102", "300", "503"]);
+    directOperationalColumns.find((column) => column.key === "special").codes = (cache.funds || [])
+      .map((fund) => String(fund.Fund_Code || "").trim())
+      .filter((code) => code && !explicitlyPresentedCodes.has(code));
+    const capitalCodes = ["300"];
+    const allowedCodes = new Set(directOperationalColumns.flatMap((column) => column.codes).concat(capitalCodes));
+    const codeSets = directOperationalColumns.map((column) => new Set(column.codes));
+    const isRevenueTransfer = (row) => String(row.Revenue_Code || "").trim() === "381000";
+    const isExpenseTransfer = (row) => normalizeDeptName(activityForDeptCode(row.Dept_Code)) === "interfund transfers";
+
+    function paperValues(sourceRows, predicate, isTransfer) {
+      const direct = directOperationalColumns.map(() => 0);
+      let capital = 0;
+      let elimination = 0;
+      (sourceRows || []).forEach((row) => {
+        const code = fundCodeForRow(row);
+        if (!allowedCodes.has(code) || !predicate(row)) return;
+        const amount = row.FY2027_Proposed || 0;
+        const directIndex = codeSets.findIndex((codes) => codes.has(code));
+        if (directIndex >= 0) direct[directIndex] += amount;
+        else if (capitalCodes.includes(code)) capital += amount;
+        if (isTransfer(row)) elimination -= amount;
+      });
+      const operational = direct.reduce((sum, value) => sum + value, 0) + elimination;
+      return direct.concat([elimination, operational, capital, operational + capital]);
+    }
+
+    function balanceValues() {
+      const direct = directOperationalColumns.map((column) => fundBalanceForYear(column.codes, 2026));
+      const operational = direct.reduce((sum, value) => sum + value, 0);
+      const capital = fundBalanceForYear(capitalCodes, 2026);
+      return direct.concat([0, operational, capital, operational + capital]);
+    }
+
+    const allRevenue = (row) => allowedCodes.has(fundCodeForRow(row));
+    const allExpense = (row) => allowedCodes.has(fundCodeForRow(row));
+    const discountRevenue = (row) => String(row.Revenue_Code || "").trim() === "389001";
+    const currentRevenue = (row) => allRevenue(row) && !discountRevenue(row);
+    const sourceNetRevenueValues = paperValues(cache.revenues, currentRevenue, isRevenueTransfer);
+    const propertyTaxPredicate = (row) => ["311000", "311001"].includes(String(row.Revenue_Code || "").trim());
+    const netPropertyTaxValues = paperValues(cache.revenues, propertyTaxPredicate, isRevenueTransfer);
+    // The FY2027 property-tax amounts in the budget source are already the
+    // statutorily budgeted 95-percent collections. The newspaper summary
+    // shows the corresponding 100-percent levy first, then displays the
+    // five-percent reduction separately so Total Estimated Revenues returns
+    // to the exact source amount.
+    const propertyTaxValues = netPropertyTaxValues.map((value) => value ? value / 0.95 : 0);
+    const discountValues = propertyTaxValues.map((gross, index) => netPropertyTaxValues[index] - gross);
+    const grossRevenueValues = sourceNetRevenueValues.map(
+      (value, index) => value + propertyTaxValues[index] - netPropertyTaxValues[index]
+    );
+    const revenueValues = grossRevenueValues.map((value, index) => value + discountValues[index]);
+    const expenditureValues = paperValues(cache.expenditures, allExpense, isExpenseTransfer);
+    const beginningBalances = balanceValues();
+    const endingReserves = beginningBalances.map((balance, index) => balance + revenueValues[index] - expenditureValues[index]);
+    const revenuesAndReserves = beginningBalances.map((balance, index) => balance + revenueValues[index]);
+    const expendituresAndReserves = expenditureValues.map((expense, index) => expense + endingReserves[index]);
+
+    const headers = [""].concat(directOperationalColumns.map((column) => column.label)).concat([
+      "Less Interfund Transfers", "Total Operational Revenues / Expenditures", "Capital Project Fund", "Total All Funds"
+    ]);
+    const bodyRows = [];
+    const paperCurrency = (value) => value < 0
+      ? "($" + Math.abs(value).toLocaleString("en-US", { maximumFractionDigits: 0 }) + ")"
+      : formatCurrency(value);
+    const moneyRow = (label, values, className) => '<tr class="' + (className || "") + '"><td>' + escapeHtml(label) + '</td>' +
+      values.map((value) => '<td class="wc-num">' + (value ? paperCurrency(value) : "&ndash;") + '</td>').join("") + '</tr>';
+    const predicateForRevenueType = (key) => (row) => String(row.Revenue_Type || "").trim().toLowerCase() === key.toLowerCase() && !discountRevenue(row);
+
+    const millageValues = directOperationalColumns.map((column) => column.key === "general" ? "3.4347" : (column.key === "mosquito" ? "0.4410" : "&ndash;")).concat(["&ndash;", "&ndash;", "&ndash;", "&ndash;"]);
+    bodyRows.push('<tr class="wc-table-millage-row trim-table-gray-row"><td>Millage per $1,000</td>' + millageValues.map((value) => '<td class="wc-num">' + value + '</td>').join("") + '</tr>');
+    bodyRows.push(moneyRow("Property Taxes (Ad Valorem)", propertyTaxValues));
+    bodyRows.push(moneyRow("General Government Taxes (excluding Property Taxes)", paperValues(cache.revenues, (row) => predicateForRevenueType("General Government Taxes")(row) && !["311000", "311001", "389001"].includes(String(row.Revenue_Code || "").trim()), isRevenueTransfer)));
+    CONSOLIDATED_REVENUE_TYPE_ROWS.slice(2).forEach((spec) => {
+      const predicate = spec.key === "Other Sources"
+        ? (row) => predicateForRevenueType(spec.key)(row) || isRevenueTransfer(row)
+        : predicateForRevenueType(spec.key);
+      bodyRows.push(moneyRow(spec.label, paperValues(cache.revenues, predicate, isRevenueTransfer)));
+    });
+    bodyRows.push(moneyRow("Total Revenues", grossRevenueValues, "wc-table-total-row trim-table-gray-row"));
+    bodyRows.push(moneyRow("Less 5%", discountValues));
+    bodyRows.push(moneyRow("Total Estimated Revenues", revenueValues, "wc-table-total-row"));
+    bodyRows.push(moneyRow("Total Revenues & Reserves", revenuesAndReserves, "wc-table-total-row"));
+    ["General Government", "Public Safety", "Physical Environment", "Transportation", "Economic Environment", "Human Services", "Culture and Recreation", "Court Related Cost", "Debt Service"].forEach((activity) => {
+      bodyRows.push(moneyRow(activity, paperValues(cache.expenditures, (row) => expenseActivityForRow(row) === activity && !isExpenseTransfer(row), isExpenseTransfer)));
+    });
+    bodyRows.push(moneyRow("Other Uses", paperValues(cache.expenditures, (row) => expenseActivityForRow(row) === "Other Uses" || isOtherFinancingExpenseRow(row), isExpenseTransfer)));
+    bodyRows.push(moneyRow("Total Expenditures", expenditureValues, "wc-table-total-row trim-table-gray-row"));
+    bodyRows.push(moneyRow("Reserves", endingReserves, "wc-table-balance-row"));
+    bodyRows.push(moneyRow("Total Expenditures & Reserves", expendituresAndReserves, "wc-table-total-row"));
+
+    const operatingIncreasePercent = consolidatedBudgetChangePercent();
+    const operatingIncreaseHtml = operatingIncreasePercent > 0
+      ? '<p class="trim-operating-increase">THE PROPOSED OPERATING BUDGET EXPENDITURES OF THE WALTON COUNTY BOARD OF COUNTY COMMISSIONERS ARE ' +
+        (operatingIncreasePercent * 100).toFixed(1) + '% MORE THAN LAST YEAR&rsquo;S TOTAL OPERATING EXPENDITURES.</p>'
+      : "";
+
+    return '<div class="wc-table-wrap trim-budget-summary-ad">' +
+      '<div class="trim-budget-heading"><h2>Budget Summary</h2>' +
+      '<p>Walton County, Florida &mdash; Board of County Commissioners &mdash; Fiscal Year 2026&ndash;2027</p>' +
+      operatingIncreaseHtml + '</div>' +
+      '<div class="wc-data-table-scroll"><table class="wc-data-table wc-consolidated-financial-table">' +
+      '<thead><tr>' + headers.map((header) => '<th>' + escapeHtml(header) + '</th>').join("") + '</tr></thead>' +
+      '<tbody>' + bodyRows.join("") + '</tbody></table></div>' +
+      '<p class="trim-budget-record-note">The tentative adopted, and/or final budgets are on file in the Office of the Walton County Board of County Commissioners as a public record.</p></div>';
   }
 
   // "Fund Financial Schedules" page: a Beginning Fund Balance -> Revenues
@@ -8295,7 +8476,7 @@
       const totalPrior = summaries.reduce((sum, item) => sum + item.prior, 0);
       const totalProposed = summaries.reduce((sum, item) => sum + item.proposed, 0);
       const netChange = totalProposed - totalPrior;
-      const netPct = totalPrior !== 0 ? netChange / totalPrior : 0;
+      const netPct = consolidatedBudgetChangePercent();
       const largestIncrease = increases[0] || null;
       const maxAbsChange = Math.max.apply(null, summaries.map((item) => Math.abs(item.change)).concat([1]));
       const chartItems = summaries.filter((item) => item.change !== 0).sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 10);
@@ -13140,8 +13321,10 @@
   }
 
   function initConsolidatedFundTablesPage() {
-    initConsolidatedFundTableContainer("consolidated-revenue-budget-table", renderConsolidatedRevenueBudgetTable, "consolidated revenue budget");
-    initConsolidatedFundTableContainer("consolidated-expenditure-budget-table", renderConsolidatedExpenditureBudgetTable, "consolidated expenditure budget");
+    const bindConsolidatedTooltips = (container) => bindTooltipAnchors(container);
+    initConsolidatedFundTableContainer("consolidated-revenue-budget-table", renderConsolidatedRevenueBudgetTable, "consolidated revenue budget", bindConsolidatedTooltips);
+    initConsolidatedFundTableContainer("consolidated-expenditure-budget-table", renderConsolidatedExpenditureBudgetTable, "consolidated expenditure budget", bindConsolidatedTooltips);
+    initConsolidatedFundTableContainer("consolidated-financial-budget-table", renderConsolidatedFinancialBudgetTable, "consolidated financial schedule", bindConsolidatedTooltips);
   }
 
   function initFinancialForecastPage() {
@@ -13204,6 +13387,7 @@
     renderFilterControls,
     renderConsolidatedRevenueBudgetTable,
     renderConsolidatedExpenditureBudgetTable,
+    renderConsolidatedFinancialBudgetTable,
     renderMachinerySummary,
     renderContractualServicesSummary,
     renderPersonnelSummary,

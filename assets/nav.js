@@ -2259,6 +2259,8 @@
       sectionCrumb = '<a href="budget-overview.html">Budget Overview</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText === "Financials" || eyebrowText === "Financial Summaries" || eyebrowText === "Debt and Financial Forecast" || eyebrowText === "Glossary, Statistical, and Supplemental Information"){
       sectionCrumb = '<a href="financials.html">Financials</a><span class="wc-breadcrumb-sep">/</span>';
+    }else if(eyebrowText === "Supporting Budget Documentation"){
+      sectionCrumb = '<a href="supporting-budget-documentation.html">Supporting Budget Documentation</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(currentPage === "cip-project.html" || eyebrowText === "Capital Projects" || eyebrowText === "Capital Improvement Plan"){
       sectionCrumb = '<a href="capital-projects.html">Capital Projects</a><span class="wc-breadcrumb-sep">/</span>';
     }else if(eyebrowText){

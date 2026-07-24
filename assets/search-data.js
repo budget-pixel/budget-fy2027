@@ -35,6 +35,7 @@ var wcCoreBudgetPages = [
   { title:"Summary of Contractual Services", section:"Financial Summaries", href:"summary-of-contractual-services.html", darkModeOnly:true },
   { title:"Financials", section:"Financials", href:"financials.html" },
   { title:"Supporting Budget Documentation", section:"Financials", href:"supporting-budget-documentation.html" },
+  { title:"TRIM Newspaper Advertisements", section:"Supporting Budget Documentation", href:"trim-newspaper-advertisements.html", darkModeOnly:true },
   { title:"Board of County Commissioners", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc6947be859271a418" },
   { title:"Clerk of Courts & County Comptroller", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbcc965cb8dc61a1909" },
   { title:"Property Appraiser", section:"Constitutional Officers", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbc872420fe4b9ad729" },
@@ -175,6 +176,10 @@ var wcHiddenBudgetPageTitles = new Set([
 
     "Consolidated Financial Schedules": [
       "consolidated schedule", "financial schedule", "all funds", "total all funds", "total revenues", "total expenses", "revenues by fund", "expenses by fund", "fund totals", "combined schedule", "summary schedule"
+    ],
+
+    "TRIM Newspaper Advertisements": [
+      "trim advertisement", "newspaper ad", "notice of budget hearing", "budget summary advertisement", "rolled-back rate", "rollback rate", "print budget notice", "final budget hearing"
     ],
 
     "Fund Financial Schedules": [
@@ -486,6 +491,7 @@ var wcHiddenBudgetPageTitles = new Set([
     "Summary of Property Tax Allocations": "summary-of-property-tax-allocations.html",
     "Financial Policies": "financial-policies.html",
     "Consolidated Financial Schedules": "consolidated-financial-schedules.html",
+    "TRIM Newspaper Advertisements": "trim-newspaper-advertisements.html",
     "Fund Financial Schedules": "fund-financial-schedules.html",
     "Summary of Revenues": "summary-of-revenues.html",
     "Summary of Expenses": "summary-of-expenses.html",
