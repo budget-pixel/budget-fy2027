@@ -7648,17 +7648,18 @@
     const endingValues = changeValues.map((v, i) => v + beginningValues[i]);
     bodyRows.push(rowHtml("Estimated Ending Fund Balance", endingValues, "wc-table-subtotal-row"));
 
-    const showPrior = getShowPriorYears();
+    // Fund Financial Schedules always show every historical year -- there
+    // is no prior-years toggle on this page (see [fund financial schedule
+    // years always visible]).
     const headerCells = ["ROW LABELS"].concat(
       FUND_SCHEDULE_YEAR_COLUMNS.map((c, i) => ({ label: c.label.toUpperCase(), prior: i < FUND_SCHEDULE_YEAR_COLUMNS.length - 1 }))
     );
 
     return (
-      '<div class="wc-budget-lines-card' + (showPrior ? " show-prior-years" : "") + '">' +
+      '<div class="wc-budget-lines-card show-prior-years">' +
       '<div class="wc-table-wrap">' +
       '<div class="wc-table-label-row wc-fund-financial-label-row">' +
       '<p class="wc-table-label wc-fund-financial-table-title">' + escapeHtml(caption) + "</p>" +
-      priorYearsToggleHtml(showPrior) +
       "</div>" +
       '<div class="wc-data-table-scroll wc-fund-financial-schedule-scroll">' +
       '<table class="wc-data-table wc-fund-financial-schedule-table">' +
