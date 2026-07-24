@@ -2741,6 +2741,44 @@ a:where(:visited) {
   font-weight: 800;
   color: var(--green);
 }
+.wc-forecast-line-toggle-row {
+  color:var(--green);
+  font-weight:800;
+  cursor:pointer;
+}
+.wc-forecast-line-toggle-row:hover > td,
+.wc-forecast-line-toggle-row:focus-visible > td {
+  background:rgba(0,98,49,.07);
+}
+.wc-forecast-line-toggle-row:focus-visible {
+  outline:2px solid var(--green);
+  outline-offset:-2px;
+}
+.wc-forecast-line-detail-row > td {
+  padding:12px!important;
+  background:var(--light);
+}
+.wc-forecast-line-detail-row .wc-data-table-wrap {
+  margin:0;
+}
+.wc-forecast-assumption-link {
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--green);
+  font:inherit;
+  font-weight:700;
+  text-align:left;
+  cursor:pointer;
+}
+.wc-forecast-assumption-link:hover,
+.wc-forecast-assumption-link:focus-visible {
+  text-decoration:underline;
+}
+.wc-forecast-assumption-highlight > td {
+  background:rgba(209,190,120,.28)!important;
+  transition:background-color .25s ease;
+}
 .wc-forecast-assumptions-intro {
   margin: 10px 0 16px;
   max-width: 900px;

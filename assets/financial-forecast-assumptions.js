@@ -50,11 +50,27 @@
 
   const fundOverrides = {
     "001": {
-      revenue: {
-        "General Government Taxes": [0.02, 0.02, 0.02, 0.02]
+      expense: {
+        "Personnel Services": [0.02, 0.02, 0.02, 0.02],
+        "Operating Expenses": [0.02, 0.02, 0.02, 0.02],
+        "Capital Outlay": [0.02, 0.02, 0.02, 0.02],
+        "Grants and Aids": [0.02, 0.02, 0.02, 0.02],
+        "Debt Service": [0, 0, 0, 0],
+        "Other Uses / Transfers": [0.02, 0.02, 0.02, 0.02]
       },
-      method: "conservative manual growth",
-      notes: "General Fund tax revenue is held to a lower growth assumption so the forecast reflects a more conservative 1% to 2% annual revenue change."
+      method: "revenue-constrained growth",
+      notes: "General Fund department expenditures are limited to 2% annual growth so recurring costs remain supportable by projected recurring revenue. BCC Contingency remains flat, and separately linked interfund transfers retain their shared-revenue assumptions."
+    },
+    "101": {
+      revenue: {
+        "Other Sources": [0.025, 0.025, 0.025, 0.025]
+      },
+      method: "shared revenue growth",
+      notes: "Transportation's share of the Local Discretionary Sales Surtax is recorded as an Interfund Transfer In. The transfer is forecast at the same 2.5% annual growth rate as the shared sales-tax revenue while fund balance remains free to increase or decrease."
+    },
+    "107": {
+      method: "transfer-supported forecast",
+      notes: "The Sheriff Fund's Interfund Transfer In is calculated each year as the amount needed to support forecast expenditures after applying the fund's other projected revenues. The Walton County Sheriff's Office expense line uses a 2.5% management estimate while other Fund 107 expenses retain their normal assumptions."
     },
     "300": {
       revenue: {
