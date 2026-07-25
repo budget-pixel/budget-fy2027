@@ -17,6 +17,10 @@
     y=l.getElementsByTagName(r)[0];
     y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "xb6teb7sh7");
+  window.clarity("consentv2", {
+    ad_Storage: "denied",
+    analytics_Storage: "granted"
+  });
 </script>
 <script>
   (function(){
@@ -1311,15 +1315,77 @@
     border-top:1px solid rgba(36,52,77,.10);
     width:min(1180px, 100%);
   }
-  .wc-footer-links a{
+  .wc-footer-links a,
+  .wc-footer-contact-button{
+    padding:0;
+    border:0;
+    background:transparent;
     color:#172033;
+    font-family:inherit;
     font-size:11px;
     font-weight:700;
     text-decoration:none;
     transition:color .2s ease;
+    cursor:pointer;
   }
-  .wc-footer-links a:hover{
+  .wc-footer-links a:hover,
+  .wc-footer-contact-button:hover{
     color:#004b2d;
+  }
+  .wc-footer-contact-dialog{
+    position:fixed;
+    inset:0;
+    margin:auto;
+    width:min(520px, calc(100% - 32px));
+    max-height:calc(100vh - 32px);
+    overflow:auto;
+    padding:0;
+    border:1px solid rgba(36,52,77,.16);
+    border-radius:18px;
+    background:#fff;
+    color:#172033;
+    box-shadow:0 24px 70px rgba(0,0,0,.24);
+  }
+  .wc-footer-contact-dialog::backdrop{
+    background:rgba(10,18,28,.58);
+  }
+  .wc-footer-contact-dialog-inner{
+    padding:26px;
+  }
+  .wc-footer-contact-dialog h2{
+    margin:0 0 12px;
+    font:700 24px/1.2 Georgia, "Times New Roman", serif;
+  }
+  .wc-footer-contact-dialog p{
+    margin:0;
+    color:#4e5d69;
+    font-size:14px;
+    line-height:1.65;
+  }
+  .wc-footer-contact-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:22px;
+  }
+  .wc-footer-contact-actions button,
+  .wc-footer-contact-actions a{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:40px;
+    padding:0 16px;
+    border:1px solid rgba(0,63,40,.22);
+    border-radius:999px;
+    background:#fff;
+    color:#003f28;
+    font:700 12px/1 Arial, Helvetica, sans-serif;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .wc-footer-contact-actions a{
+    background:#003f28;
+    color:#fff;
   }
 
   html[data-theme="dark"]{
@@ -1369,8 +1435,27 @@
   html[data-theme="dark"] .wc-budget-card-millage,
   html[data-theme="dark"] .wc-project-card p,
   html[data-theme="dark"] .wc-footer-search-copy p,
-  html[data-theme="dark"] .wc-footer-links a{
+  html[data-theme="dark"] .wc-footer-links a,
+  html[data-theme="dark"] .wc-footer-contact-button{
     color:var(--wc-muted);
+  }
+  html[data-theme="dark"] .wc-footer-contact-dialog{
+    border-color:rgba(226,235,229,.18);
+    background:#101d17;
+    color:#edf3ef;
+  }
+  html[data-theme="dark"] .wc-footer-contact-dialog p{
+    color:#a9b9b0;
+  }
+  html[data-theme="dark"] .wc-footer-contact-actions button{
+    border-color:rgba(123,211,159,.34);
+    background:transparent;
+    color:#edf3ef;
+  }
+  html[data-theme="dark"] .wc-footer-contact-actions a{
+    border-color:rgba(123,211,159,.38);
+    background:rgba(123,211,159,.16);
+    color:#edf3ef;
   }
   html[data-theme="dark"] .wc-footer-search-button{
     background:rgba(123,211,159,.13);
@@ -1727,9 +1812,20 @@
       </button>
     </div>
     <nav class="wc-footer-links" aria-label="Footer utility links">
-      <a href="mailto:budget@mywaltonfl.gov">Contact Budget Office</a>
+      <button class="wc-footer-contact-button" type="button">Contact Budget Office</button>
       <a href="pages/accessibility.html">Accessibility</a>
+      <a href="pages/privacy.html">Privacy</a>
     </nav>
+    <dialog class="wc-footer-contact-dialog" aria-labelledby="wcHomeFooterContactTitle" aria-describedby="wcHomeFooterContactNotice">
+      <div class="wc-footer-contact-dialog-inner">
+        <h2 id="wcHomeFooterContactTitle">Contact Budget Office</h2>
+        <p id="wcHomeFooterContactNotice">Under Florida law, email addresses are public records. If you do not want your email address released in response to a public records request, do not send electronic mail to this entity. Instead, contact this office by phone or in writing.</p>
+        <div class="wc-footer-contact-actions">
+          <form method="dialog"><button type="submit">Cancel</button></form>
+          <a href="mailto:budget@mywaltonfl.gov">Continue to Email</a>
+        </div>
+      </div>
+    </dialog>
   </footer>
 </div>
 
@@ -1888,6 +1984,27 @@
           openSearch();
         });
       });
+      var footerContactDialog = $(".wc-footer-contact-dialog");
+      document.querySelectorAll(".wc-footer-contact-button").forEach(function(button){
+        button.addEventListener("click", function(){
+          if(footerContactDialog && typeof footerContactDialog.showModal === "function"){
+            footerContactDialog.showModal();
+          }else if(footerContactDialog){
+            footerContactDialog.setAttribute("open", "");
+          }
+        });
+      });
+      if(footerContactDialog){
+        footerContactDialog.addEventListener("click", function(event){
+          if(event.target === footerContactDialog){
+            footerContactDialog.close();
+          }
+        });
+        var footerEmailLink = footerContactDialog.querySelector('a[href^="mailto:"]');
+        if(footerEmailLink){
+          footerEmailLink.addEventListener("click", function(){ footerContactDialog.close(); });
+        }
+      }
       window.addEventListener("resize", function(){
         if(nav.classList.contains("is-search-open")) syncHeaderMetrics();
       });

@@ -5,14 +5,21 @@
   var wcBudgetAssetBaseUrl = (document.currentScript && document.currentScript.src)
     ? document.currentScript.src.replace(/[^/]+$/, "")
     : "../assets/";
-  (function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);
-    t.async=1;
-    t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];
-    y.parentNode.insertBefore(t,y);
-  })(window, document, "clarity", "script", "xb6teb7sh7");
+  var wcIsSearchResultsPage = /\/search\.html$/.test(window.location.pathname);
+  if(!wcIsSearchResultsPage){
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);
+      t.async=1;
+      t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];
+      y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xb6teb7sh7");
+    window.clarity("consentv2", {
+      ad_Storage: "denied",
+      analytics_Storage: "granted"
+    });
+  }
 
   /* Google Analytics 4 */
   window.dataLayer = window.dataLayer || [];
@@ -24,7 +31,11 @@
   document.head.appendChild(gaScript);
 
   gtag("js", new Date());
-  gtag("config", "G-Z7W0K4BTDP");
+  gtag("config", "G-Z7W0K4BTDP", {
+    allow_google_signals: false,
+    allow_ad_personalization_signals: false,
+    page_location: window.location.origin + window.location.pathname
+  });
   var mobileStylesheetId = "wc-budget-mobile-styles";
   var splitLogoScriptId = "wc-split-logo-script";
   var splitLogoScriptUrl = wcBudgetAssetBaseUrl + "brand-logo.js?v=20260723-asset-path-cleanup";
@@ -1393,7 +1404,7 @@
     border-radius:999px !important;
     color:#24344d !important;
     font-family:Arial, Helvetica, sans-serif !important;
-    font-size:10px !important;
+    font-size:12px !important;
     font-weight:600 !important;
   }
   .wc-has-fy-column-toggle-title{
@@ -1790,20 +1801,81 @@
     padding-top:18px !important;
     border-top:1px solid rgba(36,52,77,.10) !important;
   }
-  .wc-search-footer .wc-budget-footer-links a{
+  .wc-search-footer .wc-budget-footer-links a,
+  .wc-search-footer .wc-footer-contact-button{
     min-height:auto !important;
     padding:0 !important;
+    border:0 !important;
     border-radius:0 !important;
     color:#172033 !important;
     background:transparent !important;
+    font-family:inherit !important;
     font-size:11px !important;
     font-weight:700 !important;
     letter-spacing:.02em !important;
     text-transform:none !important;
+    text-decoration:none !important;
+    cursor:pointer !important;
   }
-  .wc-search-footer .wc-budget-footer-links a:hover{
+  .wc-search-footer .wc-budget-footer-links a:hover,
+  .wc-search-footer .wc-footer-contact-button:hover{
     color:#004b2d !important;
     background:transparent !important;
+  }
+  .wc-footer-contact-dialog{
+    position:fixed;
+    inset:0;
+    margin:auto;
+    width:min(520px, calc(100% - 32px));
+    max-height:calc(100vh - 32px);
+    overflow:auto;
+    padding:0;
+    border:1px solid rgba(36,52,77,.16);
+    border-radius:18px;
+    background:#fff;
+    color:#172033;
+    box-shadow:0 24px 70px rgba(0,0,0,.24);
+  }
+  .wc-footer-contact-dialog::backdrop{
+    background:rgba(10,18,28,.58);
+  }
+  .wc-footer-contact-dialog-inner{
+    padding:26px;
+  }
+  .wc-footer-contact-dialog h2{
+    margin:0 0 12px;
+    font:700 24px/1.2 Georgia, "Times New Roman", serif;
+  }
+  .wc-footer-contact-dialog p{
+    margin:0;
+    color:#4e5d69;
+    font-size:14px;
+    line-height:1.65;
+  }
+  .wc-footer-contact-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:22px;
+  }
+  .wc-footer-contact-actions button,
+  .wc-footer-contact-actions a{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:40px;
+    padding:0 16px;
+    border:1px solid rgba(0,63,40,.22);
+    border-radius:999px;
+    background:#fff;
+    color:#003f28;
+    font:700 12px/1 Arial, Helvetica, sans-serif;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .wc-footer-contact-actions a{
+    background:#003f28;
+    color:#fff;
   }
   .wc-search-footer .wc-budget-footer-bottom,
   .wc-search-footer .wc-budget-footer-brand{
@@ -1821,8 +1893,27 @@
     color:#edf3ef !important;
   }
   html[data-theme="dark"] .wc-footer-search-copy p,
-  html[data-theme="dark"] .wc-search-footer .wc-budget-footer-links a{
+  html[data-theme="dark"] .wc-search-footer .wc-budget-footer-links a,
+  html[data-theme="dark"] .wc-search-footer .wc-footer-contact-button{
     color:#a9b9b0 !important;
+  }
+  html[data-theme="dark"] .wc-footer-contact-dialog{
+    border-color:rgba(226,235,229,.18);
+    background:#101d17;
+    color:#edf3ef;
+  }
+  html[data-theme="dark"] .wc-footer-contact-dialog p{
+    color:#a9b9b0;
+  }
+  html[data-theme="dark"] .wc-footer-contact-actions button{
+    border-color:rgba(123,211,159,.34);
+    background:transparent;
+    color:#edf3ef;
+  }
+  html[data-theme="dark"] .wc-footer-contact-actions a{
+    border-color:rgba(123,211,159,.38);
+    background:rgba(123,211,159,.16);
+    color:#edf3ef;
   }
   html[data-theme="dark"] .wc-footer-search-button{
     background:rgba(123,211,159,.13) !important;
@@ -2373,6 +2464,7 @@
     }
     footer.classList.add("wc-search-footer");
     var accessibilityHref = /\/pages\//.test(window.location.pathname) ? "accessibility.html" : "pages/accessibility.html";
+    var privacyHref = /\/pages\//.test(window.location.pathname) ? "privacy.html" : "pages/privacy.html";
     var desiredFooterHtml = `
       <div class="wc-budget-footer-inner">
         <div class="wc-footer-search-copy">
@@ -2387,9 +2479,20 @@
         </button>
       </div>
       <nav class="wc-budget-footer-links" aria-label="Footer utility links">
-        <a href="mailto:budget@mywaltonfl.gov">Contact Budget Office</a>
+        <button class="wc-footer-contact-button" type="button">Contact Budget Office</button>
         <a href="${accessibilityHref}">Accessibility</a>
+        <a href="${privacyHref}">Privacy</a>
       </nav>
+      <dialog class="wc-footer-contact-dialog" aria-labelledby="wcFooterContactTitle" aria-describedby="wcFooterContactNotice">
+        <div class="wc-footer-contact-dialog-inner">
+          <h2 id="wcFooterContactTitle">Contact Budget Office</h2>
+          <p id="wcFooterContactNotice">Under Florida law, email addresses are public records. If you do not want your email address released in response to a public records request, do not send electronic mail to this entity. Instead, contact this office by phone or in writing.</p>
+          <div class="wc-footer-contact-actions">
+            <form method="dialog"><button type="submit">Cancel</button></form>
+            <a href="mailto:budget@mywaltonfl.gov">Continue to Email</a>
+          </div>
+        </div>
+      </dialog>
     `;
     if(footerContainer.getAttribute("data-wc-rendered") !== "true" || footerContainer.innerHTML.trim() !== desiredFooterHtml.trim()){
       footerContainer.innerHTML = desiredFooterHtml;
@@ -2409,6 +2512,27 @@
         openWaltonBudgetFooterSearch();
       });
     });
+    var contactDialog = footer.querySelector('.wc-footer-contact-dialog');
+    footer.querySelectorAll('.wc-footer-contact-button').forEach(function(button){
+      button.addEventListener('click', function(){
+        if(contactDialog && typeof contactDialog.showModal === 'function'){
+          contactDialog.showModal();
+        }else if(contactDialog){
+          contactDialog.setAttribute('open', '');
+        }
+      });
+    });
+    if(contactDialog){
+      contactDialog.addEventListener('click', function(event){
+        if(event.target === contactDialog){
+          contactDialog.close();
+        }
+      });
+      var emailLink = contactDialog.querySelector('a[href^="mailto:"]');
+      if(emailLink){
+        emailLink.addEventListener('click', function(){ contactDialog.close(); });
+      }
+    }
   }
   function startWcBudgetNav(){
     ensureWaltonSplitLogoStyles();

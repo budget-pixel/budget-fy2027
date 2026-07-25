@@ -7,6 +7,7 @@ window.wcProjectSearchBaseUrl = window.location.pathname.indexOf("/pages/") !== 
   : "pages/search.html?q=";
 
 var wcCoreBudgetPages = [
+  { title:"Privacy Statement", section:"Website Information", href:"privacy.html", keywords:["privacy","cookies","analytics","public records","data"] },
   { title:"Table of Contents", section:"Introduction and Overview", href:"table-of-contents.html" },
   { title:"GFOA Distinguished Budget Presentation Award", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbd25815ed4e2fe49b4" },
   { title:"Transmittal Letter", section:"Introduction and Overview", href:"https://stories.opengov.com/countyofwaltonfl/cf6eaa7a-a98d-479a-9869-b20398ee38e5/published/re0lJHwus?currentPageId=6989dbbdc3a5aa570050fba9" },
