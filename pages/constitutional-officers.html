@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Constitutional Officers & Other Agencies — Walton County FY 2027 Budget</title>
-<link rel="stylesheet" href="../assets/style.css?v=20260711-dark-mode-only-pages">
+<link rel="stylesheet" href="../assets/style.css?v=20260724-property-tax-label">
 </head>
 <body>
 
@@ -484,10 +484,10 @@
       el.innerHTML = fundSummaries.map(function(f, index){
         var trendClass = (f.trendDollar && f.trendDollar !== "Loading") ? (f.trendDollar.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
         var fteTrendClass = (f.fteTrend && f.fteTrend !== "Loading") ? (f.fteTrend.charAt(0) === "-" ? "wc-directory-item-trend-down" : "wc-directory-item-trend-up") : "";
-        var propertyTaxLabel = f.propertyTax === "Loading" || f.propertyTax ? "Property Tax" : "Not Funded with Property Tax";
+        var propertyTaxLabel = "Property Tax";
         var propertyTaxValueHtml = f.propertyTax === "Loading"
           ? LOADING_DOTS_HTML
-          : (f.propertyTax ? escapeHtml(f.propertyTax) : "");
+          : escapeHtml(f.propertyTax || "$0");
         var isActive = activeSpecIndex === index;
         return '<button type="button" class="wc-dept-fund-card wc-dept-fund-card--clickable' + (isActive ? " wc-dept-fund-card--active" : "") + '" data-spec-index="' + index + '" aria-pressed="' + (isActive ? "true" : "false") + '">' +
           '<p class="wc-dept-fund-card-label">' + escapeHtml(f.label) + '</p>' +

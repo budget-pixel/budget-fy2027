@@ -41,6 +41,8 @@
     "sheriffs office": ["walton county sheriff s office", "walton county sheriffs office", "sheriff"],
     "clerk of courts and county comptroller": ["clerk of court", "clerk of circuit court"],
     "engineering department": ["public works engineering services", "engineering services"],
+    "engineering services": ["engineering department", "public works engineering services"],
+    "public works engineering services": ["engineering department", "engineering services"],
     "environmental resources": ["environmental services"],
     "probation": ["probation services"],
     "purchasing": ["procurement"],
@@ -13403,6 +13405,251 @@
       });
   }
 
+  const STRATEGIC_INITIATIVES = [
+    { code: "I", title: "Planned Growth with Sustainable Infrastructure" },
+    { code: "II", title: "Organizational Performance and Asset Management" },
+    { code: "III", title: "Workforce Development and Accessible Housing" },
+    { code: "IV", title: "Preservation of Natural Resources, Historical Heritage, and Natural Beauty" },
+    { code: "V", title: "Safe, Clean, and Prideful Communities" },
+    { code: "VI", title: "Visitor Experience Diversification" },
+    { code: "VII", title: "Cultural, Arts, and Recreational Experience Expansion" }
+  ];
+
+  const STRATEGIC_SCOPE_EXCLUSIONS = [
+    "sheriff",
+    "clerk of court",
+    "clerk of courts",
+    "clerk of the circuit court",
+    "tax collector",
+    "property appraiser",
+    "supervisor of elections"
+  ];
+
+  function isBoardControlledStrategicDepartment(row) {
+    const name = normalizeDeptName(row && row.Dept_Name);
+    return !STRATEGIC_SCOPE_EXCLUSIONS.some((excluded) => name.includes(normalizeDeptName(excluded)));
+  }
+
+  function strategicInitiativeCodes(value) {
+    const codes = String(value || "").toUpperCase().match(/\b(?:VII|VI|IV|V|III|II|I)\b/g) || [];
+    return Array.from(new Set(codes));
+  }
+
+  function strategicDepartmentBudget(row) {
+    const sumProposed = (expenses) => expenses
+      .reduce((sum, expense) => sum + (expense.FY2027_Proposed || 0), 0);
+    const codeMatchedTotal = sumProposed(getDepartmentExpenses(row.Dept_Name, row.Dept_Code));
+    if (codeMatchedTotal) return codeMatchedTotal;
+
+    // Some performance records retain a legacy department code even after
+    // the budget moved to a renamed or reorganized department. Engineering
+    // is the current example: its code still finds a zero-dollar legacy row,
+    // while its FY 2027 budget is carried under Engineering Services/Public
+    // Works Engineering Services. Retry through the shared name aliases when
+    // the code match has no proposed budget.
+    return sumProposed(getDepartmentExpenses(row.Dept_Name, ""));
+  }
+
+  // Shared by both the initiative summary line and the filter pill count so
+  // the two numbers a reader sees for the same initiative always agree --
+  // previously the pill showed a raw performance-measure count while the
+  // summary line showed a distinct-goal count, and the two never matched.
+  function countUniqueGoals(rows) {
+    return new Set(
+      rows.map((row) => [row.Dept_Code, row.Goal].join("|")).filter((key) => key.split("|")[1])
+    ).size;
+  }
+
+  function strategicInitiativeGroupHtml(initiative, rows) {
+    const departments = new Map();
+    rows.forEach((row) => {
+      const key = row.Dept_Code || normalizeDeptName(row.Dept_Name);
+      if (!departments.has(key)) {
+        departments.set(key, {
+          code: row.Dept_Code,
+          name: row.Dept_Name || "Department not identified",
+          amount: strategicDepartmentBudget(row),
+          rows: []
+        });
+      }
+      departments.get(key).rows.push(row);
+    });
+
+    const departmentList = Array.from(departments.values()).sort((a, b) => a.name.localeCompare(b.name));
+    const initiativeAmount = departmentList.reduce((sum, department) => sum + department.amount, 0);
+    const goalCount = countUniqueGoals(rows);
+
+    const departmentHtml = departmentList.map((department) => {
+      const href = departmentPageHref(department.name);
+      const heading = href
+        ? '<a href="' + escapeHtml(href) + '">' + escapeHtml(department.name) + "</a>"
+        : escapeHtml(department.name);
+
+      // Several performance measures often share one Department Goal (e.g.
+      // "Ensure safe, quality construction" backing both an inspections and
+      // a licensing measure) -- group by goal so that statement prints once
+      // as a heading instead of being repeated on every measure beneath it.
+      const goalGroups = new Map();
+      department.rows.forEach((row) => {
+        const goalKey = row.Goal || "Not provided";
+        if (!goalGroups.has(goalKey)) goalGroups.set(goalKey, []);
+        goalGroups.get(goalKey).push(row);
+      });
+
+      const goalGroupHtml = Array.from(goalGroups.entries()).map(([goal, goalRows]) => {
+        const measureRows = goalRows.map((row) => {
+          const target = row.Projected_2027 || "Not provided";
+          return (
+            '<div class="wc-alignment-measure-row">' +
+              '<div><span>Objective</span><p>' + escapeHtml(row.Objective || "Not provided") + "</p></div>" +
+              '<div><span>Performance measure</span><p>' + escapeHtml(row.Measure || "Not provided") + "</p></div>" +
+              '<div class="wc-alignment-target"><span>FY 2027 target</span><p>' + escapeHtml(target) + "</p></div>" +
+            "</div>"
+          );
+        }).join("");
+        return (
+          '<div class="wc-alignment-goal-group">' +
+            '<p class="wc-alignment-goal-heading"><span>Department goal</span>' + escapeHtml(goal) + "</p>" +
+            '<div class="wc-alignment-measure-rows">' + measureRows + "</div>" +
+          "</div>"
+        );
+      }).join("");
+
+      const measureCount = department.rows.length;
+      const summaryDetail = goalGroups.size + " " + (goalGroups.size === 1 ? "goal" : "goals") +
+        " · " + measureCount + " performance " + (measureCount === 1 ? "measure" : "measures");
+
+      return (
+        '<details class="wc-alignment-department">' +
+          '<summary><span class="wc-alignment-department-summary-copy"><strong>' + heading + '</strong><small>' + summaryDetail + '</small></span>' +
+          '<span class="wc-alignment-department-heading"><span>FY 2027 proposed department budget</span><strong>' + formatCurrency(department.amount) + "</strong></span></summary>" +
+          goalGroupHtml +
+        "</details>"
+      );
+    }).join("");
+
+    return (
+      '<details class="wc-alignment-initiative" id="priority-detail-' + initiative.code + '" data-initiative="' + initiative.code + '">' +
+        '<summary><span class="wc-alignment-roman">' + initiative.code + '.</span><span class="wc-alignment-summary-copy"><strong>' +
+        escapeHtml(initiative.title) + '</strong><small>' + departmentList.length + " " + (departmentList.length === 1 ? "department" : "departments") +
+        " · " + goalCount + " " + (goalCount === 1 ? "goal" : "goals") + " · " + formatCurrency(initiativeAmount) +
+        " in proposed department budgets</small></span></summary>" +
+        '<div class="wc-alignment-initiative-body"><button type="button" class="wc-priority-back" data-initiative-filter="all">&larr; All priorities</button>' +
+        (departmentHtml || '<p class="wc-alignment-empty">No aligned department goals are currently listed.</p>') + "</div>" +
+      "</details>"
+    );
+  }
+
+  function initStrategicInitiativesPage() {
+    const container = document.getElementById("strategic-initiative-alignment");
+    if (!container) return;
+    container.innerHTML = '<div class="wc-data-loading">' + LOADING_MESSAGE_HTML + "</div>";
+
+    loadBudgetData().then((data) => {
+      const performanceRows = (data.performanceMeasures || []).filter((row) =>
+        row.Dept_Name && isBoardControlledStrategicDepartment(row) && strategicInitiativeCodes(row["Code Link"]).length
+      );
+      const representedDepartments = new Map();
+      performanceRows.forEach((row) => {
+        const key = row.Dept_Code || normalizeDeptName(row.Dept_Name);
+        if (!representedDepartments.has(key)) representedDepartments.set(key, strategicDepartmentBudget(row));
+      });
+      const controlledBudget = Array.from(representedDepartments.values()).reduce((sum, amount) => sum + amount, 0);
+      const controlledBudgetElement = document.getElementById("strategic-controlled-budget");
+      const controlledDepartmentsElement = document.getElementById("strategic-controlled-departments");
+      if (controlledBudgetElement) controlledBudgetElement.textContent = formatCurrency(controlledBudget);
+      if (controlledDepartmentsElement) {
+        controlledDepartmentsElement.textContent = representedDepartments.size + " aligned Board-controlled " +
+          (representedDepartments.size === 1 ? "department" : "departments");
+      }
+      const groups = STRATEGIC_INITIATIVES.map((initiative) => ({
+        initiative,
+        rows: performanceRows.filter((row) => strategicInitiativeCodes(row["Code Link"]).includes(initiative.code))
+      }));
+
+      const priorityCards = groups.map(({ initiative, rows }) => {
+        const departments = new Map();
+        rows.forEach((row) => {
+          const key = row.Dept_Code || normalizeDeptName(row.Dept_Name);
+          if (!departments.has(key)) departments.set(key, strategicDepartmentBudget(row));
+        });
+        const budget = Array.from(departments.values()).reduce((sum, amount) => sum + amount, 0);
+        const goalCount = countUniqueGoals(rows);
+        return '<button type="button" class="wc-priority-card" data-initiative-filter="' + initiative.code + '" aria-controls="priority-detail-' + initiative.code + '" aria-pressed="false">' +
+          '<span class="wc-priority-number">' + initiative.code + '.</span>' +
+          '<span class="wc-priority-card-copy"><strong>' + escapeHtml(initiative.title) + '</strong><small>' +
+          departments.size + " " + (departments.size === 1 ? "department" : "departments") + " · " +
+          goalCount + " " + (goalCount === 1 ? "goal" : "goals") + '</small><span class="wc-priority-action">Explore priority &rarr;</span></span>' +
+          '<span class="wc-priority-budget"><span>FY 2027 department budgets represented</span>' + formatCurrency(budget) + "</span>" +
+        "</button>";
+      }).join("");
+
+      container.innerHTML =
+        '<div class="wc-priority-toolbar"><span>Select a priority to see its department goals and performance measures.</span>' +
+          '<button type="button" class="wc-priority-reset" data-initiative-filter="all" hidden>Return to all priorities</button></div>' +
+        '<div class="wc-priority-grid" role="group" aria-label="Board strategic priorities">' + priorityCards + "</div>" +
+        '<p class="wc-alignment-note">Budget figures provide department-level context and are not direct allocations to an individual goal, objective, or performance measure.</p>' +
+        '<p class="wc-priority-prompt">Choose a priority above to explore the departments and measurable work supporting it.</p>' +
+        '<div class="wc-alignment-groups">' + groups.map(({ initiative, rows }) => strategicInitiativeGroupHtml(initiative, rows)).join("") + "</div>";
+
+      container.querySelectorAll(".wc-alignment-initiative").forEach((group) => { group.hidden = true; });
+
+      function selectPriority(selected, options) {
+        options = options || {};
+        container.querySelectorAll(".wc-priority-card").forEach((item) => {
+          const active = item.dataset.initiativeFilter === selected;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+        const reset = container.querySelector(".wc-priority-reset");
+        const prompt = container.querySelector(".wc-priority-prompt");
+        reset.hidden = selected === "all";
+        prompt.hidden = selected !== "all";
+        container.querySelectorAll(".wc-alignment-initiative").forEach((group) => {
+          group.hidden = selected === "all" || group.dataset.initiative !== selected;
+          group.open = selected !== "all" && !group.hidden;
+        });
+        if (!options.skipHash && window.history && window.history.replaceState) {
+          const base = window.location.pathname + window.location.search;
+          window.history.replaceState(null, "", selected === "all" ? base : base + "#priority-" + selected);
+        }
+        if (options.scroll) {
+          const target = selected === "all"
+            ? container.querySelector(".wc-priority-grid")
+            : container.querySelector('[data-initiative="' + selected + '"]');
+          if (target) window.requestAnimationFrame(() => target.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }
+      }
+
+      container.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-initiative-filter]");
+        if (!button) return;
+        selectPriority(button.dataset.initiativeFilter, { scroll: true });
+      });
+
+      const hashMatch = window.location.hash.match(/^#priority-(I|II|III|IV|V|VI|VII)$/);
+      if (hashMatch) selectPriority(hashMatch[1], { skipHash: true, scroll: true });
+
+      container.querySelector(".wc-alignment-groups").addEventListener("toggle", (event) => {
+        const opened = event.target;
+        if (!opened.open) return;
+        if (opened.classList.contains("wc-alignment-initiative")) {
+          container.querySelectorAll(".wc-alignment-initiative[open]").forEach((group) => {
+            if (group !== opened) group.open = false;
+          });
+        } else if (opened.classList.contains("wc-alignment-department")) {
+          const parent = opened.closest(".wc-alignment-initiative");
+          parent.querySelectorAll(".wc-alignment-department[open]").forEach((department) => {
+            if (department !== opened) department.open = false;
+          });
+        }
+      }, true);
+    }).catch((err) => {
+      console.error("WCBudgetData: failed to load strategic initiative alignment", err);
+      container.innerHTML = '<div class="wc-data-error">' + escapeHtml(ERROR_MESSAGE) + "</div>";
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initDepartmentPage();
     initFinancialSummaryPage();
@@ -13419,6 +13666,7 @@
     initConsolidatedBudgetChangesPage();
     initExpenseActivityChartsPage();
     initFinancialForecastPage();
+    initStrategicInitiativesPage();
   });
 
   window.WCBudgetData = {

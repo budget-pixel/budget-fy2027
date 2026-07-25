@@ -2900,13 +2900,8 @@ a:where(:visited) {
   letter-spacing: .03em; line-height: 1.2; text-transform: uppercase; white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis;
 }
-.wc-dept-fund-chip:nth-child(3) .wc-dept-fund-chip-label,
 .wc-dept-fund-chip:nth-child(4) .wc-dept-fund-chip-label {
   font-size: 0;
-}
-.wc-dept-fund-chip:nth-child(3) .wc-dept-fund-chip-label::after {
-  content: "Budget Change";
-  font-size: .74rem;
 }
 .wc-dept-fund-chip:nth-child(4) .wc-dept-fund-chip-label::after {
   content: "Staff";
