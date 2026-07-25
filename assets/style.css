@@ -122,17 +122,17 @@ a:where(:visited) {
   margin: 28px 0 10px; text-transform: uppercase; letter-spacing: .05em;
   border-left: 4px solid var(--gold); padding-left: 10px;
 }
-.page-text .privacy-use-list {
+.page-text .wc-page-text-list {
   margin: -2px 0 18px;
   padding-left: 1.15rem;
 }
-.page-text .privacy-use-list li {
+.page-text .wc-page-text-list li {
   margin: 0 0 5px;
   padding-left: .15rem;
   font-size: .9rem;
   line-height: 1.65;
 }
-.page-text .privacy-use-list li::marker {
+.page-text .wc-page-text-list li::marker {
   color: var(--green);
   font-size: .8em;
 }
