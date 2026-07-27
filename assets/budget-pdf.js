@@ -1219,6 +1219,17 @@ var PRINT_CSS = `
     overflow:visible !important;
   }
 
+  /* Tourism Administration pairs a division's Expenditure Summary with
+     its Advertising Services card in a two-column screen layout. Printed
+     budget lines need the full page width, so keep Advertising Services
+     in the same division but place it below the main expenditure table. */
+  .tourism-admin-financial-pair{
+    display:block !important;
+    grid-template-columns:none !important;
+    width:100% !important;
+    margin:0 !important;
+  }
+
   .wc-finance-card::before{
     content:attr(data-print-title) !important;
     display:block !important;
