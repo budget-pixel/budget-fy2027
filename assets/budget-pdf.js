@@ -140,7 +140,8 @@ var PRINT_CSS = `
   .mosquito-statement-media,
   .eagle-springs-statement-media,
   .eagle-springs-grill-statement-media,
-  .code-compliance-statement-media{
+  .code-compliance-statement-media,
+  .lifeguard-expense-map-row{
     display:block !important;
     grid-template-columns:none !important;
   }
