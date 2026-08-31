@@ -25,6 +25,11 @@
   const LOADING_MESSAGE_HTML = escapeHtml(LOADING_MESSAGE) +
     ' <span class="wc-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>';
   const ERROR_MESSAGE = "Budget data could not be loaded. Please try again later.";
+  // A browser fetch can remain pending indefinitely when a content blocker,
+  // captive portal, or transient third-party outage prevents a response. The
+  // page's renderers all wait on the shared load promise, so bound external
+  // requests and let the existing per-source fallbacks/error UI take over.
+  const EXTERNAL_REQUEST_TIMEOUT_MS = 15000;
   const HISTORICAL_ACTUAL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
   const SUPABASE_CLIENT_SCRIPT = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
@@ -374,8 +379,29 @@
   };
   let loadPromise = null;
 
+  function withTimeout(promise, label, fallbackValue) {
+    let timeoutId;
+    const timeout = new Promise((resolve) => {
+      timeoutId = setTimeout(() => {
+        console.warn("WCBudgetData: " + label + " timed out after " + EXTERNAL_REQUEST_TIMEOUT_MS + "ms.");
+        resolve(fallbackValue);
+      }, EXTERNAL_REQUEST_TIMEOUT_MS);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+  }
+
+  function fetchWithTimeout(url) {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    let timeoutId;
+    if (controller) timeoutId = setTimeout(() => controller.abort(), EXTERNAL_REQUEST_TIMEOUT_MS);
+    return fetch(url, {
+      cache: "no-store",
+      signal: controller ? controller.signal : undefined
+    }).finally(() => clearTimeout(timeoutId));
+  }
+
   function loadScriptOnce(id, src) {
-    return new Promise((resolve, reject) => {
+    return withTimeout(new Promise((resolve, reject) => {
       const existing = document.getElementById(id);
       if (existing) {
         if (existing.dataset.loaded === "true") {
@@ -401,6 +427,8 @@
       );
       script.addEventListener("error", () => reject(new Error("Failed to load " + src)), { once: true });
       document.head.appendChild(script);
+    }), "script load for " + src, null).then((result) => {
+      if (result === null) throw new Error("Timed out loading " + src);
     });
   }
 
@@ -417,7 +445,7 @@
   }
 
   function loadSupabaseActualLookups() {
-    return ensureSupabaseDataLayer().then((supabaseData) => {
+    const request = ensureSupabaseDataLayer().then((supabaseData) => {
       if (!supabaseData) return null;
 
       return Promise.all([
@@ -434,6 +462,7 @@
       console.error("WCBudgetData: Supabase actuals could not be loaded; using Google Sheets fallbacks.", err);
       return null;
     });
+    return withTimeout(request, "Supabase actuals", null);
   }
 
   // Some departments' historical actuals are booked under older Dept_Code
@@ -2789,7 +2818,7 @@
   }
 
   function fetchCSV(url) {
-    return fetch(url, { cache: "no-store" })
+    return fetchWithTimeout(url)
       .then((res) => {
         if (!res.ok) throw new Error("Request failed with status " + res.status);
         return res.text();
@@ -12507,7 +12536,7 @@
   }
 
   function fetchPersonnelCostFormulaInputs() {
-    return fetch(DATA_SOURCES.personnelCostFormulaInputs, { cache: "no-store" })
+    return fetchWithTimeout(DATA_SOURCES.personnelCostFormulaInputs)
       .then((res) => {
         if (!res.ok) throw new Error("Request failed with status " + res.status);
         return res.text();
