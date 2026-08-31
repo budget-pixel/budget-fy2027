@@ -137,20 +137,57 @@
       });
   }
 
-  function fetchCSV(url) {
-    return fetch(url, { cache: "no-store" })
-      .then((res) => {
-        if (!res.ok) throw new Error("Request failed with status " + res.status);
-        return res.text();
+  // Short-lived cache + one retry + stale-cache fallback, same pattern as
+  // assets/budget-data.js's fetchWithTimeout.
+  const RESPONSE_CACHE_TTL_MS = 5 * 60 * 1000;
+
+  function fetchTextCached(url) {
+    const cacheKey = "wcFetchCache:" + url;
+    let cached = null;
+    try {
+      const raw = sessionStorage.getItem(cacheKey);
+      cached = raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      cached = null;
+    }
+    if (cached && Date.now() - cached.savedAt < RESPONSE_CACHE_TTL_MS) {
+      return Promise.resolve(cached.text);
+    }
+
+    function attempt(retriesLeft) {
+      return fetch(url, { cache: "no-store" })
+        .then((res) => {
+          if (!res.ok) throw new Error("Request failed with status " + res.status);
+          return res.text();
+        })
+        .catch((err) => {
+          if (retriesLeft > 0) return attempt(retriesLeft - 1);
+          throw err;
+        });
+    }
+
+    return attempt(1)
+      .then((text) => {
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ text, savedAt: Date.now() }));
+        } catch (err) {
+          // sessionStorage can throw (private browsing, quota) -- caching is
+          // an optimization, never required for correctness.
+        }
+        return text;
       })
-      .then(parseCSV);
+      .catch((err) => {
+        if (cached) return cached.text;
+        throw err;
+      });
+  }
+
+  function fetchCSV(url) {
+    return fetchTextCached(url).then(parseCSV);
   }
 
   function fetchJSON(url) {
-    return fetch(url, { cache: "no-store" }).then((res) => {
-      if (!res.ok) throw new Error("Request failed with status " + res.status);
-      return res.json();
-    });
+    return fetchTextCached(url).then((text) => JSON.parse(text));
   }
 
   // Single pass over the template text: escapes plain text, converts

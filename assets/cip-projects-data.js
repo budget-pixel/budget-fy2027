@@ -33,6 +33,62 @@
 
   window.wcCipProjects = Array.isArray(window.wcCipProjects) ? window.wcCipProjects : [];
 
+  // Short-lived cache + one retry + stale-cache fallback, same pattern as
+  // assets/budget-data.js's fetchWithTimeout -- avoids re-fetching this
+  // ~180KB sheet on every page view, and degrades to slightly-old data
+  // instead of an empty project list if the sheet is slow to publish.
+  const RESPONSE_CACHE_TTL_MS = 5 * 60 * 1000;
+  const RESPONSE_CACHE_KEY = "wcFetchCache:" + CAPITAL_PROJECTS_CSV_URL;
+
+  function readResponseCache() {
+    try {
+      const raw = sessionStorage.getItem(RESPONSE_CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function writeResponseCache(text) {
+    try {
+      sessionStorage.setItem(RESPONSE_CACHE_KEY, JSON.stringify({ text, savedAt: Date.now() }));
+    } catch (err) {
+      // sessionStorage can throw (private browsing, quota) -- caching is an
+      // optimization, never required for correctness.
+    }
+  }
+
+  function fetchCsvTextWithRetry() {
+    const cached = readResponseCache();
+    if (cached && Date.now() - cached.savedAt < RESPONSE_CACHE_TTL_MS) {
+      return Promise.resolve(cached.text);
+    }
+
+    function attempt(retriesLeft) {
+      return fetch(CAPITAL_PROJECTS_CSV_URL, { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Capital projects sheet request failed with status " + response.status);
+          }
+          return response.text();
+        })
+        .catch((err) => {
+          if (retriesLeft > 0) return attempt(retriesLeft - 1);
+          throw err;
+        });
+    }
+
+    return attempt(1)
+      .then((text) => {
+        writeResponseCache(text);
+        return text;
+      })
+      .catch((err) => {
+        if (cached) return cached.text;
+        throw err;
+      });
+  }
+
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -341,13 +397,7 @@
   }
 
   function fetchCapitalProjects() {
-    return fetch(CAPITAL_PROJECTS_CSV_URL, { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Capital projects sheet request failed with status " + response.status);
-        }
-        return response.text();
-      })
+    return fetchCsvTextWithRetry()
       .then(parseCSV)
       .then(normalizeCapitalProjects)
       .then((projects) => {

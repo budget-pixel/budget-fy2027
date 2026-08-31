@@ -390,14 +390,104 @@
     return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
   }
 
+  // Short-lived response cache (sessionStorage) so repeat page views within
+  // the same browsing session don't re-fetch every published sheet tab from
+  // scratch -- these are 10+ separate requests per page load, and Google's
+  // publish-to-web CSV endpoint is slow enough (0.5-2s per tab, observed)
+  // that doing this uncached on every navigation is the main source of slow
+  // loads. A few minutes of staleness is an acceptable trade for a site that
+  // still reads "live" off Google Sheets.
+  const RESPONSE_CACHE_TTL_MS = 5 * 60 * 1000;
+  const RESPONSE_CACHE_PREFIX = "wcFetchCache:";
+  // Set when a fetch had to fall back to a retry or stale cached data this
+  // load -- drives the "data may be incomplete" banner in loadBudgetData().
+  let hadDegradedFetch = false;
+
+  function readResponseCache(url) {
+    try {
+      const raw = sessionStorage.getItem(RESPONSE_CACHE_PREFIX + url);
+      return raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function writeResponseCache(url, text) {
+    try {
+      sessionStorage.setItem(RESPONSE_CACHE_PREFIX + url, JSON.stringify({ text, savedAt: Date.now() }));
+    } catch (err) {
+      // sessionStorage can throw (private browsing, quota) -- caching is an
+      // optimization, never required for correctness.
+    }
+  }
+
+  function textResponse(text) {
+    return { ok: true, status: 200, text: () => Promise.resolve(text) };
+  }
+
+  // Fetches a URL with a timeout, one retry on failure, a short-lived
+  // sessionStorage cache to skip the network entirely on repeat page views,
+  // and a stale-cache fallback so a single flaky/slow request degrades to
+  // "slightly old data" instead of silently rendering as empty (the actual
+  // cause of things like Summary of Personnel's FTE totals going blank).
   function fetchWithTimeout(url) {
-    const controller = typeof AbortController === "function" ? new AbortController() : null;
-    let timeoutId;
-    if (controller) timeoutId = setTimeout(() => controller.abort(), EXTERNAL_REQUEST_TIMEOUT_MS);
-    return fetch(url, {
-      cache: "no-store",
-      signal: controller ? controller.signal : undefined
-    }).finally(() => clearTimeout(timeoutId));
+    const cached = readResponseCache(url);
+    if (cached && Date.now() - cached.savedAt < RESPONSE_CACHE_TTL_MS) {
+      return Promise.resolve(textResponse(cached.text));
+    }
+
+    function attempt(retriesLeft) {
+      const controller = typeof AbortController === "function" ? new AbortController() : null;
+      let timeoutId;
+      if (controller) timeoutId = setTimeout(() => controller.abort(), EXTERNAL_REQUEST_TIMEOUT_MS);
+      return fetch(url, { cache: "no-store", signal: controller ? controller.signal : undefined })
+        .finally(() => clearTimeout(timeoutId))
+        .catch((err) => {
+          if (retriesLeft > 0) {
+            hadDegradedFetch = true;
+            return attempt(retriesLeft - 1);
+          }
+          throw err;
+        });
+    }
+
+    return attempt(1)
+      .then((res) => {
+        if (!res.ok) return res;
+        return res.text().then((text) => {
+          writeResponseCache(url, text);
+          return textResponse(text);
+        });
+      })
+      .catch((err) => {
+        if (cached) {
+          hadDegradedFetch = true;
+          return textResponse(cached.text);
+        }
+        throw err;
+      });
+  }
+
+  // Small dismissible page-level notice for when some budget figures loaded
+  // from stale/retried data rather than a fresh fetch -- shown instead of
+  // silently rendering incomplete tables with no indication anything is off.
+  function showDataFreshnessWarning() {
+    if (document.getElementById("wc-data-freshness-warning")) return;
+    const bar = document.createElement("div");
+    bar.id = "wc-data-freshness-warning";
+    bar.setAttribute("role", "status");
+    bar.style.cssText =
+      "position:sticky;top:0;z-index:9999;background:#fff3cd;color:#664d03;" +
+      "border-bottom:1px solid #ffe69c;padding:10px 16px;font-size:14px;" +
+      "display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;";
+    bar.innerHTML =
+      '<span>Some figures on this page may be out of date or incomplete due to a slow connection to the data source.</span>' +
+      '<button type="button" style="background:#664d03;color:#fff3cd;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;">Refresh</button>' +
+      '<button type="button" aria-label="Dismiss" style="background:none;border:none;color:#664d03;cursor:pointer;font-size:16px;line-height:1;">&times;</button>';
+    const [refreshButton, dismissButton] = bar.querySelectorAll("button");
+    refreshButton.addEventListener("click", () => window.location.reload());
+    dismissButton.addEventListener("click", () => bar.remove());
+    document.body.insertBefore(bar, document.body.firstChild);
   }
 
   function loadScriptOnce(id, src) {
@@ -3085,6 +3175,8 @@
   function loadBudgetData() {
     if (loadPromise) return loadPromise;
 
+    hadDegradedFetch = false;
+
     const specs = [
       ["expenditures", DATA_SOURCES.expenditures, normalizeExpenditureRow],
       ["revenues", DATA_SOURCES.revenues, normalizeRevenueRow],
@@ -3171,6 +3263,10 @@
 
       auditDepartmentExpenseRevenueParity();
       auditPersonnelCostPositionParity();
+
+      if (Object.keys(cache.errors).length > 0 || hadDegradedFetch) {
+        showDataFreshnessWarning();
+      }
 
       return cache;
     });

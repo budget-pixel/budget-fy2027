@@ -74,13 +74,49 @@
     return value.toFixed(2) + "%";
   }
 
+  // Short-lived cache + one retry + stale-cache fallback, same pattern as
+  // assets/budget-data.js's fetchWithTimeout.
+  const RESPONSE_CACHE_TTL_MS = 5 * 60 * 1000;
+
   function fetchCSV(url) {
-    return fetch(url, { cache: "no-store" })
-      .then((res) => {
-        if (!res.ok) throw new Error("Request failed with status " + res.status);
-        return res.text();
+    const cacheKey = "wcFetchCache:" + url;
+    let cached = null;
+    try {
+      const raw = sessionStorage.getItem(cacheKey);
+      cached = raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      cached = null;
+    }
+    if (cached && Date.now() - cached.savedAt < RESPONSE_CACHE_TTL_MS) {
+      return Promise.resolve(parseCSVRows(cached.text));
+    }
+
+    function attempt(retriesLeft) {
+      return fetch(url, { cache: "no-store" })
+        .then((res) => {
+          if (!res.ok) throw new Error("Request failed with status " + res.status);
+          return res.text();
+        })
+        .catch((err) => {
+          if (retriesLeft > 0) return attempt(retriesLeft - 1);
+          throw err;
+        });
+    }
+
+    return attempt(1)
+      .then((text) => {
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ text, savedAt: Date.now() }));
+        } catch (err) {
+          // sessionStorage can throw (private browsing, quota) -- caching is
+          // an optimization, never required for correctness.
+        }
+        return parseCSVRows(text);
       })
-      .then(parseCSVRows);
+      .catch((err) => {
+        if (cached) return parseCSVRows(cached.text);
+        throw err;
+      });
   }
 
   function renderTaxpayersTable(container, rows) {

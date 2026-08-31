@@ -16,6 +16,51 @@
       .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
 
+  // Short-lived cache + one retry + stale-cache fallback, same pattern as
+  // assets/budget-data.js's fetchWithTimeout.
+  const RESPONSE_CACHE_TTL_MS = 5 * 60 * 1000;
+
+  function fetchEquipmentCsvText() {
+    const cacheKey = "wcFetchCache:" + DATA_URL;
+    let cached = null;
+    try {
+      const raw = sessionStorage.getItem(cacheKey);
+      cached = raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      cached = null;
+    }
+    if (cached && Date.now() - cached.savedAt < RESPONSE_CACHE_TTL_MS) {
+      return Promise.resolve(cached.text);
+    }
+
+    function attempt(retriesLeft) {
+      return fetch(DATA_URL)
+        .then((response) => {
+          if (!response.ok) throw new Error("Equipment sheet request failed");
+          return response.text();
+        })
+        .catch((err) => {
+          if (retriesLeft > 0) return attempt(retriesLeft - 1);
+          throw err;
+        });
+    }
+
+    return attempt(1)
+      .then((text) => {
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ text, savedAt: Date.now() }));
+        } catch (err) {
+          // sessionStorage can throw (private browsing, quota) -- caching is
+          // an optimization, never required for correctness.
+        }
+        return text;
+      })
+      .catch((err) => {
+        if (cached) return cached.text;
+        throw err;
+      });
+  }
+
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -114,8 +159,7 @@
       return;
     }
 
-    fetch(DATA_URL)
-      .then((response) => { if (!response.ok) throw new Error("Equipment sheet request failed"); return response.text(); })
+    fetchEquipmentCsvText()
       .then(parseCSV)
       .then((records) => {
         const record = records.find((item) => String(item["Equip Code"] || "").trim() === String(requestedAsset).trim());
