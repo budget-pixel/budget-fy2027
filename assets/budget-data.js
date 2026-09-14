@@ -3062,8 +3062,8 @@
         const sum381fy2025 = all381.reduce((s, r) => s + (r.FY2025_Actual || 0), 0);
         const sum381fy2026 = all381.reduce((s, r) => s + (r.FY2026_Original_Budget || r.FY2026_Budget || 0), 0);
         const total2027 = [src311, ...all381].reduce((s, r) => s + (r.FY2027_Proposed || 0), 0);
-        const fy2027AdValorem = Math.max(0, total2027 - 480000);
-        let interfundAssigned = false;
+        const fy2027AdValorem = Math.max(0, total2027 - 460000);
+        const e911Row = all381.find((r) => /e[-\s]?911/i.test(String((r && r.Note) || "")));
         filledRevenueRows = filledRevenueRows.map((r) => {
           const code = String((r && r.Revenue_Code) || "").trim();
           if (code === "311000") {
@@ -3078,8 +3078,7 @@
             };
           }
           if (code === "381000") {
-            const fy2027 = !interfundAssigned ? 480000 : 0;
-            interfundAssigned = true;
+            const isE911Row = e911Row ? r === e911Row : r === all381[0];
             return {
               ...r,
               _actualsBackfilled: true,
@@ -3088,7 +3087,7 @@
               FY2025_Actual: 0,
               FY2026_Original_Budget: 0,
               FY2026_Budget: 0,
-              FY2027_Proposed: fy2027,
+              FY2027_Proposed: isE911Row ? 460000 : 0,
             };
           }
           return r;
@@ -11140,8 +11139,8 @@
             const sum381fy2025 = all381.reduce((s, r) => s + (r.FY2025_Actual || 0), 0);
             const sum381fy2026 = all381.reduce((s, r) => s + (r.FY2026_Original_Budget || r.FY2026_Budget || 0), 0);
             const total2027 = [src311, ...all381].reduce((s, r) => s + (r.FY2027_Proposed || 0), 0);
-            const fy2027AdValorem = Math.max(0, total2027 - 480000);
-            let interfundAssigned = false;
+            const fy2027AdValorem = Math.max(0, total2027 - 460000);
+            const e911Row = all381.find((r) => /e[-\s]?911/i.test(String((r && r.Note) || "")));
             filledRevenueRows = filledRevenueRows.map((r) => {
               const code = String((r && r.Revenue_Code) || "").trim();
               if (code === "311000") {
@@ -11156,8 +11155,7 @@
                 };
               }
               if (code === "381000") {
-                const fy2027 = !interfundAssigned ? 480000 : 0;
-                interfundAssigned = true;
+                const isE911Row = e911Row ? r === e911Row : r === all381[0];
                 return {
                   ...r,
                   _actualsBackfilled: true,
@@ -11166,7 +11164,7 @@
                   FY2025_Actual: 0,
                   FY2026_Original_Budget: 0,
                   FY2026_Budget: 0,
-                  FY2027_Proposed: fy2027,
+                  FY2027_Proposed: isE911Row ? 460000 : 0,
                 };
               }
               return r;
