@@ -1,21 +1,28 @@
-/* Walton County FY 2027 Budget — live Google Sheets data layer.
-   Fetches, parses, and renders department + financial summary data from the
-   published budget CSVs. Exposes window.WCBudgetData for reuse on any page. */
+/* Walton County FY 2027 Budget — frozen static data layer.
+   Fetches, parses, and renders department + financial summary data from a
+   snapshot of the published budget CSVs stored in assets/data/. These CSVs
+   are a point-in-time freeze of the FY2027 tentative budget spreadsheet and
+   are no longer refetched from Google Sheets, so the site's numbers stay
+   static regardless of later edits to that sheet. Exposes
+   window.WCBudgetData for reuse on any page. */
 (function () {
   "use strict";
 
+  const currentScriptSrc = document.currentScript && document.currentScript.src;
+  const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
+
   const DATA_SOURCES = {
-    expenditures: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=0&single=true&output=csv",
-    revenues: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1812049672&single=true&output=csv",
-    staffing: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=676680519&single=true&output=csv",
-    performanceMeasures: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=95242207&single=true&output=csv",
-    departmentNarratives: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=445845528&single=true&output=csv",
-    funds: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=968844446&single=true&output=csv",
-    activities: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1380538812&single=true&output=csv",
-    fundBalances: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=78843155&single=true&output=csv",
-    personnelPositionCosts: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1934273460&single=true&output=csv",
-    personnelCostFormulaInputs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1205082856&single=true&output=csv",
-    machineryUnfunded: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=708613103&single=true&output=csv"
+    expenditures: assetBaseUrl + "data/expenditures.csv",
+    revenues: assetBaseUrl + "data/revenues.csv",
+    staffing: assetBaseUrl + "data/staffing.csv",
+    performanceMeasures: assetBaseUrl + "data/performance-measures.csv",
+    departmentNarratives: assetBaseUrl + "data/department-narratives.csv",
+    funds: assetBaseUrl + "data/funds.csv",
+    activities: assetBaseUrl + "data/activities.csv",
+    fundBalances: assetBaseUrl + "data/fund-balances.csv",
+    personnelPositionCosts: assetBaseUrl + "data/personnel-position-costs.csv",
+    personnelCostFormulaInputs: assetBaseUrl + "data/personnel-cost-formula-inputs.csv",
+    machineryUnfunded: assetBaseUrl + "data/machinery-unfunded.csv"
   };
 
   const LOADING_MESSAGE = "Loading budget data...";
@@ -33,8 +40,6 @@
   const HISTORICAL_ACTUAL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
   const SUPABASE_CLIENT_SCRIPT = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
-  const currentScriptSrc = document.currentScript && document.currentScript.src;
-  const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
   const supabaseDataScript = assetBaseUrl + "supabase-data.js?v=20260706-1";
 
   // The published sheets use department names that differ slightly between

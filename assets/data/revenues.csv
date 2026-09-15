@@ -1,0 +1,226 @@
+Dept_Code,Dept_Name,Note,Project_Name,Revenue_Code,Revenue_Name,Revenue_Type,FY2027_Proposed,Fund_code
+103322,Building Department,,,322000,Building Permits,Permits Fees and Special Assessments,0.00,103
+103329,Building Department,,,329006,Contractor Registration,Permits Fees and Special Assessments,0.00,103
+103341,Building Department,,,341302,Copies and Public Records Request,Charges for Services,0.00,103
+103361,Building Department,,,361100,Interest,Miscellaneous Revenue,0.00,103
+001311,Interfund Group Transfer Out,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"25,035,734.00",001
+103364,Building Department,,,364001,Surplus Equipment Sales,Miscellaneous Revenue,0.00,103
+103369,Building Department,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,0.00,103
+103389,Building Department,,,389000,Nonoperating Balance Brought Forward,Other Sources,"4,000,000.00",103
+300381,Capital Projects,Property Tax,,381000,Interfund Group Transfer In,Other Sources,"25,035,734.00",300
+300361,Capital Projects,,,361100,Interest,Miscellaneous Revenue,0.00,300
+300389,Capital Projects,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,300
+001348,Circuit Court,,,348144,Court Facilities Trust Fund Fee,Charges for Services,"150,000.00",001
+107342,Walton County Sheriff's Office,EMS Collections,,342600,Ambulance Fees,Charges for Services,"3,000,000.00",107
+001329,Code Compliance,,,329002,Beach Vehicle Permits,Permits Fees and Special Assessments,"120,000.00",001
+001329,Code Compliance,,,329003,Special Events Permits,Permits Fees and Special Assessments,"350,000.00",001
+001329,Code Compliance,,,329004,Beach Vending Permits,Permits Fees and Special Assessments,"350,000.00",001
+001329,Code Compliance,,,329005,Beach Dog Permits,Permits Fees and Special Assessments,"190,000.00",001
+001329,Code Compliance,,,329009,Beach Bonfire Permits,Permits Fees and Special Assessments,"750,000.00",001
+001341,Code Compliance,,,341203,Lien Searches,Charges for Services,"250,000.00",001
+001342,Code Compliance,,,342900,Code Enforcement Fees,Charges for Services,"150,000.00",001
+001354,Code Compliance,,,354002,Ordinance Fine (Handicap Parking),"Judgments, Fines and Forfeits","10,000.00",001
+001354,Code Compliance,,,354003,Ordinance Fine (Parking),"Judgments, Fines and Forfeits","190,000.00",001
+001369,Code Compliance,"Under Florida Statutes §125.0104(5)(c), eligible counties may allocate up to 10% of Tourist Development Tax revenues to reimburse public safety expenses necessitated by increased tourism and visitor impacts.",,369903,TDC Public Safety Reimbursements,Miscellaneous Revenue,"2,244,645.00",001
+001348,Court Innovations,,,348140,Additional Court Cost (Law Library),Charges for Services,"20,000.00",001
+001348,Court Innovations,,,348141,Additional Court Cost (Juvenile Justice),Charges for Services,"20,000.00",001
+001348,Court Innovations,,,348142,Additional Court Cost (Legal Aid),Charges for Services,"20,000.00",001
+001348,Court Innovations,,,348143,Additional Court Cost (Innovative Programs),Charges for Services,"20,000.00",001
+001341,Court Technology - Court Administration,"Florida Statute § 25.24(12)(e)(1) authorizes a $2.00 fee for court-related technology, which is distributed to the county to fund technology needs for the trial courts, state attorney, public defender, and related offices.",,341160,$2 Recording Fee,Charges for Services,"185,436.00",001
+109335,E911 Fund,"State-distributed E911 surcharge revenues dedicated to supporting the County’s emergency telephone system, including equipment, technology, and eligible operational costs.",,335221,E911 Communications/Non-Wireless,Intergovernmental Revenues,"80,000.00",109
+109335,E911 Fund,"State-distributed E911 surcharge revenues dedicated to supporting the County’s emergency telephone system, including equipment, technology, and eligible operational costs.",,335222,E911 Communications/Wireless,Intergovernmental Revenues,"380,000.00",109
+001347,Eagle Springs Golf and Recreation Center,,,347201,Membership Fees,Charges for Services,"550,000.00",001
+001347,Eagle Springs Golf and Recreation Center,,,347202,Green Fees,Charges for Services,"430,000.00",001
+001347,Eagle Springs Golf and Recreation Center,,,347203,Cart Fees,Charges for Services,"330,000.00",001
+001347,Eagle Springs Golf and Recreation Center,,,347204,Pro Shop Sales,Charges for Services,"10,000.00",001
+001347,Eagle Springs Golf and Recreation Center,,,347208,Pro Shop Sales,Charges for Services,"50,000.00",001
+001347,Eagle Springs Golf and Recreation Center,,,347210,Golf Course Non-Taxable,Charges for Services,"20,000.00",001
+001347,Eagle Springs Golf and Recreation Center,,,347211,Pool Entry Fees,Charges for Services,0.00,001
+001347,Eagle Springs Grill,,,347205,Grill Food Revenue,Charges for Services,"295,000.00",001
+001347,Eagle Springs Grill,,,347206,Grill Beverage Revenue,Charges for Services,"135,000.00",001
+001347,Eagle Springs Grill,,,347207,Restaurant Sales,Charges for Services,0.00,001
+001347,Eagle Springs Grill,,,347209,Restaurant Non-Taxable,Charges for Services,"10,000.00",001
+107381,Walton County Sheriff's Office,Property Tax,,381000,Interfund Group Transfer In,Other Sources,"98,004,256.00",107
+107335,Walton County Sheriff's Office,,,335210,Supplemental Fire Support,Intergovernmental Revenues,"10,000.00",107
+107311,Walton County Sheriff's Office,,,311001,Ad Valorem Taxes Delinquent,General Government Taxes,0.00,107
+107311,Walton County Sheriff's Office,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,0.00,107
+107337,Walton County Sheriff's Office,"Reimbursements from Walton County School District, Gateway Academny, and Ohana Institute",,337200,Resource Officer,Intergovernmental Revenues,"1,370,000.00",107
+107342,Walton County Sheriff's Office,,,342300,Housing Prisoners Revenue,Charges for Services,"3,500,000.00",107
+107331,Walton County Sheriff's Office,,,331200,Federal Grant (Public Safety),Intergovernmental Revenues,0.00,107
+107342,Walton County Sheriff's Office,,,342901,Prisoner Work Detail,Charges for Services,"58,972.00",107
+107343,Walton County Sheriff's Office,,,343410,MSBU Fees,Charges for Services,"1,400,000.00",107
+001369,Code Compliance,"Managed Beach Vendor Revenue $1,530,000 committed to Board initiatives",10647,329004,Beach Vending Permits,Permits Fees and Special Assessments,0.01,001
+107346,Walton County Sheriff's Office,,,346400,Animal Shelter Fees,Charges for Services,"18,000.00",107
+107359,Walton County Sheriff's Office,,,359000,Civil Process Fees,"Judgments, Fines and Forfeits","60,000.00",107
+107361,Walton County Sheriff's Office,,,361100,Interest,Miscellaneous Revenue,"1,000,000.00",107
+107361,Walton County Sheriff's Office,,,361108,Interest (Sheriff),Miscellaneous Revenue,"500,000.00",107
+107364,Walton County Sheriff's Office,,,364001,Surplus Equipment Sales,Miscellaneous Revenue,"100,000.00",107
+107369,Walton County Sheriff's Office,Funds returned to the County for payments or expenditures made in a previous fiscal year.,,369300,Refund of Prior Year Expenditures,Miscellaneous Revenue,"5,000.00",107
+107369,Walton County Sheriff's Office,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,"500,000.00",107
+107389,Walton County Sheriff's Office,,,389000,Nonoperating Balance Brought Forward,Other Sources,"4,130,000.00",107
+001381,Interfund Group Transfer In,Small County Surtax,,381000,Interfund Group Transfer In,Other Sources,"2,581,997.00",001
+001329,Board of County Commissioners,Managed Beach Vendor Revenue,10647,329004,Beach Vending Permits,Permits Fees and Special Assessments,"1,530,000.00",001
+001335,Board of County Commissioners,A portion of Florida’s state cigarette tax is shared with counties through the Revenue Sharing Program and may be used for general government services,,335120,State Shared Cigarette Tax,Intergovernmental Revenues,"25,000.00",001
+001335,Board of County Commissioners,"The Florida Revenue Sharing Act of 1972 was a significant legislative effort to ensure a minimum level of revenue parity across local government units. An allocation formula is used to distribute 2.9 percent of net cigarette tax collections and 2.044 percent of sales and use tax collections among qualifying counties. This formula considers each county's total population, unincorporated population, and sales tax collections to determine its share",,335121,State Revenue Share Proceeds,Intergovernmental Revenues,"2,000,874.00",001
+001335,Board of County Commissioners,A portion of insurance agent license tax revenues distributed by the State of Florida to counties for general government purposes.,,335130,Insurance Agents LLC,Intergovernmental Revenues,"40,000.00",001
+001335,Board of County Commissioners,A portion of state-collected mobile home registration fees distributed to counties for general government purposes.,,335140,Mobile Home Licenses,Intergovernmental Revenues,"40,000.00",001
+001335,Board of County Commissioners,"Florida Statute § 550.0951 imposes a racing tax on pari-mutuel wagering, with a determined portion of the revenue remitted to counties for general government services, this is split 50/50 between the general fund and the transportation fund",,335160,Racing Tax,Intergovernmental Revenues,"112,000.00",001
+001335,Board of County Commissioners,"Counties and municipalities that collect vessel registration fees retain the county-designated portion, which must be used exclusively for boating-related purposes such as maintaining public boat ramps and docks, installing waterway markers, and removing derelict vessels or debris that obstruct access.",,335700,Florida Boating Improvement Program Allocation,Intergovernmental Revenues,"100,000.00",001
+001336,Board of County Commissioners,"The State of Florida administers a Payment in Lieu of Taxes (PILT) program to compensate counties for the loss of property tax revenue due to state-owned, tax-exempt lands. This program is particularly relevant for lands acquired under conservation initiatives, such as those outlined in Florida Statutes § 259.032 and § 373.59. ",,336000,State Payment in Lieu of Tax,Intergovernmental Revenues,"100,000.00",001
+001354,Board of County Commissioners,,,354000,Ordinance Fine (Animal Control),"Judgments, Fines and Forfeits","2,500.00",001
+001361,Board of County Commissioners,,,361100,Interest,Miscellaneous Revenue,"1,750,000.00",001
+001361,Board of County Commissioners,,,361105,Investments (Florida Local Government Investment Trust),Miscellaneous Revenue,"200,000.00",001
+001361,Board of County Commissioners,,,361106,Investments (SBA Florida Prime),Miscellaneous Revenue,"5,000.00",001
+001361,Board of County Commissioners,,,361111,Constitutional Officer Interest,Miscellaneous Revenue,"250,000.00",001
+001362,Board of County Commissioners,,,362001,Office Rental,Miscellaneous Revenue,"28,200.00",001
+001369,Board of County Commissioners,Funds returned to the County for payments or expenditures made in a previous fiscal year.,,369300,Refund of Prior Year Expenditures,Miscellaneous Revenue,"10,000.00",001
+001369,Board of County Commissioners,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,"100,000.00",001
+001369,Board of County Commissioners,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"1,969,762.00",001
+001389,Board of County Commissioners,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,001
+001315,Geographic Info Systems,"Communications services tax (CST) revenue consists of a locally retained portion based on in-county telecommunications activity and a smaller, formula-driven share of state-collected revenues redistributed through Florida’s revenue-sharing system.",,315001,Telecommunication and Local Communication Tax,General Government Taxes,"350,000.00",001
+001324,Geographic Info Systems,"Established its E911 addressing system in 2001 through Ordinance 2001-08, should be used to support GIS/GPS equipment and mapping necessary for accurate emergency response.",,324004,E-911 Plat Fee,Permits Fees and Special Assessments,"22,000.00",001
+001329,Geographic Info Systems,$5 utility permit fee charged per dwelling unit by the Building Department for GIS E911 addressing,,329001,E-911 Utility Permits,Permits Fees and Special Assessments,"80,000.00",001
+001335,Geographic Info Systems,,,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"282,372.00",001
+001369,Geographic Info Systems,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"104,774.00",001
+110331,Housing & Urban Development,Federal funding provided by the U.S. Department of Housing and Urban Development (HUD) to support rental assistance for eligible low-income households and the administration of the County’s Housing Choice Voucher (Section 8) Program.,,331500,Federal Grant (Economic Environment),Intergovernmental Revenues,"3,057,056.00",110
+110361,Housing & Urban Development,,,361100,Interest,Miscellaneous Revenue,0.00,110
+001334,Libraries,,10029,334700,State Grant (Culture/Recreation),Intergovernmental Revenues,0.00,001
+001347,Libraries,,,347100,Library Fines & Fees,Charges for Services,"18,000.00",001
+001362,Libraries,,,362002,Library Rentals,Miscellaneous Revenue,"3,000.00",001
+105311,Mosquito Control,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"1,426,937.00",105
+105311,Mosquito Control,,,311001,Ad Valorem Taxes Delinquent,General Government Taxes,0.00,105
+105336,Mosquito Control,"The State of Florida administers a Payment in Lieu of Taxes (PILT) program to compensate counties for the loss of property tax revenue due to state-owned, tax-exempt lands. This program is particularly relevant for lands acquired under conservation initiatives, such as those outlined in Florida Statutes § 259.032 and § 373.59. ",,336000,State Payment in Lieu of Tax,Intergovernmental Revenues,0.00,105
+105361,Mosquito Control,,,361100,Interest,Miscellaneous Revenue,0.00,105
+105389,Mosquito Control,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,105
+106334,Mosquito Control State Aid,Mosquito Control State Aid,10630,334610,State Grant (Health),Intergovernmental Revenues,"69,588.00",106
+106361,Mosquito Control State Aid,,,361100,Interest,Miscellaneous Revenue,0.00,106
+106364,Mosquito Control State Aid,,,364001,Surplus Equipment Sales,Miscellaneous Revenue,0.00,106
+101324,Mossy Head Wastewater Treatment Facility,,,324002,Sewer Impact Fees,Permits Fees and Special Assessments,0.00,101
+101343,Mossy Head Wastewater Treatment Facility,,,343500,Sewer and Wastewater Fees,Charges for Services,"85,000.00",101
+101389,Mossy Head Wastewater Treatment Facility,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,101
+102343,MUNICIPAL SERVICE BENEFIT UNIT,,,343410,MSBU Fees,Charges for Services,"43,225.00",102
+102361,MUNICIPAL SERVICE BENEFIT UNIT,,,361100,Interest,Miscellaneous Revenue,0.00,102
+102389,MUNICIPAL SERVICE BENEFIT UNIT,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,102
+102389,MUNICIPAL SERVICE BENEFIT UNIT,,,389001,Nonoperating less 5%,General Government Taxes,0.00,102
+111312,Tourism North Walton,,,312170,Tourist Development Tax,General Government Taxes,"355,500.00",111
+001347,Recreation,,,347200,Program & Sports Fees,Charges for Services,"135,000.00",001
+001362,Recreation,,,362000,Park Rental Fee,Miscellaneous Revenue,"45,000.00",001
+001341,Planning,,,341201,Planning Fees,Charges for Services,"1,200,000.00",001
+001341,Planning,,,341202,Development Order Inspection,Charges for Services,"120,000.00",001
+001341,Planning,,,341204,White Sands Fee,Charges for Services,0.00,001
+001341,Planning,,,341205,Short-Term Rental Certificate Fee,Charges for Services,"615,523.00",001
+001348,Probation Services,,,348880,Probation Fees,Charges for Services,"215,000.00",001
+101312,Public Works,"A one-cent per gallon local fuel tax authorized under Florida law and dedicated to transportation-related expenditures, including road and bridge maintenance and other eligible infrastructure improvements.",,312300,9th Cent Voted Fuel Tax,General Government Taxes,"800,000.00",101
+101312,Public Works,"A five-cent per gallon local fuel tax levied on motor fuel and diesel fuel under Florida law to fund transportation infrastructure, including road and bridge maintenance, traffic safety, and public transportation improvements.",,312410,Local Option Fuel Tax,General Government Taxes,"1,631,094.00",101
+101335,Public Works,"Florida Statute § 550.0951 imposes a racing tax on pari-mutuel wagering, with a determined portion of the revenue remitted to counties for general government services",,335160,Racing Tax,Intergovernmental Revenues,"112,000.00",101
+101335,Public Works,A state-collected 1-cent per gallon fuel tax distributed to municipalities based on population to fund eligible road maintenance and transportation projects.,,335420,Municipal Fuel Tax,Intergovernmental Revenues,"500,000.00",101
+101335,Public Works,A state-collected fuel tax of up to 1 cent per gallon authorized under Florida law and distributed to counties to support transportation and road-related projects.,,335421,County Fuel Tax,Intergovernmental Revenues,"1,000,000.00",101
+101335,Public Works,"A state-collected 2-cent per gallon fuel tax distributed to counties under Florida law to fund eligible road construction, reconstruction, and maintenance projects.",,335422,Constitutional Fuel Tax,Intergovernmental Revenues,"1,750,000.00",101
+101335,Public Works,"A state-collected tax on motor fuel used in Florida that is distributed to local governments to support eligible transportation purposes, including the construction, maintenance, and operation of public roads and related transportation infrastructure.",,335490,Motor Fuel Use Tax,Intergovernmental Revenues,"3,000.00",101
+101361,Public Works,,,361100,Interest,Miscellaneous Revenue,"1,650,000.00",101
+101361,Public Works,,,361106,Investments (SBA Florida Prime),Miscellaneous Revenue,0.00,101
+101364,Public Works,,,364001,Surplus Equipment Sales,Miscellaneous Revenue,"776,000.00",101
+101369,Public Works,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,"100,000.00",101
+101389,Public Works,,,389000,Nonoperating Balance Brought Forward,Other Sources,"4,881,906.00",101
+114369,Recreation Plat Fee,"A fee collected through the subdivision platting process to fund the acquisition and development of parks, recreational facilities, and related capital improvements needed to serve new growth.",,369902,Recreation Plat Fees,Miscellaneous Revenue,"600,000.00",114
+114389,Recreation Plat Fee,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,114
+001341,Planning,,,341205,Short-Term Rental Certificate Fee,Charges for Services,"1,584,477.00",001
+115361,Sidewalk,,,361100,Interest,Miscellaneous Revenue,0.00,115
+115369,Sidewalk,"A fee collected to support the construction, maintenance, and improvement of sidewalks and pedestrian infrastructure throughout the County.",,369910,Sidewalk Fees,Miscellaneous Revenue,"100,000.00",115
+115389,Sidewalk,,,389000,Nonoperating Balance Brought Forward,Other Sources,"200,000.00",115
+112312,Solid Waste,"A voter-approved 1-cent local sales tax collected by the State of Florida and distributed to Walton County to fund solid waste services, capital improvements, and other eligible infrastructure projects.",,312600,Discretionary Sales Surtax,General Government Taxes,"40,000,000.00",112
+112343,Solid Waste,"Fees charged for the disposal of solid waste at County facilities to support landfill operations, maintenance, regulatory compliance, and capital improvements.",,343400,Landfill Fees,Charges for Services,"560,000.00",112
+112361,Solid Waste,,,361100,Interest,Miscellaneous Revenue,"101,564.00",112
+112361,Solid Waste,,,361107,Interest (Landfill Escrow),Miscellaneous Revenue,0.00,112
+112365,Solid Waste,,,365000,Scrap Sales,Miscellaneous Revenue,"40,000.00",112
+001386,Tax Collector,,,386700,Surplus Budget Tax Collector,Other Sources,"4,050,600.00",001
+111312,Tourist Development Taxes,"A local tax levied on short-term accommodations rented for six months or less. In Walton County, the tax is 5% on accommodations located south of Choctawhatchee Bay (South Walton) and 3% on accommodations located north of Choctawhatchee Bay (North Walton).",,312120,Tourist Development Tax,General Government Taxes,"23,529,650.00",111
+111312,Tourist Development Taxes,"A local tax levied on short-term accommodations rented for six months or less. In Walton County, the tax is 5% on accommodations located south of Choctawhatchee Bay (South Walton) and 3% on accommodations located north of Choctawhatchee Bay (North Walton).",,312130,Tourist Development Tax,General Government Taxes,"11,693,600.00",111
+111312,Tourist Development Taxes,"A local tax levied on short-term accommodations rented for six months or less. In Walton County, the tax is 5% on accommodations located south of Choctawhatchee Bay (South Walton) and 3% on accommodations located north of Choctawhatchee Bay (North Walton).",,312150,Tourist Development Tax,General Government Taxes,"11,693,600.00",111
+111312,Tourist Development Taxes,"A local tax levied on short-term accommodations rented for six months or less. In Walton County, the tax is 5% on accommodations located south of Choctawhatchee Bay (South Walton) and 3% on accommodations located north of Choctawhatchee Bay (North Walton).",,312160,Tourist Development Tax,General Government Taxes,"11,693,600.00",111
+111312,Tourist Development Taxes,"A local tax levied on short-term accommodations rented for six months or less. In Walton County, the tax is 5% on accommodations located south of Choctawhatchee Bay (South Walton) and 3% on accommodations located north of Choctawhatchee Bay (North Walton).",,312170,Tourist Development Tax,General Government Taxes,0.00,111
+111345,Tourist Development Taxes,,,345900,Sales & Promotions,Charges for Services,0.00,111
+111345,Tourist Development Taxes,,,345901,Sales & Promotions Out of State,Charges for Services,0.00,111
+111361,Tourist Development Taxes,,,361100,Interest,Miscellaneous Revenue,0.00,111
+111361,Tourist Development Taxes,,,361102,Interest (Beach Management),Miscellaneous Revenue,0.00,111
+111361,Tourist Development Taxes,,,361103,Interest (New Product Development),Miscellaneous Revenue,0.00,111
+111369,Tourist Development Taxes,Funds returned to the County for payments or expenditures made in a previous fiscal year.,,369300,Refund of Prior Year Expenditures,Miscellaneous Revenue,0.00,111
+111369,Tourist Development Taxes,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,0.00,111
+503341,Self-Insurance Fees and Charges,,,341208,Employee Health Fees,Charges for Services,"22,331,947.00",503
+503341,Self-Insurance Fees and Charges,,,341209,Retiree Health Fees,Charges for Services,"500,000.00",503
+503341,Self-Insurance Fees and Charges,,,341210,Cobra Health Fees,Charges for Services,"50,000.00",503
+503361,Self-Insurance Interest,,,361100,Interest,Miscellaneous Revenue,"45,000.00",503
+503389,Self-Insurance Fees and Charges,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,503
+503341,Self-Insurance Fees and Charges,,,381000,Interfund Group Transfer In,Other Sources,0.00,503
+001369,Statutory & Other,"Opioid Settlement Year 4 ($242,183)",10720,369900,Miscellaneous Revenue,Miscellaneous Revenue,"186,119.00",001
+001369,Statutory & Other,"15% Opioid Settlement Year 4 ($68,768)",10732,369900,Miscellaneous Revenue,Miscellaneous Revenue,"68,768.00",001
+001386,Clerk of Court,,,386200,Surplus Budget Clerk of Court,Other Sources,0.00,001
+001386,Supervisor of Elections,,,386800,Surplus Budget Supervisor of Elections,Other Sources,0.00,001
+001386,Property Appraiser,,,386900,Surplus Budget Property Appraiser,Other Sources,0.00,001
+001362,Building Construction and Maintenance,,,362003,Morrison Springs Entry Fee,Miscellaneous Revenue,"65,000.00",001
+001311,Interfund Group Transfer Out,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"98,004,256.00",001
+101381,Public Works,Small County Surtax,,381000,Interfund Group Transfer In,Other Sources,"14,621,000.00",101
+001311,Board of County Commissioners,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"4,491,053.00",001
+001311,Clerk of Court,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"6,871,175.00",001
+001311,Property Appraiser,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"4,954,338.00",001
+001311,Supervisor of Elections,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"1,663,865.00",001
+001311,Tax Collector,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"4,449,400.00",001
+001311,South Walton Fire,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"980,074.00",001
+001311,Building Construction and Maintenance,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"1,426,130.00",001
+001311,Medical Examiner,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"881,930.00",001
+001311,Circuit Court,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"111,493.00",001
+001311,County Court,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"70,056.00",001
+001311,Public Defender,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"254,833.00",001
+001311,Non-Profit Funding Program,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"450,000.00",001
+001311,Statutory & Other,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"3,247,957.00",001
+001311,Walton County Health Department,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"1,724,397.00",001
+101312,Engineering Services,,,312410,Local Option Fuel Tax,General Government Taxes,"2,379,118.00",101
+001311,Environmental Services,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"640,922.00",001
+001329,Environmental Services,"Permit fees collected for the review and administration of coastal armoring projects, including seawalls and similar shoreline protection structures.",,329007,Coastal Armoring Fees,Permits Fees and Special Assessments,"8,000.00",001
+001354,Code Compliance,,,354001,Ordinance Fine (Beach Activities),"Judgments, Fines and Forfeits","25,000.00",001
+001335,Building Construction and Maintenance,"The Florida Revenue Sharing Act of 1972 was a significant legislative effort to ensure a minimum level of revenue parity across local government units. An allocation formula is used to distribute 2.9 percent of net cigarette tax collections and 2.044 percent of sales and use tax collections among qualifying counties. This formula considers each county's total population, unincorporated population, and sales tax collections to determine its share",,335121,State Revenue Share Proceeds,Intergovernmental Revenues,"792,317.00",001
+001335,Building Construction and Maintenance,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"6,350,567.00",001
+001335,Extension Office,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"597,319.00",001
+001335,Human Resources,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"364,788.00",001
+001369,Building Construction and Maintenance,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"278,291.00",001
+001311,Code Compliance,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"331,009.00",001
+001311,Office of the County Attorney,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"674,542.00",001
+001335,Office of the County Attorney,"The Florida Revenue Sharing Act of 1972 was a significant legislative effort to ensure a minimum level of revenue parity across local government units. An allocation formula is used to distribute 2.9 percent of net cigarette tax collections and 2.044 percent of sales and use tax collections among qualifying counties. This formula considers each county's total population, unincorporated population, and sales tax collections to determine its share",,335121,State Revenue Share Proceeds,Intergovernmental Revenues,"933,143.00",001
+300381,Interfund Group Transfer In,,,381000,Interfund Group Transfer In,Other Sources,"2,581,997.00",300
+001341,Office of the County Attorney,,,341302,Copies and Public Records Request,Charges for Services,"2,500.00",001
+001369,Office of the County Attorney,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"192,740.00",001
+001311,County Administration,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"1,847,203.00",001
+107381,Walton County Sheriff's Office,E911,,381000,Interfund Group Transfer In,Other Sources,"460,000.00",107
+001369,County Administration,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"412,836.00",001
+001311,Human Resources,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,0.00,001
+001335,Human Resources,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"739,165.00",001
+001369,Human Resources,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"322,983.00",001
+001335,Office of Management and Budget,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"440,670.00",001
+001342,Office of Management and Budget,,,342902,Cremation Fees,Charges for Services,"15,000.00",001
+001369,Office of Management and Budget,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"619,356.00",001
+001335,Procurement,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"864,637.00",001
+001369,Procurement,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"211,862.00",001
+001335,Eagle Springs Golf and Recreation Center,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"415,555.00",001
+001335,Eagle Springs Grill,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"130,000.00",001
+001335,Guardian Ad Litem,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"9,000.00",001
+001311,Public Defender,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"36,000.00",001
+001335,Veteran Services,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"316,650.00",001
+001335,Soil Conservation,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"150,000.00",001
+107336,Walton County Sheriff's Office,"The State of Florida administers a Payment in Lieu of Taxes (PILT) program to compensate counties for the loss of property tax revenue due to state-owned, tax-exempt lands. This program is particularly relevant for lands acquired under conservation initiatives, such as those outlined in Florida Statutes § 259.032 and § 373.59. ",,336000,State Payment in Lieu of Tax,Intergovernmental Revenues,0.00,107
+001335,Probation Services,A state-collected license fee shared with counties to support general government operations in accordance with Florida law.,,335150,Alcoholic Beverage Licenses,Intergovernmental Revenues,"80,000.00",001
+001335,Probation Services,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"75,577.00",001
+001335,Recreation,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"653,393.00",001
+001311,State Attorney,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,0.00,001
+001334,Emergency Management,,,334200,State Grant (Public Safety),Intergovernmental Revenues,,001
+107334,Walton County Sheriff's Office,,,334200,State Grant (Public Safety),Intergovernmental Revenues,0.00,107
+107369,Walton County Sheriff's Office,,,369901,Indirect Administrative Fees,Miscellaneous Revenue,0.00,107
+001335,Emergency Management,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"912,455.00",001
+001342,Emergency Management,,,342903,EOC Plan Review Fee,Charges for Services,0.00,001
+107389,Walton County Sheriff's Office,,,386600,Surplus Budget Sheriff,Other Sources,0.00,107
+001311,Libraries,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,0.00,001
+001335,Libraries,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"2,134,655.00",001
+001311,Extension Office,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,0.00,001
+001311,Planning,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"1,195,917.00",001
+001335,Planning,"A state-collected half-cent sales tax distributed to counties and municipalities to support general government operations, infrastructure,  parks, and other local services.",,335180,Local Government 1/2 Cent Sales Tax,Intergovernmental Revenues,"2,332,194.00",001
+001311,State Attorney,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"297,111.00",001
+101381,Mossy Head Wastewater Treatment Facility,Small County Surtax,,381000,Interfund Group Transfer In,Other Sources,"379,000.00",101

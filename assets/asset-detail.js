@@ -1,7 +1,12 @@
 (function () {
   "use strict";
 
-  const DATA_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1951375493&single=true&output=csv";
+  // Frozen snapshot of the published machinery-request sheet (see
+  // assets/data/asset-detail.csv) rather than a live Google Sheets fetch, so
+  // the FY2027 tentative budget figures stay static.
+  const currentScriptSrc = document.currentScript && document.currentScript.src;
+  const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
+  const DATA_URL = assetBaseUrl + "data/asset-detail.csv";
   const container = document.getElementById("asset-record");
   // Temporary display fallback until the Fleet Note column is included in
   // the published machinery-request CSV. A nonblank request note passed in

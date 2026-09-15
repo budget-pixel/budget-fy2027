@@ -1,0 +1,21 @@
+Fund_Code,Fund_Name,Fund_Type,Fund_Category,Major_NonMajor
+300,Capital Projects Fund,Capital Project Funds,Governmental,Major Funds
+001,General Fund,General Fund,Governmental,Major Funds
+107,Sheriff Fund,Special Revenue Funds,Governmental,Major Funds
+112,Solid Waste Fund,Special Revenue Funds,Governmental,Major Funds
+111,Tourist Development Fund,Special Revenue Funds,Governmental,Major Funds
+101,Transportation Fund,Special Revenue Funds,Governmental,Major Funds
+201,Debt Service Fund,Debt Service Funds,Governmental,Non-Major Funds
+103,Building Fund,Special Revenue Funds,Governmental,Non-Major Funds
+109,E911 Fund,Special Revenue Funds,Governmental,Non-Major Funds
+110,Housing & Urban Development Fund,Special Revenue Funds,Governmental,Non-Major Funds
+108,Law Enforcement Trust Fund,Special Revenue Funds,Governmental,Non-Major Funds
+116,Mobility Fee Fund,Special Revenue Funds,Governmental,Non-Major Funds
+105,Mosquito Control Fund,Special Revenue Funds,Governmental,Non-Major Funds
+106,Mosquito Control State Aid Fund,Special Revenue Funds,Governmental,Non-Major Funds
+102,MSBU Fund,Special Revenue Funds,Governmental,Non-Major Funds
+113,Preservation Fund,Special Revenue Funds,Governmental,Non-Major Funds
+114,Recreation Plat Fee Fund,Special Revenue Funds,Governmental,Non-Major Funds
+115,Sidewalk Fund,Special Revenue Funds,Governmental,Non-Major Funds
+104,State Housing Initiative Program Fund,Special Revenue Funds,Governmental,Non-Major Funds
+503,Self-Insurance Fund,Internal Service,Internal Service,Internal Service

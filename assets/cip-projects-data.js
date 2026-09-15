@@ -1,8 +1,10 @@
 (function () {
   "use strict";
 
-  const CAPITAL_PROJECTS_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1388930304&single=true&output=csv";
+  // Frozen snapshot of the Capital Projects sheet (see
+  // assets/data/cip-projects.csv) rather than a live Google Sheets fetch, so
+  // the FY2027 tentative budget figures stay static.
+  const CAPITAL_PROJECTS_CSV_URL = projectAssetPrefix() + "data/cip-projects.csv";
   const FISCAL_YEARS = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031"];
   const PROJECT_IMAGE_FILES = [
     "abt-martin-dirt-to-pave-project.jpg",

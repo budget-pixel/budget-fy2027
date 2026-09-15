@@ -6,8 +6,12 @@
 (function () {
   "use strict";
 
-  const TAXPAYERS_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=1358951318&single=true&output=csv";
+  // Frozen snapshot of the Principal Property Taxpayers sheet (see
+  // assets/data/principal-taxpayers.csv) rather than a live Google Sheets
+  // fetch, so the figures stay static.
+  const currentScriptSrc = document.currentScript && document.currentScript.src;
+  const assetBaseUrl = currentScriptSrc ? currentScriptSrc.replace(/[^/]+$/, "") : "assets/";
+  const TAXPAYERS_CSV_URL = assetBaseUrl + "data/principal-taxpayers.csv";
 
   function escapeHtml(value) {
     return String(value === undefined || value === null ? "" : value)

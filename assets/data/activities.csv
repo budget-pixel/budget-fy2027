@@ -1,0 +1,246 @@
+Dept_Code,Dept_Name,Dept_Group,Org_Type,Activity
+00101070,Medical Examiner,Medical Examiner,Autonomous Entities,Public Safety
+00101040,Circuit Court,Circuit Court,Autonomous Entities,Court Related Cost
+00101050,County Court,County Court,Autonomous Entities,Court Related Cost
+00101060,Court Technology - Court Administration,Court Technology,Autonomous Entities,Court Related Cost
+00101061,Public Defender,Court Technology,Autonomous Entities,Court Related Cost
+00101062,State Attorney,Court Technology,Autonomous Entities,Court Related Cost
+10255,Walton County Health Department,Human Services,Autonomous Entities,Human Services
+00102012,Human Services,Human Services,Autonomous Entities,Human Services
+,Statutory & Other,Statutory & Other,Autonomous Entities,Human Services
+,Court Innovations,Court Innovations,Autonomous Entities,Court Related Cost
+00102014,Non-Profit Funding Program,Non-Profit Program,Autonomous Entities,Human Services
+00101001,BCC Other Uses Contingency,Other Uses Contingency,Walton County Government,Other Sources
+00101002,Interfund Group Transfer Out,Interfund Transfers,Walton County Government,Interfund Transfers
+00101020,Guardian Ad Litem,Guardian Ad Litem,Autonomous Entities,Court Related Cost
+00101090,Public Defender,Public Defender,Autonomous Entities,Court Related Cost
+00101100,State Attorney,State Attorney,Autonomous Entities,Court Related Cost
+00102017,Culture and Recreation (Senior Centers & Mainstreet),Culture and Recreation,Autonomous Entities,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,Eagle Springs Golf,Walton County Government,Culture and Recreation
+00112040,Eagle Springs Grill,Eagle Springs Grill,Walton County Government,Culture and Recreation
+00102019,Volunteer Fire,Autonomous Entities,Autonomous Entities,Public Safety
+00111002,South Walton Fire,Autonomous Entities,Autonomous Entities,Public Safety
+11545000,Sidewalk,Sidewalk,Walton County Government,Transportation
+00102011,Economic Development Alliance,Autonomous Entities,Autonomous Entities,Economic Environment
+30047030,Capital Projects,Capital Projects,Walton County Government,Transportation
+11141070,Marketing,Marketing,Walton County Government,economic Environment
+00111000,State Fire,Autonomous Entities,Autonomous Entities,Public Safety
+10939001,E911 Transfer Out,E911 Transfer Out,Autonomous Entities,interfund Transfers
+10225010,MSBU,MSBU,Autonomous Entities,Physical Environment
+11444000,Recreation Plat Fee,Recreation Plat Fee,Walton County Government,Culture and Recreation
+00102013,Lakeview,Autonomous Entities,Autonomous Entities,Human Services
+00102016,Gulf Coast Kid's House,Autonomous Entities,Autonomous Entities,Human Services
+00108000,Libraries,Libraries,Walton County Government,Culture and Recreation
+00112000,Recreation,Recreation,Walton County Government,Culture and Recreation
+00112020,Recreation - FBIP Boating Allocation,Recreation,Walton County Government,Culture and Recreation
+11040010,Housing & Urban Development,Housing & Urban Development,Walton County Government,Economic Environment
+11040000,Housing & Urban Development,Housing & Urban Development,Walton County Government,Economic Environment
+11141000,Tourism Administration,Tourism Administration,Walton County Government,Economic Environment
+11141080,South Walton Fire Lifeguard Services,Tourism Administration,Walton County Government,Economic Environment
+11141010,Tourism Beach Operations,Tourism Beach Operations,Walton County Government,Economic Environment
+11141020,Tourism Beach Renourishment,Tourism Beach Renourishment,Walton County Government,Economic Environment
+11141090,Tourism Beach Tram,Tourism Beach Tram,Walton County Government,Economic Environment
+11141040,Tourism Communications,Tourism Communications,Walton County Government,Economic Environment
+11141060,Tourism Marketing,Tourism Marketing,Walton County Government,Economic Environment
+11141100,Tourism North Walton,Tourism North Walton,Walton County Government,Economic Environment
+11141050,Tourism Public Safety,Tourism Public Safety,Walton County Government,Economic Environment
+11141030,Tourism Sales and Visitors Center,Tourism Sales,Walton County Government,Economic Environment
+00110000,Veteran Services,Veteran Services,Walton County Government,Economic Environment
+00101010,Clerk of Court,Clerk of Court,Constitutional Officers,General Government
+00101030,Clerk of Court,Clerk of Court,Constitutional Officers,General Government
+00101080,Property Appraiser,Property Appraiser,Constitutional Officers,General Government
+00101110,Supervisor of Elections,Supervisor of Elections,Constitutional Officers,General Government
+00101120,Supervisor of Elections - Federal Elections Grant,Supervisor of Elections,Constitutional Officers,General Government
+00101130,Tax Collector,Tax Collector,Constitutional Officers,General Government
+00101000,Board of County Commissioners,Board of County Commissioners,Walton County Government,General Government
+00101999,BCC Grants,Board of County Commissioners,Walton County Government,General Government
+00117000,Building Construction and Maintenance,Building Construction and Maintenance,Walton County Government,General Government
+00117010,Building Construction and Maintenance,Building Construction and Maintenance,Walton County Government,General Government
+00117020,Building Construction and Maintenance,Building Construction and Maintenance,Walton County Government,General Government
+10117000,Building Construction and Maintenance,Building Construction and Maintenance,Walton County Government,General Government
+10117010,Building Construction and Maintenance,Building Construction and Maintenance,Walton County Government,General Government
+00102000,County Administration,County Administration,Walton County Government,General Government
+00120000,Engineering Services,Engineering Services,Walton County Government,General Government
+00105000,Geographic Info Systems,Geographic Info Systems,Walton County Government,General Government
+00106000,Human Resources,Human Resources,Walton County Government,General Government
+00106010,Human Resources (JAD),Human Resources,Walton County Government,General Government
+10116020,Mossy Head Wastewater Treatment Facility,Mossy Head Wastewater,Walton County Government,General Government
+00107000,Office of Management and Budget,Office of Management and Budget,Walton County Government,General Government
+00107010,Grants,Office of Management and Budget,Walton County Government,General Government
+00107011,Grants (Parks and Rec),Office of Management and Budget,Walton County Government,General Government
+00103000,Office of the County Attorney,Office of the County Attorney,Walton County Government,General Government
+00104000,Planning,Planning,Walton County Government,General Government
+00104010,Planning - Beach and Outdoor Permits,Planning,Walton County Government,General Government
+00107020,Procurement,Procurement,Walton County Government,General Government
+50350000,Self-Insurance Expenses,Self-Insurance,Walton County Government,General Government
+10528000,Mosquito Control,Mosquito Control,Walton County Government,Human Services
+10629000,Mosquito Control State Aid,Mosquito Control State Aid,Walton County Government,Human Services
+00119000,Environmental Services,Environmental Services,Walton County Government,Physical Environment
+00113000,Extension Office,Extension Office,Walton County Government,Physical Environment
+00114000,Soil Conservation,Soil Conservation,Walton County Government,Physical Environment
+11242001,Solid Waste Transfer,Solid Waste,Walton County Government,Interfund Transfers
+11242000,Solid Waste,Solid Waste,Walton County Government,Physical Environment
+10326000,Building Department,Building Department,Walton County Government,Public Safety
+00102030,Code Compliance,Code Compliance,Walton County Government,Public Safety
+00104020,Code Compliance,Code Compliance,Walton County Government,Public Safety
+00111001,Emergency Management,Emergency Management,Walton County Government,Public Safety
+00111010,Emergency Management - Citizen Corps,Emergency Management,Walton County Government,Public Safety
+00111020,Emergency Management - Communication Response,Emergency Management,Walton County Government,Public Safety
+00109000,Probation Services,Probation Services,Walton County Government,Public Safety
+10730000,Walton County Sheriff's Office,Sheriff's Office,Constitutional Officers,Public Safety
+10116001,Public Works,Public Works,Walton County Government,Transportation
+10116002,Engineering Services,Public Works,Walton County Government,Transportation
+30047000,Capital Projects,Capital Projects,Walton County Government,Transportation
+20146000,Debt Service - Roads & Streets,Debt Service,Walton County Government,Transportation
+001348,Court Related Revenues,Court Related Revenues,Charges for Services,Charges for Services
+001347,Culture and Recreation,Culture and Recreation,Charges for Services,Charges for Services
+111345,Visitor Center Sales,Economic Environment,Charges for Services,Charges for Services
+001341,General Government,General Government,Charges for Services,Charges for Services
+103341,General Government,General Government,Charges for Services,Charges for Services
+105341,General Government,General Government,Charges for Services,Charges for Services
+107346,Animal Shelter Fees,Human Services,Charges for Services,Charges for Services
+105340,Mosquito Control Services,Human Services,Charges for Services,Charges for Services
+503341,Self-Insurance Fees and Charges,Internal Service Fund Fees and Charges,Charges for Services,Charges for Services
+503361,Self-Insurance Interest,Internal Service Fund Fees and Charges,Charges for Services,Charges for Services
+001343,Physical Environment,Physical Environment,Charges for Services,Charges for Services
+101343,Physical Environment,Physical Environment,Charges for Services,Charges for Services
+102343,Physical Environment,Physical Environment,Charges for Services,Charges for Services
+107343,Physical Environment,Physical Environment,Charges for Services,Charges for Services
+112343,Physical Environment,Physical Environment,Charges for Services,Charges for Services
+001342,Public Safety,Public Safety,Charges for Services,Charges for Services
+107342,Public Safety,Public Safety,Charges for Services,Charges for Services
+111000,Tourist Development Council Balance Sheet Accounts,Tourism Administration,Walton County Government,Economic Environment
+300000,CAPITAL PROJECTS,Assets and Liabilities,Walton County Government,General Government
+201000,DEBT SERVICES,Assets and Liabilities,Walton County Government,General Government
+109000,ENHANCED 911,Assets and Liabilities,Walton County Government,General Government
+901000,General Fixed Assets Group of Accounts,Assets and Liabilities,Walton County Government,General Government
+001000,General Fund Balance Sheet Accounts,Assets and Liabilities,Walton County Government,General Government
+110000,HOUSING & URBAN DEVELOPMENT,Assets and Liabilities,Walton County Government,General Government
+108000,LAW ENFORCEMENT TRUST FUND,Assets and Liabilities,Walton County Government,General Government
+105000,MOSQUITO CONTROL,Assets and Liabilities,Walton County Government,General Government
+106000,MOSQUITO CONTROL STATE AID,Assets and Liabilities,Walton County Government,General Government
+102000,MUNICIPAL SERVICE BENEFIT UNIT,Assets and Liabilities,Walton County Government,General Government
+801000,POOLED CASH,Assets and Liabilities,Walton County Government,General Government
+113000,PRESERVATION,Assets and Liabilities,Walton County Government,General Government
+114000,RECREATION PLAT FEE,Assets and Liabilities,Walton County Government,General Government
+115000,SIDEWALK,Assets and Liabilities,Walton County Government,General Government
+104000,STATE HOUSING INITIATIVE PROGRAM,Assets and Liabilities,Walton County Government,General Government
+112323,LF/FRANCHISE FEE,Description pending,Walton County Government,General Government
+001311,Ad Valorem Taxes,Ad Valorem Taxes,General Government Taxes,General Government Taxes
+101311,Ad Valorem Taxes,Ad Valorem Taxes,General Government Taxes,General Government Taxes
+105311,Ad Valorem Taxes,Ad Valorem Taxes,General Government Taxes,General Government Taxes
+107311,Ad Valorem Taxes,Ad Valorem Taxes,General Government Taxes,General Government Taxes
+300311,Ad Valorem Taxes,Ad Valorem Taxes,General Government Taxes,General Government Taxes
+001315,Communication Service Taxes,Communication Services Taxes,General Government Taxes,General Government Taxes
+112312,Local Discretionary Sales Surtax,"Local Option, Use & Fuel Taxes",General Government Taxes,General Government Taxes
+101312,Local Option Use & Fuel Taxes,"Local Option, Use & Fuel Taxes",General Government Taxes,General Government Taxes
+111312,Tourist Development Taxes,"Local Option, Use & Fuel Taxes",General Government Taxes,General Government Taxes
+300381,Interfund Group Transfer In,Capital Projects Fund,Interfund Transfers,Interfund Transfers
+001381,Interfund Group Transfer In,General Fund,Interfund Transfers,Interfund Transfers
+101381,Interfund Group Transfer In,Public Works,Interfund Transfers,Interfund Transfers
+503381,Interfund Group Transfer In,Self-Insurance,Interfund Transfers,Interfund Transfers
+107381,Interfund Group Transfer In,Sheriff's Office,Interfund Transfers,Interfund Transfers
+111381,Interfund Group Transfer In,Tourism Administration,Interfund Transfers,Interfund Transfers
+107331,Federal Grant,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+001331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+101331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+104331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+110331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+111331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+113331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+300331,Federal Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+107337,Grants from Other Local Units,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+001334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+101334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+104334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+106334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+107334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+109334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+111334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+112334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+201334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+300334,State Grants,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+001336,State Payment in Lieu of Tax,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+105336,State Payment in Lieu of Tax,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+107336,State Payment in Lieu of Tax,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+101336,State Payment in Lieu of Taxes,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+001335,State Shared Revenues,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+101335,State Shared Revenues,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+107335,State Shared Revenues,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+109335,State Shared Revenues,Intergovernmental Revenue,Intergovernmental Revenue,Intergovernmental Revenue
+108351,Judgements and Fines,Court-Ordered Judgments and Fines,"Judgments, Fines, and Forfeits","Judgments, Fines, and Forfeits"
+001354,Fines Local Ordinance Violations,Fines,"Judgments, Fines, and Forfeits","Judgments, Fines, and Forfeits"
+107359,Inmate Fees,"Other Judgments, Fines, and Forfeitures","Judgments, Fines, and Forfeits","Judgments, Fines, and Forfeits"
+107356,State Fines and Forfeits,State Fines & Forfeits,"Judgments, Fines, and Forfeits","Judgments, Fines, and Forfeits"
+001366,Contributions & Donations,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+101366,Contributions & Donations,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+107364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+001364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+101364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+103364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+106364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+111364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+112364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+300364,Disposition of Fixed Assets,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+001361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+101361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+102361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+103361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+104361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+105361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+106361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+107361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+108361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+109361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+110361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+111361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+112361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+113361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+114361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+115361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+201361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+300361,Interest & Other Earnings,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+116361,Mobility Fees,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+111369,Other Miscellaneous Revenue,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+001369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+101369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+103369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+107369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+112369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+113369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+115369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+300369,Other Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+114369,Recreation Plat Fees,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+001362,Rents and Royalties,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+111362,Rents and Royalties,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+112365,Sale of Surplus Material & Scrap,Miscellaneous Revenues,Miscellaneous Revenues,Miscellaneous Revenues
+001384,Debt Proceeds,Other Sources,Other Sources,Other Sources
+300384,Debt Proceeds,Other Sources,Other Sources,Other Sources
+001386,Intragovernmental Transfers,Other Sources,Other Sources,Other Sources
+107386,Intragovernmental Transfers,Other Sources,Other Sources,Other Sources
+001389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+101389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+102389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+104389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+105389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+106389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+109389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+110389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+111389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+112389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+113389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+114389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+201389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+300389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+503389,Non-Operating Sources,Other Sources,Other Sources,Other Sources
+107389,Prop Non-Operating Sources,Other Sources,Other Sources,Other Sources
+103389,Proprietary Non-Operating,Other Sources,Other Sources,Other Sources
+103322,Building Permits,"Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments"
+001324,E911 Fund,"Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments"
+103329,Other Permits & Fees,"Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments"
+001329,"Permits, Fee, and Special Assessments","Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments"
+101324,Sign Fees & Sewer Impact Fees,"Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments","Permits, Fees, and Special Assessments"
+112000,Solid Waste Balance Sheet Accounts,Solid Waste,Walton County Government,Physical Environment
+107000,Fine & Forfeiture Balance Sheet Accounts,Sheriff's Office,Constitutional Officers,Public Safety
+103000,Building Balance Sheet Accounts,Building Department,Walton County Government,Public Safety
+101000,Public Works Balance Sheet Accounts,Public Works,Walton County Government,Transportation

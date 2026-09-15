@@ -1,0 +1,315 @@
+Dept_Code,Dept_Name,Position_Name,2024,2025,2026,2027
+00108000,County Libraries,Library Administrative Specialist,1,1,1,1
+00112010,Eagle Springs Golf and Recreation Center,Golf Course Spray Technician,1,1,1,1
+00112010,Eagle Springs Golf and Recreation Center,Golf Course Grounds Crew,5,4.5,5.5,5.5
+00112010,Eagle Springs Golf and Recreation Center,Golf Course & Sports Park Superintendent,1,1,1,1
+00112010,Eagle Springs Golf and Recreation Center,Golf Course Attendant,3,3,3.5,3.5
+00117000,Building Construction and Maintenance,Director of Building Construction & Maintenance,1,1,1,1
+00117000,Building Construction and Maintenance,Parks & Recreation Foreman,2,2,2,2
+00117000,Building Construction and Maintenance,Parks Maintenance Worker,15,14.5,19,19
+00117000,Building Construction and Maintenance,Executive Assistant,1,1,1,1
+00117000,Building Construction and Maintenance,Projects Manager,0,1,0,0
+00117000,Building Construction and Maintenance,Work Order Supervisor,1,1,1,1
+00117000,Building Construction and Maintenance,Administrative Assistant,1,1,1,1
+00117000,Building Construction and Maintenance,Custodian,9,9,11,11
+00117000,Building Construction and Maintenance,Custodian - Building,0,0,1,1
+00117000,Building Construction and Maintenance,Construction Foreman,1,1,1,1
+00117000,Building Construction and Maintenance,Facilities Maintenance Technician II,7,7,7,7
+00117000,Building Construction and Maintenance,Equipment Operator,1,1,1,1
+00117000,Building Construction and Maintenance,Fixed Asset & ADA Coordinator,1,1,0,0
+00117000,Building Construction and Maintenance,Facilities Maintenance Technician III,6,6,6,6
+00117000,Building Construction and Maintenance,Facilities Maintenance Technician I,8,8,12,12
+00117000,Building Construction and Maintenance,Custodian Supervisor,1,1,1,1
+00117000,Building Construction and Maintenance,Deputy Director of Building Construction & Facilities Maintenance,1,1,1,1
+00117000,Building Construction and Maintenance,Assistant Foreman,2,2,2,2
+10326000,Building Department,Office Manager,1,1,1,1
+10326000,Building Department,Building Clerk,1,1,1,1
+10326000,Building Department,Building Technician,12,12,9,9
+10326000,Building Department,Building Coordinator,2,2,2,2
+10326000,Building Department,Building Inspector I,3,3,3,3
+10326000,Building Department,Building Inspector III,2,2,2,2
+10326000,Building Department,Building Official,1,1,1,1
+10326000,Building Department,Plans Reviewer,1,1,1,1
+10326000,Building Department,Building Inspector/Plans Reviewer,1,1,1,1
+00102030,Code Compliance Street,Deputy Director of Code Compliance,0.5,0.5,0.5,0.5
+00102030,Code Compliance Beach,Deputy Director of Code Compliance,0.5,0.5,0.5,0.5
+00102030,Code Compliance Street,Code Compliance Officer Street,6,6,6,6
+00102030,Code Compliance Street,Code Compliance Officer Parking,4,4,4,4
+00102030,Code Compliance Street,Office Manager,0.5,0.5,0.5,0.5
+00102030,Code Compliance Beach,Code Compliance Technician,3,3,3,3
+00102030,Code Compliance Street,Code Compliance Technician,1,1,1,1
+00102030,Code Compliance Street,Operations Support Specialist,0.5,0.5,0.5,0.5
+00102030,Code Compliance Street,Code Compliance Shift Supervisor,2,2,2,2
+00102030,Code Compliance Street,Director of Code Compliance,0.5,0.5,0.5,0.5
+00102030,Code Compliance Beach,Code Compliance Manager,1,1,1,1
+00102030,Code Compliance Beach,Code Compliance Officer Beach,14,14,14,14
+00102030,Code Compliance Beach,Code Compliance Shift Supervisor,4,4,4,4
+00102030,Code Compliance Beach,Lead Beach Steward,1,2,2,2
+00102030,Code Compliance Street,Code Compliance Manager,1,1,1,1
+00102030,Code Compliance Street,Code Compliance Officer STR,0,0,1,1
+00102000,County Administration,Technology & Media Manager,1,1,1,1
+00102000,County Administration,Executive Assistant,1,1,1,1
+00102000,County Administration,Director of Governmental Coordination,1,1,1,1
+00102000,County Administration,Deputy County Administrator,1,1,1,1
+00102000,County Administration,Executive Aide To The County Administrator,1,1,1,1
+00102000,County Administration,Program Development & Outreach Coordinator,1,1,1,1
+00102000,County Administration,Administrative Specialist - Contracts,1,1,1,1
+00102000,County Administration,Systems Administrator,0,0,1,1
+00102000,County Administration,Technology Support Specialist,0,1,1,1
+00102000,County Administration,Multimedia Support Specialist,1,1,1,1
+00102000,County Administration,County Administrator,1,1,1,1
+00102000,County Administration,Assistant County Administrator,1,1,1,1
+00102000,County Administration,Director of Administrative Services,1,1,1,1
+00102030,Code Compliance Beach,Office Manager,0.5,0.5,0.5,0.5
+00102000,County Administration,Administrative Assistant,1,1,1,0
+00102000,County Administration,Tri-County Attendent,1,1,1,1
+00112010,Eagle Springs Golf and Recreation Center,Assistant Golf Course Superintendent,1,1,1,1
+00102030,Code Compliance Beach,Director of Code Compliance,0.5,0.5,0.5,0.5
+00112040,Eagle Springs Grill,Golf Course Cook,4,4,2.5,2
+00112040,Eagle Springs Grill,Food & Beverage Manager,1,1,1,1
+00112040,Eagle Springs Grill,Lead Golf Course Server,1,1,1,1
+00102000,County Administration,Administration Receptionist,1,1,1,1
+00112040,Eagle Springs Grill,Golf Course Server,6,3,2,2
+00111001,Emergency Management,Emergency Management Coordinator,1,1,1,1
+00111001,Emergency Management,Director of Emergency Management,1,1,1,1
+00111001,Emergency Management,Recovery & Mitigation Coordinator,0,0,1,1
+00111001,Emergency Management,Emergency Management Logistics Coordinator,1,1,1,1
+00111001,Emergency Management,Technology Coordinator,0,0,0,0.5
+00111001,Emergency Management,Deputy Director of Emergency Management,1,1,1,1
+00111001,Emergency Management,Emergency Management Specialist,0.5,0.5,0.5,0.5
+00120000,Engineering Department,Long Range Infrastructure Program Engineer,1,1,1,1
+00120000,Engineering Department,County Engineer,1,1,1,1
+00120000,Engineering Department,Projects Manager,1,1,1,1
+00120000,Engineering Department,Administrative Assistant,1,1,1,0
+00120000,Engineering Department,Capital Improvements Work Program Engineer,1,1,1,1
+00120000,Engineering Department,Deputy County Engineer,1,1,0,0
+00120000,Engineering Department,CEI Project Coordinator,2,2,1,1
+00120000,Engineering Department,Staff Engineer II,1,1,1,1
+00120000,Engineering Department,County Surveyor,1,1,1,1
+00120000,Engineering Department,Senior Survey Party Chief,1,1,1,1
+00120000,Engineering Department,Senior Right of Way Specialist,1,1,1,1
+00120000,Engineering Department,Administrative Project Coordinator,1,1,2,1
+00120000,Engineering Department,Staff Engineer I,2,2,2,2
+00120000,Engineering Department,Engineering Technician I,1,1,1,1
+00120000,Engineering Department,Junior Survey Party Chief,1,1,1,1
+00119000,Environmental Resources,Environmental Manager,1,1,1,1
+00119000,Environmental Resources,Environmental Technician,1,1,1,1
+00119000,Environmental Resources,Environmental Planner,1,1,1,1
+00119000,Environmental Resources,Environmental Scientist,1,1,1,1
+00113000,Extension Office,Office Manager,1,1,1,1
+00113000,Extension Office,Extension Agent III,2,2,2,2
+00113000,Extension Office,4-H Program Assistant,1,1,1,1
+00113000,Extension Office,Extension Clerk,1,1,1,1
+00113000,Extension Office,FCS Extension Agent,0.5,0.5,0.5,0.5
+00113000,Extension Office,Extension Agent II,2,2,2,2
+00113000,Extension Office,Director of County Extension,1,1,1,1
+00105000,Geographic Info Systems,GIS Specialist,1,1,1,1
+00105000,Geographic Info Systems,Gis Data Coordinator,1,1,1,1
+00105000,Geographic Info Systems,GIS Analyst II,1,1,1,1
+00105000,Geographic Info Systems,GIS Technician II,1,1,1,1
+00105000,Geographic Info Systems,GIS Technician I,1,1,1,1
+00105000,Geographic Info Systems,Director of GIS,1,1,1,1
+11040000,Housing & Urban Development,Director of Housing,1,1,1,1
+11040000,Housing & Urban Development,Administrative Assistant/Hud,1,1,0,0
+11040000,Housing & Urban Development,Assistant Hud Director,1,1,1,1
+11040000,Housing & Urban Development,FSS Program Coordinator,1,1,1,1
+00106000,Human Resources,HRIS Coordinator,0,1,1,1
+00106000,Human Resources,Human Resources Generalist - Tourism,1,1,1,1
+00106000,Human Resources,Risk & Safety Manager,1,1,1,1
+00106000,Human Resources,Administrative Assistant,1,1,1,1
+00106000,Human Resources,Benefits Coordinator,1,1,1,1
+00106000,Human Resources,Human Resources Generalist,1,1,2,2
+00106000,Human Resources,Employee Relations Manager,1,1,1,1
+00106000,Human Resources,Human Resources Technician,1,1,1,1
+00106000,Human Resources,Administrative Support Specialist,1,1,1,1
+00106000,Human Resources,Human Resources Supervisor,1,1,1,1
+00106000,Human Resources,Fixed Asset & ADA Coordinator,0,0,1,1
+00102000,County Administration,Public Information Officer,1,1,1,1
+00108000,County Libraries,Library Technology Specialist,1,1,1,1
+00108000,County Libraries,Interlibrary Loan Coordinator,1,1,1,1
+00108000,County Libraries,Director of Libraries,1,1,1,1
+00108000,County Libraries,Library Youth Services Clerk,2.5,2.5,5.5,5.5
+00108000,County Libraries,Library Clerk,8,8,8,8
+00108000,County Libraries,Library Branch Manager,3,3,3,3
+00108000,County Libraries,Library Technical Services Coordinator,1,1,1,1
+00108000,County Libraries,Outreach Librarian,1,1,1,1
+00106000,Human Resources,Director of Human Resources,1,1,1,1
+10528000,Mosquito Control,Mosquito Control Technician I,3,3,3,3
+10528000,Mosquito Control,Mosquito Control Technician II,3,3,3,3
+10528000,Mosquito Control,Mosquito Control Coordinator,1,1,1,1
+10528000,Mosquito Control,Mosquito Control Manager,1,1,1,1
+10528000,Mosquito Control,Lead Mosquito Control Technician,1,1,1,0
+10116020,Mossy Head Wastewater Treatment Facility,Sewer Technician,1,1,1,1
+00107000,Office of Management and Budget,Budget Analyst,2,2,3,3
+00107000,Office of Management and Budget,Grants Coordinator,2,2,3,3
+00107000,Office of Management and Budget,Chief Financial Officer,1,1,1,1
+00107000,Office of Management and Budget,Budget Director,1,1,1,1
+00107000,Office of Management and Budget,Grants Manager,1,1,1,1
+00103000,Office of the County Attorney,Public Records Technician I,2,2,2,2
+00103000,Office of the County Attorney,Records Management Liaison Officer,0,1,1,1
+00103000,Office of the County Attorney,Contracts Manager,1,1,1,1
+00103000,Office of the County Attorney,Contracts Coordinator,1,1,1,1
+00103000,Office of the County Attorney,Assistant County Attorney,2,2,2,2
+00103000,Office of the County Attorney,County Attorney,1,1,0,0
+00103000,Office of the County Attorney,Paralegal,2,2,2,1
+00103000,Office of the County Attorney,Public Records Coordinator,1,1,1,1
+00104000,Planning,Records Technician,1,1,1,1
+00104000,Planning,Senior Planner,6,6,6,6
+00102030,Code Compliance Beach,Operations Support Specialist,0.5,0.5,0.5,0.5
+00104000,Planning,Financial Planning Coordinator,1,1,1,1
+00104000,Planning,Planning Support Specialist,1,1,1,1
+00104000,Planning,Executive Assistant,1,1,1,1
+00104000,Planning,Building Plans Review Manager,1,1,1,1
+00104000,Planning,Planning Technician,5,7,7,7
+00104000,Planning,Deputy Director of Planning & Development,1,1,1,1
+00104000,Planning,Office Manager,1,1,1,1
+00104000,Planning,Code Compliance Officer - STR,0,0,0,1
+00104000,Planning,Livability & Tourism Technician I,0,3,3,4
+00104000,Planning,Land Use Attorney,1,1,1,1
+00104000,Planning,Short Term Rentals Manager,1,1,1,1
+00104000,Planning,Planning Coordinator,1,1,1,1
+00104000,Planning,Environmental Planner,1,1,1,1
+00104000,Planning,Development Order Inspector - Planning,3,3,3,3
+00104000,Planning,Current Planning Manager,1,1,1,1
+00104000,Planning,Livability & Tourism Coordinator,0,1,1,1
+00104000,Planning,Planner,3,3,3,3
+00104000,Planning,Director of Planning & Development,1,1,1,1
+00104000,Planning,Environmental/Floodplain Specialist,0,0,1,1
+00104000,Planning,Geospatial Analysis Planner,1,1,1,1
+00104000,Planning,Planning Assistant,4,4,4,4
+00104000,Planning,Floodplain Program Manager,1,1,1,1
+00104000,Planning,Customer Service Specialist,1,1,1,1
+00104000,Planning,Plans Review Coordinator,1,1,1,1
+00109000,Probation,Probation Assistant,1,1,1,1
+00109000,Probation,Probation Officer,1,1,1,1
+00109000,Probation,Probation Manager,1,1,1,1
+,Property Appraiser,Property Appraiser,38,38,38,37
+10116001,Public Works,Assistant Road Foreman,6,6,6,6
+10116001,Public Works,Public Works Director,1,1,1,1
+10116001,Public Works,Specialty Crew Foreman,5,5,5,5
+10116001,Public Works,Utility Inspector,0,0,1,1
+10116001,Public Works,Lowboy Operator,1,1,1,1
+10116001,Public Works,Executive Assistant,1,1,1,1
+10116001,Public Works,Work Order Supervisor,1,1,1,1
+10116001,Public Works,Office Manager,1,1,1,1
+10116001,Public Works,Automotive Equipment Technician III,2,2,2,2
+10116001,Public Works,County Shop Foreman,1,1,1,1
+10116001,Public Works,Automotive Equipment Technician I,3,3,3,3
+10116001,Public Works,Sign Shop Technician,1,1,1,1
+10116001,Public Works,Administrative Assistant,7,7,7,7
+10116001,Public Works,General Equipment Operator,20,20,21,21
+10116001,Public Works,Public Works Operations Manager,1,1,1,1
+10116001,Public Works,Asphalt Operator I,2,2,2,2
+10116001,Public Works,Road Maintenance Technician II,1,1,1,1
+10116001,Public Works,Heavy Equipment Operator,57,57,61,61
+10116001,Public Works,Paint Heavy Equipment Operator,1,1,1,1
+10116001,Public Works,Road Maintenance Technician,1,1,1,1
+10116001,Public Works,Special Projects Coordinator,1,1,1,1
+10116001,Public Works,Paint Maintenance Technician,1,1,1,1
+10116001,Public Works,North Zone Manager,1,1,1,1
+10116001,Public Works,Field Service Technician,2,2,2,2
+10116001,Public Works,Deputy Director of Public Works,1,1,1,1
+10116001,Public Works,Inventory Control Specialist,1,1,1,1
+10116001,Public Works,Public Works Accounting Technician,1,1,1,1
+10116001,Public Works,Mot Flagger,3,3,3,3
+10116001,Public Works,Fleet Manager,1,1,1,1
+10116001,Public Works,Asphalt Operator II,5,5,5,5
+10116001,Public Works,Lead Fabricator/Machinist,1,1,1,1
+10116001,Public Works,Paint Foreman,1,1,1,1
+10116001,Public Works,Work Squad Supervisor,1,1,1,1
+10116001,Public Works,Asphalt Foreman,1,1,1,1
+10116001,Public Works,Road Foreman,5,5,5,5
+10116001,Public Works,Automotive Equipment Technician II,2,2,2,2
+10116001,Public Works,Special Projects Foreman,1,1,1,1
+00107020,Purchasing,Procurement Coordinator,1,1,1,1
+00107020,Purchasing,Logistics Coordinator,1,1,1,1
+00107020,Purchasing,Contracts Coordinator,0,0,1,1
+00107020,Purchasing,Procurement Analyst,2,2,2,2
+00107020,Purchasing,Buyer,2,2,2,2
+00107020,Purchasing,Fixed Asset & Inventory Coordinator,1,1,1,1
+00107020,Purchasing,Director of Procurement,1,1,1,1
+00107020,Purchasing,Procurement Manager,1,1,1,1
+00112000,Recreation,Recreation Program Coordinator,2,2,2,2
+00112000,Recreation,Director of Parks & Recreation,1,1,1,1
+00112000,Recreation,Administrative Assistant,2,2,2,2
+,Sheriff,Sheriff,630,668,668,668
+00114000,Soil Conservation,Office Manager,1,1,1,1
+00114000,Soil Conservation,Soil Conservation Technician,1,1,1,1
+11242000,Solid Waste,Solid Waste & Recycling Technician,3,3,3,3
+11242000,Solid Waste,Solid Waste Foreman,0,1,1,1
+11242000,Solid Waste,Solid Waste General Equipment Operator,5,5,5,5
+11242000,Solid Waste,Office Manager,1,1,1,1
+11242000,Solid Waste,Solid Waste Heavy Equipment Operator,7,7,7,7
+11242000,Solid Waste,Solid Waste Senior Equipment Operator,2,2,2,2
+11242000,Solid Waste,Solid Waste Office Clerk,1,1,1,1
+11242000,Solid Waste,Administrative Assistant,1,1,1,1
+11242000,Solid Waste,Solid Waste Heavy Equipment Operator & Technician,1,1,1,1
+11242000,Solid Waste,Lead Solid Waste & Recycling Technician,1,1,1,1
+11242000,Solid Waste,Solid Waste Operations Manager,1,1,1,1
+11242000,Solid Waste,Director of Environmental Services,1,1,1,1
+,Tax Collector,Tax Collector,40,40,40,40
+11141000,Tourism Administration,Sustainability And Stewardship Coordinator,1,1,0,0
+11141000,Tourism Administration,Tourism Administrative Specialist,1,1,1,1
+11141000,Tourism Administration,Administrative Support Specialist,1,1,1,1
+11141000,Tourism Administration,Tourism Director,1,1,1,1
+11141060,Tourism Marketing,Graphic Designer,3.5,1,1,1
+11141030,Tourism Sales and Visitors Center,Visitor Information Manager,1,1,1,1
+11141030,Tourism Sales and Visitors Center,Weekend Lead Information Specialist,0,0,0,1
+11141030,Tourism Sales and Visitors Center,Visitor Information Specialist,3,4,4,3
+11141030,Tourism Sales and Visitors Center,Sales Manager,1,1,1,1
+11141030,Tourism Sales and Visitors Center,Deputy Director of Tourism - Sales,1,1,1,1
+11141030,Tourism Sales and Visitors Center,Tourism Sales Specialist,1,1,1,1
+11141090,Tourism Beach Tram,Transportation Assistant Mechanic,1,0,0,0
+11141040,Tourism Communications,Deputy Director of Tourism - Communications,1,1,1,1
+11141040,Tourism Communications,Industry Relations Specialist,1,1,1,1
+11141040,Tourism Communications,Content & Public Relations Specialist,1,1,1,1
+11141040,Tourism Communications,Content Coordinator,1,1,1,1
+11141040,Tourism Communications,Database Specialist,1,1,1,1
+11141060,Tourism Marketing,Marketing Manager,1,0,0,0
+11141060,Tourism Marketing,Marketing Specialist,5,2,2,2
+11141060,Tourism Marketing,Deputy Director of Tourism - Marketing,1,1,1,1
+11141000,Tourism Administration,Executive Director,1,1,1,1
+11141010,Tourism Beach Operations,Beach Operations Projects Coordinator,1,1,1,1
+11141010,Tourism Beach Operations,Assistant Landscape Crew Leader,1,1,1,1
+11141010,Tourism Beach Operations,Beach Maintenance Specialist Crew Leader,2,2,2,2
+11141010,Tourism Beach Operations,Beach Maintenance Manager,1,1,1,1
+11141010,Tourism Beach Operations,Assistant Beach Maintenance Specialist Crew Leader,2,2,2,2
+11141010,Tourism Beach Operations,Executive Assistant,1,1,1,1
+11141010,Tourism Beach Operations,Administrative Assistant,1,1,1,1
+11141010,Tourism Beach Operations,Beach Maintenance Technician,6,8,8,8
+11141010,Tourism Beach Operations,Beach Maint Technician Crew Leader,1,1,1,1
+11141010,Tourism Beach Operations,Deputy Director of Beach Operations,0,1,1,1
+11141010,Tourism Beach Operations,Beach Maintenance Landscape Technician,6,6,6,8
+11141010,Tourism Beach Operations,Shop Foreman,1,1,1,1
+11141010,Tourism Beach Operations,Electrician Helper,0,0,0,1
+11141010,Tourism Beach Operations,Assistant Shop Foreman,1,1,1,1
+11141010,Tourism Beach Operations,Assistant Beach Maintenance Technician Crew Leader,1,1,1,1
+11141010,Tourism Beach Operations,Electrician,1,1,1,1
+11141010,Tourism Beach Operations,Beach Maintenance Specialist,29,29,29,33
+11141010,Tourism Beach Operations,Landscape Maintenance Coordinator,0,1,1,1
+11141010,Tourism Beach Operations,Director of Beach Operations,1,1,1,1
+11141090,Tourism Beach Tram,Beach Tram Driver,60,44,44,48
+11141090,Tourism Beach Tram,Transportation Specialist,2,2,2,2
+11141090,Tourism Beach Tram,Administrative Assistant,2,1,1,1
+11141090,Tourism Beach Tram,Transportation Assistant Crew Leader,4,2,2,4
+11141090,Tourism Beach Tram,Transportation Crew Leader,2,2,2,2
+11141090,Tourism Beach Tram,Transportation Assistant Manager,1,1,1,1
+11141090,Tourism Beach Tram,Transportation Mechanic,1,1,1,1
+11141090,Tourism Beach Tram,Transportation Manager,1,1,1,1
+11141030,Tourism Sales and Visitors Center,Lead Visitor Information Specialist,1,1,1,1
+00110000,Veteran Services,Assistant Veterans Officer,1,1,1,1
+00110000,Veteran Services,Veterans Service Officer,1,1,1,1
+,Circuit Court,Administrative Assistant II ,1,1,1,1
+,Board of County Commissioners,County Commissioner,5,5,5,5
+,Board of County Commissioners,Commissioner's Aide,5,5,5,5
+,Board of County Commissioners,Chairperson's Aide,0,0,1,1
+00109000,Probation,Probation Officer II,1,1,1,1
+,Clerk of Circuit Court,IT Tech III,,,,1
+,Clerk of Circuit Court,IT Systems Administrator,,,,1
+,Clerk of Circuit Court,Network Administrator,,,,1
+,Clerk of Circuit Court,Clerk of Circuit Court,74,72,77,77
+00112000,Recreation,Assistant Recreation Coordinator,1,1,1,1
+,Sheriff,School Resource Officer,,,,1
+11242000,Solid Waste,Solid Waste Scale Operator,2,2,2,3
+,Supervisor of Elections,Supervisor of Elections,9.5,9.5,10,10
+00110000,Veteran Services,Administrative Assistant,0,0,0,1

@@ -8,8 +8,10 @@
   "use strict";
 
   const CENSUS_DATA_JSON_URL = "../assets/census-data.json";
-  const CENSUS_NARRATIVES_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRc6KHhTwcdREn_SvLONy_cucXH8NxF45hgdyn8IoFGSeTbIVKtDGMMWsbgSFpMizxtxy_fE-pAMmiu/pub?gid=945636240&single=true&output=csv";
+  // Frozen snapshot of the Census Narratives sheet (see
+  // assets/data/census-narratives.csv) rather than a live Google Sheets
+  // fetch, so this page's numbers stay static.
+  const CENSUS_NARRATIVES_CSV_URL = "../assets/data/census-narratives.csv";
   // data.census.gov vizwidget geography code for Walton County, FL.
   const CENSUS_IFRAME_GEOGRAPHY = "050XX00US12131";
 

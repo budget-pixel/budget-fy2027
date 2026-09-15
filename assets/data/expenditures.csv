@@ -1,0 +1,942 @@
+Dept_Code,Dept_Name,Note,M&E_type,BCC_Replacement,Contract_Status,Vendor,Contract_No,Contract_Link,Project_Code,Project_Name,Object_Code,Object_Name,Object_Type,FY2027_Proposed,Fund_code,activity
+00117000,Building Construction and Maintenance,,,,,,,,,,562000,Buildings,Capital Outlay,0.00,001,General Government
+00112000,Recreation,,,,,,,,,,562000,Buildings,Capital Outlay,"30,000.00",001,Culture and Recreation
+00107020,Procurement,,,,,,,,,,562000,Buildings,Capital Outlay,"50,000.00",001,General Government
+00104000,Planning Short-Term Rental,Short-Term Rental,,,,,,,10639,Short-Term Rental,562000,Buildings,Capital Outlay,"100,000.00",001,General Government
+11141010,Beach Operations,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"3,363,126.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"260,117.00",111,Economic Environment
+11141010,Beach Operations,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"423,755.00",111,Economic Environment
+11141010,Beach Operations,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"879,831.00",111,Economic Environment
+11141010,Beach Operations,US Highway 331 Median & Right-of-Way Maintenance,,,Active Contract,"Harper Landscaping, LLC",22-028,,,,534000,Other Services,Operating Expenditures,"455,000.00",111,Economic Environment
+11141010,Beach Operations,SR 83 (US 331) Landscaping Improvements,,,Active Contract,"C&A Landscape Maintenance, LLC",25-26,https://www.mywaltonfl.gov/DocumentCenter/View/45339/Contract-25-26-Landscaping-Improvements-1,,,534000,Other Services,Operating Expenditures,"515,000.00",111,Economic Environment
+11141010,Beach Operations,Highway 98 Median & Right-of-Way Maintenance,,,Active Contract,"ZIIC Outdoors, LLC",020-016,,,,534000,Other Services,Operating Expenditures,"300,000.00",111,Economic Environment
+11141010,Beach Operations,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"64,870.00",111,Economic Environment
+11141010,Beach Operations,Task Orders Services,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"200,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,534000,Other Services,Operating Expenditures,"916,625.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"7,875.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,541000,Communication Services,Operating Expenditures,"114,150.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"3,150.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,543000,Utility Services,Operating Expenditures,"273,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"70,350.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"656,250.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,546001,Tires,Operating Expenditures,"42,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,546002,Vehicle Repairs,Operating Expenditures,"225,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"65,625.00",111,Economic Environment
+00104000,Planning,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"40,000.00",001,General Government
+11040000,Housing & Urban Development,,,,,,,,,,549001,Vouchers Rent,Operating Expenditures,"2,600,000.00",110,Economic Environment
+11141060,Marketing,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"224,827.00",111,Economic Environment
+11141060,Marketing,,,,,,,,,,551000,Office Supplies,Operating Expenditures,600.00,111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"45,000.00",111,Economic Environment
+10116002,Engineering Services,,,,,,,,,,552002,Fuel,Operating Expenditures,"20,000.00",101,Transportation
+11141030,Sales and Visitors Center,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"34,600.00",111,Economic Environment
+11141020,Beach Renourishment,Beach Renourishment Task Order Services,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"250,000.00",111,Economic Environment
+11141010,Beach Operations,Dune Allen,,,,,,,10439,,563000,Infrastructure,Capital Outlay,0.00,111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"2,000.00",111,Economic Environment
+00110000,Veteran Services,,,,,,,,,,551000,Office Supplies,Operating Expenditures,500.00,001,Economic Environment
+10116002,Engineering Services,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"2,000.00",101,Transportation
+11141010,Beach Operations,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"1,115,259.00",111,Economic Environment
+00101000,Board of County Commissioners,District 1 Discretionary Funding,,,,,,,00001,,552000,Operating Supplies,Operating Expenditures,"25,000.00",001,General Government
+11141010,Beach Operations,,,,,,,,10724,Boardwalk Dune Walkover Repair/Replacement,563000,Infrastructure,Capital Outlay,0.00,111,Economic Environment
+00101000,Board of County Commissioners,"Salaries for County Commissioners are established by Florida law and are based on the county's population. The State sets a salary schedule and provides annual adjustments as required by law; the County does not independently determine these salary amounts. See Florida Statutes, Chapter 145, Section 145.031 for the salary formula and Chapter 145 for annual compensation provisions.",,,,,,,,,511000,Commissioner Salaries,Personnel Services,"411,860.00",001,General Government
+00101000,Board of County Commissioners,"Funds staff who assist County Commissioners with constituent services, communications, and daily operations",,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"476,617.00",001,General Government
+00101000,Board of County Commissioners,,,,,,,,,,512007,PTO Buyback,Personnel Services,"220,000.00",001,General Government
+00101000,Board of County Commissioners,Summer Students Program and Merit increase for Board departments,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"200,000.00",001,General Government
+00101000,Board of County Commissioners,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"60,789.00",001,General Government
+00101000,Board of County Commissioners,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"249,148.00",001,General Government
+00101000,Board of County Commissioners,"Board and Constitutional Offices' share of health insurance costs for approximately 332 eligible retirees and beneficiaries, based on the most recent OPEB actuarial study.",,,,,,,,,523000,Life & Health Insurance,Personnel Services,"620,000.00",001,General Government
+00101000,Board of County Commissioners,"Board and Constitutional Offices' share of funding for the Florida Retirement System Health Insurance Subsidy (HIS), which provides eligible retirees with a monthly benefit based on their years of creditable service.",,,,,,,,,523000,Life & Health Insurance,Personnel Services,"500,000.00",001,General Government
+00101000,Board of County Commissioners,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,875.00,001,General Government
+00101000,Board of County Commissioners,County share of the State Unemployment Compensation Trust Fund ,,,,,,,,,525000,Unemployment Compensation,Personnel Services,"15,000.00",001,General Government
+00101000,Board of County Commissioners,Professional & Technical Services,,,,,,,,,531000,Professional Services,Operating Expenditures,"236,900.00",001,General Government
+00101000,Board of County Commissioners,OPEB/GASB 75 Valuation,,,Active Contract,McGriff Insurance Services,,https://www.mywaltonfl.gov/DocumentCenter/View/45305/OPEB-GASB-75-Valuation,,,531000,Professional Services,Operating Expenditures,"8,000.00",001,General Government
+00101000,Board of County Commissioners,Financial Advisor Services for Debt Issuance,,,Active Contract,PFM Financial Advisors LLC,23-15,https://www.mywaltonfl.gov/DocumentCenter/View/45306/23-15-PFM-Financial-contract,,,531000,Professional Services,Operating Expenditures,"10,000.00",001,General Government
+00101000,Board of County Commissioners,Employee Benefits Consultant,,,Active Contract,The Gehring Group,22-036,https://www.mywaltonfl.gov/DocumentCenter/View/45310/Gehring-Contract-22-036,,,531000,Professional Services,Operating Expenditures,"95,000.00",001,General Government
+00101000,Board of County Commissioners,State Lobbyist (75/25 split with Tourist Fund),,,Active Contract,"Heffley & Associates, Inc.",25-28,https://www.mywaltonfl.gov/DocumentCenter/View/45313/Lobbying-Services-034,,,531000,Professional Services,Operating Expenditures,"66,000.00",001,General Government
+00101000,Board of County Commissioners,Federal Lobbyist (50/50 split with Tourist Fund),,,New Procurement,,,,,,531000,Professional Services,Operating Expenditures,"48,000.00",001,General Government
+00101000,Board of County Commissioners,Cost Allocation Service Study,,,Cooperative Agreement,"Maximus US Services, Inc",,https://www.mywaltonfl.gov/DocumentCenter/View/45332/Walton-County-FL-Cost-Allocation-Plan-Proposal-24A--25A---FINAL---2426-Rev,,,531000,Professional Services,Operating Expenditures,"11,100.00",001,General Government
+00101000,Board of County Commissioners,Comprehensive Annual Financial Audit Services,,,Active Contract,"Carr, Riggs, & Ingram",,https://www.mywaltonfl.gov/DocumentCenter/View/45342/Walton-County-Engagement-Letter-FY2025-Audit,,,532000,Accounting & Auditing,Operating Expenditures,"310,000.00",001,General Government
+00101000,Board of County Commissioners,Enhanced South Walton Right Away Landscaping Services (Portion paid by Tourist Fund),,,Active Contract,"Harper Landscaping, LLC",24-16A,https://www.mywaltonfl.gov/DocumentCenter/View/45307/24-16A-Harper-Landscaping-Agreement,,,534000,Other Services,Operating Expenditures,"500,000.00",001,General Government
+00101000,Board of County Commissioners,Enhanced South Walton Right Away Landscaping Services (Portion paid by Tourist Fund),,,Active Contract,"ZIIC Outdoors, LLC",24-16B,https://www.mywaltonfl.gov/DocumentCenter/View/45312/ITB-24-16-Contract-24-16B-ZIIC,,,534000,Other Services,Operating Expenditures,"25,000.00",001,General Government
+00101000,Board of County Commissioners,Enhanced South Walton Right Away Landscaping Services (Portion paid by Tourist Fund),,,Active Contract,"ZIIC Outdoors, LLC",24-16C,https://www.mywaltonfl.gov/DocumentCenter/View/45311/ITB-24-16-Contract--24-16C--ZIIC,,,534000,Other Services,Operating Expenditures,"650,000.00",001,General Government
+00101000,Board of County Commissioners,,,,,,,,,,534000,Other Services,Operating Expenditures,"70,000.00",001,General Government
+00101000,Board of County Commissioners,"County Website, ADA Website Compliance, Archive Services for Social Media, Public Records Software",,,Active Contract,CivicPlus,,,,,534000,Other Services,Operating Expenditures,"50,000.00",001,General Government
+00101000,Board of County Commissioners,Commissioner and Board Agenda Management Software,,,Active Contract,iCompass,,,,,534000,Other Services,Operating Expenditures,"30,000.00",001,General Government
+00101000,Board of County Commissioners,"Board ERP Finance, HR, Planning & Permit Software",,,Active Contract,Tyler Technologies,,https://www.mywaltonfl.gov/DocumentCenter/View/45325/Tyler-Technologies,,,534000,Other Services,Operating Expenditures,"420,000.00",001,General Government
+00101000,Board of County Commissioners,State Mandated Juvenile Justice Department Contribution,,,State Mandate,,,,,,534000,Other Services,Operating Expenditures,"250,000.00",001,General Government
+00101000,Board of County Commissioners,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"70,000.00",001,General Government
+00101000,Board of County Commissioners,,,,,,,,,,541000,Communication Services,Operating Expenditures,"175,000.00",001,General Government
+00101000,Board of County Commissioners,State Mandated TRIM notice mailed by the Property Appraiser,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"80,000.00",001,General Government
+00101000,Board of County Commissioners,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"165,000.00",001,General Government
+00101000,Board of County Commissioners,General Liability & Cyber Liability Coverage (FACT),,,,,,,,,545000,Insurance,Operating Expenditures,"2,000,000.00",001,General Government
+00101000,Board of County Commissioners,"Auto, Property, & Workers Compensation Coverage (FMIT)",,,,,,,,,545000,Insurance,Operating Expenditures,"1,615,000.00",001,General Government
+00101000,Board of County Commissioners,Freeport Business Complex Property Insurance,,,,,,,,,545000,Insurance,Operating Expenditures,"85,000.00",001,General Government
+00101000,Board of County Commissioners,"Repairs to Courthouse and South Walton Annex, and other county maintained facilities",,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"100,000.00",001,General Government
+00101000,Board of County Commissioners,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"20,000.00",001,General Government
+11141030,Sales and Visitors Center,,,,,,,,13500,,548000,Promotional Activities,Operating Expenditures,"300,000.00",111,Economic Environment
+11141030,Sales and Visitors Center,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"126,725.00",111,Economic Environment
+00101000,Board of County Commissioners,District 2 Discretionary Funding,,,,,,,00002,,552000,Operating Supplies,Operating Expenditures,"25,000.00",001,General Government
+10116001,Public Works,,,,,,,,,,553000,Road Materials & Supplies,Operating Expenditures,"2,538,400.00",101,Transportation
+11141000,Tourism Administration,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"122,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,10725,Deer Lake Path Realignment,563000,Infrastructure,Capital Outlay,0.00,111,Economic Environment
+11444000,Recreation Plat Fee,,,,,,,,,,563000,Infrastructure,Capital Outlay,"600,000.00",114,Culture and Recreation
+11545000,Sidewalk,,,,,,,,,,563000,Infrastructure,Capital Outlay,"300,000.00",115,Transportation
+11141010,Beach Operations,,,,,,,,10726,30A Gateway Improvements,563000,Infrastructure,Capital Outlay,"600,000.00",111,Economic Environment
+10326000,Building Department,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"1,573,326.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,103,Public Safety
+10326000,Building Department,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"35,000.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,514000,Overtime,Personnel Services,"5,000.00",103,Public Safety
+10326000,Building Department,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"118,982.00",103,Public Safety
+10326000,Building Department,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"219,552.00",103,Public Safety
+10326000,Building Department,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"343,453.00",103,Public Safety
+10326000,Building Department,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"16,888.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"4,000.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,541000,Communication Services,Operating Expenditures,"20,000.00",103,Public Safety
+30047030,Capital Projects,,,,,,,,,,563000,Infrastructure,Capital Outlay,"25,035,734.00",300,Transportation
+10326000,Building Department,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"2,500.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,543000,Utility Services,Operating Expenditures,"40,000.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"30,000.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"35,000.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,546001,Tires,Operating Expenditures,"3,000.00",103,Public Safety
+10326000,Building Department,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"5,000.00",103,Public Safety
+11040000,Housing & Urban Development,,,,,,,,,,549002,Vouchers Utilities,Operating Expenditures,"25,000.00",110,Economic Environment
+11141000,Tourism Administration,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"1,054,085.00",111,Economic Environment
+00101000,Board of County Commissioners,District 3 Discretionary Funding,,,,,,,00003,,552000,Operating Supplies,Operating Expenditures,"25,000.00",001,General Government
+00110000,Veteran Services,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"3,276.00",001,Economic Environment
+00101000,Board of County Commissioners,Settlements and unanticipated items,,,,,,,,,530000,Operating Expenses and Budget,Operating Expenditures,"100,000.00",001,General Government
+10116001,Public Works,,,,,,,,,,553001,In-House Road Material,Operating Expenditures,"1,376,000.00",101,Transportation
+00110000,Veteran Services,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"4,500.00",001,Economic Environment
+11141090,Beach Tram,,,,,,,,10400,,563000,Infrastructure,Capital Outlay,0.00,111,Economic Environment
+00106000,Human Resources,,,,,,,,,,555001,Employee Tuition Reimbursement,Operating Expenditures,"30,000.00",001,General Government
+00101030,Clerk of Court,,,,,,,,,,560000,Capital Outlay Budget,Capital Outlay,"120,000.00",001,General Government
+11141020,Beach Renourishment,,,,,,,,,,563000,Infrastructure,Capital Outlay,"10,750,000.00",111,Economic Environment
+00101000,Board of County Commissioners,Managed Vendor Program Revenue set aside by the Board for future program needs or Board-approved purposes,,,,,,,10647,,563000,Infrastructure,Capital Outlay,"1,530,000.00",001,General Government
+00101000,Board of County Commissioners,"Funds for audio-visual and security upgrades in County boardrooms to improve functionality, reliability, and safety",,,,,,,10030,,552000,Operating Supplies,Operating Expenditures,"75,000.00",001,General Government
+00101000,Board of County Commissioners,Funds capital improvement projects identified and approved by the Board,,,,,,,,,563000,Infrastructure,Capital Outlay,"75,000.00",001,General Government
+00112020,Board of County Commissioners,"Funds capital improvements supported by vessel registration fees for public boat ramps, docks, waterway access, and other eligible boating-related projects.",,,,,,,,,563000,Infrastructure,Capital Outlay,"100,000.00",001,Culture and Recreation
+00111000,State Fire,,,,,,,,,,581000,Aid to Government Agencies,Grants and Aid,"32,790.00",001,Public Safety
+00102012,Human Services,Statutory & Other,,,,,,,10259,Medicaid Services,581000,Aid to Government Agencies,Grants and Aid,"1,243,475.00",001,Human Services
+00102012,Human Services,Statutory & Other,,,,,,,10260,Health Care Response (HCRA),581000,Aid to Government Agencies,Grants and Aid,"100,000.00",001,Human Services
+00102012,Human Services,Statutory & Other,,,,,,,,DeFuniak Community Redevelopment Agency,581000,Aid to Government Agencies,Grants and Aid,"767,938.00",001,Human Services
+00102019,Volunteer Fire,Statutory & Other,,,,,,,10277,Liberty Volunteer Fire Department,581000,Aid to Government Agencies,Grants and Aid,"175,000.00",001,Public Safety
+00102019,Volunteer Fire,Statutory & Other,,,,,,,10278,Argyle Volunteer Fire Department,581000,Aid to Government Agencies,Grants and Aid,"175,000.00",001,Public Safety
+00102012,Walton County Health Department,,,,,,,,10255,Walton County Health Department,581000,Aid to Government Agencies,Grants and Aid,"1,724,397.00",001,Human Services
+00102012,Human Services,Statutory & Other,,,,,,,10760,Opioid Settlement Year 4,581000,Aid to Government Agencies,Grants and Aid,"186,119.00",001,Human Services
+00102012,Human Services,Statutory & Other,,,,,,,10732,15% Opioid Settlement Year 4,581000,Aid to Government Agencies,Grants and Aid,"68,768.00",001,Human Services
+00101000,Board of County Commissioners,Health Department Storage Unit,,,,,,,1,,581001,Aid to Government Agencies,Grants and Aid,"5,000.00",001,General Government
+00113000,Extension Office,,,,,,,,,,582000,Aid to Private Organizations,Grants and Aid,"3,000.00",001,Physical Environment
+00102011,Economic Development Alliance,Statutory & Other,,,,,,,10257,Economic Development Alliance,582000,Aid to Private Organizations,Grants and Aid,"421,444.00",001,Economic Environment
+00102016,Gulf Coast Kid's House,Statutory & Other,,,,,,,10251,Gulf Coast Kid's House,582000,Aid to Private Organizations,Grants and Aid,"98,100.00",001,Human Services
+00102017,Culture and Recreation (Senior Centers & Mainstreet),Statutory & Other,,,,,,,10253,DeFuniak Springs Interlocal (Life Enrichment Center),582000,Aid to Private Organizations,Grants and Aid,"42,000.00",001,Culture and Recreation
+00102014,Non-Profit Funding Program,,,,,,,,10261,,583000,Other Grants & Aid,Grants and Aid,"450,000.00",001,Human Services
+00102014,Indigent Cremation Program,Statutory & Other,,,,,,,,Indigent Cremation Program,583000,Other Grants & Aid,Grants and Aid,"50,000.00",001,Human Services
+50350000,Self-Insurance Expenses,,,,,,,,,,590000,Other Uses Budget,Other Uses,0.00,503,General Government
+00101040,Circuit Court,,,,,,,,,,510000,Personnel Services Budget,Personnel Services,"187,097.00",001,Court Related Cost
+00101040,Circuit Court,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"25,275.00",001,Court Related Cost
+00101040,Circuit Court,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"1,934.00",001,Court Related Cost
+00101040,Circuit Court,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"3,379.00",001,Court Related Cost
+00101040,Circuit Court,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"6,353.00",001,Court Related Cost
+00101040,Circuit Court,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,55.00,001,Court Related Cost
+00101040,Circuit Court,,,,,,,,,,535000,Investigations,Operating Expenditures,"10,400.00",001,Court Related Cost
+00101040,Circuit Court,,,,,,,,,,541000,Communication Services,Operating Expenditures,"1,000.00",001,Court Related Cost
+00101040,Circuit Court,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"5,000.00",001,Court Related Cost
+00101000,Board of County Commissioners,District 4 Discretionary Funding,,,,,,,00004,,552000,Operating Supplies,Operating Expenditures,"25,000.00",001,General Government
+00101030,Clerk of Court,,,,,,,,,,510000,Personnel Services Budget,Personnel Services,"4,905,230.00",001,General Government
+00101030,Clerk of Court,,,,,,,,,,530000,Operating Expenses and Budget,Operating Expenditures,"1,845,945.00",001,General Government
+11141030,Sales and Visitors Center,,,,,,,,,,555000,Training,Operating Expenditures,"28,500.00",111,Economic Environment
+00102030,Code Compliance Beach,,,,,,,,BEACH,Beach Code,512000,Regular Salaries & Wages,Personnel Services,"1,727,550.00",001,Public Safety
+00102030,Code Compliance Beach,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,BEACH,Beach Code,521000,FICA Taxes & Medicare,Personnel Services,"107,487.00",001,Public Safety
+00102030,Code Compliance Beach,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,BEACH,Beach Code,522000,Retirement Contributions,Personnel Services,"196,676.00",001,Public Safety
+00102030,Code Compliance Beach,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,BEACH,Beach Code,523000,Life & Health Insurance,Personnel Services,"373,317.00",001,Public Safety
+00102030,Code Compliance Beach,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,BEACH,Beach Code,524000,Workers Compensation,Personnel Services,"27,081.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"874,137.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Public Safety
+00117000,Building Construction and Maintenance,Elevator Maintenance Contract,,,Active Contract,KONE,,https://www.mywaltonfl.gov/DocumentCenter/View/45326/Kone-Inc,,,546000,Repair & Maintenance,Operating Expenditures,"25,000.00",001,General Government
+00117000,Building Construction and Maintenance,"Repair, Inspection & Service of Fire Protection",,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"40,000.00",001,General Government
+00102030,Code Compliance Beach,,,,,,,,BEACH,Beach Code,513000,Other Salaries & Wages,Personnel Services,"416,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,514000,Overtime,Personnel Services,"2,000.00",001,Public Safety
+00117000,Building Construction and Maintenance,Splash Pad Maintenance & Water Testing Services,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"15,000.00",001,General Government
+00102030,Code Compliance,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"88,713.00",001,Public Safety
+00102030,Code Compliance,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"163,248.00",001,Public Safety
+00102030,Code Compliance,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"272,662.00",001,Public Safety
+00102030,Code Compliance,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"11,873.00",001,Public Safety
+00117000,Building Construction and Maintenance,Pest Management Services,,,Cooperative Agreement,Terminix,23-1732,https://www.mywaltonfl.gov/DocumentCenter/View/45327/Terminix,,,534000,Other Services,Operating Expenditures,"45,000.00",001,General Government
+00102030,Code Compliance,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"4,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,541000,Communication Services,Operating Expenditures,"46,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"13,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"11,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"30,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,546001,Tires,Operating Expenditures,"10,000.00",001,Public Safety
+00102030,Code Compliance,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"6,000.00",001,Public Safety
+11141030,Sales and Visitors Center,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"325,500.00",111,Economic Environment
+11141000,Tourism Administration,Clerk TDT Commission based on collections,,,,,,,,,549007,Clerk TDT Commission,Operating Expenditures,"800,000.00",111,Economic Environment
+00101000,Board of County Commissioners,District 5 Discretionary Funding,,,,,,,00005,,552000,Operating Supplies,Operating Expenditures,"25,000.00",001,General Government
+10116002,Engineering Services,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"32,500.00",101,Transportation
+10116001,Public Works,,,,,,,,,,553002,Road Signs,Operating Expenditures,"110,000.00",101,Transportation
+10116002,Engineering Services,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"25,000.00",101,Transportation
+00102000,County Administration,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"1,429,186.00",001,General Government
+00102000,County Administration,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00102000,County Administration,,,,,,,,,,514000,Overtime,Personnel Services,"1,000.00",001,General Government
+00102000,County Administration,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"106,573.00",001,General Government
+00102000,County Administration,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"270,237.00",001,General Government
+00102000,County Administration,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"250,676.00",001,General Government
+00102000,County Administration,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"3,367.00",001,General Government
+00102000,County Administration,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"35,000.00",001,General Government
+00102000,County Administration,,,,,,,,,,541000,Communication Services,Operating Expenditures,"15,000.00",001,General Government
+00102000,County Administration,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"8,000.00",001,General Government
+00102000,County Administration,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"10,000.00",001,General Government
+00102000,County Administration,,,,,,,,,,546001,Tires,Operating Expenditures,"2,000.00",001,General Government
+00102000,County Administration,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"5,000.00",001,General Government
+11141000,Tourism Administration,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"60,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"30,000.00",111,Economic Environment
+00101000,Board of County Commissioners,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"140,000.00",001,General Government
+11141090,Beach Tram,,,,,,,,,,552001,Equipment < $5000,Operating Expenditures,"20,000.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"51,525.00",111,Economic Environment
+11141010,Beach Operations,,,,,,,,,,555000,Training,Operating Expenditures,"44,625.00",111,Economic Environment
+00101050,County Court,,,,,,,,,,541000,Communication Services,Operating Expenditures,"3,000.00",001,Court Related Cost
+10326000,Building Department,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"839,559.00",103,Public Safety
+00101000,Board of County Commissioners,Court Innovation FTE,,,,,,,1040,,512000,Regular Salaries & Wages,Personnel Services,"25,285.00",001,General Government
+00101000,Board of County Commissioners,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,1040,,521000,FICA Taxes & Medicare,Personnel Services,"1,934.00",001,General Government
+00101000,Board of County Commissioners,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,1040,,522000,Retirement Contributions,Personnel Services,"3,379.00",001,General Government
+00101000,Board of County Commissioners,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,1040,,523000,Life & Health Insurance,Personnel Services,"6,264.00",001,General Government
+00101000,Board of County Commissioners,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,1040,,524000,Workers Compensation,Personnel Services,29.00,001,General Government
+00101000,Court Innovations,,,,,,,,,,531001,Court Ordinance (Law Library),Operating Expenditures,0.00,001,General Government
+00101000,Court Innovations,,,,,,,,,,531002,Court Ordinance (Juvenile Justice),Operating Expenditures,0.00,001,General Government
+00101000,Court Innovations,,,,,,,,,,531003,Court Ordinance (Legal Aid),Operating Expenditures,"21,555.00",001,General Government
+00101000,Court Innovations,,,,,,,,,,531004,Court Ordinance (Innovative Program),Operating Expenditures,"21,554.00",001,General Government
+00101060,Court Technology - Court Administration,,,,,,,,,,531000,Professional Services,Operating Expenditures,"121,878.00",001,Court Related Cost
+00101060,Court Technology - Court Administration,,,,,,,,,,534000,Other Services,Operating Expenditures,500.00,001,Court Related Cost
+00101060,Court Technology - Court Administration,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"1,000.00",001,Court Related Cost
+00101060,Court Technology - Court Administration,,,,,,,,,,541000,Communication Services,Operating Expenditures,"9,000.00",001,Court Related Cost
+00101060,Court Technology - Court Administration,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"7,708.00",001,Court Related Cost
+00101000,Board of County Commissioners,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"2,500.00",001,General Government
+00101040,Circuit Court,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"21,000.00",001,Court Related Cost
+00101000,Board of County Commissioners,"Subscriptions for Device Management software, Docusign, Zoom, FAC membership",,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"145,000.00",001,General Government
+00101061,Public Defender,,,,,,,,,,541000,Communication Services,Operating Expenditures,"18,000.00",001,Court Related Cost
+00101061,Public Defender,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"214,293.00",001,Court Related Cost
+00102030,Code Compliance,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"178,000.00",001,Public Safety
+00101062,State Attorney,,,,,,,,,,541000,Communication Services,Operating Expenditures,"11,360.00",001,Court Related Cost
+00101062,State Attorney,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"43,403.00",001,Court Related Cost
+00102000,County Administration,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"20,000.00",001,General Government
+11141010,Beach Operations,18k Hunter 4-post Lift -Rpl #,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"50,000.00",111,Economic Environment
+00101050,County Court,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"1,200.00",001,Court Related Cost
+00101060,Court Technology - Court Administration,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,0.00,001,Court Related Cost
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"532,806.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"50,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,514000,Overtime,Personnel Services,"25,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"40,301.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"71,759.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"176,761.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"6,428.00",001,Culture and Recreation
+00117000,Building Construction and Maintenance,Park Field Spraying & Fertilizer Services,,,Active Contract,"PPM Sports Turf, LLC",26-14,https://www.mywaltonfl.gov/DocumentCenter/View/45334/1-Signed-PPM-SPORTS-Contract-26-14,,,534000,Other Services,Operating Expenditures,"165,000.00",001,General Government
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"8,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,541000,Communication Services,Operating Expenditures,"11,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,Equipment Lease,,,Active Contract,"Wells Fargo Financial Leasing, Inc",,https://www.mywaltonfl.gov/DocumentCenter/View/45328/Beard-Equipment-Lease-2024,,,544000,Rentals & Leases,Operating Expenditures,"100,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"60,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,546001,Tires,Operating Expenditures,500.00,001,Culture and Recreation
+11141010,Beach Operations,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"13,125.00",111,Economic Environment
+10326000,Building Department,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"5,000.00",103,Public Safety
+00101061,Public Defender,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"22,540.00",001,Court Related Cost
+11141010,Beach Operations,,,,,,,,,,552002,Fuel,Operating Expenditures,"173,250.00",111,Economic Environment
+10326000,Building Department,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"10,000.00",103,Public Safety
+00101000,Board of County Commissioners,"FSU CPM Course, NACO & FAC conferences",,,,,,,,,555000,Training,Operating Expenditures,"90,000.00",001,General Government
+10939001,E911 Fund,E911 Revenue to Sheriff,,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"460,000.00",109,interfund Transfers
+11141010,Beach Operations,Snap On Zeus Shop Diagnostic Tool,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"18,000.00",111,Economic Environment
+00101062,State Attorney,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"216,648.00",001,Court Related Cost
+00112010,Eagle Springs Golf and Recreation Center,Building Operating Supplies,,,,,,,10329,Building Operating Supplies,552000,Operating Supplies,Operating Expenditures,"50,000.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"265,179.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Culture and Recreation
+00112040,Eagle Springs Grill,,,,,,,,,,514000,Overtime,Personnel Services,"5,000.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"19,776.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"32,008.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"60,702.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"2,435.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,400.00,001,Culture and Recreation
+00112040,Eagle Springs Grill,Dishwasher Maintenance Agreement,,,Active Contract,"Auto-Chlor Services, LLC",,https://www.mywaltonfl.gov/DocumentCenter/View/45329/Auto-Chlor-Addendum-1-to-Contract,,,546000,Repair & Maintenance,Operating Expenditures,"8,000.00",001,Culture and Recreation
+00101000,Board of County Commissioners,"State mandated newspaper notices/ads/publications, Tyler Tech eCheck Fee for online billing, Tax Collector and Clerk Escrow accounts for fees",,,,,,,,,549000,Other Current Charges,Operating Expenditures,"122,600.00",001,General Government
+00102030,Code Compliance,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"6,000.00",001,Public Safety
+11141040,Communications,Public Relations Services,,,Active Contract,"Turner Public Relations, LLC",25-17,https://www.mywaltonfl.gov/DocumentCenter/View/45318/Public-Relations-Services-Agreement,,,548000,Promotional Activities,Operating Expenditures,"114,000.00",111,Economic Environment
+00112010,Eagle Springs Golf and Recreation Center,Pro Shop,,,,,,,10330,Pro Shop,552000,Operating Supplies,Operating Expenditures,"70,000.00",001,Culture and Recreation
+00102030,Code Compliance,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"19,510.00",001,Public Safety
+10326000,Building Department,,,,,,,,,,555000,Training,Operating Expenditures,"2,000.00",103,Public Safety
+00111001,Emergency Management,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"475,627.00",001,Public Safety
+00111001,Emergency Management,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Public Safety
+00111001,Emergency Management,,,,,,,,,,514000,Overtime,Personnel Services,0.00,001,Public Safety
+00111001,Emergency Management,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"36,937.00",001,Public Safety
+00111001,Emergency Management,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"101,526.00",001,Public Safety
+00111001,Emergency Management,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"89,904.00",001,Public Safety
+00111001,Emergency Management,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,532.00,001,Public Safety
+00111001,Emergency Management,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"25,000.00",001,Public Safety
+00111001,Emergency Management,,,,,,,,,,541000,Communication Services,Operating Expenditures,"51,200.00",001,Public Safety
+00111001,Emergency Management,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,400.00,001,Public Safety
+00111001,Emergency Management,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"5,000.00",001,Public Safety
+00111001,Emergency Management,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"23,000.00",001,Public Safety
+00111001,Emergency Management,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"3,000.00",001,Public Safety
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"295,000.00",001,Culture and Recreation
+10326000,Building Department,,,,,,,,,,552002,Fuel,Operating Expenditures,"20,000.00",103,Public Safety
+00102000,County Administration,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"20,000.00",001,General Government
+00102030,Code Compliance,,,,,,,,,,555000,Training,Operating Expenditures,"43,000.00",001,Public Safety
+11141010,Beach Operations,Telehandler Lift,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"150,000.00",111,Economic Environment
+00119000,Environmental Services,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"316,298.00",001,Physical Environment
+00119000,Environmental Services,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Physical Environment
+00119000,Environmental Services,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"24,197.00",001,Physical Environment
+00119000,Environmental Services,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"50,185.00",001,Physical Environment
+00119000,Environmental Services,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"60,803.00",001,Physical Environment
+00119000,Environmental Services,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,348.00,001,Physical Environment
+00102030,Code Compliance,Special Magistrate Services,,,Active Contract,Hand Arendall Harrison ,,https://www.mywaltonfl.gov/DocumentCenter/View/45338/Attorney-Services-67,,,531000,Professional Services,Operating Expenditures,"87,600.00",001,Public Safety
+11141040,Communications,"Helicopter for shoreline video (insurance required), Strategic (PR) and Crisis communications, focus groups, helicopter for shoreline video (insurance required)",,,,,,,,,534000,Other Services,Operating Expenditures,"26,900.00",111,Economic Environment
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,534000,Other Services,Operating Expenditures,"3,000.00",001,Culture and Recreation
+00119000,Environmental Services,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"10,000.00",001,Physical Environment
+00119000,Environmental Services,,,,,,,,,,541000,Communication Services,Operating Expenditures,"5,000.00",001,Physical Environment
+00119000,Environmental Services,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"3,000.00",001,Physical Environment
+00119000,Environmental Services,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"4,000.00",001,Physical Environment
+00102030,Code Compliance,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"3,000.00",001,Public Safety
+00112040,Eagle Springs Grill,Food Budget,,,,,,,10331,Food Budget,552000,Operating Supplies,Operating Expenditures,"100,000.00",001,Culture and Recreation
+00102030,Code Compliance,,,,,,,,,,552002,Fuel,Operating Expenditures,"94,000.00",001,Public Safety
+00101060,Court Technology - Court Administration,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"32,350.00",001,Court Related Cost
+00102000,County Administration,,,,,,,,,,555000,Training,Operating Expenditures,"10,000.00",001,General Government
+11141010,Beach Operations,Portable Change Message Board - Replacement,Equipment,8323,,,,,,,564000,Machinery & Equipment,Capital Outlay,"25,000.00",111,Economic Environment
+00113000,Extension Office,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"411,693.00",001,Physical Environment
+00113000,Extension Office,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Physical Environment
+00113000,Extension Office,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"31,495.00",001,Physical Environment
+00113000,Extension Office,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"42,719.00",001,Physical Environment
+00113000,Extension Office,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"28,112.00",001,Physical Environment
+00113000,Extension Office,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,905.00,001,Physical Environment
+00113000,Extension Office,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"4,000.00",001,Physical Environment
+00113000,Extension Office,,,,,,,,,,541000,Communication Services,Operating Expenditures,"10,000.00",001,Physical Environment
+00113000,Extension Office,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"4,000.00",001,Physical Environment
+00102000,County Administration,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,000.00",001,General Government
+00112040,Eagle Springs Grill,Beverage Budget,,,,,,,10332,Beverage Budget,552000,Operating Supplies,Operating Expenditures,"30,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"10,000.00",001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,555000,Training,Operating Expenditures,"6,000.00",001,Culture and Recreation
+00117000,Building Construction and Maintenance,Van - Replacement,Vehicle,9186,,,,,,,564000,Machinery & Equipment,Capital Outlay,"45,000.00",001,General Government
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"50,000.00",001,Culture and Recreation
+11141010,Beach Operations,Portable Change Message Board - Replacement,Equipment,8637,,,,,,,564000,Machinery & Equipment,Capital Outlay,"25,000.00",111,Economic Environment
+00112040,Eagle Springs Grill,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"30,000.00",001,Culture and Recreation
+00117000,Building Construction and Maintenance,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"3,402,464.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"225,000.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,514000,Overtime,Personnel Services,"61,000.00",001,General Government
+00117000,Building Construction and Maintenance,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"259,685.00",001,General Government
+00117000,Building Construction and Maintenance,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"459,182.00",001,General Government
+00117000,Building Construction and Maintenance,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"934,416.00",001,General Government
+00117000,Building Construction and Maintenance,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"86,008.00",001,General Government
+10116002,Engineering Services,Includes professional services for projects that are not covered under other departments.  Based upon the capital improvement projects for the next FY identified in the adopted Five Year Work Plan.  ,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"100,000.00",101,Transportation
+00119000,Environmental Services,CBA Choctawhatchee Bay Water Quality Contract,,,Active Contract,Choctawhatchee Basin Alliance,,https://www.mywaltonfl.gov/DocumentCenter/View/45343/2023-2027---Choctawhatchee-Basin-Alliance_BAY_FINAL,,,534000,Other Services,Operating Expenditures,"36,000.00",001,Physical Environment
+00117000,Building Construction and Maintenance,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"1,000.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,541000,Communication Services,Operating Expenditures,"44,000.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,543000,Utility Services,Operating Expenditures,"1,250,000.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"53,500.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"540,000.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,546001,Tires,Operating Expenditures,"17,500.00",001,General Government
+00102000,County Administration,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"1,000.00",001,General Government
+00101060,Court Technology - Court Administration,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"13,000.00",001,Court Related Cost
+00111001,Emergency Management,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"16,729.00",001,Public Safety
+00102000,County Administration,,,,,,,,,,552002,Fuel,Operating Expenditures,"7,000.00",001,General Government
+00112040,Eagle Springs Grill,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"6,000.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,,,,,,,,,,555000,Training,Operating Expenditures,200.00,001,Culture and Recreation
+10730000,Walton County Sheriff's Office,,,,,,,,,,560000,Capital Outlay Budget,Capital Outlay,"9,160,322.00",107,Public Safety
+11242001,Solid Waste Transfer,Small County Surtax ,,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"2,581,997.00",112,Interfund Transfers
+11141010,Beach Operations,Turo Dingo Lift Landscape,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"70,000.00",111,Economic Environment
+00105000,Geographic Info Systems,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"477,520.00",001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00105000,Geographic Info Systems,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"36,531.00",001,General Government
+00105000,Geographic Info Systems,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"65,045.00",001,General Government
+00105000,Geographic Info Systems,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"102,599.00",001,General Government
+00105000,Geographic Info Systems,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,526.00,001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"10,000.00",001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,541000,Communication Services,Operating Expenditures,"5,000.00",001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"4,500.00",001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"4,000.00",001,General Government
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,000.00",001,Culture and Recreation
+00119000,Environmental Services,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"26,716.00",001,Physical Environment
+00111001,Emergency Management,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"32,500.00",001,Public Safety
+00111001,Emergency Management,,,,,,,,,,555000,Training,Operating Expenditures,"5,000.00",001,Public Safety
+00101020,Guardian Ad Litem,,,,,,,,,,541000,Communication Services,Operating Expenditures,"6,000.00",001,Court Related Cost
+00101020,Guardian Ad Litem,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"2,000.00",001,Court Related Cost
+00113000,Extension Office,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"14,895.00",001,Physical Environment
+11040000,Housing & Urban Development,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"197,530.00",110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,110,Economic Environment
+11040000,Housing & Urban Development,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"15,111.00",110,Economic Environment
+00111001,Emergency Management,Disaster Management Software,,,Active Contract,"ESI Acquisition, Inc",,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"4,100.00",001,Public Safety
+00111001,Emergency Management,Weather Monitoring Services,,,Active Contract,"WeatherSTEM, Inc",,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"2,000.00",001,Public Safety
+11040000,Housing & Urban Development,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"26,907.00",110,Economic Environment
+11040000,Housing & Urban Development,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"26,959.00",110,Economic Environment
+11040000,Housing & Urban Development,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,218.00,110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,531000,Professional Services,Operating Expenditures,250.00,110,Economic Environment
+11040000,Housing & Urban Development,Audit Services,,,Active Contract,"Carr, Riggs, & Ingram",,,,,532000,Accounting & Auditing,Operating Expenditures,"11,500.00",110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"2,500.00",110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,541000,Communication Services,Operating Expenditures,"2,000.00",110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"2,500.00",110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"3,000.00",110,Economic Environment
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"20,000.00",001,Culture and Recreation
+11141040,Communications,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"13,250.00",111,Economic Environment
+11141030,Sales and Visitors Center,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"5,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"2,500.00",111,Economic Environment
+50350000,Self-Insurance Expenses,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"2,300,000.00",503,General Government
+00112040,Eagle Springs Grill,,,,,,,,,,551000,Office Supplies,Operating Expenditures,300.00,001,Culture and Recreation
+00117000,Building Construction and Maintenance,ADA Facility Upgrades,,,,,,,10466,ADA Facility Upgrades,552000,Operating Supplies,Operating Expenditures,"200,000.00",001,General Government
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,552002,Fuel,Operating Expenditures,"12,000.00",001,Culture and Recreation
+00119000,Environmental Services,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"2,500.00",001,Physical Environment
+00119000,Environmental Services,,,,,,,,,,555000,Training,Operating Expenditures,"8,000.00",001,Physical Environment
+11040010,Housing & Urban Development,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"50,047.00",110,Economic Environment
+11040010,Housing & Urban Development,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"3,829.00",110,Economic Environment
+11040010,Housing & Urban Development,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"6,818.00",110,Economic Environment
+11040010,Housing & Urban Development,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"13,331.00",110,Economic Environment
+11040010,Housing & Urban Development,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,56.00,110,Economic Environment
+00106000,Human Resources,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"836,015.00",001,General Government
+00106000,Human Resources,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00106000,Human Resources,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"63,956.00",001,General Government
+00106000,Human Resources,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"140,993.00",001,General Government
+00106000,Human Resources,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"214,499.00",001,General Government
+00106000,Human Resources,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,920.00,001,General Government
+00119000,Environmental Services,CBA Coastal Dune Lake Water Quality Contract,,,Active Contract,Choctawhatchee Basin Alliance,,https://www.mywaltonfl.gov/DocumentCenter/View/45344/2025-2029-CBA-of-NWFSC-Interlocal-Agreement,,,534000,Other Services,Operating Expenditures,"26,875.00",001,Physical Environment
+00106000,Human Resources,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"10,653.00",001,General Government
+00106000,Human Resources,,,,,,,,,,541000,Communication Services,Operating Expenditures,"9,000.00",001,General Government
+00106000,Human Resources,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"1,000.00",001,General Government
+00106000,Human Resources,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"5,000.00",001,General Government
+00106000,Human Resources,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"2,000.00",001,General Government
+00113000,Extension Office,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,500.00",001,Physical Environment
+00117000,Building Construction and Maintenance,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"685,000.00",001,General Government
+00111001,Emergency Management,,,,,,,,,,552002,Fuel,Operating Expenditures,"15,000.00",001,Public Safety
+00113000,Extension Office,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"1,000.00",001,Physical Environment
+00113000,Extension Office,,,,,,,,,,555000,Training,Operating Expenditures,"4,000.00",001,Physical Environment
+11141060,Marketing,,,,,,,,,,555000,Training,Operating Expenditures,"13,000.00",111,Economic Environment
+11141010,Beach Operations,20' Trailer - Replacement,Equipment,4369,,,,,,,564000,Machinery & Equipment,Capital Outlay,"9,000.00",111,Economic Environment
+00108000,Libraries,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"1,122,091.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Culture and Recreation
+00108000,Libraries,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"85,458.00",001,Culture and Recreation
+00108000,Libraries,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"137,559.00",001,Culture and Recreation
+00108000,Libraries,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"279,318.00",001,Culture and Recreation
+00108000,Libraries,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"1,229.00",001,Culture and Recreation
+00108000,Libraries,"Annual conference travel for Association of Bookmobile and Outreach Services (Outreach Coordinator), Technology and Computers in Libraries (Technology Specialist), Association of Rural and Small Libraries (Branch Manager), Florida Library Directors Annual Meeting (Library Director) and Florida Library Association (Branch Manager x2 and Library Director) or similar",,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"9,000.00",001,Culture and Recreation
+00108000,Libraries,"Additional cost for E-rate internet services for the Teen Library ($4,800)",,,,,,,,,541000,Communication Services,Operating Expenditures,"65,000.00",001,Culture and Recreation
+00108000,Libraries,"ILL shipping funded in part by state library, decreasing our costs",,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"2,000.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,543000,Utility Services,Operating Expenditures,"44,000.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"16,500.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"5,000.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"3,000.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"3,000.00",001,Culture and Recreation
+00112040,Eagle Springs Grill,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"10,000.00",001,Culture and Recreation
+00117000,Building Construction and Maintenance,,,,,,,,,,551000,Office Supplies,Operating Expenditures,800.00,001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"20,800.00",001,General Government
+00119000,Environmental Services,,,,,,,,,,552002,Fuel,Operating Expenditures,"4,500.00",001,Physical Environment
+00117000,Building Construction and Maintenance,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"3,750.00",001,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,555000,Training,Operating Expenditures,"1,000.00",001,General Government
+11141010,Beach Operations,16' utility trailer - Replacement,Equipment,3963,,,,,,,564000,Machinery & Equipment,Capital Outlay,"5,000.00",111,Economic Environment
+00101070,Medical Examiner,,,,,,,,10345,MEDICAL EXAMINER FACILITY,531000,Professional Services,Operating Expenditures,0.00,001,Public Safety
+00101070,Medical Examiner,,,,,,,,,,531000,Professional Services,Operating Expenditures,"881,930.00",001,Public Safety
+10528000,Mosquito Control,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"430,420.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,512007,PTO Buyback,Personnel Services,"5,000.00",105,Human Services
+00105000,Geographic Info Systems,"Computer Peripherals (6 positions) (Keyboards/Mice/Monitors/UPS/Storage Devices, Desktop Printers) ",,,,,,,,,552000,Operating Supplies,Operating Expenditures,"11,500.00",001,General Government
+00105000,Geographic Info Systems,2 Desktop Workstation Computers to replace out of warranty,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"10,000.00",001,General Government
+10528000,Mosquito Control,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"10,000.00",105,Human Services
+00105000,Geographic Info Systems,Enterprise GIS Software & Mapping Services,,,Active Contract,Environmental Systems Research Institute (ESRI),,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"60,300.00",001,General Government
+10528000,Mosquito Control,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"33,064.00",105,Human Services
+10528000,Mosquito Control,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"64,843.00",105,Human Services
+10528000,Mosquito Control,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"117,773.00",105,Human Services
+10528000,Mosquito Control,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"12,338.00",105,Human Services
+00119000,Environmental Services,Choctawhatchee Bay Estuary Program,,,,,,,,,534000,Other Services,Operating Expenditures,"50,000.00",001,Physical Environment
+10528000,Mosquito Control,,,,,,,,,,541000,Communication Services,Operating Expenditures,"20,000.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"3,000.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,543000,Utility Services,Operating Expenditures,"6,000.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"2,500.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"24,000.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,546001,Tires,Operating Expenditures,"4,000.00",105,Human Services
+00119000,Environmental Services,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,500.00,001,Physical Environment
+11040000,Housing & Urban Development,,,,,,,,,,549003,FSS Deposits,Operating Expenditures,"50,000.00",110,Economic Environment
+00105000,Geographic Info Systems,,,,,,,,,,551000,Office Supplies,Operating Expenditures,300.00,001,General Government
+00101020,Guardian Ad Litem,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"1,000.00",001,Court Related Cost
+00117000,Building Construction and Maintenance,,,,,,,,,,552002,Fuel,Operating Expenditures,"80,000.00",001,General Government
+00105000,Geographic Info Systems,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"18,525.00",001,General Government
+10629000,Mosquito Control State Aid,,,,,,,,10630,Grant Mosquito Control State Aid,534000,Other Services,Operating Expenditures,"2,000.00",106,Human Services
+10629000,Mosquito Control State Aid,,,,,,,,10630,Grant Mosquito Control State Aid,540000,Travel & Per Diem,Operating Expenditures,"11,000.00",106,Human Services
+11040000,Housing & Urban Development,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"6,500.00",110,Economic Environment
+00105000,Geographic Info Systems,,,,,,,,,,555000,Training,Operating Expenditures,"12,000.00",001,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"54,571.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,514000,Overtime,Personnel Services,"3,000.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"4,152.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"17,513.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"13,344.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"2,220.00",101,General Government
+00106000,Human Resources,Employee Screening Services,,,Active Contract,"AssureHire, Inc.",,https://www.mywaltonfl.gov/DocumentCenter/View/45330/Complete_with_Docusign_AIR_25-1520_Assure_HI,,,531000,Professional Services,Operating Expenditures,"29,600.00",001,General Government
+00102013,Lakeview,Statutory & Other,,,,,,,10246,Lakeview Center (Women & Children),531000,Professional Services,Operating Expenditures,"75,000.00",001,Human Services
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"1,000.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,541000,Communication Services,Operating Expenditures,"2,200.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,543000,Utility Services,Operating Expenditures,"34,000.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"75,000.00",101,General Government
+00117000,Building Construction and Maintenance,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"2,000.00",001,General Government
+11040000,Housing & Urban Development,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,000.00",110,Economic Environment
+00106000,Human Resources,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"32,000.00",001,General Government
+11040000,Housing & Urban Development,,,,,,,,,,552002,Fuel,Operating Expenditures,500.00,110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"1,000.00",110,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,555000,Training,Operating Expenditures,"2,000.00",110,Economic Environment
+10225010,MSBU,,,,,,,,,,531000,Professional Services,Operating Expenditures,"43,225.00",102,Physical Environment
+11141010,Beach Operations,14k Tilt Trailer - Replacement,Equipment,8880,,,,,,,564000,Machinery & Equipment,Capital Outlay,"12,000.00",111,Economic Environment
+00101080,Property Appraiser,,,,,,,,,,524000,Workers Compensation,Personnel Services,"25,000.00",001,General Government
+11141100,North Walton Tourist Development Tax,Sponsorships,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"73,500.00",111,Economic Environment
+11141100,North Walton Tourist Development Tax,Merch for Events,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"25,433.00",111,Economic Environment
+11040000,Housing & Urban Development,,,,,,,,,,549004,Portable Admin Fee,Operating Expenditures,"6,500.00",110,Economic Environment
+00107000,Office of Management and Budget,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"721,014.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00106000,Human Resources,,,,,The Krizner Group,,,,,531000,Professional Services,,,001,General Government
+00107000,Office of Management and Budget,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"53,638.00",001,General Government
+00107000,Office of Management and Budget,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"141,247.00",001,General Government
+00107000,Office of Management and Budget,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"100,487.00",001,General Government
+00107000,Office of Management and Budget,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,890.00,001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,531000,Professional Services,Operating Expenditures,0.00,001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"12,000.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,541000,Communication Services,Operating Expenditures,"5,000.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,250.00,001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"3,500.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"2,000.00",001,General Government
+00108000,Libraries,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"100,000.00",001,Culture and Recreation
+00106000,Human Resources,,,,,,,,,,552002,Fuel,Operating Expenditures,"2,000.00",001,General Government
+00106000,Human Resources,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"2,500.00",001,General Government
+00106000,Human Resources,,,,,,,,,,555000,Training,Operating Expenditures,"14,000.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"714,202.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00103000,Office of the County Attorney,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"57,614.00",001,General Government
+00103000,Office of the County Attorney,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"158,912.00",001,General Government
+00103000,Office of the County Attorney,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"121,432.50",001,General Government
+00103000,Office of the County Attorney,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,764.00,001,General Government
+00102013,Lakeview,Statutory & Other,,,,,,,10247,Lakeview Center (Mental Health),531000,Professional Services,Operating Expenditures,"50,000.00",001,Human Services
+00103000,Office of the County Attorney,,,,,,,,,,533000,Court Reporter Services,Operating Expenditures,"10,000.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"10,000.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,541000,Communication Services,Operating Expenditures,"5,500.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,500.00,001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"10,000.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"10,000.00",001,General Government
+00106000,Human Resources,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,800.00",001,General Government
+10528000,Mosquito Control,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"252,316.00",105,Human Services
+00108000,Libraries,,,,,,,,,,552002,Fuel,Operating Expenditures,"5,000.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"20,000.00",001,Culture and Recreation
+00108000,Libraries,Youth services staff continuing education courses for certifications,,,,,,,,,555000,Training,Operating Expenditures,"4,000.00",001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"354,525.00",001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"65,000.00",001,Culture and Recreation
+00108000,Libraries,Integrated Library System (ILS),,,Active Contract,The Library Corporation,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"60,000.00",001,Culture and Recreation
+00108000,Libraries,Digital Library Services,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"40,000.00",001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,514000,Overtime,Personnel Services,"10,000.00",001,Culture and Recreation
+00112000,Recreation,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"27,064.00",001,Culture and Recreation
+00112000,Recreation,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"48,189.00",001,Culture and Recreation
+00108000,Libraries,Print and e-books circulation and costs,,,,,,,,,566000,Books Publications Library Materials,Capital Outlay,"130,000.00",001,Culture and Recreation
+00112000,Recreation,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"86,490.00",001,Culture and Recreation
+00112000,Recreation,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,390.00,001,Culture and Recreation
+00102013,Lakeview,Statutory & Other,,,,,,,10248,Lakeview Center (Baker Act),531000,Professional Services,Operating Expenditures,"50,000.00",001,Human Services
+11141060,Marketing,"Contractual Services: Page Freezer, Datafy, Hootsuite, Klear, Threshold 360, Mozeo, Programmatic services ",,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,534000,Other Services,Operating Expenditures,"658,448.00",111,Economic Environment
+00112000,Recreation,,,,,,,,,,541000,Communication Services,Operating Expenditures,"4,000.00",001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"10,000.00",001,Culture and Recreation
+11141060,Marketing,Digital Asset Management / User-Generated Content Platform,,,Active Contract,"Crowdriff, Inc",,https://www.mywaltonfl.gov/DocumentCenter/View/45331/Walton20242025CrowdRiff-Executed,,,534000,Other Services,Operating Expenditures,"25,000.00",111,Economic Environment
+11141060,Marketing,Public Relations ,,,Active Contract,"Turner Public Relations, LLC",25-17,https://www.mywaltonfl.gov/DocumentCenter/View/45318/Public-Relations-Services-Agreement,,,534000,Other Services,Operating Expenditures,"86,000.00",111,Economic Environment
+11141060,Marketing,Tourism Analytics Platform,,,Active Contract,"Key Data Dashboard, Inc",,https://www.mywaltonfl.gov/DocumentCenter/View/45323/Key-Data---Walton-County---20202021-agreement---Fully-executed-1,,,534000,Other Services,Operating Expenditures,"84,600.00",111,Economic Environment
+11141060,Marketing,Marketing Research Services,,,Active Contract,Downs & St. Germain Research,24-37,https://www.mywaltonfl.gov/DocumentCenter/View/45319/24-37,,,534000,Other Services,Operating Expenditures,"65,000.00",111,Economic Environment
+11141060,Marketing,Customer Relationship Management Platform,,,Active Contract,Granicus LLC,,https://www.mywaltonfl.gov/DocumentCenter/View/45345/Simpleview-CRM-Agreement,,,534000,Other Services,Operating Expenditures,"25,000.00",111,Economic Environment
+00112000,Recreation,,,,,,,,,,545000,Insurance,Operating Expenditures,"8,235.00",001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"1,000.00",001,Culture and Recreation
+00108000,Libraries,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"3,000.00",001,Culture and Recreation
+10629000,Mosquito Control State Aid,,,,,,,,10630,GRANT MOSQUITO CONTROL STATE AID,552000,Operating Supplies,Operating Expenditures,"45,588.00",106,Human Services
+10528000,Mosquito Control,,,,,,,,,,552002,Fuel,Operating Expenditures,"45,000.00",105,Human Services
+10528000,Mosquito Control,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"15,000.00",105,Human Services
+00101110,Supervisor of Elections,,,,,,,,,,560000,Capital Outlay Budget,Capital Outlay,"91,420.00",001,General Government
+00104000,Planning,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"2,980,561.00",001,General Government
+00104000,Planning,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00104000,Planning,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"228,013.00",001,General Government
+00104000,Planning,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"408,982.00",001,General Government
+00104000,Planning,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"663,802.00",001,General Government
+11141100,North Walton Tourist Development Tax,Media Plan,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45314/ocampo-agreement,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"224,165.00",111,Economic Environment
+11141100,North Walton Tourist Development Tax,Service Fees,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45314/ocampo-agreement,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"26,900.00",111,Economic Environment
+00104000,Planning,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"3,251.00",001,General Government
+11141060,Marketing,,,,,,,,,,534000,Other Services,Operating Expenditures,"234,600.00",111,Economic Environment
+10528000,Mosquito Control,Portion of the Walton County Property Appraiser Budget (approx. 0.42%),,,,,,,,,531000,Professional Services,Operating Expenditures,"24,500.00",105,Human Services
+10116020,Mossy Head Wastewater Treatment Facility,"Services needs for FDEP permit requirements  as well as design, permitting and/or CEI services for general plant operation (grit removal system and effluent disposal modifications/expansion).",,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"100,000.00",101,General Government
+11141060,Marketing,Regional Tourism Communications Partnership,,,Active Contract,Florida's Coastal Northwest Communications Council,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"265,500.00",111,Economic Environment
+00104000,Planning,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"44,000.00",001,General Government
+00104000,Planning,,,,,,,,,,541000,Communication Services,Operating Expenditures,"23,200.00",001,General Government
+11141060,Marketing,"Media plan: Leisure, Group, WCT, Beach Safety",,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"7,892,149.00",111,Economic Environment
+11141060,Marketing,"Social, Digital, Reputation Management Projects",,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"1,115,000.00",111,Economic Environment
+11141060,Marketing,"Production: Visitor Guide, Online guide, WCL, KWCB, Video, Photo, TV",,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"825,200.00",111,Economic Environment
+11141060,Marketing,"Activations in multiple markets including but not limited to: Chicago, Dallas, Houston, Nashville, New York and Atlanta",,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"482,000.00",111,Economic Environment
+00104000,Planning,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"24,000.00",001,General Government
+00104000,Planning,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"42,500.00",001,General Government
+11040000,Housing & Urban Development,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"2,000.00",110,Economic Environment
+10528000,Mosquito Control,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,500.00",105,Human Services
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"20,000.00",101,General Government
+00104000,Planning,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"46,000.00",001,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,552002,Fuel,Operating Expenditures,"2,000.00",101,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,500.00,101,General Government
+10629000,Mosquito Control State Aid,,,,,,,,10630,GRANT MOSQUITO CONTROL STATE AID,555000,Training,Operating Expenditures,"11,000.00",106,Human Services
+11141030,Sales and Visitors Center,Cvent - online meeting website package,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"52,438.00",111,Economic Environment
+11141010,Beach Operations,Ford Transit Van Additional Staff - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"70,000.00",111,Economic Environment
+10326000,Building Department,F150 - Replacement,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,0.00,103,Public Safety
+11141010,Beach Operations,Bronco Sport/Ranger Administration - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"35,000.00",111,Economic Environment
+00109000,Probation Services,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"219,447.00",001,Public Safety
+00109000,Probation Services,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"29,892.00",001,Public Safety
+00109000,Probation Services,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"60,259.00",001,Public Safety
+00109000,Probation Services,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"3,141.00",001,Public Safety
+10116020,Mossy Head Wastewater Treatment Facility,Contract for Certified Wastewater Plant Operator (meets FDEP Permit Requirements),,,Active Contract,Paul E. Johnson,25-1072,https://www.mywaltonfl.gov/DocumentCenter/View/45315/Paul-Johnson-MH-WWTF,,,534000,Other Services,Operating Expenditures,"50,000.00",101,General Government
+00103000,Office of the County Attorney,County Attorney Legal Services,,,Active Contract,Clay Adkinson,,https://www.mywaltonfl.gov/DocumentCenter/View/45347/Complete_with_Docusign_Adkinson_Law_Firm_LL,,,531000,Professional Services,Operating Expenditures,"650,000.00",001,General Government
+00109000,Probation Services,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,500.00,001,Public Safety
+00109000,Probation Services,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"1,000.00",001,Public Safety
+00109000,Probation Services,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"2,800.00",001,Public Safety
+00109000,Probation Services,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"2,000.00",001,Public Safety
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,551000,Office Supplies,Operating Expenditures,500.00,101,General Government
+00107000,Office of Management and Budget,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"10,000.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"20,000.00",001,General Government
+00107020,Procurement,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"628,649.00",001,General Government
+00107020,Procurement,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,General Government
+00107020,Procurement,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"49,513.00",001,General Government
+00107020,Procurement,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"88,161.00",001,General Government
+00107020,Procurement,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"120,112.00",001,General Government
+00107020,Procurement,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"2,564.00",001,General Government
+00107020,Procurement,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"15,000.00",001,General Government
+00107020,Procurement,,,,,,,,,,541000,Communication Services,Operating Expenditures,"5,000.00",001,General Government
+00107020,Procurement,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"15,000.00",001,General Government
+00107020,Procurement,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"2,000.00",001,General Government
+00107020,Procurement,,,,,,,,,,546001,Tires,Operating Expenditures,500.00,001,General Government
+00108000,Libraries,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,500.00,001,Culture and Recreation
+00103000,Office of the County Attorney,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"5,000.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"15,000.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,552002,Fuel,Operating Expenditures,"1,000.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"18,000.00",001,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,555000,Training,Operating Expenditures,"4,000.00",101,General Government
+11141010,Beach Operations,Trash Compactor,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"100,000.00",111,Economic Environment
+00101080,Property Appraiser,,,,,,,,,,510000,Personnel Services Budget,Personnel Services,"4,098,584.00",001,General Government
+00101080,Property Appraiser,,,,,,,,,,530000,Operating Expenses and Budget,Operating Expenditures,"697,382.00",001,General Government
+00117000,Building Construction and Maintenance,Crew Cab Truck - Replacement,Vehicle,6551,,,,,,,564000,Machinery & Equipment,Capital Outlay,"68,000.00",001,General Government
+00117000,Building Construction and Maintenance,Crew Cab Truck - Replacement,Vehicle,9218,,,,,,,564000,Machinery & Equipment,Capital Outlay,"68,000.00",001,General Government
+00101090,Public Defender,,,,,,,,,,541000,Communication Services,Operating Expenditures,"25,000.00",001,Court Related Cost
+00101090,Public Defender,,,,,,,,,,543000,Utility Services,Operating Expenditures,"6,000.00",001,Court Related Cost
+00101090,Public Defender,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"2,500.00",001,Court Related Cost
+00112000,Recreation,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"125,000.00",001,Culture and Recreation
+00112000,Recreation,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"10,000.00",001,Culture and Recreation
+00104000,Planning,LDC Update,,,New Procurement,,,,,,531000,Professional Services,Operating Expenditures,"282,000.00",001,General Government
+00104000,Planning,Local Mitigation Strategy (LMS) Update,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"150,000.00",001,General Government
+00101002,Interfund Group Transfer Out,Property Tax (Sheriff),,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"98,004,256.00",001,Interfund Transfers
+00101002,Interfund Group Transfer Out,Debt Payment,,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"2,581,997.00",001,Interfund Transfers
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,563000,Infrastructure,Capital Outlay,"125,000.00",001,Culture and Recreation
+00117000,Building Construction and Maintenance,,,,,,,,,,563000,Infrastructure,Capital Outlay,0.00,001,General Government
+10116001,Public Works,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"8,226,204.00",101,Transportation
+10116001,Public Works,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,101,Transportation
+10116001,Public Works,,,,,,,,,,513000,Other Salaries & Wages,Personnel Services,"156,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,514000,Overtime,Personnel Services,"260,000.00",101,Transportation
+10116001,Public Works,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"649,187.00",101,Transportation
+10116001,Public Works,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"1,217,049.00",101,Transportation
+10116001,Public Works,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"2,110,061.00",101,Transportation
+10116001,Public Works,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"464,599.00",101,Transportation
+00104000,Planning,(CMS) Continuing Maintenance Services,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"110,000.00",001,General Government
+00104000,Planning Short-Term Rental,South Walton Fire District Short Term Rental Fire Code Compliance Program,,,Interlocal Agreement,South Walton Fire District,,https://www.mywaltonfl.gov/DocumentCenter/View/45321/Interlocal-with-SWFD-Short-Term-Rental-Cert-Program,10639,Short-Term Rental,534000,Other Services,Operating Expenditures,"220,000.00",001,General Government
+00104000,Planning Short-Term Rental,Call-Line 24/Service & Short-Term Rental Software,,,Active Contract,GovOS,,https://www.mywaltonfl.gov/DocumentCenter/View/45320/GovOS-Proposal_Walton-County_Executable-Version-1,10639,Short-Term Rental,534000,Other Services,Operating Expenditures,"210,000.00",001,General Government
+10116001,Public Works,,,,Active Contract,"Grading & Bush Hog Services, Inc",24-04,https://walton.civicweb.net/document/480590/Request%20to%20approve%20and%20authorize%20the%20Chair%20to%20s.pdf?handle=8A8F70DED285498E9EE1515A5A684A28&utm_source=chatgpt.com&notices=True,,,534001,Guardrail Services,Operating Expenditures,"200,000.00",101,Transportation
+10116001,Public Works,,,,Active Contract,"Emerald Coast Striping, LLC",24-1842,https://walton.civicweb.net/document/500326/Request%20to%20approve%20and%20authorize%20the%20Chair%20to%20s.pdf?handle=2761F5671A554F97850CA370EB973576&utm_source=chatgpt.com,,,534002,Thermo-striping Services,Operating Expenditures,"200,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"5,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,541000,Communication Services,Operating Expenditures,"80,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"1,500.00",101,Transportation
+10116001,Public Works,,,,,,,,,,543000,Utility Services,Operating Expenditures,"180,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"80,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"800,000.00",101,Transportation
+10116001,Public Works,,,,,,,,,,546001,Tires,Operating Expenditures,"110,000.00",101,Transportation
+10528000,Mosquito Control,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,500.00,105,Human Services
+00112000,Recreation,,,,,,,,,,551000,Office Supplies,Operating Expenditures,500.00,001,Culture and Recreation
+00104000,Planning,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"257,825.00",001,General Government
+00103000,Office of the County Attorney,,,,,,,,,,552002,Fuel,Operating Expenditures,"1,000.00",001,General Government
+11242000,Solid Waste,,,,,,,,,,552002,Fuel,Operating Expenditures,"225,000.00",112,Physical Environment
+11141090,Beach Tram,,,,,,,,,,552002,Fuel,Operating Expenditures,"160,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,552002,Fuel,Operating Expenditures,"5,000.00",111,Economic Environment
+00104000,Planning,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"19,700.00",001,General Government
+00107000,Office of Management and Budget,,,,,,,,,,555000,Training,Operating Expenditures,"4,000.00",001,General Government
+11141010,Beach Operations,F250 Super Cab 4x4. New Specialist Positions - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"78,000.00",111,Economic Environment
+00109000,Probation Services,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Public Safety
+00103000,Office of the County Attorney,,,,,,,,,,555000,Training,Operating Expenditures,"15,000.00",001,General Government
+10730000,Walton County Sheriff's Office,,,,,,,,,,510000,Personnel Services Budget,Personnel Services,"71,254,611.00",107,Public Safety
+10730000,Walton County Sheriff's Office,,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"12,352,431.00",107,Public Safety
+10730000,Walton County Sheriff's Office,,,,,,,,,,530000,Operating Expenses and Budget,Operating Expenditures,"17,848,864.00",107,Public Safety
+10730000,Walton County Sheriff's Office,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"3,500,000.00",107,Public Safety
+11141000,Tourism Administration,,,,,,,,,,555000,Training,Operating Expenditures,"10,000.00",111,Economic Environment
+00104000,Planning Short-Term Rental,,,,,,,,10639,Short-Term Rental,512000,Regular Salaries & Wages,Personnel Services,"426,726.00",001,General Government
+00104000,Planning Short-Term Rental,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,10639,Short-Term Rental,521000,FICA Taxes & Medicare,Personnel Services,"33,640.00",001,General Government
+00104000,Planning Short-Term Rental,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,10639,Short-Term Rental,522000,Retirement Contributions,Personnel Services,"59,898.00",001,General Government
+00104000,Planning Short-Term Rental,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,10639,Short-Term Rental,523000,Life & Health Insurance,Personnel Services,"113,745.00",001,General Government
+00104000,Planning Short-Term Rental,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,10639,Short-Term Rental,524000,Workers Compensation,Personnel Services,"2,468.00",001,General Government
+00104000,Planning Short-Term Rental,Call-Line 24/Service & Short-Term Rental Software,,,Active Contract,"OpenGov, Inc",,,10639,Short-Term Rental,534000,Other Services,Operating Expenditures,"250,000.00",001,General Government
+00104000,Planning Short-Term Rental,Data Science Services,,,,,,,10639,Short-Term Rental,534000,Other Services,Operating Expenditures,"30,000.00",001,General Government
+00109000,Probation Services,Spanish Interpretation Services,,,Active Contract,Maria O'Camo,24-1725,https://www.mywaltonfl.gov/DocumentCenter/View/45314/ocampo-agreement,,,531000,Professional Services,Operating Expenditures,"7,000.00",001,Public Safety
+00109000,Probation Services,Caseload Software,,,Active Contract,Tyler Technologies,,https://www.mywaltonfl.gov/DocumentCenter/View/45322/20201029-FL-Walton-County-Tyler-Supervision-Agreement,,,534000,Other Services,Operating Expenditures,"12,000.00",001,Public Safety
+00104000,Planning Short-Term Rental,,,,,,,,10639,Short-Term Rental,542000,Freight & Postage Services,Operating Expenditures,"20,000.00",001,General Government
+00104000,Planning Short-Term Rental,,,,,,,,10639,Short-Term Rental,544000,Rentals & Leases,Operating Expenditures,"16,000.00",001,General Government
+00104000,Planning,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"10,000.00",001,General Government
+00109000,Probation Services,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"8,000.00",001,Public Safety
+00104000,Planning,,,,,,,,,,555000,Training,Operating Expenditures,"14,800.00",001,General Government
+00101050,County Court,,,,,,,,,,510000,Personnel Services Budget,Personnel Services,"65,856.00",001,Court Related Cost
+00109000,Probation Services,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"16,788.00",001,Public Safety
+00114000,Soil Conservation,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"100,076.00",001,Physical Environment
+00114000,Soil Conservation,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"7,608.00",001,Physical Environment
+00114000,Soil Conservation,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"13,547.00",001,Physical Environment
+00114000,Soil Conservation,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"26,425.00",001,Physical Environment
+00114000,Soil Conservation,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,864.00,001,Physical Environment
+00114000,Soil Conservation,,,,,,,,,,541000,Communication Services,Operating Expenditures,480.00,001,Physical Environment
+00107020,Procurement,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"20,000.00",001,General Government
+11242000,Solid Waste,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"1,549,338.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,514000,Overtime,Personnel Services,"50,000.00",112,Physical Environment
+11242000,Solid Waste,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"116,991.00",112,Physical Environment
+11242000,Solid Waste,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"227,966.00",112,Physical Environment
+11242000,Solid Waste,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"395,985.00",112,Physical Environment
+11242000,Solid Waste,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"36,995.00",112,Physical Environment
+10116001,Public Works,Task Order Services,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"100,000.00",101,Transportation
+10116001,Public Works,Traffic Signal Services,,,Active Contract,"Murdock Investments, LLC",24-36,https://www.mywaltonfl.gov/DocumentCenter/View/45346/Traffic-Signal-Maintenance-057,,,534000,Other Services,Operating Expenditures,"125,000.00",101,Transportation
+11242000,Solid Waste,,,,,,,,,,532000,Accounting & Auditing,Operating Expenditures,"7,100.00",112,Physical Environment
+10116001,Public Works,Freeport Interlocal Road Maintenance,,,Interlocal Agreement,City of Freeport,,https://www.mywaltonfl.gov/DocumentCenter/View/43961/City-of-Freeport-Amend-2-Interlocal-Road-Maintenance,,,534000,Other Services,Operating Expenditures,0.10,101,Transportation
+10116001,Public Works,Paxton Interlocal Road Maintenance,,,Interlocal Agreement,City of Paxton,,https://www.mywaltonfl.gov/DocumentCenter/View/43962/City-of-Paxton-Interlocal-Road-Maintenance-Agreement,,,534000,Other Services,Operating Expenditures,0.10,101,Transportation
+10116001,Public Works,DeFuniak Springs Interlocal Road Maintenance ,,,Interlocal Agreement,City of DeFuniak Springs,,https://www.mywaltonfl.gov/DocumentCenter/View/43960/City-of-DFS-Amend-3-Road-and-Bridges,,,534000,Other Services,Operating Expenditures,"50,000.00",101,Transportation
+11242000,Solid Waste,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"10,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,541000,Communication Services,Operating Expenditures,"16,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"1,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,543000,Utility Services,Operating Expenditures,"50,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"7,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"300,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,546001,Tires,Operating Expenditures,"110,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"4,000.00",112,Physical Environment
+11141010,Beach Operations,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"833,992.00",111,Economic Environment
+00109000,Probation Services,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"3,250.00",001,Public Safety
+00101090,Public Defender,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,500.00,001,Court Related Cost
+00112000,Recreation,,,,,,,,,,552002,Fuel,Operating Expenditures,"3,000.00",001,Culture and Recreation
+00109000,Probation Services,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"1,500.00",001,Public Safety
+00107020,Procurement,,,,,,,,,,555000,Training,Operating Expenditures,"10,000.00",001,General Government
+00102030,Code Compliance,SUV - Replacement,Vehicle,10514,,,,,,,564000,Machinery & Equipment,Capital Outlay,"36,000.00",001,Public Safety
+10528000,Mosquito Control,ULV Spray Unit,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"18,000.00",105,Human Services
+11141080,South Walton Fire Lifeguard Services,,,,Interlocal Agreement,South Walton Fire District,22-1656,https://www.mywaltonfl.gov/DocumentCenter/View/45233/South-Walton-Lifeguard-Agreement,10629,South Walton Fire Lifeguard Services,534000,Other Services,Operating Expenditures,"3,380,779.00",111,Economic Environment
+11141010,Beach Operations,F250 Super Cab 4x4. New Specialist Positions - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"78,000.00",111,Economic Environment
+00112000,Recreation,Security for Recreation Programs,,,,,,,,,534000,Other Services,Operating Expenditures,"20,000.00",001,Culture and Recreation
+00101100,State Attorney,,,,,,,,,,541000,Communication Services,Operating Expenditures,"10,000.00",001,Court Related Cost
+00101100,State Attorney,,,,,,,,,,543000,Utility Services,Operating Expenditures,"12,000.00",001,Court Related Cost
+10116001,Public Works,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"1,350,000.00",101,Transportation
+11141010,Beach Operations,F250 Super Cab 4X4 Service Electrician Helper - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"101,000.00",111,Economic Environment
+11141010,Beach Operations,F250 Super Cab 4X4 Service New Landscape Techs - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"101,000.00",111,Economic Environment
+00117000,Building Construction and Maintenance,"52"" Lawn Mower",Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"11,000.00",001,General Government
+00101080,Property Appraiser,,,,,,,,,,523000,Life & Health Insurance,Personnel Services,0.00,001,General Government
+00101080,Property Appraiser,,,,,,,,,,560000,Capital Outlay Budget,Capital Outlay,0.00,001,General Government
+00101080,Property Appraiser,,,,,,,,,,541000,Communication Services,Operating Expenditures,0.00,001,General Government
+00102030,Code Compliance,SUV - Replacement,Vehicle,10515,,,,,,,564000,Machinery & Equipment,Capital Outlay,"36,000.00",001,Public Safety
+00112000,Recreation,Sport Officials for Recreation Programs,,,,,,,,,534000,Other Services,Operating Expenditures,"30,000.00",001,Culture and Recreation
+11242000,Solid Waste,Iron Remediation System Remedial Action Plan Modifications,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"100,000.00",112,Physical Environment
+11242000,Solid Waste,Annual Compliance Monitoring Services,,,Task Order Services,,,,,,531000,Professional Services,Operating Expenditures,"100,000.00",112,Physical Environment
+00102030,Code Compliance,UTV,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"19,200.00",001,Public Safety
+00102030,Code Compliance,UTV,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"19,200.00",001,Public Safety
+00102030,Code Compliance,UTV,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"19,200.00",001,Public Safety
+00101110,Supervisor of Elections,,,,,,,,,,510000,Personnel Services Budget,Personnel Services,"1,197,899.00",001,General Government
+00101110,Supervisor of Elections,,,,,,,,,,523000,Life & Health Insurance,Personnel Services,0.00,001,General Government
+00101110,Supervisor of Elections,,,,,,,,,,524000,Workers Compensation,Personnel Services,864.00,001,General Government
+00101110,Supervisor of Elections,,,,,,,,,,530000,Operating Expenses and Budget,Operating Expenditures,"348,682.00",001,General Government
+00104000,Planning Short-Term Rental,,,,,,,,10639,Short-Term Rental,552000,Operating Supplies,Operating Expenditures,"23,000.00",001,General Government
+00110000,Veteran Services,,,,,,,,,,555000,Training,Operating Expenditures,"1,500.00",001,Economic Environment
+00113000,Extension Office,4X4 Crew Cab Truck - Replacement,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"40,000.00",001,Physical Environment
+00101130,Tax Collector,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"7,508,920.00",001,General Government
+00101130,Tax Collector,,,,,,,,,,524000,Workers Compensation,Personnel Services,"4,000.00",001,General Government
+00101130,Tax Collector,,,,,,,,,,541000,Communication Services,Operating Expenditures,"25,000.00",001,General Government
+00101130,Tax Collector,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"160,000.00",001,General Government
+10116020,Mossy Head Wastewater Treatment Facility,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"80,000.00",101,General Government
+10116001,Public Works,,,,,,,,,,563000,Infrastructure,Capital Outlay,"4,500,000.00",101,Transportation
+11141090,Beach Tram,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"2,411,040.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,514000,Overtime,Personnel Services,"5,000.00",111,Economic Environment
+11141090,Beach Tram,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"190,080.00",111,Economic Environment
+11141090,Beach Tram,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"338,450.00",111,Economic Environment
+11141090,Beach Tram,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"763,649.00",111,Economic Environment
+11141090,Beach Tram,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"105,086.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,541000,Communication Services,Operating Expenditures,"14,500.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,500.00,111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"40,000.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,546001,Tires,Operating Expenditures,"60,000.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,546002,Vehicle Repairs,Operating Expenditures,"140,000.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"16,750.00",111,Economic Environment
+11141090,Beach Tram,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"25,000.00",111,Economic Environment
+10326000,Building Department,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"671,740.00",103,Public Safety
+00107020,Procurement,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"1,500.00",001,General Government
+00114000,Soil Conservation,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"1,000.00",001,Physical Environment
+11141030,Sales and Visitors Center,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"6,000.00",111,Economic Environment
+00104000,Planning,,,,,,,,,,552002,Fuel,Operating Expenditures,"15,000.00",001,General Government
+11141040,Communications,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"345,444.00",111,Economic Environment
+11141040,Communications,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"26,050.00",111,Economic Environment
+11141040,Communications,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"46,383.00",111,Economic Environment
+11141040,Communications,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"97,617.00",111,Economic Environment
+11141040,Communications,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,375.00,111,Economic Environment
+11242000,Solid Waste,Waste Collection and Disposal Franchise Services,,,Active Contract,Waste Managements Inc of Florida,24-33,,,,534000,Other Services,Operating Expenditures,"17,000,000.00",112,Physical Environment
+11141040,Communications,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"22,100.00",111,Economic Environment
+11141040,Communications,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,250.00,111,Economic Environment
+11141040,Communications,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"26,503.00",111,Economic Environment
+11141040,Communications,,,,,,,,,,548000,Promotional Activities,Operating Expenditures,"144,436.00",111,Economic Environment
+00104000,Planning,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"40,000.00",001,General Government
+10528000,Mosquito Control,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"264,183.00",105,Human Services
+10116001,Public Works,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"7,000.00",101,Transportation
+11242000,Solid Waste,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"300,000.00",112,Physical Environment
+00107020,Procurement,Purchasing Software,,,Active Contract,OpenGov,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"65,000.00",001,General Government
+00107020,Procurement,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"2,000.00",001,General Government
+10116001,Public Works,,,,,,,,,,555000,Training,Operating Expenditures,"5,000.00",101,Transportation
+00111002,South Walton Fire,Emergency Medical Services Interlocal,,,Interlocal Agreement,South Walton Fire District,,https://www.mywaltonfl.gov/DocumentCenter/View/45232/South-Walton-Fire--State-Control-Budget,,,534000,Other Services,Operating Expenditures,"947,284.00",001,Public Safety
+11141060,Marketing,,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,0.00,111,Economic Environment
+11141060,Marketing,Agency Award Submission and attendance,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"25,000.00",111,Economic Environment
+11141060,Marketing,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"286,289.00",111,Economic Environment
+11141060,Marketing,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"21,902.00",111,Economic Environment
+11141060,Marketing,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"38,997.00",111,Economic Environment
+11141060,Marketing,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"60,639.00",111,Economic Environment
+11141000,Tourism Administration,TDC Attorney,,,Active Contract,Clay Adkinson,,https://www.mywaltonfl.gov/DocumentCenter/View/45348/Adkinson,,,531000,Professional Services,Operating Expenditures,"30,000.00",111,Economic Environment
+11141060,Marketing,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"54,300.00",111,Economic Environment
+11141060,Marketing,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"22,984.00",111,Economic Environment
+11141060,Marketing,Media Service Fee,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"953,350.00",111,Economic Environment
+11141100,North Walton Tourist Development Tax,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"5,502.00",111,Economic Environment
+00104000,Planning Short-Term Rental,,,,,,,,10639,Short-Term Rental,551000,Office Supplies,Operating Expenditures,"10,000.00",001,General Government
+00101100,State Attorney,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"3,700.00",001,Court Related Cost
+00101090,Public Defender,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"2,000.00",001,Court Related Cost
+10116002,Engineering Services,,,,,,,,,,555000,Training,Operating Expenditures,"10,000.00",101,Transportation
+11141060,Marketing,Tourism Event Grant Program,,,,,,,10656,Advertising Services,548000,Promotional Activities,Operating Expenditures,"642,450.00",111,Economic Environment
+11141060,Marketing,"Branded Merch (Activations, In Market Events, Leisure Shows, Events), Art in Public Places, Marine Grant, SWARA, Coastal Clean up, Media/Influencer FAMS",,,,,,,,,548000,Promotional Activities,Operating Expenditures,"320,000.00",111,Economic Environment
+11141070,Marketing,,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,0.00,111,economic Environment
+11141030,Sales and Visitors Center,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"594,463.00",111,Economic Environment
+11141030,Sales and Visitors Center,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"45,706.00",111,Economic Environment
+11141030,Sales and Visitors Center,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"81,381.00",111,Economic Environment
+11141030,Sales and Visitors Center,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"141,779.00",111,Economic Environment
+11141030,Sales and Visitors Center,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,658.00,111,Economic Environment
+11141030,Sales and Visitors Center,,,,,,,,,,531000,Professional Services,Operating Expenditures,"62,750.00",111,Economic Environment
+11141030,Sales and Visitors Center,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"47,500.00",111,Economic Environment
+11141030,Sales and Visitors Center,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"2,000.00",111,Economic Environment
+11141030,Sales and Visitors Center,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"10,000.00",111,Economic Environment
+11141030,Sales and Visitors Center,Joint Media Brand Mission Sales & Marketing,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"75,000.00",111,Economic Environment
+11242000,Solid Waste,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"697,192.00",112,Physical Environment
+00101110,Supervisor of Elections,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,0.00,001,General Government
+10116001,Public Works,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"75,000.00",101,Transportation
+00104000,Planning Short-Term Rental,,,,,,,,10639,Short-Term Rental,555000,Training,Operating Expenditures,"20,000.00",001,General Government
+11141000,Tourism Administration,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"451,538.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,111,Economic Environment
+11141000,Tourism Administration,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"35,471.00",111,Economic Environment
+11141000,Tourism Administration,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"63,158.00",111,Economic Environment
+11141000,Tourism Administration,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"80,737.00",111,Economic Environment
+11141000,Tourism Administration,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,511.00,111,Economic Environment
+11141000,Tourism Administration,South Walton Turtle Watch,,,Active Contract,"South Walton Turtle Watch Group, Inc",17-0709,https://www.mywaltonfl.gov/DocumentCenter/View/45316/Sea-Turtle-Monitoring-Services,,,531000,Professional Services,Operating Expenditures,"85,000.00",111,Economic Environment
+11141000,Tourism Administration,State Lobbyist (75/25 split with Tourist Fund),,,Active Contract,"Heffley & Associates, Inc.",25-28,https://www.mywaltonfl.gov/DocumentCenter/View/45313/Lobbying-Services-034,,,531000,Professional Services,Operating Expenditures,"22,000.00",111,Economic Environment
+11141000,Tourism Administration,Federal Lobbyist (50/50 split with Tourist Fund),,,New Procurement,,,,,,531000,Professional Services,Operating Expenditures,"48,000.00",111,Economic Environment
+11141000,Tourism Administration,State Park Admission Agreement,,,Interlocal Agreement,Florida Department of Environmental Protection,,,,,534000,Other Services,Operating Expenditures,"205,000.00",111,Economic Environment
+11141050,Tourism Public Safety,Code Enforcement Beach,,,,,,,10284,,534000,Other Services,Operating Expenditures,"2,245,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"10,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,541000,Communication Services,Operating Expenditures,"40,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,"15,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,543000,Utility Services,Operating Expenditures,"22,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"25,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"1,000.00",111,Economic Environment
+11141000,Tourism Administration,,,,,,,,,,547000,Printing & Binding,Operating Expenditures,"5,000.00",111,Economic Environment
+11141030,Sales and Visitors Center,4 meeting/2 wedding e-newsletters,,,Active Contract,"Zehnder, Inc",24-27,https://www.mywaltonfl.gov/DocumentCenter/View/45317/Contract-24-27-Zehnder,10655,Advertising Services,548000,Promotional Activities,Operating Expenditures,"10,000.00",111,Economic Environment
+10116001,Public Works,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"50,000.00",101,Transportation
+11141090,Beach Tram,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"177,166.00",111,Economic Environment
+11141040,Communications,General Fund Cost Allocation for services provide to special revenue fund,,,,,,,,,549006,Indirect Admin Allocation,Operating Expenditures,"57,192.00",111,Economic Environment
+11242000,Solid Waste,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"5,000.00",112,Physical Environment
+00102030,Code Compliance,UTV,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"19,200.00",001,Public Safety
+11141090,Beach Tram,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"253,000.00",111,Economic Environment
+00107020,Procurement,,,,,,,,,,552002,Fuel,Operating Expenditures,"1,500.00",001,General Government
+00102000,County Administration,SUV,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"65,000.00",001,General Government
+11242000,Solid Waste,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"10,000.00",112,Physical Environment
+11242000,Solid Waste,,,,,,,,,,555000,Training,Operating Expenditures,"10,000.00",112,Physical Environment
+00109000,Probation Services,,,,,,,,,,541000,Communication Services,Operating Expenditures,"3,000.00",001,Public Safety
+00110000,Veteran Services,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"206,356.00",001,Economic Environment
+00110000,Veteran Services,,,,,,,,,,512007,PTO Buyback,Personnel Services,0.00,001,Economic Environment
+00110000,Veteran Services,,,,,,,,,,514000,Overtime,Personnel Services,480.00,001,Economic Environment
+00110000,Veteran Services,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"15,787.00",001,Economic Environment
+00110000,Veteran Services,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"28,109.00",001,Economic Environment
+00110000,Veteran Services,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"47,765.00",001,Economic Environment
+00110000,Veteran Services,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,227.00,001,Economic Environment
+00110000,Veteran Services,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"4,500.00",001,Economic Environment
+00110000,Veteran Services,,,,,,,,,,541000,Communication Services,Operating Expenditures,"1,500.00",001,Economic Environment
+00110000,Veteran Services,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,150.00,001,Economic Environment
+00110000,Veteran Services,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"2,000.00",001,Economic Environment
+11141090,Beach Tram,,,,,,,,,,551000,Office Supplies,Operating Expenditures,"15,000.00",111,Economic Environment
+11141040,Communications,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"9,500.00",111,Economic Environment
+11141040,Communications,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"11,400.00",111,Economic Environment
+11141010,Beach Operations,F250 Super Cab 4x4.-Replacement,Vehicle,8635,,,,,,,564000,Machinery & Equipment,Capital Outlay,"101,000.00",111,Economic Environment
+11141040,Communications,,,,,,,,,,555000,Training,Operating Expenditures,"8,500.00",111,Economic Environment
+11141010,Beach Operations,F150 Super Cab 4x4 -Replacement,Vehicle,9043,,,,,,,564000,Machinery & Equipment,Capital Outlay,"74,500.00",111,Economic Environment
+11141010,Beach Operations,Truck Wash System,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"200,000.00",111,Economic Environment
+50350000,Self-Insurance Expenses,,,,,,,,,,531000,Professional Services,Operating Expenditures,0.00,503,General Government
+50350000,Self-Insurance Expenses,,,,,,,,,,534000,Other Services,Operating Expenditures,"20,626,947.00",503,General Government
+00101130,Tax Collector,,,,,,,,,,549000,Other Current Charges,Operating Expenditures,"802,080.00",001,General Government
+10326000,Building Department,F150 - Replacement,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,0.00,103,Public Safety
+10326000,Building Department,F150 - Replacement,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,0.00,103,Public Safety
+00101060,Court Technology - Court Administration,,,,,,,,,,564000,Machinery & Equipment,Capital Outlay,0.00,001,Court Related Cost
+00117000,Building Construction and Maintenance,Van - Replacement,Vehicle,9036,,,,,,,564000,Machinery & Equipment,Capital Outlay,"45,000.00",001,General Government
+00112010,Eagle Springs Golf and Recreation Center,,,,,,,,,,564000,Machinery & Equipment,Capital Outlay,,001,Culture and Recreation
+00112010,Eagle Springs Golf and Recreation Center,Golf Lift,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"13,000.00",001,Culture and Recreation
+10116002,Engineering Services,,,,,,,,,,512000,Regular Salaries & Wages,Personnel Services,"1,515,351.00",101,Transportation
+10116002,Engineering Services,Employer payroll taxes include the County's required contributions for Social Security (FICA) and Medicare. Contributions are budgeted using federally established tax rates applicable to eligible employee compensation.,,,,,,,,,521000,FICA Taxes & Medicare,Personnel Services,"115,933.00",101,Transportation
+00117000,Building Construction and Maintenance,"52"" Lawn Mower",Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"11,000.00",001,General Government
+00106000,Human Resources,SUV - Replacement,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"31,000.00",001,General Government
+10116002,Engineering Services,Employer retirement contribution rates are established annually by the Florida Legislature in accordance with state law and are applied based on each employee's FRS membership class.,,,,,,,,,522000,Retirement Contributions,Personnel Services,"237,325.00",101,Transportation
+10528000,Mosquito Control,,,,,,,,,,564000,Machinery & Equipment,Capital Outlay,,105,Human Services
+00112010,Eagle Springs Golf and Recreation Center,Reel Grinder,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"68,000.00",001,Culture and Recreation
+10116002,Engineering Services,Employer contributions for employee life and health insurance are budgeted based on the County's adopted benefit plans and applicable coverage elections.,,,,,,,,,523000,Life & Health Insurance,Personnel Services,"212,454.00",101,Transportation
+10116002,Engineering Services,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,"2,055.00",101,Transportation
+11141050,Tourism Public Safety,Sheriff Beach Patrol,,,,,,,10622,,534000,Other Services,Operating Expenditures,"3,050,000.00",111,Economic Environment
+00111001,Emergency Management,UTV (BCC10404),Equipment,10404,,,,,,,564000,Machinery & Equipment,Capital Outlay,"15,000.00",001,Public Safety
+10116002,Engineering Services,,,,,,,,,,540000,Travel & Per Diem,Operating Expenditures,"7,500.00",101,Transportation
+10116002,Engineering Services,,,,,,,,,,542000,Freight & Postage Services,Operating Expenditures,0.00,101,Transportation
+10116002,Engineering Services,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,"20,000.00",101,Transportation
+10116002,Engineering Services,,,,,,,,,,546000,Repair & Maintenance,Operating Expenditures,"25,000.00",101,Transportation
+11141040,Communications,,,,,,,,,,551000,Office Supplies,Operating Expenditures,100.00,111,Economic Environment
+11141060,Marketing,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,"6,000.00",111,Economic Environment
+10116001,Public Works,,,,,,,,,,552002,Fuel,Operating Expenditures,"300,000.00",101,Transportation
+00111001,Emergency Management,Harris XL 200,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"10,000.00",001,Public Safety
+00119000,Environmental Services,ATV Trailer,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"2,500.00",001,Physical Environment
+11141060,Marketing,,,,,,,,,,554000,Books Publications Subscriptions or Memberships,Operating Expenditures,"73,300.00",111,Economic Environment
+00119000,Environmental Services,ATV Side-by-side,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"17,500.00",001,Physical Environment
+00117000,Building Construction and Maintenance,Crew Cab Truck - New (Morrison Springs Attendant),Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"68,000.00",001,General Government
+11141060,Marketing,"Workers' compensation premiums are budgeted based on employee classifications, payroll, and rates established by the County's workers' compensation insurance provider.",,,,,,,,,524000,Workers Compensation,Personnel Services,315.00,111,Economic Environment
+10528000,Mosquito Control,4x4 Cab Truck,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"55,000.00",105,Human Services
+10528000,Mosquito Control,ULV Spray Unit,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"18,000.00",105,Human Services
+11242001,Solid Waste Transfer,Small County Surtax (Mossy Head Wastewater Treatment),,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"379,000.00",112,Interfund Transfers
+11242001,Solid Waste Transfer,Small County Surtax (Transportation),,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"14,621,000.00",112,Interfund Transfers
+00104000,Planning,SUV - Replacement,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"60,000.00",001,General Government
+10326000,Building Department,,,,,,,,,,564000,Machinery & Equipment,Capital Outlay,,103,Public Safety
+10116001,Public Works,21 yard Dump Truck- District 2,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"245,000.00",101,Transportation
+10116001,Public Works,"1000 gal Water Tank w/ 2"" pump and chemical storage rack - PW County Wide",Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"14,000.00",101,Transportation
+10116001,Public Works,"75-80 hp Tractor w/Loader, Grapple, Forks-PW County Wide",Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"85,000.00",101,Transportation
+10116001,Public Works,1/2 Ton Pickup Crew Cab w/fuel transfer tank and toolbox - Replacement,Vehicle,9214,,,,,,,564000,Machinery & Equipment,Capital Outlay,"58,000.00",101,Transportation
+10116001,Public Works,3/4 Ton Crew Cab Truck w/Utility Body - Replacement,Vehicle,9005,,,,,,,564000,Machinery & Equipment,Capital Outlay,"65,000.00",101,Transportation
+10116001,Public Works,1/2 Ton Pickup Crew Cab w/fuel transfer tank and toolbox - Replacement,Vehicle,10427,,,,,,,564000,Machinery & Equipment,Capital Outlay,"58,000.00",101,Transportation
+10116001,Public Works,Mid-size Excavator - Special Projects Crew,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"159,000.00",101,Transportation
+10116001,Public Works,Flatbed Dump (750 or equiv.) -Special Projects Crew,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"165,000.00",101,Transportation
+10116001,Public Works,Mid-size Excavator-Drainage Crew,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"159,000.00",101,Transportation
+10116001,Public Works,Service Truck w/Lube Body-County Shop,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"195,000.00",101,Transportation
+10116001,Public Works,21 yard Dump Truck-District 5,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"245,000.00",101,Transportation
+10116001,Public Works,3/4 Ton Crew Cab Truck w/Utility Body - Replacement,Vehicle,8213,,,,,,,564000,Machinery & Equipment,Capital Outlay,"65,000.00",101,Transportation
+10116001,Public Works,21 yard Dump Truck-District 4,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"245,000.00",101,Transportation
+10116001,Public Works,3/4 Ton Crew Cab Truck w/Utility Body - Replacement,Vehicle,8511,,,,,,,564000,Machinery & Equipment,Capital Outlay,"65,000.00",101,Transportation
+10116001,Public Works,21 yard Dump Truck- District 1,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"245,000.00",101,Transportation
+10116001,Public Works,21 yard Dump Truck-District 3,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"245,000.00",101,Transportation
+10116001,Public Works,Mid-size Excavator w/ mulching head-District 2,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"186,000.00",101,Transportation
+00104000,Planning Short-Term Rental,SUV - New,Vehicle,,,,,,10639,Short-Term Rental,564000,Machinery & Equipment,Capital Outlay,"49,000.00",001,General Government
+10116002,Engineering Services,,,,,,,,,,541000,Communication Services,Operating Expenditures,"9,000.00",101,Transportation
+11242000,Solid Waste,Pickup Truck 4x4 - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"62,500.00",112,Physical Environment
+11242000,Solid Waste,Compactor,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"1,150,000.00",112,Physical Environment
+11242000,Solid Waste,"10,000 lb Lull and attachments",Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"200,000.00",112,Physical Environment
+11242000,Solid Waste,Mini-skid Steer and attachments,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"60,000.00",112,Physical Environment
+11242000,Solid Waste,Service Truck and tools,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"200,000.00",112,Physical Environment
+11242000,Solid Waste,Roll-off Dumpsters,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"40,000.00",112,Physical Environment
+11242000,Solid Waste,Pickup Truck 4x4 - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"62,500.00",112,Physical Environment
+11242000,Solid Waste,Gate arm for Transfer Station,Equipment,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"15,000.00",112,Physical Environment
+11141090,Beach Tram,,,,,,,,,,564000,Machinery & Equipment,Capital Outlay,,111,Economic Environment
+11141090,Beach Tram,2027 Starcraft ADA Shuttle - Replacement,Vehicle,10284,,,,,,,564000,Machinery & Equipment,Capital Outlay,"155,000.00",111,Economic Environment
+11141090,Beach Tram,2027 Ford Ranger XLT 2WD Crew Cab - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"42,000.00",111,Economic Environment
+11141090,Beach Tram,2027 Starcraft ADA Shuttle - Replacement,Vehicle,10289,,,,,,,564000,Machinery & Equipment,Capital Outlay,"155,000.00",111,Economic Environment
+11141090,Beach Tram,2027 Starcraft ADA Shuttle - Replacement,Vehicle,10287,,,,,,,564000,Machinery & Equipment,Capital Outlay,"155,000.00",111,Economic Environment
+11141000,Tourism Administration,SUV - Replacement,Vehicle,8668,,,,,,,564000,Machinery & Equipment,Capital Outlay,"50,000.00",111,Economic Environment
+30047030,Capital Projects,,,,,,,,,,563000,Infrastructure,Capital Outlay,0.00,300,Transportation
+10116002,Engineering Services,4x4 Crew Cab Truck - New,Vehicle,,,,,,,,564000,Machinery & Equipment,Capital Outlay,"45,000.00",101,Transportation
+00108000,Libraries,"Support Dolly Parton's Imagination Library directly instead of through nonprofit grant process at $20,000.",,,,,,,,,566000,Books Publications Library Materials,Capital Outlay,"20,000.00",001,Culture and Recreation
+30047000,Capital Projects,,,,,,,,,,571000,Principal,Debt Service,"2,312,780.00",300,Transportation
+30047000,Capital Projects,,,,,,,,,,572000,Interest Expense,Debt Service,"269,217.00",300,Transportation
+00101002,Interfund Group Transfer Out,Property Tax (Capital),,,,,,,,,591000,Intergovernmental Transfers,Other Uses,"25,035,734.00",001,Interfund Transfers
+10730000,Walton County Sheriff's Office,,,,,,,,,,549005,Bad Debt Expense,Operating Expenditures,0.00,107,Public Safety
+10730000,Walton County Sheriff's Office,,,,,,,,,,562000,Buildings,Capital Outlay,0.00,107,Public Safety
+10730000,Walton County Sheriff's Office,,,,,,,,,,561000,Land,Capital Outlay,0.00,107,Public Safety
+10730000,Walton County Sheriff's Office,,,,,,,,,,552000,Operating Supplies,Operating Expenditures,0.00,107,Public Safety
+00101080,Property Appraiser,,,,,,,,,,599000,Other Uses Contingency,Other Uses,"133,372.00",001,General Government
+10730000,Walton County Sheriff's Office,,,,,,,,,,544000,Rentals & Leases,Operating Expenditures,0.00,107,Public Safety
+00101001,BCC Other Uses Contingency,"Funds set aside for unexpected expenses, emergencies, or unplanned costs.",,,,,,,,,599000,Other Uses Contingency,Other Uses,"400,000.00",001,Other Sources
+00101110,Supervisor of Elections,,,,,,,,,,599000,Other Uses Contingency,Other Uses,"25,000.00",001,General Government

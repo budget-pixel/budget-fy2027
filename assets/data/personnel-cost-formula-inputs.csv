@@ -1,0 +1,76 @@
+Formula Inputs,
+COLA Rate,3.00%
+FICA Rate,6.20%
+Medicare Rate,1.45%
+Basic Life Annual Cost,$25.00
+Healthiest You Annual Cost,$80.00
+Default LTD Rate,0.31%
+,
+Health Key,
+FB1|EE,"$13,073.16"
+FB1|FAM,"$21,208.20"
+FB2|EE,"$12,833.40"
+FB2|FAM,"$20,664.72"
+FB3|EE,"$12,837.60"
+FB3|FAM,"$20,673.48"
+FB4|FAM,"$12,837.60"
+FB5|FAM,"$12,226.32"
+FB6|FAM,"$12,593.16"
+FB7|FAM,"$12,858.72"
+,
+Pension Plan,
+7200,14.03%
+7231,58.68%
+7205,22.02%
+7210,14.03%
+7215,58.68%
+7225,14.03%
+7230,58.68%
+7235,34.69%
+7245,6.84%
+7250,46.23%
+7251,25.90%
+7262,6.84%
+7255,12.39%
+7261,8.56%
+7220,33.24%
+,
+Risk Code,
+1463,8.72%
+5190,3.21%
+5213,4.76%
+5222,5.96%
+5509,6.87%
+5606,0.65%
+5651,5.24%
+6217,3.53%
+7380,4.59%
+7720,2.83%
+8380,1.72%
+8601,0.32%
+8603,0.08%
+8810,0.11%
+8820,0.08%
+9015,2.68%
+9060,1.22%
+9082,1.24%
+9102,2.75%
+9178,3.86%
+9182,1.51%
+9402,4.09%
+9410,2.07%
+9501,2.24%
+,
+Formula Map,
+Q Hourly Wage,Hourly Base Wage × Standard Hours per Year × Allocation %
+R Cost of Living Adjustments,Q × COLA Rate
+S Commissioner Vehicle Allowance,"Uses column J only when annual allowance is greater than 1,000; multiplied by Allocation %"
+T FICA,(Q + R + S) × FICA Rate
+U Medicare,(Q + R + S) × Medicare Rate
+V Health Insurance,Health Plan + Coverage lookup × Allocation %
+W Basic Life Insurance,Basic Life Annual Cost × Allocation %
+X Long Term Disability,(Q + R + S) × LTD rate by Pension Plan
+Y Retirement Plan,(Q + R + S) × Pension Plan rate
+Z Workers' Compensation,(Q + R + S) × Risk Code rate
+AA Healthiest You,Healthiest You Annual Cost × Allocation %
+AB Weekend Pay,"Weekend Pay × Allocation %, only when Weekend Pay is greater than 100"

@@ -1,10 +1,9 @@
 name: Update Census Data
 
 on:
+  # Automatic monthly schedule disabled to freeze the FY2027 tentative
+  # budget site as static. Trigger manually if a refresh is ever needed.
   workflow_dispatch: {}
-  schedule:
-    # 06:00 UTC on the 1st of every month.
-    - cron: "0 6 1 * *"
 
 permissions:
   contents: write
