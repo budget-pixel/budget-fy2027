@@ -9,11 +9,11 @@ This document defines the core budget terms used throughout this site in plain E
 - **Budget**: the financial plan of revenues and expenditures the Board of County Commissioners approves for a fiscal year.
 - **Adopted Budget**: "The financial plan of revenues and expenditures for a fiscal year as approved by the Board of County Commissioners."
 - **Legally Adopted Budget**: the budget as formally adopted, which sets the legal spending ceiling by fund.
-- **Proposed Budget**: the budget presented for public review and workshops before the Board takes its final adoption vote. On this site, the "FY 2027" figures are the proposed budget until adoption is complete.
+- **Tentative Budget**: the budget presented for public review and workshops before the Board takes its final adoption vote. On this site, the "FY 2027" figures are the tentative budget until adoption is complete.
 - **Amendment**: "A change to an adopted budget, which may increase or decrease a fund total. The change must be approved by the Board of County Commissioners."
 - **Actual**: the closed, historical record of what a fund or account truly collected or spent in a completed fiscal year, as distinct from what was budgeted.
 
-See [How to Read the Budget](how-to-read-the-budget.md) for a full walkthrough of how Actual, Budget, and Proposed columns relate on this site's tables.
+See [How to Read the Budget](how-to-read-the-budget.md) for a full walkthrough of how Actual, Budget, and Tentative columns relate on this site's tables.
 
 ## Organizational Terms
 

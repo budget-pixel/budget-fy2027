@@ -6,21 +6,21 @@ This document explains how to correctly interpret the figures shown across this 
 
 ## Overview
 
-Nearly every financial table on this site follows the same column pattern, moving from historical actuals on the left to the current-year proposed budget on the right:
+Nearly every financial table on this site follows the same column pattern, moving from historical actuals on the left to the current-year tentative budget on the right:
 
 | Column | Meaning |
 |---|---|
 | FY 2020–2025 Actual | What the County actually collected or spent that fiscal year, based on closed-out financial records. |
 | FY 2026 Budget | The original budget the Board adopted for the current fiscal year (FY 2026), before any mid-year amendments. |
-| FY 2027 Proposed | The proposed budget for the upcoming fiscal year — the subject of this site. |
+| FY 2027 Tentative | The tentative budget for the upcoming fiscal year — the subject of this site. |
 
-**Actual figures are historical fact; Budget and Proposed figures are financial plans.** A department's FY2025 Actual spending will not exactly match its FY2025 Budget, because actual conditions (staffing vacancies, project timing, emergency response, revenue performance) always differ somewhat from what was planned. That gap is normal and expected — see [Common Misconceptions](common-misconceptions.md) for why it does not indicate a problem.
+**Actual figures are historical fact; Budget and Tentative figures are financial plans.** A department's FY2025 Actual spending will not exactly match its FY2025 Budget, because actual conditions (staffing vacancies, project timing, emergency response, revenue performance) always differ somewhat from what was planned. That gap is normal and expected — see [Common Misconceptions](common-misconceptions.md) for why it does not indicate a problem.
 
-## Actual vs. Budget vs. Proposed vs. Adopted
+## Actual vs. Budget vs. Tentative vs. Adopted
 
 - **Actual**: the closed, historical record of what was truly collected or spent in a completed fiscal year.
 - **Original Budget**: the budget the Board formally adopted for a given fiscal year, before any amendments.
-- **Proposed Budget**: the budget presented for review before formal adoption — this is what "FY 2027" figures on this site represent until the Board completes the [budget process](budget-process.md) and adopts a final budget.
+- **Tentative Budget**: the budget presented for review before formal adoption — this is what "FY 2027" figures on this site represent until the Board completes the [budget process](budget-process.md) and adopts a final budget.
 - **Adopted Budget**: the final budget the Board approves after public hearings, which becomes the fiscal year's Original Budget going forward.
 
 ## How Rows Roll Up
@@ -47,8 +47,8 @@ A department or revenue line can appear on more than one table because it is bei
 **Why don't Actual and Budget figures match for the same year?**
 Actuals reflect what really happened; Budget reflects what was planned. Vacancies, project delays, emergency spending, weather events, and revenue performance all cause real-world variance from a plan set months in advance.
 
-**What does "FY 2027 Proposed" mean, exactly?**
-It is the budget Walton County has proposed for the fiscal year beginning October 1, 2026 and ending September 30, 2027, prior to final adoption through the process described in [Budget Process](budget-process.md).
+**What does "FY 2027 Tentative" mean, exactly?**
+It is the tentative budget Walton County has set for the fiscal year beginning October 1, 2026 and ending September 30, 2027, prior to final adoption through the process described in [Budget Process](budget-process.md).
 
 **If a number changes between when I looked at this site last week and today, is that an error?**
 Not necessarily. Budget development is iterative during the proposal and workshop phases, and figures can be refined before final adoption. Always note the date you're citing a figure and prefer the live page over a cached figure.

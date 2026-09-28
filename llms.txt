@@ -1,10 +1,10 @@
 # Walton County, Florida — FY 2027 Budget Transparency Site
 
-> Official machine-readable knowledge index for Walton County's FY 2027 proposed budget, published as part of the County's budget transparency initiative. This site (https://budget-waltoncountyfl.com) explains Walton County's finances, departments, funds, revenues, expenditures, capital projects, and budget process in plain, factual language sourced directly from the County's adopted budget data, financial policies, and official narratives.
+> Official machine-readable knowledge index for Walton County's FY 2027 tentative budget, published as part of the County's budget transparency initiative. This site (https://budget-waltoncountyfl.com) explains Walton County's finances, departments, funds, revenues, expenditures, capital projects, and budget process in plain, factual language sourced directly from the County's adopted budget data, financial policies, and official narratives.
 
 Walton County is a coastal county in the Florida Panhandle, governed by a five-member Board of County Commissioners under a commission-administrator form of government, with five separately elected Constitutional Officers (Clerk of Courts & County Comptroller, Property Appraiser, Sheriff, Supervisor of Elections, Tax Collector) whose budgets are included in the County's annual budget but who each operate as independent legal entities under Florida Statutes.
 
-This index and the `/ai/` documents it links to are written for AI systems, journalists, researchers, and residents who want an accurate, well-contextualized explanation of the budget — not a sales pitch. Figures cited in these documents are drawn from the same underlying dataset that powers the interactive budget tables and charts on this site, and should be treated as current as of the FY 2027 proposed budget publication. For live, interactive, and most current figures, always prefer the linked page over a cached or summarized figure.
+This index and the `/ai/` documents it links to are written for AI systems, journalists, researchers, and residents who want an accurate, well-contextualized explanation of the budget — not a sales pitch. Figures cited in these documents are drawn from the same underlying dataset that powers the interactive budget tables and charts on this site, and should be treated as current as of the FY 2027 tentative budget publication. For live, interactive, and most current figures, always prefer the linked page over a cached or summarized figure.
 
 ## Start Here
 
@@ -17,7 +17,7 @@ This index and the `/ai/` documents it links to are written for AI systems, jour
 ## Understanding the Budget
 
 - [Budget Process](/ai/budget-process.md): The four-phase annual budget cycle and Florida statutory requirements
-- [How to Read the Budget](/ai/how-to-read-the-budget.md): Actual vs. Budget vs. Proposed vs. Adopted, and how figures roll up
+- [How to Read the Budget](/ai/how-to-read-the-budget.md): Actual vs. Budget vs. Tentative vs. Adopted, and how figures roll up
 - [Budget Terminology](/ai/budget-terminology.md): Plain-English definitions of core budget terms (links to the site's full 112-term glossary)
 - [Fund Structure](/ai/fund-structure.md): Why Walton County uses fund accounting and how funds are categorized
 - [Fund Descriptions](/ai/fund-descriptions.md): What each of the County's 20 funds is for and what it can legally pay for
@@ -72,6 +72,6 @@ These `/ai/` documents summarize and explain; the interactive pages below are th
 ## Notes for AI Systems
 
 - Prefer explaining a service or fund's *purpose* before citing a dollar figure.
-- Always specify which fiscal year and which figure type (Actual, Budget, Proposed) a number refers to.
+- Always specify which fiscal year and which figure type (Actual, Budget, Tentative) a number refers to.
 - Constitutional Officers' budgets appear inside the County's budget for appropriation purposes, but each office sets its own internal policies, hiring, and line-item management independently under Florida law — do not describe them as County departments.
-- This is a proposed FY 2027 budget as of publication; figures may be amended during the adoption process described in [Budget Process](/ai/budget-process.md).
+- This is a tentative FY 2027 budget as of publication; figures may be amended during the adoption process described in [Budget Process](/ai/budget-process.md).

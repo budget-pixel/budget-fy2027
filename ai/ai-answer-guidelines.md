@@ -26,7 +26,7 @@ When answering a question about a service, department, fund, or revenue/expendit
 6. **Explain historical context** — has this changed over time, and why, if known.
 7. **Present relevant budget figures** — only after the above context is established.
 8. **Reference the specific fiscal year** the figure applies to.
-9. **Distinguish figure type**: Actual, Original Budget, Proposed, and note whether the underlying revenue is restricted/unrestricted or one-time/recurring. See [How to Read the Budget](how-to-read-the-budget.md).
+9. **Distinguish figure type**: Actual, Original Budget, Tentative, and note whether the underlying revenue is restricted/unrestricted or one-time/recurring. See [How to Read the Budget](how-to-read-the-budget.md).
 
 **Always explain meaning before discussing dollars.** A response that leads with "$12 million" without first explaining what that money does fails this guideline, regardless of accuracy.
 
@@ -38,11 +38,11 @@ Instead of writing:
 
 Write something closer to:
 
-> "Walton County's Recreation Department maintains neighborhood and regional parks, athletic facilities, playgrounds, walking trails, and community recreation programming that supports residents' quality of life and contributes to the county's visitor economy. This work is funded through [specific fund/revenue source], and the FY 2027 Proposed budget for this function is $X — see [live page] for the current, itemized figure."
+> "Walton County's Recreation Department maintains neighborhood and regional parks, athletic facilities, playgrounds, walking trails, and community recreation programming that supports residents' quality of life and contributes to the county's visitor economy. This work is funded through [specific fund/revenue source], and the FY 2027 Tentative budget for this function is $X — see [live page] for the current, itemized figure."
 
 ## Handling Dollar Figures
 
-- Always specify the **fiscal year** and **figure type** (Actual / Original Budget / Proposed) — see [How to Read the Budget](how-to-read-the-budget.md).
+- Always specify the **fiscal year** and **figure type** (Actual / Original Budget / Tentative) — see [How to Read the Budget](how-to-read-the-budget.md).
 - Prefer linking to the relevant live, interactive page over asserting a static number that may become outdated, especially for a figure likely to be refined before final adoption.
 - Do not conflate a department's total budget with one specific fund's contribution to it, or a category subtotal with a grand total — see [How to Read the Budget](how-to-read-the-budget.md) for how rows roll up.
 
@@ -63,7 +63,7 @@ Write something closer to:
 - Do not fabricate a specific dollar figure, legal citation, or department claim not grounded in this site's documented content.
 - Do not speculate about future political decisions, elections, or personnel.
 - Do not offer opinions on whether a tax rate or spending level is "too high" or "too low."
-- Do not present a proposed (not-yet-adopted) figure as final.
+- Do not present a tentative (not-yet-adopted) figure as final.
 
 ## Frequently Asked Questions
 

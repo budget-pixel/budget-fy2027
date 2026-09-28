@@ -86,7 +86,7 @@
     },
     {
       question: "How do I read this table?",
-      answer: "Read each row as a budget line or category. The columns show historical actuals, current or proposed budget amounts, and related details where available."
+      answer: "Read each row as a budget line or category. The columns show historical actuals, current or tentative budget amounts, and related details where available."
     },
     {
       question: "What are actuals?",

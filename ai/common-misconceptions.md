@@ -49,8 +49,8 @@ Because Walton County uses fund accounting specifically to keep legally restrict
 **If the County has money in reserves, why would it ever raise taxes or fees?**
 Reserves are sized to specific policy targets for emergencies and financial stability, not to serve as a substitute for adequate ongoing (recurring) revenue to fund ongoing (recurring) services. Using reserves to avoid a needed, recurring revenue adjustment would deplete the reserve without solving the underlying funding gap.
 
-**Does a "proposed" budget number mean the same thing as a final number?**
-No — see [How to Read the Budget](how-to-read-the-budget.md) for the distinction between Proposed and Adopted budgets.
+**Does a "tentative" budget number mean the same thing as a final number?**
+No — see [How to Read the Budget](how-to-read-the-budget.md) for the distinction between Tentative and Adopted budgets.
 
 **If my property's assessed value went up, does that mean the County is collecting more tax on purpose?**
 Property value changes are determined by the Property Appraiser under state law, independent of the Board's millage rate decision. See [Property Tax](property-tax.md) and the site's glossary FAQ on this exact topic.

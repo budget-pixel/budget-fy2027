@@ -327,7 +327,7 @@
     },
     {
       "intent": "why-budget-amounts-change",
-      "summary": "Explains why budget figures change year to year or between proposed and adopted.",
+      "summary": "Explains why budget figures change year to year or between tentative and adopted.",
       "recommended_documents": [
         "/ai/intents/why-budget-amounts-change.md",
         "/ai/ai-answer-guidelines.md"
@@ -2392,7 +2392,7 @@
     },
     {
       "intent": "define-proposed-budget",
-      "summary": "Defines the budget term \"Proposed Budget\" in plain English.",
+      "summary": "Defines the budget term \"Tentative Budget\" in plain English.",
       "recommended_documents": [
         "/ai/budget-terminology.md"
       ],
@@ -2400,12 +2400,13 @@
         "Budget Terminology"
       ],
       "keywords": [
+        "tentative budget",
         "proposed budget",
         "definition",
         "glossary"
       ],
       "common_follow_up_questions": [
-        "What is Proposed Budget?"
+        "What is Tentative Budget?"
       ],
       "primary_budget_sections": [
         "Glossary, Acronyms, and Frequently Asked Questions"

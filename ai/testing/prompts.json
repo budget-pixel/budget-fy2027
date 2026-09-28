@@ -430,7 +430,7 @@
     {
       "question": "Why does a budget number for the same department look different this year compared to last year?",
       "expected_concepts": [
-        "Actual vs Budget vs Proposed",
+        "Actual vs Budget vs Tentative",
         "one-time items",
         "recurring vs non-recurring",
         "Section 129.06 amendments"
@@ -448,7 +448,7 @@
       "minimum_acceptable_answer": "Identifies at least two legitimate causes (revenue performance, cost changes, one-time items, mandates, Board decisions, or formal amendments) for a year-over-year change.",
       "ideal_answer_outline": [
         "List the legitimate causes of budget change",
-        "Explain Actual vs Budget/Proposed variance is normal",
+        "Explain Actual vs Budget/Tentative variance is normal",
         "Reference the Section 129.06 amendment process",
         "Recommend checking whether a change is one-time or recurring before drawing conclusions"
       ]

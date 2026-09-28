@@ -3,7 +3,7 @@ Dept_Code,Dept_Name,Note,Project_Name,Revenue_Code,Revenue_Name,Revenue_Type,FY2
 103329,Building Department,,,329006,Contractor Registration,Permits Fees and Special Assessments,0.00,103
 103341,Building Department,,,341302,Copies and Public Records Request,Charges for Services,0.00,103
 103361,Building Department,,,361100,Interest,Miscellaneous Revenue,0.00,103
-001311,Interfund Group Transfer Out,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"25,035,734.00",001
+001311,Interfund Group Transfer Out,"Property taxes levied on real and tangible personal property based on assessed taxable value. Ad valorem taxes are the County’s largest revenue source and provide funding for general government operations, public safety, constitutional officers, and other County services.",,311000,Ad Valorem Taxes,General Government Taxes,"16,988,464.00",001
 103364,Building Department,,,364001,Surplus Equipment Sales,Miscellaneous Revenue,0.00,103
 103369,Building Department,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,0.00,103
 103389,Building Department,,,389000,Nonoperating Balance Brought Forward,Other Sources,"4,000,000.00",103
@@ -76,7 +76,7 @@ Dept_Code,Dept_Name,Note,Project_Name,Revenue_Code,Revenue_Name,Revenue_Type,FY2
 001369,Board of County Commissioners,Funds returned to the County for payments or expenditures made in a previous fiscal year.,,369300,Refund of Prior Year Expenditures,Miscellaneous Revenue,"10,000.00",001
 001369,Board of County Commissioners,,,369900,Miscellaneous Revenue,Miscellaneous Revenue,"100,000.00",001
 001369,Board of County Commissioners,"General Fund admin cost allocation from Tourist Development Fund, Building Fund, Mosquito Control Fund, and Solid Waste Fund",,369901,Indirect Administrative Fees,Miscellaneous Revenue,"1,969,762.00",001
-001389,Board of County Commissioners,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,001
+001389,Board of County Commissioners,,,389000,Nonoperating Balance Brought Forward,Other Sources,"8,047,270.00",001
 001315,Geographic Info Systems,"Communications services tax (CST) revenue consists of a locally retained portion based on in-county telecommunications activity and a smaller, formula-driven share of state-collected revenues redistributed through Florida’s revenue-sharing system.",,315001,Telecommunication and Local Communication Tax,General Government Taxes,"350,000.00",001
 001324,Geographic Info Systems,"Established its E911 addressing system in 2001 through Ordinance 2001-08, should be used to support GIS/GPS equipment and mapping necessary for accurate emergency response.",,324004,E-911 Plat Fee,Permits Fees and Special Assessments,"22,000.00",001
 001329,Geographic Info Systems,$5 utility permit fee charged per dwelling unit by the Building Department for GIS E911 addressing,,329001,E-911 Utility Permits,Permits Fees and Special Assessments,"80,000.00",001
@@ -152,7 +152,7 @@ Dept_Code,Dept_Name,Note,Project_Name,Revenue_Code,Revenue_Name,Revenue_Type,FY2
 503361,Self-Insurance Interest,,,361100,Interest,Miscellaneous Revenue,"45,000.00",503
 503389,Self-Insurance Fees and Charges,,,389000,Nonoperating Balance Brought Forward,Other Sources,0.00,503
 503341,Self-Insurance Fees and Charges,,,381000,Interfund Group Transfer In,Other Sources,0.00,503
-001369,Statutory & Other,"Opioid Settlement Year 4 ($242,183)",10720,369900,Miscellaneous Revenue,Miscellaneous Revenue,"186,119.00",001
+001369,Statutory & Other,"Opioid Settlement Year 4 ($242,183)",10760,369900,Miscellaneous Revenue,Miscellaneous Revenue,"186,119.00",001
 001369,Statutory & Other,"15% Opioid Settlement Year 4 ($68,768)",10732,369900,Miscellaneous Revenue,Miscellaneous Revenue,"68,768.00",001
 001386,Clerk of Court,,,386200,Surplus Budget Clerk of Court,Other Sources,0.00,001
 001386,Supervisor of Elections,,,386800,Surplus Budget Supervisor of Elections,Other Sources,0.00,001

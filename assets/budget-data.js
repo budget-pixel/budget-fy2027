@@ -684,6 +684,7 @@
     "00102012|581000|10259",
     "00102012|581000|10260",
     "00102012|581000|10720",
+    "00102012|581000|10760",
     "00102012|581000|10732",
     "00102012|581000|",
     "00102019|581000|10277",
@@ -4225,7 +4226,7 @@
         ])
         .concat(
           priorYearColumns.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year", "wc-fy-" + c.year] })),
-          [{ label: "FY 2027 Proposed", num: true }]
+          [{ label: "FY 2027 Tentative", num: true }]
         ),
       bodyRows: bodyRows
     });
@@ -4307,7 +4308,7 @@
     const printDetailTable = renderTable({
       columns: [{ label: isExpense ? "Object Name" : "Revenue Name" }]
         .concat(printYearColumns.map((c) => ({ label: printColumnLabel(c.label), num: true, classes: ["wc-prior-year", "wc-fy-" + c.year] })))
-        .concat([{ label: "FY 2027\nProposed", num: true }]),
+        .concat([{ label: "FY 2027\nTentative", num: true }]),
       bodyRows: printBodyRows,
       hideVisualCaption: true
     });
@@ -4728,7 +4729,7 @@
 
     const columns = []
       .concat(showDept ? [{ label: "Department" }] : [])
-      .concat([{ label: typeLabel }, { label: codeLabel }, { label: nameLabel }, { label: "FY 2027 Proposed", num: true }]);
+      .concat([{ label: typeLabel }, { label: codeLabel }, { label: nameLabel }, { label: "FY 2027 Tentative", num: true }]);
     const colCount = columns.length;
 
     const sorted = rows.slice().sort((a, b) => {
@@ -4819,7 +4820,7 @@
     const detail = options.detail || { button: "", detail: "" };
     const updated = lastUpdatedNoteHtml();
     const zeroClass = total === 0 ? " is-zero" : "";
-    const currentLabel = kind === "revenue" ? "FY 2027 Proposed Revenue" : "FY 2027 Proposed Budget";
+    const currentLabel = kind === "revenue" ? "FY 2027 Tentative Revenue" : "FY 2027 Tentative Budget";
     // Secondary sub-program cards (e.g. Code Compliance Beach) pass
     // showChange: false -- their FY2026 figures share the same per-account
     // dedup unreliability as their "View Prior Years" toggle (already
@@ -5716,7 +5717,7 @@
     });
     if (!html) return html;
     const millageCells = CONSOLIDATED_REVENUE_FUND_COLUMNS.map((fund) => {
-      if (fund.code === "001") return "3.4347";
+      if (fund.code === "001") return "3.2500";
       if (fund.code === "105") return "0.4410";
       return "&ndash;";
     }).concat(["&ndash;", "&ndash;"]);
@@ -5844,7 +5845,7 @@
       values.map((value) => '<td class="wc-num">' + (value ? paperCurrency(value) : "&ndash;") + '</td>').join("") + '</tr>';
     const predicateForRevenueType = (key) => (row) => String(row.Revenue_Type || "").trim().toLowerCase() === key.toLowerCase() && !discountRevenue(row);
 
-    const millageValues = directOperationalColumns.map((column) => column.key === "general" ? "3.4347" : (column.key === "mosquito" ? "0.4410" : "&ndash;")).concat(["&ndash;", "&ndash;", "&ndash;", "&ndash;"]);
+    const millageValues = directOperationalColumns.map((column) => column.key === "general" ? "3.2500" : (column.key === "mosquito" ? "0.4410" : "&ndash;")).concat(["&ndash;", "&ndash;", "&ndash;", "&ndash;"]);
     bodyRows.push('<tr class="wc-table-millage-row trim-table-gray-row"><td>Millage per $1,000</td>' + millageValues.map((value) => '<td class="wc-num">' + value + '</td>').join("") + '</tr>');
     bodyRows.push(moneyRow("Property Taxes (Ad Valorem)", propertyTaxValues));
     bodyRows.push(moneyRow("General Government Taxes (excluding Property Taxes)", paperValues(cache.revenues, (row) => predicateForRevenueType("General Government Taxes")(row) && !["311000", "311001", "389001"].includes(String(row.Revenue_Code || "").trim()), isRevenueTransfer)));
@@ -7615,7 +7616,7 @@
         '</details>' +
         '<details id="forecast-expense-assumptions" class="wc-forecast-detail wc-forecast-assumptions-detail">' +
           '<summary>Expenditure Assumptions</summary>' +
-          '<p class="wc-forecast-assumptions-intro">Expenditure assumptions are developed using normalized historical spending, known recurring operating needs, personnel cost expectations, capital exclusions, and management judgment. One-time capital purchases, administrative pass-throughs, land purchases, and other nonrecurring items are excluded from trend calculations where they would distort future operating growth. The FY 2027 baseline remains the proposed budget; these adjustments affect only the growth assumptions applied to future years.</p>' +
+          '<p class="wc-forecast-assumptions-intro">Expenditure assumptions are developed using normalized historical spending, known recurring operating needs, personnel cost expectations, capital exclusions, and management judgment. One-time capital purchases, administrative pass-throughs, land purchases, and other nonrecurring items are excluded from trend calculations where they would distort future operating growth. The FY 2027 baseline remains the tentative budget; these adjustments affect only the growth assumptions applied to future years.</p>' +
           renderForecastAssumptionsDetailTable(model, "expense") +
         '</details>' +
       '</section>' +
@@ -7629,7 +7630,7 @@
   // fallback when a row is not present in that cache.
   const FUND_SCHEDULE_YEAR_COLUMNS = BUDGET_LINE_PRIOR_YEAR_COLUMNS
     .concat([
-      { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
+      { field: "FY2027_Proposed", label: "FY 2027 Tentative" }
     ]);
 
   function fiscalYearForField(field) {
@@ -8678,7 +8679,7 @@
 
       executiveEl.innerHTML =
         '<div class="wc-budget-kpi-grid">' +
-          kpiCard("Total FY2027 proposed budget", compactCurrency(totalProposed), formatCurrency(totalProposed), "neutral") +
+          kpiCard("Total FY2027 tentative budget", compactCurrency(totalProposed), formatCurrency(totalProposed), "neutral") +
           kpiCard("Net dollar change", compactCurrency(netChange), netChange >= 0 ? "Increase from FY2026" : "Reduction from FY2026", netChange >= 0 ? "increase" : "decrease") +
           kpiCard("Net percent change", (netPct >= 0 ? "+" : "") + (netPct * 100).toFixed(1) + "%", "Countywide change", netPct >= 0 ? "increase" : "decrease") +
           kpiCard("Largest budget increase", largestIncrease ? compactCurrency(largestIncrease.change) : "None", largestIncrease ? largestIncrease.dept : "No department increase", "increase") +
@@ -9063,7 +9064,7 @@
     const detailTable = renderTable({
       columns: [{ label: "Category" }, { label: "Department" }].concat(
         BUDGET_LINE_PRIOR_YEAR_COLUMNS.map((c) => ({ label: c.label, num: true, classes: ["wc-prior-year"] })),
-        [{ label: "FY 2027 Proposed", num: true }]
+        [{ label: "FY 2027 Tentative", num: true }]
       ),
       bodyRows: bodyRows
     });
@@ -9597,7 +9598,7 @@
     // empty. See BUDGET_LINE_PRIOR_YEAR_COLUMNS for the same field used
     // everywhere else FY2026 is shown.
     { field: "FY2026_Original_Budget", label: "FY 2026 Budget" },
-    { field: "FY2027_Proposed", label: "FY 2027 Proposed" }
+    { field: "FY2027_Proposed", label: "FY 2027 Tentative" }
   ];
 
   const REVENUE_TOPIC_CHART_COLORS = [
@@ -11452,7 +11453,7 @@
       const total = filtered.reduce((s, r) => s + (r.FY2027_Proposed || 0), 0);
       summaryEl.innerHTML =
         '<p class="wc-filter-result-count">Showing ' + filtered.length.toLocaleString() + " of " + rows.length.toLocaleString() +
-        " rows &mdash; FY 2027 Proposed Total: " + formatCurrency(total) + "</p>";
+        " rows &mdash; FY 2027 Tentative Total: " + formatCurrency(total) + "</p>";
     }
 
     renderFilterControls(
@@ -13650,7 +13651,7 @@
       return (
         '<details class="wc-alignment-department">' +
           '<summary><span class="wc-alignment-department-summary-copy"><strong>' + heading + '</strong><small>' + summaryDetail + '</small></span>' +
-          '<span class="wc-alignment-department-heading"><span>FY 2027 proposed department budget</span><strong>' + formatCurrency(department.amount) + "</strong></span></summary>" +
+          '<span class="wc-alignment-department-heading"><span>FY 2027 tentative department budget</span><strong>' + formatCurrency(department.amount) + "</strong></span></summary>" +
           goalGroupHtml +
         "</details>"
       );
@@ -13661,7 +13662,7 @@
         '<summary><span class="wc-alignment-roman">' + initiative.code + '.</span><span class="wc-alignment-summary-copy"><strong>' +
         escapeHtml(initiative.title) + '</strong><small>' + departmentList.length + " " + (departmentList.length === 1 ? "department" : "departments") +
         " · " + goalCount + " " + (goalCount === 1 ? "goal" : "goals") + " · " + formatCurrency(initiativeAmount) +
-        " in proposed department budgets</small></span></summary>" +
+        " in tentative department budgets</small></span></summary>" +
         '<div class="wc-alignment-initiative-body"><button type="button" class="wc-priority-back" data-initiative-filter="all">&larr; All priorities</button>' +
         (departmentHtml || '<p class="wc-alignment-empty">No aligned department goals are currently listed.</p>') + "</div>" +
       "</details>"

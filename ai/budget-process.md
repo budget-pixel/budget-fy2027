@@ -24,7 +24,7 @@ The tentative budget is reviewed publicly with the Board of County Commissioners
 
 ### Phase 4: Adoption
 
-Florida law requires public hearings before the Board adopts the final millage rate and annual operating budget. This is the point at which the "proposed" budget becomes the "adopted" budget for the fiscal year. See [How to Read the Budget](how-to-read-the-budget.md) for the distinction between these terms.
+Florida law requires public hearings before the Board adopts the final millage rate and annual operating budget. This is the point at which the "tentative" budget becomes the "adopted" budget for the fiscal year. See [How to Read the Budget](how-to-read-the-budget.md) for the distinction between these terms.
 
 ## Basis of Budgeting
 
@@ -63,7 +63,7 @@ A public hearing is a formally noticed meeting where residents can comment befor
 
 ## Common Misconceptions
 
-- **"The budget is finalized the moment it's proposed."** A proposed budget still has to go through public review, workshops, and legally required hearings before it is adopted — see [How to Read the Budget](how-to-read-the-budget.md).
+- **"The budget is finalized the moment it's proposed."** A tentative budget still has to go through public review, workshops, and legally required hearings before it is adopted — see [How to Read the Budget](how-to-read-the-budget.md).
 - **"Once adopted, the budget can never change."** It can be amended by Board resolution during the fiscal year under specific statutory conditions, though total fund-level appropriations remain legally controlled.
 - **"Grant funding is available to spend as soon as a grant is announced."** Grant revenue is generally added to the budget only after the grant agreement is executed.
 
